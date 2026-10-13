@@ -31,6 +31,7 @@ the first table; go to a game's documents when you work on that game.
 | [port/README.md](port/README.md) | The native port, OpenGOAL's way: no emulation; what is decided and open ([DESIGN.md](port/DESIGN.md)), the order of work ([ROADMAP.md](port/ROADMAP.md)) |
 | [port/DECOMP_STATUS.md](port/DECOMP_STATUS.md), [port/PORTABILITY.md](port/PORTABILITY.md) | How much of Ratchet & Clank (PAL) is C a PC could build; what the matching C assumes about the console |
 | [port/RENDERER.md](port/RENDERER.md) | How the game builds a frame, everything it draws, the VU programs, the graphics chip's conventions |
+| [port/PERF_OVERLAY.md](port/PERF_OVERLAY.md) | The port's performance overlay: the frame's stages and what slows the game, turned on from the launcher |
 | [port/RAC1_PAL_SURVEY.md](port/RAC1_PAL_SURVEY.md) | Ratchet & Clank's frame loop, display list, microprograms, menu path, disc, memory card and library surface, from the decompilation |
 | [port/VU_PROGRAMS.md](port/VU_PROGRAMS.md) | The games' vector unit programs by name: where the executables list them, which ones the games share |
 | [port/OPENGOAL_NOTES.md](port/OPENGOAL_NOTES.md) | How OpenGOAL's renderer and platform layer work, and what carries over |

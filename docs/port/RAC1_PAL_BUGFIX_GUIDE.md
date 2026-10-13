@@ -104,6 +104,8 @@ All are environment variables read by the game.
 | `OPENRAC_DEBUG=1`, `OPENRAC_TRACE_MISSING=1` | More log; the host stack of the first call to each function without C |
 | `OPENRAC_SHOT=N:PREFIX`, `OPENRAC_SHOT_FROM` | Screenshots |
 | `OPENRAC_NO_BLEND=1`, `OPENRAC_UNCAPPED=1` | One frame a tick; no wait between frames |
+| `OPENRAC_PERF=1` (or `--perf`), `OPENRAC_PERF_CSV=FILE` | The performance overlay, F3 cycling it; each tick written to FILE ([PERF_OVERLAY.md](PERF_OVERLAY.md)) |
+| `OPENRAC_FPS=1`, `OPENRAC_HITCH=1` | Ticks per second every 300 ticks; each tick a quarter longer than it should be, in the log |
 | `SDL_AUDIODRIVER=disk` with `SDL_AUDIO_DISK_OUTPUT_FILE=FILE` | Writes what would be played to FILE as raw 16-bit stereo at 48 kHz, in silence, for measuring levels |
 
 Addresses worth knowing (PAL):
