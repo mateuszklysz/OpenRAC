@@ -63,8 +63,10 @@ void Recorder::charge(Clock::time_point now) {
 
 void Recorder::begin(Stage stage, Clock::time_point now) {
     charge(now);
+    // A frame drawn between ticks is charged as a whole, but for its swap and any wait.
     const bool inside_between = !m_open.empty() && m_open.back().charge == Stage::Between;
-    m_open.push_back({stage, inside_between && stage != Stage::Swap ? Stage::Between : stage});
+    const bool own = stage == Stage::Swap || stage == Stage::Pace;
+    m_open.push_back({stage, inside_between && !own ? Stage::Between : stage});
 }
 
 void Recorder::end(Clock::time_point now) {
@@ -96,63 +98,13 @@ void Recorder::tick(Clock::time_point now, double budget_ms, int level) {
     r.tick = m_ticks++;
     r.level = level;
     r.budget_ms = budget_ms;
-    r.total_ms = 0.0;
     for (double ms : r.stage_ms) {
         r.total_ms += ms;
     }
-    for (std::size_t i = 0; i < kCounters; ++i) {
-        r.counts[i] = grown(m_totals[i], m_last_totals[i]);
-    }
-    m_last_totals = m_totals;
-    for (const RendererTime& t : m_renderer_totals) {
-        RendererTime d = t;
-        for (const RendererTime& before : m_last_renderer_totals) {
-            if (before.name == t.name) {
-                d.cpu_ms = grown(t.cpu_ms, before.cpu_ms);
-                d.gpu_ms = grown(t.gpu_ms, before.gpu_ms);
-                break;
-            }
-        }
-        r.gpu_ms += d.gpu_ms;
-        r.renderers.push_back(std::move(d));
-    }
-    m_last_renderer_totals = m_renderer_totals;
-
-    // A hitch: a tick a quarter longer than the game's.
-    if (budget_ms > 0.0 && r.total_ms > 1.25 * budget_ms) {
-        Hitch h{r.tick, r.total_ms, Stage::Game, 0.0, {}};
-        for (std::size_t i = 0; i < kStages; ++i) {
-            const auto s = static_cast<Stage>(i);
-            if (s != Stage::Pace && r.stage_ms[i] > h.stage_ms) {
-                h.stage = s;
-                h.stage_ms = r.stage_ms[i];
-            }
-        }
-        if (level != m_level) {
-            h.note = "level change";
-        } else if (const auto sectors = r.count(Counter::Sectors); sectors > 0) {
-            h.note = std::format("{} sectors read", sectors);
-        } else if (const auto conversions = r.count(Counter::Conversions); conversions > 0) {
-            h.note = std::format("{} textures converted", conversions);
-        }
-        m_hitches.push_back(std::move(h));
-        if (m_hitches.size() > kHitches) {
-            m_hitches.erase(m_hitches.begin());
-        }
-    }
+    count_growth(r);
+    note_hitch(r);
+    write_line(r);
     m_level = level;
-
-    if (m_csv != nullptr) {
-        std::string line = std::format("{},{},{:.3f},{:.3f}", r.tick, r.level, r.budget_ms, r.total_ms);
-        for (double ms : r.stage_ms) {
-            line += std::format(",{:.3f}", ms);
-        }
-        for (std::uint64_t n : r.counts) {
-            line += std::format(",{}", n);
-        }
-        line += std::format(",{:.3f}\n", r.gpu_ms);
-        std::fputs(line.c_str(), m_csv);
-    }
 
     if (m_ring.size() < kHistory) {
         m_ring.push_back(std::move(r));
@@ -163,30 +115,85 @@ void Recorder::tick(Clock::time_point now, double budget_ms, int level) {
     m_current = Record{};
 }
 
-std::vector<Record> Recorder::history() const {
-    if (m_ring.size() < kHistory) {
-        return m_ring;
+// What the running totals grew by since the last tick.
+void Recorder::count_growth(Record& r) {
+    for (std::size_t i = 0; i < kCounters; ++i) {
+        r.counts[i] = grown(m_totals[i], m_last_totals[i]);
     }
-    std::vector<Record> out;
-    out.reserve(kHistory);
-    for (std::size_t i = 0; i < kHistory; ++i) {
-        out.push_back(m_ring[(m_next + i) % kHistory]);
+    m_last_totals = m_totals;
+    for (const RendererTime& now : m_renderer_totals) {
+        RendererTime d = now;
+        for (const RendererTime& before : m_last_renderer_totals) {
+            if (before.name == now.name) {
+                d.cpu_ms = grown(now.cpu_ms, before.cpu_ms);
+                d.gpu_ms = grown(now.gpu_ms, before.gpu_ms);
+                break;
+            }
+        }
+        r.gpu_ms += d.gpu_ms;
+        r.renderers.push_back(std::move(d));
     }
-    return out;
+    m_last_renderer_totals = m_renderer_totals;
+}
+
+// A hitch: a tick a quarter longer than the game's, kept with the stage that took longest and
+// what else happened in it.
+void Recorder::note_hitch(const Record& r) {
+    if (r.budget_ms <= 0.0 || r.total_ms <= 1.25 * r.budget_ms) {
+        return;
+    }
+    Hitch h{r.tick, r.total_ms, Stage::Game, 0.0, {}};
+    for (std::size_t i = 0; i < kStages; ++i) {
+        const auto s = static_cast<Stage>(i);
+        if (s != Stage::Pace && r.stage_ms[i] > h.stage_ms) {
+            h.stage = s;
+            h.stage_ms = r.stage_ms[i];
+        }
+    }
+    if (r.level != m_level) {
+        h.note = "level change";
+    } else if (const auto sectors = r.count(Counter::Sectors); sectors > 0) {
+        h.note = std::format("{} sectors read", sectors);
+    } else if (const auto conversions = r.count(Counter::Conversions); conversions > 0) {
+        h.note = std::format("{} textures converted", conversions);
+    }
+    m_hitches.push_back(std::move(h));
+    if (m_hitches.size() > kHitches) {
+        m_hitches.erase(m_hitches.begin());
+    }
+}
+
+void Recorder::write_line(const Record& r) {
+    if (m_csv == nullptr) {
+        return;
+    }
+    std::string line = std::format("{},{},{:.3f},{:.3f}", r.tick, r.level, r.budget_ms, r.total_ms);
+    for (double ms : r.stage_ms) {
+        line += std::format(",{:.3f}", ms);
+    }
+    for (std::uint64_t n : r.counts) {
+        line += std::format(",{}", n);
+    }
+    line += std::format(",{:.3f}\n", r.gpu_ms);
+    std::fputs(line.c_str(), m_csv);
+}
+
+const Record& Recorder::record(std::size_t i) const {
+    // Until the ring is full its records are in order; then the oldest is the next to be replaced.
+    return m_ring.size() < kHistory ? m_ring[i] : m_ring[(m_next + i) % kHistory];
 }
 
 Summary Recorder::summary(std::size_t ticks) const {
     Summary s;
-    const std::vector<Record> all = history();
-    const std::size_t n = std::min(ticks, all.size());
+    const std::size_t n = std::min(ticks, size());
     if (n == 0) {
         s.verdict = "measuring";
         return s;
     }
     s.ticks = n;
     std::size_t late = 0;
-    for (std::size_t i = all.size() - n; i < all.size(); ++i) {
-        const Record& r = all[i];
+    for (std::size_t i = size() - n; i < size(); ++i) {
+        const Record& r = record(i);
         s.budget_ms = r.budget_ms;
         s.total_ms += r.total_ms;
         s.work_ms += r.work_ms();
@@ -313,20 +320,30 @@ Scope::~Scope() {
     }
 }
 
+namespace {
+
+// OPENRAC_PERF_CSV=FILE: each tick, as a line of FILE (left open until the program exits).
+void open_csv() {
+    const char* path = std::getenv("OPENRAC_PERF_CSV");
+    if (path == nullptr || path[0] == '\0') {
+        return;
+    }
+    if (std::FILE* f = std::fopen(path, "w")) {
+        recorder().write_csv(f);
+    }
+}
+
+}  // namespace
+
 void tick(double budget_ms, int level) {
     if (!g_enabled) {
         return;
     }
-    // OPENRAC_PERF_CSV=FILE: each tick, as a line of FILE.
-    static const bool csv = [] {
-        if (const char* path = std::getenv("OPENRAC_PERF_CSV"); path != nullptr && path[0] != '\0') {
-            if (std::FILE* f = std::fopen(path, "w")) {
-                recorder().write_csv(f);  // closed at exit
-            }
-        }
-        return true;
-    }();
-    (void)csv;
+    static bool csv_opened = false;
+    if (!csv_opened) {
+        csv_opened = true;
+        open_csv();
+    }
     recorder().tick(Clock::now(), budget_ms, level);
 }
 

@@ -85,11 +85,16 @@ int Picture::text(int x, int y, std::string_view t, std::uint32_t colour) {
     return x;
 }
 
-void PictureBlitter::blit(const Picture& p, unsigned framebuffer, int target_height, int x0, int y0, int w, int h) {
+int Picture::panel(std::string_view title) {
+    fill(0, 0, width, height, kMenuFrame);
+    fill(2, 2, width - 2, height - 2, kMenuNavy);
+    text(10, 9, title, kMenuTitle);
+    fill(8, 20, width - 8, 21, kMenuFrame);
+    return 27;
+}
+
+void PictureBlitter::upload(const Picture& p) {
     using namespace openrac::gl;
-    if (p.width <= 0 || p.height <= 0) {
-        return;
-    }
     if (m_texture == 0) {
         glGenTextures(1, &m_texture);
         glGenFramebuffers(1, &m_framebuffer);
@@ -100,13 +105,22 @@ void PictureBlitter::blit(const Picture& p, unsigned framebuffer, int target_hei
                  GL_UNSIGNED_BYTE, p.rgba.data());
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, static_cast<GLint>(GL_NEAREST));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, static_cast<GLint>(GL_NEAREST));
+    m_width = p.width;
+    m_height = p.height;
+}
+
+void PictureBlitter::blit(unsigned framebuffer, int target_height, int x0, int y0, int w, int h) {
+    using namespace openrac::gl;
+    if (m_width <= 0 || m_height <= 0) {
+        return;
+    }
     glBindFramebuffer(GL_READ_FRAMEBUFFER, m_framebuffer);
     glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_texture, 0);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer);
     glDisable(GL_SCISSOR_TEST);
     // The picture's first row is its top; GL's framebuffer counts rows from the bottom.
     const int top = target_height - y0;
-    glBlitFramebuffer(0, 0, p.width, p.height, x0, top, x0 + w, top - h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    glBlitFramebuffer(0, 0, m_width, m_height, x0, top, x0 + w, top - h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
@@ -118,6 +132,8 @@ void PictureBlitter::release() {
         glDeleteFramebuffers(1, &m_framebuffer);
         m_texture = 0;
         m_framebuffer = 0;
+        m_width = 0;
+        m_height = 0;
     }
 }
 

@@ -10,7 +10,8 @@
 // A tick runs from one vertical blank the game waits for to the next (main.cpp,
 // openrac_game_vsync): the game's own code, then the port's frame (frontend.cpp), the frames drawn
 // between ticks and the wait for the next tick. Stages nest: time is charged to the innermost one
-// open, so a tick's stages add up to its length. Inside Between only Swap is told apart.
+// open, so a tick's stages add up to its length. Inside Between only Swap and Pace are told apart:
+// the rest of a frame drawn between ticks is that frame's cost.
 //
 // Nothing here needs GL or a window: the headless program keeps the same records, and the tests
 // drive a Recorder with their own clock.
@@ -124,8 +125,11 @@ public:
     // A vertical blank: closes the tick that ends now. The first call only starts the count.
     void tick(Clock::time_point now, double budget_ms, int level);
 
-    // The records, oldest first.
-    std::vector<Record> history() const;
+    // The records kept, at most kHistory; record(0) is the oldest.
+    std::size_t size() const { return m_ring.size(); }
+    const Record& record(std::size_t i) const;
+
+    // The last hitches, oldest first.
     const std::vector<Hitch>& hitches() const { return m_hitches; }
 
     // Averages over the last `ticks` ticks, and what holds the game back.
@@ -141,6 +145,9 @@ private:
     };
 
     void charge(Clock::time_point now);
+    void count_growth(Record& r);
+    void note_hitch(const Record& r);
+    void write_line(const Record& r);
 
     std::vector<Open> m_open;
     Clock::time_point m_mark{};

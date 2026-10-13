@@ -191,35 +191,24 @@ void move(int by) {
 
 // ---- Drawing: a picture made on the CPU in the chip's pixels, blitted over the frame (picture.h) ----
 
-// The game's menu colours (its panels' navy, khaki frame, light blue and yellow text).
-constexpr std::uint32_t kNavy = rgba(14, 14, 30);
-constexpr std::uint32_t kFrame = rgba(150, 146, 104);
-constexpr std::uint32_t kText = rgba(136, 168, 255);
-constexpr std::uint32_t kSelected = rgba(255, 255, 64);
-constexpr std::uint32_t kTitle = rgba(230, 230, 230);
-constexpr std::uint32_t kHint = rgba(120, 120, 140);
-
 constexpr int kRow = 10;
 constexpr int kPanelWidth = 232;
 constexpr int kPanelHeight = 30 + 19 * kRow + 18;
 
 Picture make_picture(const Game& game) {
     Picture p(kPanelWidth, kPanelHeight);
-    p.fill(0, 0, p.width, p.height, kFrame);
-    p.fill(2, 2, p.width - 2, p.height - 2, kNavy);
-    p.text(10, 9, "OPENRAC DEBUG: START A LEVEL", kTitle);
-    p.fill(8, 20, p.width - 8, 21, kFrame);
+    const int top = p.panel("OPENRAC DEBUG: START A LEVEL");
     for (int i = 0; i < 19; ++i) {
-        const int y = 27 + i * kRow;
+        const int y = top + i * kRow;
         const bool sel = i == s.cursor;
         if (sel) {
-            p.fill(6, y - 2, p.width - 6, y + 9, rgba(36, 36, 70));
-            p.text(10, y, ">", kSelected);
+            p.fill(6, y - 2, p.width - 6, y + 9, kMenuHighlight);
+            p.text(10, y, ">", kMenuYellow);
         }
         const std::string number = (i < 10 ? " " : "") + std::to_string(i);
-        p.text(20, y, number + "  " + game.levels[static_cast<std::size_t>(i)], sel ? kSelected : kText);
+        p.text(20, y, number + "  " + game.levels[static_cast<std::size_t>(i)], sel ? kMenuYellow : kMenuText);
     }
-    p.text(10, p.height - 12, "X/RETURN START   TRIANGLE/F1 CLOSE", kHint);
+    p.text(10, p.height - 12, "X/RETURN START   TRIANGLE/F1 CLOSE", kMenuHint);
     return p;
 }
 
@@ -354,7 +343,8 @@ void draw(unsigned framebuffer, int width, int height) {
     const float sy = static_cast<float>(height) / 448.0f;
     const int w = static_cast<int>(static_cast<float>(p.width) * sx);
     const int h = static_cast<int>(static_cast<float>(p.height) * sy);
-    s.blitter.blit(p, framebuffer, height, (width - w) / 2, (height - h) / 2, w, h);
+    s.blitter.upload(p);
+    s.blitter.blit(framebuffer, height, (width - w) / 2, (height - h) / 2, w, h);
 }
 
 void release() {

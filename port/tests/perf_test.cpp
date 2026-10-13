@@ -59,9 +59,8 @@ void stages_add_up() {
     one_tick(r, t, 6, 3, 2, 4, 3);
     t += milliseconds(5);
     r.tick(t, 20.0, 3);
-    const std::vector<Record> h = r.history();
-    CHECK(h.size() == 2);
-    const Record& rec = h.back();
+    CHECK(r.size() == 2);
+    const Record& rec = r.record(1);
     CHECK(near(rec.stage(Stage::Game), 5.0));    // the game ran 5 ms before the second blank
     CHECK(near(rec.stage(Stage::Input), 1.0));
     CHECK(near(rec.stage(Stage::Render), 3.0));
@@ -70,6 +69,31 @@ void stages_add_up() {
     CHECK(near(rec.stage(Stage::Pace), 3.0));
     CHECK(near(rec.total_ms, 19.0));
     CHECK(near(rec.work_ms(), 13.0));
+}
+
+// A frame drawn between ticks is its own cost, but for its swap and the wait for the refresh.
+void between_keeps_swap_and_wait() {
+    Recorder r;
+    Clock::time_point t{};
+    r.tick(t, 20.0, 0);
+    r.begin(Stage::Between, t);
+    r.begin(Stage::Scene, t);
+    t += milliseconds(2);
+    r.end(t);
+    r.begin(Stage::Swap, t);
+    t += milliseconds(3);
+    r.end(t);
+    r.begin(Stage::Pace, t);
+    t += milliseconds(4);
+    r.end(t);
+    r.end(t);
+    r.tick(t, 20.0, 0);
+    CHECK(r.size() == 1);
+    const Record& rec = r.record(0);
+    CHECK(near(rec.stage(Stage::Between), 2.0));
+    CHECK(near(rec.stage(Stage::Scene), 0.0));
+    CHECK(near(rec.stage(Stage::Swap), 3.0));
+    CHECK(near(rec.stage(Stage::Pace), 4.0));
 }
 
 void counters_grow() {
@@ -87,15 +111,16 @@ void counters_grow() {
     r.set_renderers(std::vector<RendererTime>{{"tie", 1.0, 2.0}});
     t += milliseconds(10);
     r.tick(t, 20.0, 0);
-    const std::vector<Record> h = r.history();
-    CHECK(h.size() == 2);
-    CHECK(h[0].count(Counter::Sectors) == 64);
-    CHECK(h[0].renderers.size() == 2);
-    CHECK(near(h[0].renderers[0].cpu_ms, 1.5));
-    CHECK(near(h[0].renderers[1].gpu_ms, 0.25));
-    CHECK(near(h[0].gpu_ms, 2.25));
-    CHECK(h[1].count(Counter::Sectors) == 4);
-    CHECK(near(h[1].renderers[0].gpu_ms, 2.0));
+    CHECK(r.size() == 2);
+    const Record& first = r.record(0);
+    const Record& second = r.record(1);
+    CHECK(first.count(Counter::Sectors) == 64);
+    CHECK(first.renderers.size() == 2);
+    CHECK(near(first.renderers[0].cpu_ms, 1.5));
+    CHECK(near(first.renderers[1].gpu_ms, 0.25));
+    CHECK(near(first.gpu_ms, 2.25));
+    CHECK(second.count(Counter::Sectors) == 4);
+    CHECK(near(second.renderers[0].gpu_ms, 2.0));
 }
 
 void verdicts() {
@@ -164,16 +189,16 @@ void history_keeps_the_last() {
         t += milliseconds(20);
         r.tick(t, 20.0, 0);
     }
-    const std::vector<Record> h = r.history();
-    CHECK(h.size() == Recorder::kHistory);
-    CHECK(h.front().tick == 10);
-    CHECK(h.back().tick == Recorder::kHistory + 9);
+    CHECK(r.size() == Recorder::kHistory);
+    CHECK(r.record(0).tick == 10);
+    CHECK(r.record(Recorder::kHistory - 1).tick == Recorder::kHistory + 9);
 }
 
 }  // namespace
 
 int main() {
     stages_add_up();
+    between_keeps_swap_and_wait();
     counters_grow();
     verdicts();
     hitches();
