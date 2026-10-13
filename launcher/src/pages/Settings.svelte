@@ -167,8 +167,7 @@
           <span>
             <strong>Performance overlay</strong>
             <small>
-              The native port shows where each frame's time goes and what slows the game. F3 in the game switches it
-              between full, compact and off.
+              Over the game: where each frame's time goes and what slows it. F3 in the game shrinks or hides it.
             </small>
           </span>
         </label>
