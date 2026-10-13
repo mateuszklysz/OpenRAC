@@ -33,6 +33,8 @@ export interface Config {
   installDir: string | null;
   /** Show what contributors use (builds, checks, progress); off, a player's three steps. */
   developer: boolean;
+  /** With developer tools on: the native port's performance overlay (OPENRAC_PERF). */
+  perfOverlay: boolean;
   setupComplete: boolean;
   lastVersion: string | null;
   discordRpc: boolean;

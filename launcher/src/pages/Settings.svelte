@@ -161,6 +161,18 @@
           </small>
         </span>
       </label>
+      {#if draft.developer}
+        <label class="option">
+          <input type="checkbox" bind:checked={draft.perfOverlay} />
+          <span>
+            <strong>Performance overlay</strong>
+            <small>
+              The native port shows where each frame's time goes and what slows the game. F3 in the game switches it
+              between full, compact and off.
+            </small>
+          </span>
+        </label>
+      {/if}
       {#if draft.developer && draft.discordRpc}
         <div class="field">
           <label for="discord-client-id">Discord application ID</label>

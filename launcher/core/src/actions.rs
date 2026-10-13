@@ -413,10 +413,14 @@ impl Action {
             None => self.label.clone(),
         };
         // Developer tools on: the native port offers its developer features (a level select in the
-        // front end's Options).
+        // front end's Options), and its performance overlay when that is on too
+        // (port/game/common/perf.h).
         let mut env = Vec::new();
         if self.kind == Kind::Play && ctx.config.developer {
             env.push(("OPENRAC_DEVELOPER".to_string(), "1".to_string()));
+            if ctx.config.perf_overlay {
+                env.push(("OPENRAC_PERF".to_string(), "1".to_string()));
+            }
         }
         Ok(Plan { title, program, args, cwd, detached: self.detached, env })
     }
@@ -602,5 +606,18 @@ mod tests {
         let plan = play.plan(&ctx(&installed)).unwrap();
         let data = Path::new("/games").join("active").join("rac1").join("data");
         assert_eq!(plan.args[1], data.display().to_string());
+        assert!(plan.env.is_empty());
+
+        // Developer tools: the port's developer features, and its performance overlay when asked for
+        // (only with developer tools on, where the setting is shown).
+        let overlay_only = Config { perf_overlay: true, ..installed.clone() };
+        assert!(play.plan(&ctx(&overlay_only)).unwrap().env.is_empty());
+        let developer = Config { developer: true, ..installed.clone() };
+        assert_eq!(play.plan(&ctx(&developer)).unwrap().env, [("OPENRAC_DEVELOPER".to_string(), "1".to_string())]);
+        let profiling = Config { perf_overlay: true, ..developer.clone() };
+        assert_eq!(
+            play.plan(&ctx(&profiling)).unwrap().env,
+            [("OPENRAC_DEVELOPER".to_string(), "1".to_string()), ("OPENRAC_PERF".to_string(), "1".to_string())]
+        );
     }
 }

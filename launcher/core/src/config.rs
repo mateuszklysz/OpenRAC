@@ -20,6 +20,9 @@ pub struct Config {
     /// Show what contributors use: builds, checks, toolchains, progress.
     /// Off, the launcher shows a player's three steps: set up from your disc, play, edit levels.
     pub developer: bool,
+    /// With developer tools on: the game shows the native port's performance overlay (the frame's
+    /// pipeline and what slows it; F3 cycles it in the game). Off by default.
+    pub perf_overlay: bool,
     /// Where games are set up from the player's discs (OpenGOAL's install
     /// directory); unset: the launcher's per-user data folder.
     pub install_dir: Option<PathBuf>,
@@ -44,6 +47,7 @@ impl Default for Config {
             docker: None,
             install_dir: None,
             developer: false,
+            perf_overlay: false,
             setup_complete: false,
             last_version: None,
             discord_rpc: true,

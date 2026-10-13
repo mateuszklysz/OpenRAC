@@ -96,6 +96,7 @@ let config: Config = {
   docker: "/usr/bin/docker",
   // ?developer shows the contributor's pages.
   developer: new URLSearchParams(typeof location === "undefined" ? "" : location.search).has("developer"),
+  perfOverlay: false,
   // ?setup opens the first-run screen.
   setupComplete: !new URLSearchParams(typeof location === "undefined" ? "" : location.search).has("setup"),
   installDir: "/home/you/.local/share/dev.openrac.launcher",
