@@ -140,7 +140,7 @@ function(openrac_add_game config)
     set_source_files_properties(${host} PROPERTIES COMPILE_OPTIONS "-Wall;-Wextra")
   endif()
 
-  add_executable(openrac-${id} "${OPENRAC_GAME_DIR}/common/main.cpp")
+  add_executable(openrac-${id} "${OPENRAC_GAME_DIR}/common/main.cpp" "${OPENRAC_GAME_DIR}/common/perf.cpp")
   target_link_libraries(openrac-${id} PRIVATE openrac_${target_id}_game openrac_runtime)
   # The window: the renderer draws what the game holds in memory (game/common/frontend.h).
   if(TARGET openrac_viewer_lib AND TARGET openrac_platform)
@@ -148,7 +148,8 @@ function(openrac_add_game config)
                                          "${OPENRAC_GAME_DIR}/common/debug_menu.cpp"
                                          "${OPENRAC_GAME_DIR}/common/options_menu.cpp"
                                          "${OPENRAC_GAME_DIR}/common/settings.cpp"
-                                         "${OPENRAC_GAME_DIR}/common/picture.cpp")
+                                         "${OPENRAC_GAME_DIR}/common/picture.cpp"
+                                         "${OPENRAC_GAME_DIR}/common/perf_overlay.cpp")
     target_link_libraries(openrac-${id} PRIVATE openrac_viewer_lib openrac_platform)
     target_compile_definitions(openrac-${id} PRIVATE OPENRAC_FRONTEND=1)
     # The window's icon: OpenRAC's own, the launcher's, embedded as PNG bytes.

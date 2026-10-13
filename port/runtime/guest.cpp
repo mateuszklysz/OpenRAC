@@ -8,6 +8,7 @@
 #include "openrac/guest.h"
 
 #include <algorithm>
+#include <atomic>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -113,6 +114,7 @@ void unknown_function() {
 
 std::mutex g_missing_lock;
 std::map<std::string, unsigned long> g_missing;
+std::atomic<unsigned long long> g_missing_calls{0};
 bool g_stop_on_missing = false;
 
 }  // namespace
@@ -298,6 +300,7 @@ const char* openrac_guest_function_name(gaddr address) {
 }
 
 void openrac_guest_missing(const char* name) {
+    g_missing_calls.fetch_add(1, std::memory_order_relaxed);
     {
         std::scoped_lock hold(g_missing_lock);
         if (g_missing[name]++ != 0) {
@@ -324,6 +327,10 @@ void openrac_guest_missing(const char* name) {
         std::exit(2);
     }
     warn("{} has no C in the port yet; it does nothing", name);
+}
+
+unsigned long long openrac_guest_missing_calls(void) {
+    return g_missing_calls.load(std::memory_order_relaxed);
 }
 
 void openrac_guest_stop_on_missing(int stop) {

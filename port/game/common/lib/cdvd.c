@@ -110,6 +110,13 @@ int openrac_lib_sceCdMmode(int media) {
     return 1;
 }
 
+/* The sectors read so far (openrac_game_cd_sectors_read). */
+static unsigned long long sectors_read;
+
+unsigned long long openrac_game_cd_sectors_read(void) {
+    return sectors_read;
+}
+
 /* sceCdRead(sector, count, buffer, mode) */
 int openrac_lib_sceCdRead(unsigned int sector, unsigned int count, gaddr buffer, gaddr mode) {
     (void)mode;
@@ -134,6 +141,7 @@ int openrac_lib_sceCdRead(unsigned int sector, unsigned int count, gaddr buffer,
         return 0;
     }
     apply_patches(sector, count, (unsigned char*)G(buffer));
+    sectors_read += count;
     last_error = 0;
     return 1;
 }

@@ -4,6 +4,8 @@
 #include "frontend.h"
 #include "debug_menu.h"
 #include "options_menu.h"
+#include "perf.h"
+#include "perf_overlay.h"
 #include "settings.h"
 
 #include <SDL3/SDL.h>
@@ -505,6 +507,7 @@ void use_level(int number) {
     const bool fresh = !g->renderer;
     if (fresh) {
         g->renderer = std::make_unique<renderer::Renderer>();
+        g->renderer->set_timing(perf::enabled());
         for (const renderer::ImageUpload& image : g->images) {
             g->renderer->textures().upload(image);
         }
@@ -1116,7 +1119,10 @@ float alpha_at(std::chrono::steady_clock::time_point display) {
 void swapped(std::chrono::steady_clock::time_point started) {
     using namespace std::chrono;
     const auto before = steady_clock::now();
-    g->window->swap();
+    {
+        const perf::Scope swap(perf::Stage::Swap);
+        g->window->swap();
+    }
     const auto after = steady_clock::now();
     pacing.cost = 0.8 * pacing.cost + 0.2 * duration<double>(before - started).count();
     // The refresh interval: the display's mode (read again now and then: the window may move).
@@ -1135,6 +1141,7 @@ void swapped(std::chrono::steady_clock::time_point started) {
             static steady_clock::time_point due{};
             const auto step = duration_cast<steady_clock::duration>(duration<double>(1.0 / cap));
             due = due.time_since_epoch().count() == 0 || after > due + 2 * step ? after : due + step;
+            const perf::Scope pace(perf::Stage::Pace);
             std::this_thread::sleep_until(due);
         }
         return;
@@ -1144,6 +1151,7 @@ void swapped(std::chrono::steady_clock::time_point started) {
     if (duration<double>(after - before).count() < 0.0005) {
         pacing.last_swap = {};
         if (pacing.interval > 0.0) {
+            const perf::Scope pace(perf::Stage::Pace);
             std::this_thread::sleep_until(started + duration_cast<steady_clock::duration>(duration<double>(pacing.interval)));
         }
         return;
@@ -1359,8 +1367,10 @@ void draw_kept(bool first) {
         };
     }
     if (g->renderer) {
+        const perf::Scope render(perf::Stage::Render);
         g->renderer->render(input, {g->frame.id(), width, height, picture_scale});
     }
+    const perf::Scope present_stage(perf::Stage::Present);
     debug_menu::draw(g->frame.id(), width, height);
     // OPENRAC_SHOT=FRAME:FILE.png writes that frame (for checking without looking at the screen);
     // OPENRAC_SHOT_BETWEEN also writes the frames drawn between ticks (FILE<frame>_b<n>.png).
@@ -1383,6 +1393,8 @@ void draw_kept(bool first) {
         }
     }
     present(g->frame.id(), width, height, window_width, window_height, false, aspect);
+    // The performance overlay at the window's own pixels, over the picture (perf_overlay.h).
+    perf_overlay::draw(window_width, window_height);
     swapped(started);
 }
 
@@ -1419,6 +1431,11 @@ bool window_key(const SDL_Event& event) {
     if (event.type != SDL_EVENT_KEY_DOWN || event.key.repeat) {
         return false;
     }
+    // F3: the performance overlay off, compact or full, while the launcher has it on (perf.h).
+    if (event.key.key == SDLK_F3 && perf::enabled()) {
+        perf::cycle_mode();
+        return true;
+    }
     if (event.key.key == SDLK_F9 || event.key.key == SDLK_F10) {
         settings::set_volume(settings::get().volume + (event.key.key == SDLK_F10 ? 10 : -10));
         settings::save();
@@ -1442,6 +1459,8 @@ bool frame(std::span<const std::uint8_t> ram, std::uint32_t chain, std::uint32_t
     if (!g) {
         return true;
     }
+    std::optional<perf::Scope> stage;
+    stage.emplace(perf::Stage::Input);
     SDL_Event event;
     while (platform::poll_event(event)) {
         if (event.type == SDL_EVENT_QUIT
@@ -1461,6 +1480,8 @@ bool frame(std::span<const std::uint8_t> ram, std::uint32_t chain, std::uint32_t
     }
 
     // The level program loaded now (-1: the boot program, title and menus), as the port knows it.
+    stage.reset();
+    stage.emplace(perf::Stage::Scene);
     const int level = openrac_game_loaded_overlay();
     const viewer::GameAddresses& a =
         level >= 0 && level < 19 ? viewer::kRac1PalLevels[level] : viewer::kRac1Pal;
@@ -1813,6 +1834,7 @@ bool frame(std::span<const std::uint8_t> ram, std::uint32_t chain, std::uint32_t
     }
     // The tick's own frame (when frames are drawn between ticks, part way from the last tick's
     // scene, by the refresh it is shown at).
+    stage.reset();
     draw_kept(true);
     return true;
 }
@@ -1865,6 +1887,8 @@ int between(std::chrono::steady_clock::time_point next_tick) {
     if (next_display(std::chrono::steady_clock::now()) >= next_tick + lag) {
         return 0;
     }
+    std::optional<perf::Scope> input;
+    input.emplace(perf::Stage::Input);
     SDL_Event event;
     while (platform::poll_event(event)) {
         if (event.type == SDL_EVENT_QUIT
@@ -1876,6 +1900,7 @@ int between(std::chrono::steady_clock::time_point next_tick) {
         }
         g->input.handle_event(event);
     }
+    input.reset();
     const bool dump = renderer::g_dump_draws;
     renderer::g_dump_draws = false;
     draw_kept(false);
@@ -1930,9 +1955,29 @@ bool pad(int port, std::uint16_t* buttons, std::uint8_t analog[4]) {
     return true;
 }
 
+void perf_counters() {
+    if (!g || !g->renderer) {
+        return;
+    }
+    auto& rec = perf::recorder();
+    const renderer::RenderTotals& t = g->renderer->totals();
+    rec.set_counter(perf::Counter::Frames, t.frames);
+    rec.set_counter(perf::Counter::DrawCalls, t.draw_calls);
+    rec.set_counter(perf::Counter::Triangles, t.triangles);
+    rec.set_counter(perf::Counter::Uploads, g->renderer->textures().counts().uploads);
+    rec.set_counter(perf::Counter::Conversions, g->renderer->textures().counts().conversions);
+    std::vector<perf::RendererTime> times;
+    times.reserve(t.renderers.size());
+    for (const renderer::RendererTime& r : t.renderers) {
+        times.push_back({r.name, r.cpu_ms, r.gpu_ms});
+    }
+    rec.set_renderers(times);
+}
+
 void close() {
     if (g) {
         debug_menu::release();
+        perf_overlay::release();
         g->frame.release();
         g->picture.release();
         g->last_world.release();

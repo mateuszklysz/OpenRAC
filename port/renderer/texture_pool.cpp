@@ -93,6 +93,7 @@ void TexturePool::clear_placements() {
 }
 
 void TexturePool::upload(ImageUpload upload) {
+    m_counts.uploads++;
     if (upload.x != 0 || upload.y != 0) {
         // Uploads into the middle of a buffer (texture atlases) would need the
         // rectangle placed by its offset; the 2D path seen so far sends whole
@@ -218,6 +219,7 @@ TextureHandle TexturePool::convert_upload(const gs::Tex0& tex0, const gs::Texa& 
     if (auto found = m_converted.find(key); found != m_converted.end()) {
         return found->second;
     }
+    m_counts.conversions++;
     const std::vector<std::uint8_t> raster = texture_raster(it->second, tex0);
     Rgba8Image image =
         convert(raster, tex0.psm, tex0.width(), tex0.height(), colours, texa, AlphaScale::Gs);

@@ -15,6 +15,7 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
 #include <string>
 
 #if defined(_WIN32) && !defined(_WIN64)
@@ -37,6 +38,7 @@ using GLchar = char;
 using GLubyte = unsigned char;
 using GLsizeiptr = std::ptrdiff_t;
 using GLintptr = std::ptrdiff_t;
+using GLuint64 = std::uint64_t;
 
 // clang-format off
 inline constexpr GLboolean GL_FALSE = 0;
@@ -156,6 +158,11 @@ inline constexpr GLenum GL_COLOR_ATTACHMENT0 = 0x8CE0;
 inline constexpr GLenum GL_DEPTH_ATTACHMENT = 0x8D00;
 inline constexpr GLenum GL_DEPTH_STENCIL_ATTACHMENT = 0x821A;
 inline constexpr GLenum GL_FRAMEBUFFER_COMPLETE = 0x8CD5;
+
+// Timer queries (core since 3.3): the GPU time a span of commands took.
+inline constexpr GLenum GL_TIME_ELAPSED = 0x88BF;
+inline constexpr GLenum GL_QUERY_RESULT = 0x8866;
+inline constexpr GLenum GL_QUERY_RESULT_AVAILABLE = 0x8867;
 // clang-format on
 
 // The functions: return type, name, parameters.
@@ -252,7 +259,13 @@ inline constexpr GLenum GL_FRAMEBUFFER_COMPLETE = 0x8CD5;
     X(void, glBindRenderbuffer, (GLenum target, GLuint renderbuffer))                              \
     X(void, glRenderbufferStorage, (GLenum target, GLenum format, GLsizei w, GLsizei h))           \
     X(void, glBlitFramebuffer, (GLint sx0, GLint sy0, GLint sx1, GLint sy1, GLint dx0, GLint dy0,  \
-                                GLint dx1, GLint dy1, GLbitfield mask, GLenum filter))
+                                GLint dx1, GLint dy1, GLbitfield mask, GLenum filter))             \
+    X(void, glGenQueries, (GLsizei n, GLuint *ids))                                                \
+    X(void, glDeleteQueries, (GLsizei n, const GLuint *ids))                                       \
+    X(void, glBeginQuery, (GLenum target, GLuint id))                                              \
+    X(void, glEndQuery, (GLenum target))                                                           \
+    X(void, glGetQueryObjectiv, (GLuint id, GLenum pname, GLint *params))                          \
+    X(void, glGetQueryObjectui64v, (GLuint id, GLenum pname, GLuint64 *params))
 // clang-format on
 
 #define OPENRAC_GL_DECLARE(ret, name, params)                                                      \

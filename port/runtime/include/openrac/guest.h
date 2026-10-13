@@ -251,6 +251,8 @@ static inline float openrac_fdiv(float a, float b) {
  * (openrac_guest_stop_on_missing), so the log ends with what to do next. */
 void openrac_guest_missing(const char* name);
 void openrac_guest_report_missing(void);
+/* The calls to functions without C so far, every call counted (the performance overlay's). */
+unsigned long long openrac_guest_missing_calls(void);
 void openrac_guest_stop_on_missing(int stop);
 
 /* ---- The host's stack, for the debugging aids ----

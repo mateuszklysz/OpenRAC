@@ -253,6 +253,25 @@ int main() {
     renderer.render(input, {frame.id(), kWidth, kHeight});
     CHECK(frame.read_rgba() == px.rgba);
 
+    // Timed (the performance overlay's): the same picture, and each renderer's CPU and GPU time
+    // added up by name; the GPU's comes in once the GPU has finished (read back above, it has).
+    renderer.set_timing(true);
+    for (int i = 0; i < 6; ++i) {
+        renderer.render(input, {frame.id(), kWidth, kHeight});
+    }
+    CHECK(frame.read_rgba() == px.rgba);
+    const RenderTotals& totals = renderer.totals();
+    CHECK(totals.frames == 8);
+    CHECK(totals.draw_calls >= 8 * 8);
+    bool hud_timed = false;
+    for (const RendererTime& t : totals.renderers) {
+        if (t.name == "hud") {
+            hud_timed = t.cpu_ms > 0.0 && t.gpu_ms >= 0.0;
+        }
+    }
+    CHECK(hud_timed);
+    renderer.set_timing(false);
+
     frame.release();
     renderer.release();
     return openrac::test::result();

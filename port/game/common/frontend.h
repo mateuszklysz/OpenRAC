@@ -66,6 +66,10 @@ std::uint32_t text(int id);
 bool wants_between();
 int between(std::chrono::steady_clock::time_point next_tick);
 
+// The performance overlay's running totals (perf.h) as the renderer keeps them: frames, draws,
+// texture transfers and conversions, each renderer's time. Called at each vertical blank.
+void perf_counters();
+
 // An image the game sent to the GS outside the display list (its library's image transfer): kept
 // for every renderer the window makes, as the chip keeps it in its memory. `base` in 256-byte
 // blocks, `width_units` in 64 pixels, `pixels` in raster order in `psm`.

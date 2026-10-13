@@ -3,6 +3,9 @@
 
 #include "renderer/renderer.h"
 
+#include <chrono>
+#include <deque>
+
 #include "renderer/direct.h"
 #include "renderer/gl.h"
 #include "renderer/subsystems.h"
@@ -33,7 +36,75 @@ const char* bucket_name(Bucket bucket) {
     return "?";
 }
 
+// The GPU's side of set_timing: a timer query around each renderer's commands, read once the GPU
+// has finished them (a few frames later), so that timing never waits for the GPU.
+struct Renderer::Timing {
+    struct Pending {
+        std::size_t slot;  // in RenderTotals::renderers
+        GLuint query;
+    };
+    std::deque<std::vector<Pending>> frames;  // the frames sent and not yet read, oldest first
+    std::vector<GLuint> free;
+
+    GLuint query() {
+        if (free.empty()) {
+            GLuint q = 0;
+            glGenQueries(1, &q);
+            return q;
+        }
+        const GLuint q = free.back();
+        free.pop_back();
+        return q;
+    }
+
+    // Reads the frames the GPU has finished; with `wait`, the oldest also when it has not (so that
+    // no more than a few frames are ever waiting).
+    void collect(RenderTotals& totals, bool wait) {
+        while (!frames.empty()) {
+            std::vector<Pending>& oldest = frames.front();
+            if (!oldest.empty() && !wait) {
+                GLint ready = 0;
+                glGetQueryObjectiv(oldest.back().query, GL_QUERY_RESULT_AVAILABLE, &ready);
+                if (ready == 0) {
+                    return;
+                }
+            }
+            for (const Pending& p : oldest) {
+                GLuint64 ns = 0;
+                glGetQueryObjectui64v(p.query, GL_QUERY_RESULT, &ns);
+                totals.renderers[p.slot].gpu_ms += static_cast<double>(ns) / 1.0e6;
+                free.push_back(p.query);
+            }
+            frames.pop_front();
+            wait = false;
+        }
+    }
+
+    void release() {
+        for (const auto& f : frames) {
+            for (const Pending& p : f) {
+                free.push_back(p.query);
+            }
+        }
+        frames.clear();
+        if (!free.empty()) {
+            glDeleteQueries(static_cast<GLsizei>(free.size()), free.data());
+        }
+        free.clear();
+    }
+};
+
+Renderer::Renderer() = default;
 Renderer::~Renderer() = default;
+
+void Renderer::set_timing(bool on) {
+    if (on && !m_timing) {
+        m_timing = std::make_unique<Timing>();
+    } else if (!on && m_timing) {
+        m_timing->release();
+        m_timing.reset();
+    }
+}
 
 bool Renderer::init(std::string& error) {
     RenderState state{m_textures, {}, {}};
@@ -91,6 +162,7 @@ void Renderer::render(const FrameInput& input, const RenderTarget& target) {
             hud = i;
         }
     }
+    std::vector<Timing::Pending> pending;
     for (std::size_t i = 0; i < m_renderers.size(); ++i) {
         if (i == hud && input.before_hud) {
             input.before_hud();
@@ -98,11 +170,38 @@ void Renderer::render(const FrameInput& input, const RenderTarget& target) {
             glViewport(0, 0, target.width, target.height);
         }
         auto& r = m_renderers[i];
-        if (r->enabled) {
-            r->render(input, state);
+        if (!r->enabled) {
+            continue;
         }
+        if (!m_timing) {
+            r->render(input, state);
+            continue;
+        }
+        std::size_t slot = 0;
+        while (slot < m_totals.renderers.size() && m_totals.renderers[slot].name != r->name()) {
+            ++slot;
+        }
+        if (slot == m_totals.renderers.size()) {
+            m_totals.renderers.push_back({r->name(), 0.0, 0.0});
+        }
+        const GLuint query = m_timing->query();
+        const auto started = std::chrono::steady_clock::now();
+        glBeginQuery(GL_TIME_ELAPSED, query);
+        r->render(input, state);
+        glEndQuery(GL_TIME_ELAPSED);
+        m_totals.renderers[slot].cpu_ms +=
+            std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - started).count();
+        pending.push_back({slot, query});
     }
     m_stats = state.stats;
+    m_totals.frames++;
+    m_totals.draw_calls += static_cast<std::uint64_t>(state.stats.draw_calls);
+    m_totals.triangles += state.stats.triangles;
+    if (m_timing) {
+        m_timing->frames.push_back(std::move(pending));
+        // At most four frames in flight: the oldest is read then, waited for if it must be.
+        m_timing->collect(m_totals, m_timing->frames.size() > 4);
+    }
     m_textures.end_frame();
 }
 
@@ -116,6 +215,9 @@ void Renderer::clear_renderers() {
 void Renderer::release() {
     for (auto& r : m_renderers) {
         r->release();
+    }
+    if (m_timing) {
+        m_timing->release();
     }
     m_textures.release_gl();
 }

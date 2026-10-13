@@ -65,6 +65,11 @@ extern const char* openrac_game_card_dir;
  * 3 Spanish, 4 German, 5 Italian. */
 extern int openrac_game_language;
 
+/* ---- Kept by the replacements, read by the program ---- */
+
+/* The disc sectors the game has read so far (cdvd.c), for the performance overlay. */
+unsigned long long openrac_game_cd_sectors_read(void);
+
 /* ---- Provided by the program, called by the replacements ---- */
 
 /* The game finished a frame and waits for vsync (sceGsSyncV): present what

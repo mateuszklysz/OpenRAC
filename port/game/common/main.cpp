@@ -6,7 +6,7 @@
 // (openrac_game, generated from port/game/<id>/hostgen.json).
 //
 //   openrac-<id> --data <install>/active/<game>/data [--cards DIR] [--frames N] [--stop-on-missing]
-//                [--level N] [--skip-movies] [--mods DIR] [--settings FILE]
+//                [--level N] [--skip-movies] [--mods DIR] [--settings FILE] [--perf]
 //
 // The data folder is what the extractor made from the player's disc
 // (tools/extractor.py; the launcher's "Set up from your disc"). The program
@@ -43,6 +43,7 @@
 #include "openrac/game_host.h"
 #include "openrac/guest.h"
 #include "openrac/memory.h"
+#include "perf.h"
 
 #ifdef OPENRAC_FRONTEND
 #include "frontend.h"
@@ -100,7 +101,7 @@ std::string program_name() {
 [[noreturn]] void usage(const std::string& why) {
     log::error("{}", why);
     log::error(
-        "usage: {} --data <install>/active/{}/data [--cards DIR] [--frames N] [--stop-on-missing] [--level N] [--skip-movies] [--mods DIR] [--settings FILE]",
+        "usage: {} --data <install>/active/{}/data [--cards DIR] [--frames N] [--stop-on-missing] [--level N] [--skip-movies] [--mods DIR] [--settings FILE] [--perf]",
         program_name(),
         openrac_game.game
     );
@@ -170,6 +171,8 @@ Options parse(int argc, char** argv) {
             o.keep_going = true;
         } else if (a == "--stop-on-missing") {
             o.keep_going = false;
+        } else if (a == "--perf") {
+            frontend::perf::enable();  // the performance overlay (perf.h), as OPENRAC_PERF=1
         } else if (a == "--help" || a == "-h") {
             usage(program_name() + ": " + openrac_game.title + ", native");
         } else {
@@ -244,6 +247,20 @@ static void apply_writes() {
 }
 
 int openrac_game_vsync(void) {
+    // The performance overlay's tick (perf.h): the game's code ran until now.
+    if (frontend::perf::enabled()) {
+#ifdef OPENRAC_FRONTEND
+        if (g_window) {
+            frontend::perf_counters();
+        }
+#endif
+        auto& rec = frontend::perf::recorder();
+        rec.set_counter(frontend::perf::Counter::Sectors, openrac_game_cd_sectors_read());
+        rec.set_counter(frontend::perf::Counter::Missing, openrac_guest_missing_calls());
+        frontend::perf::tick(1000.0 / (openrac_game.frame_rate > 0 ? openrac_game.frame_rate : 60),
+                             openrac_game_loaded_overlay());
+    }
+    const frontend::perf::Scope host(frontend::perf::Stage::Host);
     g_vsync_since_kick = true;
     apply_writes();
     // With a window, the renderer draws the frame from the game's memory; without one, a frame is
@@ -351,6 +368,7 @@ int openrac_game_vsync(void) {
     // Until the next tick is due, frames at the display's rate (each swap waits for a refresh),
     // the scene moved on from the last tick's to this one's by when each is shown.
     if (g_window && frontend::wants_between()) {
+        const frontend::perf::Scope between(frontend::perf::Stage::Between);
         for (int drawn; (drawn = frontend::between(g_next_frame)) != 0;) {
             if (drawn < 0) {
                 std::exit(0);
@@ -358,6 +376,7 @@ int openrac_game_vsync(void) {
         }
     }
 #endif
+    const frontend::perf::Scope pace(frontend::perf::Stage::Pace);
     std::this_thread::sleep_until(g_next_frame);
     return static_cast<int>(g_frame & 1);
 }

@@ -151,6 +151,24 @@ struct FrameStats {
     std::uint64_t triangles = 0;
 };
 
+// What one renderer has cost since timing was turned on (Renderer::set_timing), added up over
+// every frame: the CPU's time in its render() and the GPU's time for the commands it sent
+// (known a few frames late, as the GPU finishes them).
+struct RendererTime {
+    std::string name;
+    double cpu_ms = 0.0;
+    double gpu_ms = 0.0;
+};
+
+// Everything the renderer has drawn so far, added up (a reader takes the difference between two
+// readings for what a span of frames cost).
+struct RenderTotals {
+    std::uint64_t frames = 0;
+    std::uint64_t draw_calls = 0;
+    std::uint64_t triangles = 0;
+    std::vector<RendererTime> renderers;  // by name, in the order they first ran (with timing on)
+};
+
 // What every renderer shares during a frame.
 struct RenderState {
     TexturePool& textures;
@@ -193,7 +211,7 @@ private:
 
 class Renderer {
 public:
-    Renderer() = default;
+    Renderer();
     ~Renderer();
     Renderer(const Renderer&) = delete;
     Renderer& operator=(const Renderer&) = delete;
@@ -226,10 +244,20 @@ public:
 
     const FrameStats& last_stats() const { return m_stats; }
 
+    // Time each renderer from now on (CPU, and GPU with timer queries), for the port's
+    // performance overlay; off by default, when render() reads no clock and makes no query.
+    void set_timing(bool on);
+
+    const RenderTotals& totals() const { return m_totals; }
+
 private:
+    struct Timing;
+
     TexturePool m_textures;
     std::vector<std::unique_ptr<BucketRenderer>> m_renderers;
     FrameStats m_stats;
+    RenderTotals m_totals;
+    std::unique_ptr<Timing> m_timing;
     bool m_initialised = false;
 };
 

@@ -106,6 +106,15 @@ public:
     // Live textures, the placeholder included.
     std::size_t size() const;
 
+    // The image transfers the game has sent and the ones converted to RGBA8 for drawing (a cache
+    // miss: new pixels, or a new palette), since the pool was made.
+    struct Counts {
+        std::uint64_t uploads = 0;
+        std::uint64_t conversions = 0;
+    };
+
+    const Counts& counts() const { return m_counts; }
+
 private:
     struct Key {
         std::uint32_t tbp, tbw, tw, th, cbp;
@@ -151,6 +160,7 @@ private:
     std::unordered_map<Key, TextureHandle, KeyHash> m_converted;
     TextureHandle m_placeholder = 0;
     std::uint64_t m_frame = 0;
+    Counts m_counts;
     std::unordered_map<std::uint64_t, TextureHandle> m_distance_fields;  // by the source's content
 };
 

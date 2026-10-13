@@ -62,6 +62,12 @@ target_link_libraries(runtime_test PRIVATE openrac_runtime)
 openrac_warnings(runtime_test)
 add_test(NAME runtime COMMAND runtime_test)
 
+# The performance overlay's records (game/common/perf.h): no window, no game.
+add_executable(perf_test tests/perf_test.cpp game/common/perf.cpp)
+target_include_directories(perf_test PRIVATE game/common)
+openrac_warnings(perf_test)
+add_test(NAME perf COMMAND perf_test)
+
 # ---- assets, media, audio, the extractor: no window ----
 add_executable(crate_init_test tests/crate_init_test.c)
 target_compile_options(crate_init_test PRIVATE -fno-strict-aliasing -fwrapv -ffp-contract=off)
