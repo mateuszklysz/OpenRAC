@@ -35,7 +35,7 @@ and not in a stage nested inside it, so a tick's stages add up to its length:
 | renderers (cpu) | the CPU's time in each renderer (`Renderer::render`) | `draw_kept` |
 | present | the debug menu, the picture put into the window, the overlay | `draw_kept` |
 | swap / vsync | the buffer swap: with vsync on, mostly waiting for the display's refresh | `swapped` |
-| between ticks | the frames drawn between ticks when the frame rate follows the display (all but their swaps) | `main.cpp` |
+| between ticks | the frames drawn between ticks when the frame rate follows the display (all but their swaps and waits) | `main.cpp` |
 | wait for tick | sleeping until the next tick is due | `main.cpp`, `swapped` |
 
 The work of a tick is its length without the swaps and the waiting. While it
@@ -59,7 +59,7 @@ fits the tick's budget (20 ms in PAL) the game keeps its speed.
   any. A function without C does nothing, so the game may be wrong there, and
   each call takes a lock.
 - **Graph:** the last 240 ticks, their stages stacked (the wait left out), the
-  white line the budget, a red mark over each hitch.
+  yellow line the budget, a red mark over each hitch.
 - **Hitches:** ticks longer than 1.25 budgets, with the stage that took longest
   and what else happened in them: disc reads, texture conversions, a level
   change.
@@ -71,7 +71,10 @@ code.
 
 `port/game/common/perf.{h,cpp}` keeps the records and needs neither GL nor a
 window (the headless program keeps them too); `perf_overlay.{h,cpp}` draws
-them with the 5 x 7 font of `picture.{h,cpp}`, which the debug menu also uses.
+them as one of the game's menu panels (its navy, khaki frame, light blue and
+yellow) with the 5 x 7 font of `picture.{h,cpp}`, which the debug menu also
+uses. The picture is made again every tenth frame and only then copied to the
+GPU.
 The renderer's timing is `Renderer::set_timing` and `Renderer::totals`
 (`port/renderer/renderer.h`); the texture pool counts its transfers and
 conversions (`TexturePool::counts`), the disc library its sectors
