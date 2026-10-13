@@ -147,7 +147,8 @@ function(openrac_add_game config)
     target_sources(openrac-${id} PRIVATE "${OPENRAC_GAME_DIR}/common/frontend.cpp"
                                          "${OPENRAC_GAME_DIR}/common/debug_menu.cpp"
                                          "${OPENRAC_GAME_DIR}/common/options_menu.cpp"
-                                         "${OPENRAC_GAME_DIR}/common/settings.cpp")
+                                         "${OPENRAC_GAME_DIR}/common/settings.cpp"
+                                         "${OPENRAC_GAME_DIR}/common/picture.cpp")
     target_link_libraries(openrac-${id} PRIVATE openrac_viewer_lib openrac_platform)
     target_compile_definitions(openrac-${id} PRIVATE OPENRAC_FRONTEND=1)
     # The window's icon: OpenRAC's own, the launcher's, embedded as PNG bytes.
