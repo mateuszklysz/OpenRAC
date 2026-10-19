@@ -5103,7 +5103,7 @@ msgstr "Na [orange]Hydro-Pack[default] potrzebujesz 2000 śrub"
 
 #: all_text
 msgid "21475/06445499"
-msgstr "[triangle] Włącz automat Gadgetronu"
+msgstr "[triangle] Otwórz sklep Gadgetronu"
 
 #: all_text
 msgid "21476/d68a05f0"

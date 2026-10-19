@@ -95,7 +95,7 @@ one cutscene. A cut word shows only in the game.
 |---|---|
 | bolts | śruby |
 | Gold Bolt | Złota śruba |
-| Gadgetron Vendor | automat Gadgetronu |
+| Gadgetron Vendor | automat Gadgetronu (the prompt that opens it: "Otwórz sklep Gadgetronu") |
 | HelpDesk, Help Desk | Pomoc |
 | Help Log | Dziennik |
 | Items | Przedmioty |
