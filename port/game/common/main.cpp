@@ -34,7 +34,6 @@
 #include <span>
 #include <algorithm>
 #include <format>
-#include <map>
 #include <string>
 #include <thread>
 #include <vector>
@@ -973,44 +972,34 @@ int openrac_game_foreign_glyph(int index, openrac_game_glyph* out) {
     return 0;
 }
 
-int openrac_game_text_picture(int id, float max_width, float max_height, openrac_game_picture* out) {
+uint32_t openrac_game_keep_texture(uint64_t tex0) {
 #ifdef OPENRAC_FRONTEND
     if (g_window) {
-        // Drawn once for each text and language, as the captions are drawn every frame.
-        struct drawn {
-            std::string code;
-            float max_width, max_height;
-            openrac_game_picture picture;
-        };
-        static std::map<int, drawn> pictures;
-        const std::string& code = frontend::game_text::code();
-        const auto found = pictures.find(id);
-        if (found != pictures.end() && found->second.code == code && found->second.max_width == max_width
-            && found->second.max_height == max_height) {
-            *out = found->second.picture;
-            return 1;
-        }
-        const std::string words = frontend::game_text::words(id);
-        openrac_game_picture picture{};
-        if (words.empty()) {
-            log::info("text {}: no words in '{}' for its picture", id, code);
-            return 0;
-        }
-        if (!frontend::glyphs::picture(words, code, max_width, max_height, picture)) {
-            log::warn("text {}: its picture in '{}' could not be drawn", id, code);
-            return 0;
-        }
-        log::info("text {}: a picture of {}x{} texels at key {:#x}, drawn {}x{}", id, picture.u1, picture.v1,
-                  picture.key, picture.width, picture.height);
-        pictures[id] = {code, max_width, max_height, picture};
-        *out = picture;
-        return 1;
+        constexpr std::uint32_t kKept = 0x42000;  // past the foreign letters' (glyphs.cpp)
+        return frontend::keep_texture(kKept, tex0) ? kKept : 0;
     }
 #endif
-    (void)id;
-    (void)max_width;
-    (void)max_height;
-    (void)out;
+    (void)tex0;
+    return 0;
+}
+
+uint32_t openrac_game_black_texture(void) {
+#ifdef OPENRAC_FRONTEND
+    if (g_window) {
+        constexpr std::uint32_t kBlack = 0x42001;
+        static bool placed = false;
+        if (!placed) {
+            renderer::Rgba8Image black(4, 4);
+            for (int y = 0; y < 4; ++y) {
+                for (int x = 0; x < 4; ++x) {
+                    black.set_texel(x, y, 0xFF000000u);
+                }
+            }
+            placed = frontend::place_texture(kBlack, black, "black");
+        }
+        return placed ? kBlack : 0;
+    }
+#endif
     return 0;
 }
 

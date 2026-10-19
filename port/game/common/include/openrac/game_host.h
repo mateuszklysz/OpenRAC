@@ -326,21 +326,14 @@ typedef struct openrac_game_glyph {
 /* The letter numbered INDEX among the language's: 1 with OUT filled, 0 when there is none. */
 int openrac_game_foreign_glyph(int index, openrac_game_glyph* out);
 
-/* A text drawn by the port into a texture of its own (openrac_game_ui_rect's key, log2 sizes for
- * TEX0's TW and TH): its texels (0, 0) .. (u1, v1), black with the letters left clear (on one or
- * two lines), and how big to draw them in the game's pixels. */
-typedef struct openrac_game_picture {
-    uint32_t key;
-    uint32_t log2_width, log2_height;
-    float u1, v1;
-    float width, height;
-} openrac_game_picture;
+/* What the GS holds now for the texture TEX0 (as the last frame drawn left it), kept as a texture
+ * of the port's when the game puts something else there: its key (openrac_game_ui_rect.key), 0
+ * when it holds nothing. One such texture at a time, each call replacing the last. The game's font
+ * for the captions before the story movies, whose slides are uploaded over it. */
+uint32_t openrac_game_keep_texture(uint64_t tex0);
 
-/* The translation of text ID in the language in use as such a picture of MAX_WIDTH x MAX_HEIGHT
- * pixels: 1 with OUT filled, 0 when the language has no words for it. The captions before the
- * story movies, which are pictures in the game: drawn over their band, the band shows through
- * the letters. */
-int openrac_game_text_picture(int id, float max_width, float max_height, openrac_game_picture* out);
+/* The key of an opaque black texture of the port's (4 x 4), 0 without a window. */
+uint32_t openrac_game_black_texture(void);
 
 /* How many digits a foreign letter's number has in the language in use; 0: it has none. */
 int openrac_game_foreign_digits(void);

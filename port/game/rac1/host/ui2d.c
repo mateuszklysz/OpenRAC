@@ -50,7 +50,16 @@ static int skipped(const char* name) {
     return list != NULL && strstr(list, name) != NULL;
 }
 
+/* The game's font kept for the captions before the story movies (their slides are uploaded over
+ * it): its base pointer, and the port's texture holding it while they are drawn (0: none). */
+static unsigned g_kept_font_tbp;
+static uint32_t g_kept_font_key;
+static int g_drawing_caption;
+
 static int emit(openrac_game_ui_rect* q) {
+    if (g_drawing_caption && g_kept_font_key != 0 && q->key == 0 && (unsigned)(q->tex0 & 0x3FFF) == g_kept_font_tbp) {
+        q->key = g_kept_font_key;
+    }
     static int log = -1;
     if (log < 0) {
         log = getenv("OPENRAC_UI_LOG") != NULL;
@@ -513,9 +522,25 @@ void func_001F69F0(unsigned long long colour, gaddr text, float x, int limit, lo
 /* The textured quad at a fractional place: only followed, for Font_DrawString's marks. */
 void func_001F5BB8(float x, float y, float w, float h, int u, int v, int uw, int vh, unsigned long long rgba,
                    unsigned long long tex) {
-    if (!drawn(x, y, rgba)) {
-        func_001F5BB8__game(x, y, w, h, u, v, uw, vh, rgba, tex);
+    if (drawn(x, y, rgba)) {
+        return;
     }
+    if (g_drawing_caption) {
+        /* A caption's glyph: sent by the port, to draw from the kept font (emit). */
+        openrac_game_ui_rect q;
+        memset(&q, 0, sizeof(q));
+        const float ofx = (float)SCREEN_OFX, ofy = (float)SCREEN_OFY;
+        rect(&q, (int)(x * 16.0f + ofx) - 8, (int)(y * 16.0f + ofy) - 8, (int)((x + w) * 16.0f + ofx) - 8,
+             (int)((y + h) * 16.0f + ofy) - 8, u * 16, v * 16, (u + uw) * 16, (v + vh) * 16);
+        q.z = 0xFFFFF0u;
+        q.rgba = (uint32_t)rgba;
+        q.tex0 = tex;
+        q.flags = 1u;
+        if (emit(&q)) {
+            return;
+        }
+    }
+    func_001F5BB8__game(x, y, w, h, u, v, uw, vh, rgba, tex);
 }
 
 /* The title's "PRESS START", a picture per language the disc has (effect texture 4 + the
@@ -563,25 +588,51 @@ static int press_start(int x, int y, int w, int h, unsigned long long rgba, unsi
 
 /* The captions before the story movies ("Kyzil Plateau, Planet Veldin", "Meanwhile, in a factory
  * on a nearby planet…"): pictures, one per disc language, of 512 x 64 (play_level_loading_slides,
- * func_00232EF0, draws slide k of the table, whose words are text 21251 + k). Their textures as
- * func_00232B90 prepared them, to know them when they are drawn. */
+ * func_00232EF0, draws slide k of the table, whose words are text 21251 + k), black with the letters
+ * clear over a scrolling blue band. Their textures as func_00232B90 prepared them, to know them
+ * when they are drawn. */
 static struct {
     unsigned long long tex;
     int slide;
 } g_slides[2];
 
 void func_00232B90(int language, int first, int second, gaddr shared, gaddr first_out, gaddr second_out) {
+    /* The slides are uploaded where the effect textures were paged in, over the font, and their
+     * loop pages nothing in again: when their text is printed instead, the font as the last frame
+     * left it is kept first. */
+    g_kept_font_key = 0;
+    if (openrac_game_text_by_id(21251 + first) != 0) {
+        const unsigned long long font = (unsigned long long)func_001F4868(1);
+        g_kept_font_tbp = (unsigned)(font & 0x3FFF);
+        g_kept_font_key = openrac_game_keep_texture(font);
+    }
     func_00232B90__game(language, first, second, shared, first_out, second_out);
     g_slides[0].tex = GREF(uint64_t, first_out), g_slides[0].slide = first;
     g_slides[1].tex = GREF(uint64_t, second_out), g_slides[1].slide = second;
 }
 
-/* In a language the port translates into, a caption picture is replaced by the port's own of its
- * text (the game's font is not in the GS while the slides show: their loop pages no effect
- * textures in). As the game's, it is black with the letters clear, over the band drawn before it,
- * which shows through them. True when it was. */
+/* A line of a caption centred on cx, SCALE of the font's size and no wider than the slide less a
+ * margin, in the band's light blue. */
+static void caption_line(gaddr text, int width, float cx, float cy, float scale) {
+    enum { ROOM = 480 };
+    if ((float)width * scale > (float)ROOM) {
+        scale = (float)ROOM / (float)width;
+    }
+    const float x = cx - (float)width * scale / 2.0f, y = cy - 8.0f * scale;
+    const gaddr glyphs = OPENRAC_DATA(RAC1_ADDR(0x001DF3D0u));
+    const long long font = (long long)func_001F4868(1);
+#if RAC1_DRAW_STRING_FLOATS_LAST
+    func_001F69F0(0x80807030ull, text, -1, font, glyphs, x, y, scale);
+#else
+    func_001F69F0(0x80807030ull, text, x, -1, font, glyphs, y, scale);
+#endif
+}
+
+/* In a language the port translates into, a caption picture is replaced by its text in the game's
+ * font as kept (func_00232B90), 0.85 of its size, over black: on one line, or two split at the space
+ * nearest the middle when it is wider than the slide. True when it was. */
 static int loading_slide(int x, int y, int w, int h, unsigned long long rgba, unsigned long long tex) {
-    if (w != 0x200 || h != 0x40 || tex == 0) {
+    if (w != 0x200 || h != 0x40 || tex == 0 || g_kept_font_key == 0) {
         return 0;
     }
     int slide = -1;
@@ -594,22 +645,62 @@ static int loading_slide(int x, int y, int w, int h, unsigned long long rgba, un
     if (slide < 0) {
         return 0;
     }
-    openrac_game_picture p;
-    if (!openrac_game_text_picture(21251 + slide, (float)w, (float)h, &p)) {
+    const gaddr translated = openrac_game_text_by_id(21251 + slide);
+    const uint32_t black = openrac_game_black_texture();
+    if (translated == 0 || black == 0) {
         return 0; /* the game's own words: its picture says them */
     }
-    const float x0 = (float)x, y0 = (float)y;
+    /* The slide's black, over the band. */
     openrac_game_ui_rect q;
     memset(&q, 0, sizeof(q));
-    const float ofx = (float)SCREEN_OFX, ofy = (float)SCREEN_OFY;
-    rect(&q, (int)(x0 * 16.0f + ofx) - 8, (int)(y0 * 16.0f + ofy) - 8, (int)((x0 + p.width) * 16.0f + ofx) - 8,
-         (int)((y0 + p.height) * 16.0f + ofy) - 8, 0, 0, (int)(p.u1 * 16.0f), (int)(p.v1 * 16.0f));
+    const int ofx = SCREEN_OFX, ofy = SCREEN_OFY;
+    rect(&q, x * 16 + ofx - 8, y * 16 + ofy - 8, (x + w) * 16 + ofx - 8, (y + h) * 16 + ofy - 8, 0, 0, 4 * 16, 4 * 16);
     q.z = 0xFFFFF0u;
     q.rgba = (uint32_t)rgba;
-    /* TCC, MODULATE; TW and TH the picture's, for the texel coordinates. */
-    q.tex0 = (1ull << 34) | ((unsigned long long)p.log2_width << 26) | ((unsigned long long)p.log2_height << 30);
-    q.key = p.key;
-    return emit(&q);
+    q.tex0 = (1ull << 34) | (2ull << 26) | (2ull << 30); /* TCC, MODULATE, 4 x 4 */
+    q.key = black;
+    if (!emit(&q)) {
+        return 0;
+    }
+    enum { SIZE = 256 };
+    static const float SCALE = 0.85f;
+    static gaddr text = 0;
+    if (text == 0) {
+        text = openrac_guest_static(SIZE);
+    }
+    const uint8_t* src = (const uint8_t*)G(translated);
+    uint8_t* dst = (uint8_t*)G(text);
+    const gaddr glyphs = OPENRAC_DATA(RAC1_ADDR(0x001DF3D0u));
+    int n = 0, width = 0;
+    static int width_before[SIZE];
+    for (; src[n] != 0 && n < SIZE - 1; ++n) {
+        dst[n] = src[n];
+        width_before[n] = width;
+        if (!is_mark(src[n]) && src[n] - 8u >= 8u) {
+            width += cell(glyphs, src[n]).adv;
+        }
+    }
+    dst[n] = 0;
+    width_before[n] = width;
+    const float cx = (float)x + (float)w / 2.0f, cy = (float)y + (float)h / 2.0f;
+    int split = -1;
+    if ((float)width * SCALE > 480.0f) {
+        for (int i = 0; i < n; ++i) {
+            if (dst[i] == ' ' && (split < 0 || abs(2 * width_before[i] - width) < abs(2 * width_before[split] - width))) {
+                split = i;
+            }
+        }
+    }
+    g_drawing_caption = 1;
+    if (split < 0) {
+        caption_line(text, width, cx, cy, SCALE);
+    } else {
+        dst[split] = 0;
+        caption_line(text, width_before[split], cx, cy - 9.0f * SCALE, SCALE);
+        caption_line(text + (gaddr)split + 1, width - width_before[split + 1], cx, cy + 9.0f * SCALE, SCALE);
+    }
+    g_drawing_caption = 0;
+    return 1;
 }
 
 /* DrawTexturedQuad: a w x h screen rectangle at (x, y) textured from (u, v) .. (u + uw, v + vh) of

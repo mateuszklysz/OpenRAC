@@ -2683,6 +2683,20 @@ bool place_texture(std::uint32_t key, const renderer::Rgba8Image& image, const s
     return true;
 }
 
+bool keep_texture(std::uint32_t key, std::uint64_t tex0) {
+    if (!g || !g->renderer) {
+        return false;
+    }
+    renderer::TexturePool& pool = g->renderer->textures();
+    const renderer::TextureHandle h = pool.resolve(renderer::gs::Tex0::decode(tex0), renderer::gs::Texa{0, false, 0x80});
+    if (h == pool.placeholder()) {
+        return false;
+    }
+    const renderer::TextureHandle copy = pool.add(pool.image(h), pool.alpha_scale(h), "kept texture", false, true);
+    pool.place(key, copy);
+    return true;
+}
+
 int ui_quad(const openrac_game_ui_rect& quad) {
     // The 2D layer's quads are drawn natively (on the way off the GS packets); OPENRAC_UI_REPLAY
     // replays the game's packets instead, for comparing.

@@ -47,6 +47,10 @@ int ui_quad(const openrac_game_ui_rect& quad);
 // (openrac_game_ui_rect.key), drawn filtered. False when there is no window yet.
 bool place_texture(std::uint32_t key, const renderer::Rgba8Image& image, const std::string& name);
 
+// What the GS holds now for the texture TEX0 (as the frame last drawn left it), copied to KEY as
+// such a texture: kept when the game puts something else there. False when it holds nothing.
+bool keep_texture(std::uint32_t key, std::uint64_t tex0);
+
 // How far the HUD's side-anchored elements go out past the game's picture, in its 512ths of that
 // picture's width (openrac_game_hud_side): the player's "HUD: Edges" in a wider picture, else 0.
 int hud_side();
