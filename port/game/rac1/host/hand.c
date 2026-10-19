@@ -453,10 +453,71 @@ static gaddr translated_text(gaddr text) {
  * which is right on the console (the register holds all 64 bits) but cuts it to 32 here, so the
  * glyphs would be drawn with a wrong palette and size; the port passes it whole.
  */
+/* The marks of the port's letters (ui2d.c) are bytes 2..5, and the window's line breaking breaks
+ * at any byte below 0x10, which split "układu" into "uk" and "ładu". The window is given a copy
+ * with each mark as a byte at 0x21 or above that the font has no glyph for (no advance: nothing
+ * drawn, nothing measured, no break), which the printers read as the same mark. Unchanged when the
+ * font has no such byte to spare. */
+extern unsigned char rac1_mark_of[256];
+
+static gaddr unbroken_marks(gaddr text) {
+    enum { CAPACITY = 4096, FIRST_MARK = 2, MARKS = 4 };
+    static gaddr copy;
+    static int spared;
+    static unsigned char spare[MARKS];
+    if (text == 0) {
+        return text;
+    }
+    const uint8_t* src = (const uint8_t*)G(text);
+    int n = 0, marks = 0;
+    while (src[n] != 0 && n < CAPACITY - 1) {
+        marks += src[n] - FIRST_MARK < MARKS;
+        ++n;
+    }
+    if (marks == 0 || src[n] != 0) {
+        return text;
+    }
+    if (!spared) {
+        /* A byte none of the three fonts draws. */
+        const gaddr fonts[3] = {OPENRAC_DATA(RAC1_ADDR(0x001DF3D0u)), OPENRAC_DATA(RAC1_ADDR(0x001DF770u)),
+                                OPENRAC_DATA(RAC1_ADDR(0x001DFB10u))};
+        spared = 1;
+        int k = 0;
+        for (unsigned b = 0xFF; b > 0x20 && k < MARKS; --b) {
+            int drawn = b - 0x80u < 0x68u || rac1_mark_of[b] != 0;
+            for (int f = 0; f < 3; ++f) {
+                drawn |= GREF(int8_t, fonts[f] + b * 4 + 3) != 0;
+            }
+            if (!drawn) {
+                spare[k++] = (unsigned char)b;
+            }
+        }
+        for (; k < MARKS; ++k) {
+            spare[k] = 0;
+        }
+        for (k = 0; k < MARKS; ++k) {
+            if (spare[k] != 0) {
+                rac1_mark_of[spare[k]] = (unsigned char)(FIRST_MARK + k);
+            }
+        }
+    }
+    if (copy == 0) {
+        copy = openrac_guest_static(CAPACITY);
+    }
+    uint8_t* dst = (uint8_t*)G(copy);
+    for (int i = 0; i <= n; ++i) {
+        const unsigned k = src[i] - FIRST_MARK;
+        dst[i] = k < MARKS && spare[k] != 0 ? spare[k] : src[i];
+    }
+    return copy;
+}
+
 void func_001F7560(gaddr a, gaddr b, gaddr c, gaddr d) {
-    func_001F7070(a, b, translated_text(c), d, func_001F4868(1), OPENRAC_DATA(RAC1_ADDR(0x001DF3D0u)));
+    const gaddr glyphs = OPENRAC_DATA(RAC1_ADDR(0x001DF3D0u));
+    func_001F7070(a, b, unbroken_marks(translated_text(c)), d, func_001F4868(1), glyphs);
 }
 
 void func_001F75D0(gaddr a, gaddr b, gaddr c, gaddr d) {
-    func_001F7070(a, b, translated_text(c), d, func_001F4868(2), OPENRAC_DATA(RAC1_ADDR(0x001DF770u)));
+    const gaddr glyphs = OPENRAC_DATA(RAC1_ADDR(0x001DF770u));
+    func_001F7070(a, b, unbroken_marks(translated_text(c)), d, func_001F4868(2), glyphs);
 }

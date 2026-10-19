@@ -142,8 +142,14 @@ static glyph_cell cell(gaddr glyphs, unsigned byte) {
  * OGONEK_DY" moves them, in pixels of the unscaled font, to tune them by eye. */
 enum { MARK_ACUTE = 2, MARK_DOT = 3, MARK_OGONEK = 4, MARK_STROKE = 5 };
 
+/* The mark each byte stands for: the four above, and the bytes the help window's printer is given
+ * in their place so that its line breaking, which breaks at any byte below 0x10, keeps a letter and
+ * its mark together (hand.c, unbroken_marks). */
+unsigned char rac1_mark_of[256] = {[MARK_ACUTE] = MARK_ACUTE, [MARK_DOT] = MARK_DOT,
+                                   [MARK_OGONEK] = MARK_OGONEK, [MARK_STROKE] = MARK_STROKE};
+
 static int is_mark(unsigned byte) {
-    return byte >= MARK_ACUTE && byte <= MARK_STROKE;
+    return rac1_mark_of[byte & 0xFF] != 0;
 }
 
 static const int* mark_offsets(void) {
@@ -268,7 +274,7 @@ static void draw_marks(const marked_text* m, int limit, int drawn, long long tex
     }
     for (int i = 0; i < end; ++i) {
         if (m->mark_after[i] != 0 && at_byte[i] >= 0) {
-            draw_mark(dst[i], (unsigned)m->mark_after[i], &g_drawn[at_byte[i]], texture, glyphs, scale);
+            draw_mark(dst[i], rac1_mark_of[m->mark_after[i] & 0xFF], &g_drawn[at_byte[i]], texture, glyphs, scale);
         }
     }
 }
