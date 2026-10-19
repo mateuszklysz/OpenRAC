@@ -419,23 +419,44 @@ int func_00116248(gaddr buffer, gaddr format, ...) {
     return n;
 }
 
+/* The texts these print in the language the player chose, where the port has it: the scenes'
+ * subtitles, which no text id names, by their English (game_text.h, kSubtitleId, -1); and the help
+ * window's, which it takes from the text table (D_0015F780, its count the help state's +0x2C)
+ * without the lookup, by the id of the entry holding it. The table is only read, and only where
+ * it lies in game memory: while a level loads it can name memory that is not the table yet. */
+static gaddr translated_text(gaddr text) {
+    if (text == 0) {
+        return 0;
+    }
+    gaddr translated = openrac_game_text_translated(-1, text);
+    if (translated != 0) {
+        return translated;
+    }
+    const gaddr table = GREF(gaddr, OPENRAC_DATA(RAC1_ADDR(0x0015F780u)));
+    const int count = GREF(int, OPENRAC_DATA(RAC1_ADDR(0x001997FCu)));
+    if (count <= 0 || count > 0x4000 || table == 0 || table >= GUEST_RAM_SIZE ||
+        (GUEST_RAM_SIZE - table) / 16 < (uint32_t)count) {
+        return text;
+    }
+    for (int i = 0; i < count; ++i) {
+        if (GREF(gaddr, table + (gaddr)i * 16) == text) {
+            translated = openrac_game_text_translated(GREF(int, table + (gaddr)i * 16 + 4), text);
+            return translated != 0 ? translated : text;
+        }
+    }
+    return text;
+}
+
 /*
  * FontPrintWindow in the large (mode 1) and small (mode 2) font: the effect texture's TEX0 from
  * GetEffectTex and the font's glyph table. The decompilation's matching C keeps the TEX0 in an int,
  * which is right on the console (the register holds all 64 bits) but cuts it to 32 here, so the
  * glyphs would be drawn with a wrong palette and size; the port passes it whole.
  */
-/* The scenes' subtitles are printed through these with the scene's own text, which no text id
- * names: they are translated by their English (game_text.h, kSubtitleId, -1). */
-static gaddr subtitle(gaddr text) {
-    const gaddr translated = text != 0 ? openrac_game_text_translated(-1, text) : 0;
-    return translated != 0 ? translated : text;
-}
-
 void func_001F7560(gaddr a, gaddr b, gaddr c, gaddr d) {
-    func_001F7070(a, b, subtitle(c), d, func_001F4868(1), OPENRAC_DATA(RAC1_ADDR(0x001DF3D0u)));
+    func_001F7070(a, b, translated_text(c), d, func_001F4868(1), OPENRAC_DATA(RAC1_ADDR(0x001DF3D0u)));
 }
 
 void func_001F75D0(gaddr a, gaddr b, gaddr c, gaddr d) {
-    func_001F7070(a, b, subtitle(c), d, func_001F4868(2), OPENRAC_DATA(RAC1_ADDR(0x001DF770u)));
+    func_001F7070(a, b, translated_text(c), d, func_001F4868(2), OPENRAC_DATA(RAC1_ADDR(0x001DF770u)));
 }

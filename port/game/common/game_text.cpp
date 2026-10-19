@@ -58,15 +58,14 @@ gaddr g_ring = 0;
 std::uint32_t g_ring_next = 0;
 std::unordered_map<const std::string*, gaddr> g_where;
 
-// The text table's entries the port has pointed at a translation (translate_table), by the entry's
-// address: the game's own text, what the entry was given, and in which language (g_language).
-struct TableEntry {
-    gaddr original = 0;
-    gaddr shown = 0;
-    int language = -1;
+// What translate answered for an id and a game address, while the text there is the same: the
+// game asks for the same texts every frame, and a key costs a conversion and a CRC.
+struct Answer {
+    std::string shown;
+    gaddr translated;
 };
-std::unordered_map<gaddr, TableEntry> g_table;
-int g_language = 0;  // counts the languages used
+
+std::unordered_map<std::uint64_t, Answer> g_answers;
 
 gaddr place(const std::string& text) {
     if (const auto it = g_where.find(&text); it != g_where.end()) {
@@ -80,6 +79,7 @@ gaddr place(const std::string& text) {
     if (g_ring_next + size > kRingBytes) {
         g_ring_next = 0;
         g_where.clear();
+        g_answers.clear();  // they point into the ring
     }
     const gaddr at = g_ring + g_ring_next;
     char* dst = static_cast<char*>(G(at));
@@ -246,8 +246,8 @@ bool use(const std::string& code) {
     g_texts.clear();
     g_keyed.clear();
     g_where.clear();
+    g_answers.clear();
     g_ring_next = 0;  // what the ring held was the last language's
-    ++g_language;
 #ifdef OPENRAC_HAS_DISC
     namespace disc = assets::disc;
     // The folder's file, by the English: a translator's own, or the disc's language edited.
@@ -313,11 +313,9 @@ std::string for_font(const std::string& utf8) {
 #endif
 }
 
-std::uint32_t translate(int id, std::uint32_t original) {
-    if (original == 0) {
-        return 0;
-    }
-    const char* shown = static_cast<const char*>(G(original));
+namespace {
+
+gaddr look_up(int id, const char* shown) {
     if (const auto it = g_texts.find(id); it != g_texts.end()) {
         for (const Translated& t : it->second) {
             if (std::strcmp(shown, t.english.c_str()) == 0) {
@@ -339,6 +337,26 @@ std::uint32_t translate(int id, std::uint32_t original) {
     return 0;
 }
 
+}  // namespace
+
+std::uint32_t translate(int id, std::uint32_t original) {
+    if (original == 0 || (g_texts.empty() && g_keyed.empty())) {
+        return 0;
+    }
+    const char* shown = static_cast<const char*>(G(original));
+    const std::uint64_t at =
+        static_cast<std::uint64_t>(static_cast<std::uint32_t>(id)) << 32 | original;
+    if (const auto it = g_answers.find(at); it != g_answers.end() && it->second.shown == shown) {
+        return it->second.translated;
+    }
+    if (g_answers.size() >= 0x4000) {
+        g_answers.clear();
+    }
+    const gaddr translated = look_up(id, shown);
+    g_answers[at] = {shown, translated};
+    return translated;
+}
+
 std::uint32_t translate_id(int id) {
     if (const auto it = g_texts.find(id); it != g_texts.end()) {
         for (const Translated& t : it->second) {
@@ -352,27 +370,6 @@ std::uint32_t translate_id(int id) {
         return place(it->second.front().text);
     }
     return 0;
-}
-
-void translate_table(std::uint32_t table, int count) {
-    if (table == 0 || count <= 0 || count > 0x4000) {
-        return;
-    }
-    for (int i = 0; i < count; ++i) {
-        const gaddr entry = table + static_cast<gaddr>(i) * 16;
-        const gaddr now = GREF(gaddr, entry);
-        TableEntry& e = g_table[entry];
-        const bool ours = e.shown != 0 && now == e.shown;
-        if (ours && e.language == g_language) {
-            continue;
-        }
-        // An entry the port pointed elsewhere goes back to the game's text before it is translated
-        // again; any other is the game's (a table loaded since).
-        const gaddr original = ours ? e.original : now;
-        const gaddr translated = translate(GREF(std::int32_t, entry + 4), original);
-        e = {original, translated != 0 ? translated : original, g_language};
-        GREF(gaddr, entry) = e.shown;
-    }
 }
 
 }  // namespace openrac::frontend::game_text

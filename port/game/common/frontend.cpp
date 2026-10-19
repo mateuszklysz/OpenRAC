@@ -2065,9 +2065,6 @@ bool frame(std::span<const std::uint8_t> ram, std::uint32_t chain, std::uint32_t
         apply_settings();
     }
     debug_menu::update(openrac_game_loaded_overlay(), g->index);
-    if (openrac_game_front_end != nullptr && openrac_game_front_end->translate_texts != nullptr) {
-        openrac_game_front_end->translate_texts();
-    }
 
     // The level program loaded now (-1: the boot program, title and menus), as the port knows it.
     const int level = openrac_game_loaded_overlay();

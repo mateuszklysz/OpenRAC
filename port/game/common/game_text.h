@@ -53,9 +53,4 @@ std::uint32_t translate(int id, std::uint32_t original);
 // the game's own words.
 std::uint32_t translate_id(int id);
 
-// The game's text table at TABLE (COUNT entries: +0 the text, +4 its id) pointed at the texts in
-// the language used, for the game's code that reads the table without its lookup. Each frame:
-// entries already given this language's text are left as they are.
-void translate_table(std::uint32_t table, int count);
-
 }  // namespace openrac::frontend::game_text

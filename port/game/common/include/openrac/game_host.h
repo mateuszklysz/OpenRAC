@@ -139,9 +139,6 @@ typedef struct openrac_front_end {
     gaddr level;      /* the level being played, or -1 */
     gaddr dialog;     /* the front end's dialog: +0 its kind, +0x1C its step (logged) */
     gaddr title_exit; /* the title loop's exit (logged) */
-    /* The game's text table in the language the player chose (rac1/host/options.c): called each
-     * frame, it hands openrac_game_texts_in_table the table the game reads now; null for none. */
-    void (*translate_texts)(void);
 } openrac_front_end;
 
 extern const openrac_front_end* openrac_game_front_end;
@@ -309,11 +306,6 @@ gaddr openrac_game_text_translated(int id, gaddr original);
 /* The translation of ID in the language the player chose, without the game's text (none may be
  * loaded): its game address, or 0 when there is none but the game's own words. */
 gaddr openrac_game_text_by_id(int id);
-
-/* The game's text table at TABLE, COUNT entries of 16 bytes (+0 the text's address, +4 its id): each
- * text pointed at its translation in the language the player chose, or back at the game's own, for
- * the code that reads the table without the lookup (rac1: the help window). */
-void openrac_game_texts_in_table(gaddr table, int count);
 
 /* ---- Inside the replacements ---- */
 
