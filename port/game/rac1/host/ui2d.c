@@ -609,8 +609,7 @@ static int loading_slide(int x, int y, int w, int h, unsigned long long rgba, un
     /* TCC, MODULATE; TW and TH the picture's, for the texel coordinates. */
     q.tex0 = (1ull << 34) | ((unsigned long long)p.log2_width << 26) | ((unsigned long long)p.log2_height << 30);
     q.key = p.key;
-    emit(&q);
-    return 1;
+    return emit(&q);
 }
 
 /* DrawTexturedQuad: a w x h screen rectangle at (x, y) textured from (u, v) .. (u + uw, v + vh) of

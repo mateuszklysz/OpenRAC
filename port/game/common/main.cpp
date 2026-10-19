@@ -992,9 +992,16 @@ int openrac_game_text_picture(int id, float max_width, float max_height, openrac
         }
         const std::string words = frontend::game_text::words(id);
         openrac_game_picture picture{};
-        if (words.empty() || !frontend::glyphs::picture(words, code, max_width, max_height, picture)) {
+        if (words.empty()) {
+            log::info("text {}: no words in '{}' for its picture", id, code);
             return 0;
         }
+        if (!frontend::glyphs::picture(words, code, max_width, max_height, picture)) {
+            log::warn("text {}: its picture in '{}' could not be drawn", id, code);
+            return 0;
+        }
+        log::info("text {}: a picture of {}x{} texels at key {:#x}, drawn {}x{}", id, picture.u1, picture.v1,
+                  picture.key, picture.width, picture.height);
         pictures[id] = {code, max_width, max_height, picture};
         *out = picture;
         return 1;

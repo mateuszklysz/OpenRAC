@@ -891,7 +891,8 @@ DirectVertex GifInterpreter::convert(const GsVertex& v) const {
     out.z = static_cast<float>(depth * 2.0 - 1.0);
     int frame_x = 0;
     int frame_y = 0;
-    if (attributes().tme
+    // A texture of the port's (m_key) is neither, whatever TEX0's base pointer says.
+    if (attributes().tme && m_key == 0
         && std::find(m_offscreen.begin(), m_offscreen.end(), c.tex0.tbp0) != m_offscreen.end()) {
         // A texel of an off-screen target: its pixel, over the target's square (first row on top,
         // as it was drawn).
@@ -902,7 +903,8 @@ DirectVertex GifInterpreter::convert(const GsVertex& v) const {
         out.s = u / static_cast<float>(kOffscreenPixels);
         out.t = 1.0f - w / static_cast<float>(kOffscreenPixels);
         out.q = 1.0f;
-    } else if (attributes().tme && is_colour_format(c.tex0.psm) && frame_source(c.tex0.tbp0, frame_x, frame_y)) {
+    } else if (attributes().tme && m_key == 0 && is_colour_format(c.tex0.psm)
+               && frame_source(c.tex0.tbp0, frame_x, frame_y)) {
         // A texel of the frame: its pixel, over the frame's size; the copy of the render target
         // the draw samples has its first row at the bottom, as GL keeps it.
         const float u = attributes().fst ? static_cast<float>(v.u) / 16.0f
@@ -950,6 +952,13 @@ void GifInterpreter::ensure_draw() {
             s.clamp_t = true;
         } else if (s.textured && m_key != 0) {
             s.texture = m_textures.placed(m_key);
+            if (s.texture == m_textures.placeholder()) {
+                static std::uint32_t warned = 0;
+                if (warned != m_key) {
+                    warned = m_key;
+                    log::warn("no texture of the port's at key {:#x}", m_key);
+                }
+            }
             s.texture_full_alpha = m_textures.alpha_scale(s.texture) == AlphaScale::Full;
             s.tcc = c.tex0.tcc;
             s.tfx = c.tex0.tfx;
