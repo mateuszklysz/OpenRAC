@@ -129,6 +129,9 @@ int main() {
         if (std::string_view(f.name).starts_with("game/")) {
             continue;  // the game's texts, by key (tools/game_text_po.py checks them)
         }
+        if (std::string_view(f.name).starts_with("fonts/")) {
+            continue;  // the fonts the port draws letters with (lang/fonts)
+        }
         const auto po = i18n::parse_po(f.text, why);
         CHECK(po.has_value());
         if (!po) {

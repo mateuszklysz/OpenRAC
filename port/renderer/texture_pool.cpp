@@ -89,6 +89,13 @@ void TexturePool::place(std::uint32_t tbp, TextureHandle texture) {
     m_placed[tbp] = texture;
 }
 
+TextureHandle TexturePool::placed(std::uint32_t key) {
+    const auto it = m_placed.find(key);
+    const TextureHandle h = it != m_placed.end() ? it->second : m_placeholder;
+    m_entries[h - 1].last_used = m_frame;
+    return h;
+}
+
 void TexturePool::clear_placements() {
     m_placed.clear();
 }

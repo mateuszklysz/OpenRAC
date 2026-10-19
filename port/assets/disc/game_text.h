@@ -13,9 +13,11 @@
 // from the French and Spanish strings), drawn as the letter with an accent over it; 0xa8.. a few
 // more letters whose order is not known. In the files a colour or a button is a word in brackets
 // ([orange], [cross]), a byte without a name [xNN], and a '[' of the text "[[". The game's fonts
-// have no other letters. Polish ones are the plain letter and a mark byte (kMark*: ś is 's', 0x02),
-// which the port draws over or under it from the fonts' own glyphs (game/rac1/host/ui2d.c) and the
-// game skips; any other letter the fonts lack is written as its plain one (ß ss).
+// have no other letters. The Latin ones of the languages the port adds are the plain letter and
+// its mark (kMark*: ś is 's', 0x02; č is 'c', 0x06, 0x02), which the port draws over or under it
+// from the fonts' own glyphs (game/rac1/host/ui2d.c) and the game skips; Greek, Hangul and Chinese
+// letters are a byte about as wide and the letter's number (kForeign), drawn from a font file;
+// any other letter the fonts lack is written as its plain one (ß ss).
 #pragma once
 
 #include <span>
@@ -34,7 +36,31 @@ class Disc;
 inline constexpr u8 kMarkAcute = 0x02;   // ć ń ś ź
 inline constexpr u8 kMarkDot = 0x03;     // ż
 inline constexpr u8 kMarkOgonek = 0x04;  // ą ę
-inline constexpr u8 kMarkStroke = 0x05;  // ł
+inline constexpr u8 kMarkStroke = 0x05;  // ł đ
+// The other marks: kMarkMore, then one of these.
+inline constexpr u8 kMarkMore = 0x06;
+inline constexpr u8 kMarkCaron = 0x02;         // č ď ě ň ř š ť ž
+inline constexpr u8 kMarkRing = 0x03;          // ů
+inline constexpr u8 kMarkDoubleAcute = 0x04;   // ő ű
+inline constexpr u8 kMarkBreve = 0x05;         // ă ğ
+inline constexpr u8 kMarkBelow = 0x06;         // ș ț, and as a cedilla ç ş
+inline constexpr u8 kMarkDotless = 0x07;       // ı: í (0x94) without its accent
+
+// A letter no mark makes (Greek, Hangul, Chinese): a byte the fonts draw about as wide, whose quad
+// the port replaces with the letter from a font file (game/common/glyphs.h), then kForeign and
+// the letter's number among the language's (set_foreign_letters) in foreign_digits() digits of
+// base 6, each a byte 0x02..0x07, the highest first. A lone kMarkMore after a letter is a place
+// a line may break (between Chinese characters), which the printers skip.
+inline constexpr u8 kForeign = 0x07;
+
+// The letters of the language in use that are drawn from its font file, sorted; empty for none.
+// A language's texts are turned into the game's bytes after its letters are set.
+void set_foreign_letters(std::vector<char32_t> letters);
+const std::vector<char32_t>& foreign_letters();
+int foreign_digits();
+
+// The letters of UTF8 that neither the fonts nor the port's marks draw (the ones a font file has to).
+std::vector<char32_t> letters_without_marks(std::string_view utf8);
 
 // The game's bytes as a translator reads them.
 std::string game_text_to_utf8(std::string_view game);

@@ -18,6 +18,7 @@
 #include <string>
 
 #include "openrac/game_host.h"
+#include "renderer/texture.h"
 
 namespace openrac::frontend {
 
@@ -41,6 +42,10 @@ void sky_shell(int shell, const float* matrix);
 // A quad of the 2D layer drawn natively (openrac_game_ui_quad): its index for the marker, or -1
 // when the 2D layer is replayed from the game's packets.
 int ui_quad(const openrac_game_ui_rect& quad);
+
+// A texture of the port's own at KEY in the renderer's pool, for UI quads that name it
+// (openrac_game_ui_rect.key), drawn filtered. False when there is no window yet.
+bool place_texture(std::uint32_t key, const renderer::Rgba8Image& image, const std::string& name);
 
 // How far the HUD's side-anchored elements go out past the game's picture, in its 512ths of that
 // picture's width (openrac_game_hud_side): the player's "HUD: Edges" in a wider picture, else 0.

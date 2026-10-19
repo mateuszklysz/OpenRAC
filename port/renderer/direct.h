@@ -245,6 +245,7 @@ private:
     void native_quad(const UiQuad& quad);
     std::span<const UiQuad> m_ui_quads{};
     bool m_glyph = false;  // native_quad: drawing a glyph
+    std::uint32_t m_key = 0;  // native_quad: the port's texture it draws with (UiQuad::key)
     bool m_in_native = false;  // native_quad: its own vertices
     void emit_triangle(
         const GsVertex& a, const GsVertex& b, const GsVertex& c, const GsVertex& colour_from

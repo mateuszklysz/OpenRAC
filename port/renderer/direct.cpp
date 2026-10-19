@@ -676,6 +676,10 @@ void GifInterpreter::native_quad(const UiQuad& quad) {
     const bool sprite = (quad.flags & kUiSprite) != 0;
     write_prim(sprite ? 0x156 : 0x154);
     m_glyph = (quad.flags & kUiGlyph) != 0;
+    if (m_key != quad.key) {
+        m_key = quad.key;
+        m_state_dirty = true;
+    }
     m_in_native = true;
     for (int i = 0; i < 4; ++i) {
         if (sprite && (i == 1 || i == 2)) {
@@ -694,6 +698,10 @@ void GifInterpreter::native_quad(const UiQuad& quad) {
         kick(true);
     }
     m_in_native = false;
+    if (m_key != 0) {
+        m_key = 0;
+        m_state_dirty = true;
+    }
     if (m_glyph) {
         m_glyph = false;
         m_state_dirty = true;
@@ -928,16 +936,25 @@ void GifInterpreter::ensure_draw() {
         int frame_x = 0;
         int frame_y = 0;
         s.target = offscreen_target();
-        s.source = s.textured && std::find(m_offscreen.begin(), m_offscreen.end(), c.tex0.tbp0) != m_offscreen.end()
+        s.source = s.textured && m_key == 0 && std::find(m_offscreen.begin(), m_offscreen.end(), c.tex0.tbp0) != m_offscreen.end()
                        ? c.tex0.tbp0
                        : 0;
-        s.frame_source = s.source == 0 && s.textured && is_colour_format(c.tex0.psm)
+        s.frame_source = s.source == 0 && s.textured && m_key == 0 && is_colour_format(c.tex0.psm)
                          && frame_source(c.tex0.tbp0, frame_x, frame_y);
         if (s.source != 0 || s.frame_source) {
             s.tcc = c.tex0.tcc;
             s.tfx = c.tex0.tfx;
             s.linear_mag = c.tex1.mmag;
             s.linear_min = c.tex1.mmin == 1 || c.tex1.mmin == 4 || c.tex1.mmin == 5;
+            s.clamp_s = true;
+            s.clamp_t = true;
+        } else if (s.textured && m_key != 0) {
+            s.texture = m_textures.placed(m_key);
+            s.texture_full_alpha = m_textures.alpha_scale(s.texture) == AlphaScale::Full;
+            s.tcc = c.tex0.tcc;
+            s.tfx = c.tex0.tfx;
+            s.linear_mag = true;
+            s.linear_min = true;
             s.clamp_s = true;
             s.clamp_t = true;
         } else if (s.textured) {

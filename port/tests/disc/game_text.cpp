@@ -123,6 +123,33 @@ int main() {
     CHECK(game_text_from_utf8("[[cross] [nope] [x4] [xZZ]") == "[cross] [nope] [x4] [xZZ]");
     CHECK(game_text_from_utf8("→ ß") == "? ss");
 
+    // The other languages' Latin letters: a mark of two bytes, ı as í without its accent.
+    CHECK(game_text_from_utf8("čů") == "c\x06\x02u\x06\x03");
+    CHECK(game_text_from_utf8("ı İ ő") == "\x94\x06\x07 I\x03 o\x06\x04");
+    CHECK(
+        game_text_to_utf8(game_text_from_utf8("Příliš žluťoučký kůň; Árvíztűrő; țară, ÇIĞ ı; Đurđa"))
+        == "Příliš žluťoučký kůň; Árvíztűrő; țară, ÇIĞ ı; Đurđa"
+    );
+    CHECK(game_text_to_utf8("\x06\x02") == "[x06][x02]");
+    CHECK(game_text_to_utf8(game_text_from_utf8("ş ţ")) == "ș ț");  // the cedilla forms read back as commas
+
+    // Greek, Hangul and Chinese: a byte as wide, kForeign and the letter's number in base 6.
+    set_foreign_letters({U'Ω', U'α', U'한', U'中', U'文', U'。'});
+    CHECK(foreign_digits() == 1);
+    CHECK(game_text_from_utf8("α") == "a\x07\x03");  // sorted: Ω α 。 中 文 한
+    CHECK(game_text_from_utf8("Ω") == "O\x07\x02");
+    // A place to break after a Chinese character, but not before a full stop.
+    CHECK(game_text_from_utf8("中文。") == "W\x07\x05\x06W\x07\x06W\x07\x04");
+    CHECK(game_text_to_utf8(game_text_from_utf8("한 α中文。Ω")) == "한 α中文。Ω");
+    std::vector<char32_t> many;
+    for (char32_t c = 0x4E00; c < 0x4E00 + 300; ++c) {
+        many.push_back(c);
+    }
+    set_foreign_letters(many);
+    CHECK(foreign_digits() == 4);  // 6^3 = 216 < 300
+    CHECK(game_text_to_utf8(game_text_from_utf8("丁七丄")) == "丁七丄");
+    set_foreign_letters({});
+
     // Pairing by id, a repeated text once.
     const std::vector<TextBlocks> blocks = {
         {"all_text", {{1, "Yes", -1}, {2, "No", -1}}, {{2, "Non", -1}, {1, "Oui", -1}}},

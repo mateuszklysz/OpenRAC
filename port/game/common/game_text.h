@@ -37,8 +37,10 @@ void set_folder(const std::filesystem::path& folder);
 std::vector<i18n::LanguageInfo> languages();
 
 // Reads FOLDER/<code>.po and the built-in game/<code>.po for the game's texts; English (none)
-// when neither is there. True when one was read.
-bool use(const std::string& code);
+// when neither is there. SHOWN: what else the port will write in the game's font in this language
+// (the names of the languages), whose letters a font file may have to draw too. True when one was
+// read.
+bool use(const std::string& code, const std::vector<std::string>& shown = {});
 
 // The language used now (use's code).
 const std::string& code();
@@ -60,5 +62,9 @@ std::uint32_t translate(int id, std::uint32_t original);
 // drawn before any text table is loaded): its address, or 0 when the language has none other than
 // the game's own words.
 std::uint32_t translate_id(int id);
+
+// The translation of ID as its file writes it (UTF-8, buttons and colours in brackets); empty when
+// the language has none.
+std::string words(int id);
 
 }  // namespace openrac::frontend::game_text

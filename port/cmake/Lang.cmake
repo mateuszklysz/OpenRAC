@@ -2,8 +2,10 @@
 # Copyright (c) 2026 the OpenRAC contributors
 #
 # The translations built into the port, behind common/i18n_files.h: every port/lang/*.po (the
-# port's own words, common/i18n.h) and port/lang/game/*.po (the game's texts, by key:
-# game/common/game_text.h, named "game/<code>.po") becomes bytes in a generated source of TARGET.
+# port's own words, common/i18n.h), port/lang/game/*.po (the game's texts, by key:
+# game/common/game_text.h, named "game/<code>.po") and port/lang/fonts/*.ttf (the letters of a
+# language the game's fonts lack: game/common/glyphs.h, "fonts/<code>.ttf") becomes bytes in a
+# generated source of TARGET.
 # Translations are part of the program, so a game never depends on files beside it; adding or
 # editing a .po configures again.
 
@@ -11,7 +13,8 @@ include_guard(GLOBAL)
 
 function(openrac_embed_translations target)
   file(GLOB files CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/lang/*.po"
-                                    "${PROJECT_SOURCE_DIR}/lang/game/*.po")
+                                    "${PROJECT_SOURCE_DIR}/lang/game/*.po"
+                                    "${PROJECT_SOURCE_DIR}/lang/fonts/*.ttf")
   list(SORT files)
   # A file's words changing configures again too (the glob alone notices files added or removed).
   set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${files})

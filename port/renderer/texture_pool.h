@@ -78,6 +78,8 @@ public:
     // The game has put `texture` at base pointer `tbp`; draws that sample
     // there get it, whatever their TEX0 says about format and CLUT.
     void place(std::uint32_t tbp, TextureHandle texture);
+    // What was placed at KEY: the placeholder when nothing was.
+    TextureHandle placed(std::uint32_t key);
     void clear_placements();
 
     // ---- What a draw samples ----

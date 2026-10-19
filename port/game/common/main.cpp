@@ -34,6 +34,7 @@
 #include <span>
 #include <algorithm>
 #include <format>
+#include <map>
 #include <string>
 #include <thread>
 #include <vector>
@@ -49,6 +50,7 @@
 #include "common/system_info.h"
 #ifdef OPENRAC_HAS_DISC
 #include "assets/disc/disc.h"
+#include "assets/disc/game_text.h"
 #endif
 #include "common/stats.h"
 #include "openrac/elf.h"
@@ -61,6 +63,7 @@
 #include "common/i18n.h"
 #include "frontend.h"
 #include "game_text.h"
+#include "glyphs.h"
 #include "options_menu.h"
 #include "settings.h"
 #include "openrac/sound_engine.h"
@@ -956,6 +959,60 @@ gaddr openrac_game_text_translated(int id, gaddr original) {
 #endif
     (void)id;
     (void)original;
+    return 0;
+}
+
+int openrac_game_foreign_glyph(int index, openrac_game_glyph* out) {
+#ifdef OPENRAC_FRONTEND
+    if (g_window) {
+        return frontend::glyphs::glyph(index, *out) ? 1 : 0;
+    }
+#endif
+    (void)index;
+    (void)out;
+    return 0;
+}
+
+int openrac_game_text_picture(int id, float max_width, float max_height, openrac_game_picture* out) {
+#ifdef OPENRAC_FRONTEND
+    if (g_window) {
+        // Drawn once for each text and language, as the captions are drawn every frame.
+        struct drawn {
+            std::string code;
+            float max_width, max_height;
+            openrac_game_picture picture;
+        };
+        static std::map<int, drawn> pictures;
+        const std::string& code = frontend::game_text::code();
+        const auto found = pictures.find(id);
+        if (found != pictures.end() && found->second.code == code && found->second.max_width == max_width
+            && found->second.max_height == max_height) {
+            *out = found->second.picture;
+            return 1;
+        }
+        const std::string words = frontend::game_text::words(id);
+        openrac_game_picture picture{};
+        if (words.empty() || !frontend::glyphs::picture(words, code, max_width, max_height, picture)) {
+            return 0;
+        }
+        pictures[id] = {code, max_width, max_height, picture};
+        *out = picture;
+        return 1;
+    }
+#endif
+    (void)id;
+    (void)max_width;
+    (void)max_height;
+    (void)out;
+    return 0;
+}
+
+int openrac_game_foreign_digits(void) {
+#if defined(OPENRAC_FRONTEND) && defined(OPENRAC_HAS_DISC)
+    if (g_window && !assets::disc::foreign_letters().empty()) {
+        return assets::disc::foreign_digits();
+    }
+#endif
     return 0;
 }
 

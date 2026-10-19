@@ -2673,6 +2673,16 @@ void set_tick(std::chrono::steady_clock::time_point tick, std::chrono::duration<
     pacing.late = late;
 }
 
+bool place_texture(std::uint32_t key, const renderer::Rgba8Image& image, const std::string& name) {
+    if (!g || !g->renderer) {
+        return false;
+    }
+    const renderer::TextureHandle h =
+        g->renderer->textures().add(image, renderer::AlphaScale::Full, name, false, true);
+    g->renderer->textures().place(key, h);
+    return true;
+}
+
 int ui_quad(const openrac_game_ui_rect& quad) {
     // The 2D layer's quads are drawn natively (on the way off the GS packets); OPENRAC_UI_REPLAY
     // replays the game's packets instead, for comparing.
@@ -2691,6 +2701,7 @@ int ui_quad(const openrac_game_ui_rect& quad) {
     q.rgba = quad.rgba;
     q.tex0 = quad.tex0;
     q.flags = quad.flags;
+    q.key = quad.key;
     g->ui_quads.push_back(q);
     return static_cast<int>((g->ui_quads.size() - 1) | (g->ui_generation & 0x3F) << 24);
 }
