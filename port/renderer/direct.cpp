@@ -952,13 +952,6 @@ void GifInterpreter::ensure_draw() {
             s.clamp_t = true;
         } else if (s.textured && m_key != 0) {
             s.texture = m_textures.placed(m_key);
-            if (s.texture == m_textures.placeholder()) {
-                static std::uint32_t warned = 0;
-                if (warned != m_key) {
-                    warned = m_key;
-                    log::warn("no texture of the port's at key {:#x}", m_key);
-                }
-            }
             s.texture_full_alpha = m_textures.alpha_scale(s.texture) == AlphaScale::Full;
             s.tcc = c.tex0.tcc;
             s.tfx = c.tex0.tfx;

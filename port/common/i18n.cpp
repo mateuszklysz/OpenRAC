@@ -28,9 +28,6 @@ std::map<std::string, Catalogue>& catalogues() {
             if (std::string_view(f.name).starts_with("game/")) {
                 continue;  // the game's texts: game/common/game_text.h
             }
-            if (std::string_view(f.name).starts_with("fonts/")) {
-                continue;  // the fonts the port draws letters with: game/common/glyphs.h
-            }
             std::string why;
             if (auto c = parse_po(f.text, why)) {
                 built.insert_or_assign(c->code, std::move(*c));

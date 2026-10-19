@@ -2685,7 +2685,8 @@ bool place_texture(std::uint32_t key, const renderer::Rgba8Image& image, const s
 
 std::uint32_t t8_texture(std::span<const std::uint8_t> indices, std::span<const std::uint8_t> palette, int width,
                          int height) {
-    constexpr std::uint32_t kKey = 0x43000;  // past the foreign letters' and the captions' (glyphs.cpp)
+    // Past the sky's, the particles' and the black one's keys (main.cpp).
+    constexpr std::uint32_t kKey = 0x43000;
     if (!g || !g->renderer) {
         return 0;
     }

@@ -453,16 +453,15 @@ gaddr rac1_translated_text(gaddr text) {
  * which is right on the console (the register holds all 64 bits) but cuts it to 32 here, so the
  * glyphs would be drawn with a wrong palette and size; the port passes it whole.
  */
-/* The marks of the port's letters (ui2d.c) are bytes 2..7, and the window's line breaking breaks
+/* The marks of the port's letters (ui2d.c) are bytes 2..5, and the window's line breaking breaks
  * at any byte below 0x10, which split "układu" into "uk" and "ładu". The window is given a copy
  * with each mark as a byte at 0x21 or above that the font has no glyph for (no advance: nothing
- * drawn, nothing measured, no break), which the printers read as the same mark. A lone kMarkMore
- * (the place a line may break between Chinese characters) is kept, for the window to break at and
- * drop. Unchanged when the font has no such byte to spare. */
+ * drawn, nothing measured, no break), which the printers read as the same mark. Unchanged when the
+ * font has no such byte to spare. */
 extern unsigned char rac1_mark_of[256];
 
 static gaddr unbroken_marks(gaddr text) {
-    enum { CAPACITY = 4096, FIRST_MARK = 2, MARKS = 6, MORE = 6, FOREIGN = 7 };
+    enum { CAPACITY = 4096, FIRST_MARK = 2, MARKS = 4 };
     static gaddr copy;
     static int spared;
     static unsigned char spare[MARKS];
@@ -506,19 +505,9 @@ static gaddr unbroken_marks(gaddr text) {
         copy = openrac_guest_static(CAPACITY);
     }
     uint8_t* dst = (uint8_t*)G(copy);
-    const int digits = openrac_game_foreign_digits();
-    int left = 0; /* the bytes still to come of a mark of several: all spared */
     for (int i = 0; i <= n; ++i) {
         const unsigned k = src[i] - FIRST_MARK;
-        if (left == 0 && k < MARKS) {
-            left = src[i] == FOREIGN ? 1 + digits
-                   : src[i] == MORE  ? (src[i + 1] - (unsigned)FIRST_MARK < (unsigned)MARKS ? 2 : 0)
-                                     : 1;
-        }
-        dst[i] = left > 0 && k < MARKS && spare[k] != 0 ? spare[k] : src[i];
-        if (left > 0) {
-            --left;
-        }
+        dst[i] = k < MARKS && spare[k] != 0 ? spare[k] : src[i];
     }
     return copy;
 }

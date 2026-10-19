@@ -100,7 +100,7 @@ struct UiQuad {
     std::uint64_t tex0 = 0;
     std::uint32_t flags = 0;  // kUiGlyph: a glyph of text (drawn from a distance field); kUiSprite
     // A texture of the port's own (TexturePool::place) instead of TEX0's base pointer, drawn
-    // filtered: a letter from a language's font file. 0: none.
+    // filtered: a texture the game uploads in a place the GS reuses (the captions' font). 0: none.
     std::uint32_t key = 0;
 };
 

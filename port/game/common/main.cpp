@@ -49,7 +49,6 @@
 #include "common/system_info.h"
 #ifdef OPENRAC_HAS_DISC
 #include "assets/disc/disc.h"
-#include "assets/disc/game_text.h"
 #endif
 #include "common/stats.h"
 #include "openrac/elf.h"
@@ -62,7 +61,6 @@
 #include "common/i18n.h"
 #include "frontend.h"
 #include "game_text.h"
-#include "glyphs.h"
 #include "options_menu.h"
 #include "settings.h"
 #include "openrac/sound_engine.h"
@@ -961,17 +959,6 @@ gaddr openrac_game_text_translated(int id, gaddr original) {
     return 0;
 }
 
-int openrac_game_foreign_glyph(int index, openrac_game_glyph* out) {
-#ifdef OPENRAC_FRONTEND
-    if (g_window) {
-        return frontend::glyphs::glyph(index, *out) ? 1 : 0;
-    }
-#endif
-    (void)index;
-    (void)out;
-    return 0;
-}
-
 uint32_t openrac_game_t8_texture(gaddr pixels, gaddr clut, int log2_width, int log2_height) {
 #ifdef OPENRAC_FRONTEND
     if (g_window && log2_width >= 0 && log2_width <= 10 && log2_height >= 0 && log2_height <= 10) {
@@ -1005,15 +992,6 @@ uint32_t openrac_game_black_texture(void) {
             placed = frontend::place_texture(kBlack, black, "black");
         }
         return placed ? kBlack : 0;
-    }
-#endif
-    return 0;
-}
-
-int openrac_game_foreign_digits(void) {
-#if defined(OPENRAC_FRONTEND) && defined(OPENRAC_HAS_DISC)
-    if (g_window && !assets::disc::foreign_letters().empty()) {
-        return assets::disc::foreign_digits();
     }
 #endif
     return 0;

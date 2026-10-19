@@ -240,8 +240,8 @@ typedef struct openrac_game_ui_rect {
     uint32_t rgba;
     uint64_t tex0;
     uint32_t flags; /* 1: a glyph of text; 2: sent as a sprite (corners 0 and 3) */
-    uint32_t key;   /* a texture of the port's own to draw with instead of TEX0's base pointer (0: none),
-                       filtered: a foreign letter's font (openrac_game_glyph) */
+    uint32_t key;   /* a texture of the port's own to draw with instead of TEX0's base pointer, filtered
+                       (openrac_game_t8_texture, openrac_game_black_texture); 0: none */
 } openrac_game_ui_rect;
 
 int openrac_game_ui_quad(const openrac_game_ui_rect* quad);
@@ -310,22 +310,6 @@ gaddr openrac_game_text_translated(int id, gaddr original);
  * loaded): its game address, or 0 when there is none but the game's own words. */
 gaddr openrac_game_text_by_id(int id);
 
-/* A letter of the language in use that the port draws from its font file (Greek, Hangul, Chinese:
- * assets/disc/game_text.h, kForeign): where it is in the font's texture, a texture of the port's
- * (openrac_game_ui_rect's key, log2 sizes for TEX0's TW and TH), in texels; and its quad around the
- * pen in ems (x right from the pen, y down from the baseline), with how far the pen moves. */
-typedef struct openrac_game_glyph {
-    uint32_t key;
-    uint32_t log2_width, log2_height;
-    float u0, v0, u1, v1;
-    float x0, y0, x1, y1;
-    float advance;
-    int chinese; /* a Han character or Hangul, as wide as high: drawn to fill its place */
-} openrac_game_glyph;
-
-/* The letter numbered INDEX among the language's: 1 with OUT filled, 0 when there is none. */
-int openrac_game_foreign_glyph(int index, openrac_game_glyph* out);
-
 /* A PSMT8 texture of the game's as it uploads it (1 << LOG2_WIDTH x 1 << LOG2_HEIGHT indices at
  * PIXELS, a 16 x 16 CSM1 palette of PSMCT32 at CLUT, in game memory) as a texture of the port's: its
  * key (openrac_game_ui_rect.key), 0 without a window. The game's font for the captions before the
@@ -334,9 +318,6 @@ uint32_t openrac_game_t8_texture(gaddr pixels, gaddr clut, int log2_width, int l
 
 /* The key of an opaque black texture of the port's (4 x 4), 0 without a window. */
 uint32_t openrac_game_black_texture(void);
-
-/* How many digits a foreign letter's number has in the language in use; 0: it has none. */
-int openrac_game_foreign_digits(void);
 
 /* ---- Inside the replacements ---- */
 

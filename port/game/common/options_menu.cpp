@@ -288,7 +288,7 @@ constexpr std::uint32_t kPadRight = 0x2000;
 // The port's text ids: past the game's last (its table's ids are under 0x7000).
 constexpr int kTextFirst = 0x7E00;
 constexpr int kShown = 4;  // the rows the page's frame holds
-constexpr gaddr kTextBytes = 256;  // room for letters drawn from a font file (seven bytes each)
+constexpr gaddr kTextBytes = 48;
 
 constexpr gaddr kItemBytes = 12;  // an Options list item: label, action, page, sublabel, timer
 constexpr int kMaxItems = 8;
@@ -466,64 +466,28 @@ constexpr std::int16_t kSetLanguage = 9;
 constexpr std::int32_t kEnglish = 0;  // the global's English (InitOnce)
 constexpr std::int32_t kNone = -1;    // a value the global never has: no mark
 constexpr std::uint32_t kPadCross = 0x40;
-constexpr int kMaxExtra = 16;
+constexpr int kMaxExtra = 4;
 constexpr int kTextFirst = page::kPauseRowText + 2 * page::kPauseRows;  // the added items' labels
 
 // The port's languages as each language names them, as the game's list names its own ("Englisch"
-// on the German page): a row a language, a column a language of the page (kPages). A language
-// missing here is named in its own words.
-constexpr const char* kPages[] = {"en", "fr", "de", "es", "it", "pl", "cs", "el",
-                                  "hu", "ro", "hr", "tr", "ko", "zh-Hans", "zh-Hant"};
-constexpr std::size_t kPageCount = std::size(kPages);
-struct Names {
+// on the German page). A language missing here is named in its own words.
+struct Name {
     const char* code;
-    const char* in[kPageCount];
+    const char* in;  // the language of the page
+    const char* name;
 };
-constexpr Names kNames[] = {
-    {"pl", {"Polish", "Polonais", "Polnisch", "Polaco", "Polacco", "Polski", "Polština", "Πολωνικά", "Lengyel",
-            "Poloneză", "Poljski", "Lehçe", "폴란드어", "波兰语", "波蘭語"}},
-    {"cs", {"Czech", "Tchèque", "Tschechisch", "Checo", "Ceco", "Czeski", "Čeština", "Τσεχικά", "Cseh", "Cehă",
-            "Češki", "Çekçe", "체코어", "捷克语", "捷克語"}},
-    {"el", {"Greek", "Grec", "Griechisch", "Griego", "Greco", "Grecki", "Řečtina", "Ελληνικά", "Görög", "Greacă",
-            "Grčki", "Yunanca", "그리스어", "希腊语", "希臘語"}},
-    {"hu", {"Hungarian", "Hongrois", "Ungarisch", "Húngaro", "Ungherese", "Węgierski", "Maďarština", "Ουγγρικά",
-            "Magyar", "Maghiară", "Mađarski", "Macarca", "헝가리어", "匈牙利语", "匈牙利語"}},
-    {"ro", {"Romanian", "Roumain", "Rumänisch", "Rumano", "Rumeno", "Rumuński", "Rumunština", "Ρουμανικά", "Román",
-            "Română", "Rumunjski", "Rumence", "루마니아어", "罗马尼亚语", "羅馬尼亞語"}},
-    {"hr", {"Croatian", "Croate", "Kroatisch", "Croata", "Croato", "Chorwacki", "Chorvatština", "Κροατικά", "Horvát",
-            "Croată", "Hrvatski", "Hırvatça", "크로아티아어", "克罗地亚语", "克羅埃西亞語"}},
-    {"tr", {"Turkish", "Turc", "Türkisch", "Turco", "Turco", "Turecki", "Turečtina", "Τουρκικά", "Török", "Turcă",
-            "Turski", "Türkçe", "터키어", "土耳其语", "土耳其語"}},
-    {"ko", {"Korean", "Coréen", "Koreanisch", "Coreano", "Coreano", "Koreański", "Korejština", "Κορεατικά", "Koreai",
-            "Coreeană", "Korejski", "Korece", "한국어", "韩语", "韓語"}},
-    {"zh-Hans", {"Chinese (Simplified)", "Chinois simplifié", "Chinesisch (vereinf.)", "Chino simplificado",
-                 "Cinese semplificato", "Chiński uproszczony", "Čínština (zjedn.)", "Κινεζικά (απλοπ.)",
-                 "Kínai (egyszerűsített)", "Chineză simplificată", "Kineski (pojednost.)", "Basitleştirilmiş Çince",
-                 "중국어(간체)", "简体中文", "簡體中文"}},
-    {"zh-Hant", {"Chinese (Traditional)", "Chinois traditionnel", "Chinesisch (tradit.)", "Chino tradicional",
-                 "Cinese tradizionale", "Chiński tradycyjny", "Čínština (trad.)", "Κινεζικά (παραδ.)",
-                 "Kínai (hagyományos)", "Chineză tradițională", "Kineski (tradicionalni)", "Geleneksel Çince",
-                 "중국어(번체)", "繁体中文", "繁體中文"}},
+constexpr Name kNames[] = {
+    {"pl", "en", "Polish"},  {"pl", "fr", "Polonais"}, {"pl", "de", "Polnisch"},
+    {"pl", "es", "Polaco"},  {"pl", "it", "Polacco"},  {"pl", "pl", "Polski"},
 };
 
 std::string name_in(const std::string& code, const std::string& in, const std::string& own) {
-    for (const Names& n : kNames) {
-        for (std::size_t k = 0; k < kPageCount && code == n.code; ++k) {
-            if (in == kPages[k]) {
-                return n.in[k];
-            }
+    for (const Name& n : kNames) {
+        if (code == n.code && in == n.in) {
+            return n.name;
         }
     }
     return own;
-}
-
-// The names the page shows in language IN, for the letters a font file draws.
-std::vector<std::string> names_in(const std::string& in) {
-    std::vector<std::string> out;
-    for (const Names& n : kNames) {
-        out.push_back(name_in(n.code, in, n.code));
-    }
-    return out;
 }
 
 struct Made {
@@ -618,9 +582,6 @@ void update(const openrac_front_end& fe, bool front) {
         const gaddr shown = GREF(std::uint32_t, fe.language_list + 0x34);
         if (m.items != 0 && shown == m.game_items) {
             GREF(std::uint32_t, fe.language_list + 0x34) = m.items;
-            // More languages than the frame holds: the list scrolls by whole rows (0x8000), as the
-            // debug menu's list of planets does.
-            GREF(std::uint32_t, fe.language_list + 0x30) |= 0x8000u;
         }
         // Cross on an item of the port's, on the Language page.
         const std::uint32_t pressed = GREF(std::uint32_t, fe.pad + 0x1C4);
@@ -925,7 +886,7 @@ void apply_language() {
     const std::string code =
         chosen == "auto" ? i18n::from_locales(platform::preferred_languages(), all_languages()) : chosen;
     i18n::set_language(code);
-    game_text::use(code, language_page::names_in(code));
+    game_text::use(code);
 }
 
 bool update(int loaded_overlay) {
