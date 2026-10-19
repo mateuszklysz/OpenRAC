@@ -43,6 +43,8 @@
 /* The loading slides' textures (play_level_loading_slides' preparation). */
 #define func_00232B90 game_FUN_00231878
 #define func_00232B90__game game_FUN_00231878__game
+#define func_00232A00 game_FUN_002316e8
+#define func_00232A00__game game_FUN_002316e8__game
 /* Font_DrawString's parameters as the NTSC decomp orders them: the floats last. */
 #define RAC1_DRAW_STRING_FLOATS_LAST 1
 

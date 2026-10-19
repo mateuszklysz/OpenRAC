@@ -616,9 +616,19 @@ void func_00232B90(int language, int first, int second, gaddr shared, gaddr firs
     g_slides[1].tex = GREF(uint64_t, second_out), g_slides[1].slide = second;
 }
 
+/* The band under a slide (func_00232A00, drawn just before it): its alpha is the slides' fade, in
+ * and out, which shows through the letters. */
+static unsigned g_band_alpha = 0x80;
+
+void func_00232A00(int x, int y, int w, int h, unsigned long long rgba, unsigned long long tex, float u0, float u1,
+                   float v0, float v1) {
+    g_band_alpha = (unsigned)(rgba >> 24) & 0xFFu;
+    func_00232A00__game(x, y, w, h, rgba, tex, u0, u1, v0, v1);
+}
+
 /* A line of a caption centred on cx, SCALE of the font's size and no wider than the slide less a
- * margin, in the band's light blue. */
-static void caption_line(gaddr text, int width, float cx, float cy, float scale) {
+ * margin, in the band's light blue faded as it is. */
+static void caption_line(gaddr text, int width, float cx, float cy, float scale, unsigned alpha) {
     enum { ROOM = 480 };
     if ((float)width * scale > (float)ROOM) {
         scale = (float)ROOM / (float)width;
@@ -626,49 +636,24 @@ static void caption_line(gaddr text, int width, float cx, float cy, float scale)
     const float x = cx - (float)width * scale / 2.0f, y = cy - 8.0f * scale;
     const gaddr glyphs = OPENRAC_DATA(RAC1_ADDR(0x001DF3D0u));
     const long long font = (long long)func_001F4868(1);
+    const unsigned long long colour = ((unsigned long long)alpha << 24) | 0x807030ull;
 #if RAC1_DRAW_STRING_FLOATS_LAST
-    func_001F69F0(0x80807030ull, text, -1, font, glyphs, x, y, scale);
+    func_001F69F0(colour, text, -1, font, glyphs, x, y, scale);
 #else
-    func_001F69F0(0x80807030ull, text, x, -1, font, glyphs, y, scale);
+    func_001F69F0(colour, text, x, -1, font, glyphs, y, scale);
 #endif
 }
 
-/* In a language the port translates into, a caption picture is replaced by its text in the game's
- * font as kept (func_00232B90), 0.85 of its size, over black: on one line, or two split at the space
- * nearest the middle when it is wider than the slide. True when it was. */
-static int loading_slide(int x, int y, int w, int h, unsigned long long rgba, unsigned long long tex) {
-    if (w != 0x200 || h != 0x40 || tex == 0 || g_kept_font_key == 0) {
-        return 0;
-    }
-    int slide = -1;
-    for (int k = 0; k < 2; ++k) {
-        if (g_slides[k].tex == tex) {
-            slide = g_slides[k].slide;
-            break;
-        }
-    }
-    if (slide < 0) {
-        return 0;
-    }
+/* The text of slide SLIDE in the game's font as decoded (func_00232B90), 0.98 of its size, centred
+ * on (cx, cy): on one line, or two split at the space nearest the middle when it is wider than the
+ * slide. False when the language has no words for it. */
+static int caption(int slide, float cx, float cy, unsigned alpha) {
     const gaddr translated = openrac_game_text_by_id(21251 + slide);
-    const uint32_t black = openrac_game_black_texture();
-    if (translated == 0 || black == 0) {
-        return 0; /* the game's own words: its picture says them */
-    }
-    /* The slide's black, over the band. */
-    openrac_game_ui_rect q;
-    memset(&q, 0, sizeof(q));
-    const int ofx = SCREEN_OFX, ofy = SCREEN_OFY;
-    rect(&q, x * 16 + ofx - 8, y * 16 + ofy - 8, (x + w) * 16 + ofx - 8, (y + h) * 16 + ofy - 8, 0, 0, 4 * 16, 4 * 16);
-    q.z = 0xFFFFF0u;
-    q.rgba = (uint32_t)rgba;
-    q.tex0 = (1ull << 34) | (2ull << 26) | (2ull << 30); /* TCC, MODULATE, 4 x 4 */
-    q.key = black;
-    if (!emit(&q)) {
+    if (translated == 0) {
         return 0;
     }
     enum { SIZE = 256 };
-    static const float SCALE = 0.85f;
+    static const float SCALE = 0.98f;
     static gaddr text = 0;
     if (text == 0) {
         text = openrac_guest_static(SIZE);
@@ -687,7 +672,6 @@ static int loading_slide(int x, int y, int w, int h, unsigned long long rgba, un
     }
     dst[n] = 0;
     width_before[n] = width;
-    const float cx = (float)x + (float)w / 2.0f, cy = (float)y + (float)h / 2.0f;
     int split = -1;
     if ((float)width * SCALE > 480.0f) {
         for (int i = 0; i < n; ++i) {
@@ -698,13 +682,65 @@ static int loading_slide(int x, int y, int w, int h, unsigned long long rgba, un
     }
     g_drawing_caption = 1;
     if (split < 0) {
-        caption_line(text, width, cx, cy, SCALE);
+        caption_line(text, width, cx, cy, SCALE, alpha);
     } else {
         dst[split] = 0;
-        caption_line(text, width_before[split], cx, cy - 9.0f * SCALE, SCALE);
-        caption_line(text + (gaddr)split + 1, width - width_before[split + 1], cx, cy + 9.0f * SCALE, SCALE);
+        caption_line(text, width_before[split], cx, cy - 9.0f * SCALE, SCALE, alpha);
+        caption_line(text + (gaddr)split + 1, width - width_before[split + 1], cx, cy + 9.0f * SCALE, SCALE, alpha);
     }
     g_drawing_caption = 0;
+    return 1;
+}
+
+/* In a language the port translates into, a caption picture is replaced by black (over its band)
+ * and its text, faded with the band. Of two slides, the upper one's text sits lower and the lower
+ * one's higher, as in the game's pictures; the lower slide's black, drawn over the upper's bottom,
+ * has the upper's text printed again over it. True when it was. */
+static int loading_slide(int x, int y, int w, int h, unsigned long long rgba, unsigned long long tex) {
+    enum { CLOSER = 8 };
+    static struct {
+        int slide;
+        float cx, cy;
+        unsigned alpha;
+    } upper = {-1, 0.0f, 0.0f, 0};
+    if (w != 0x200 || h != 0x40 || tex == 0 || g_kept_font_key == 0) {
+        return 0;
+    }
+    int k = -1;
+    for (int i = 0; i < 2; ++i) {
+        if (g_slides[i].tex == tex) {
+            k = i;
+            break;
+        }
+    }
+    const uint32_t black = openrac_game_black_texture();
+    if (k < 0 || black == 0 || openrac_game_text_by_id(21251 + g_slides[k].slide) == 0) {
+        return 0; /* the game's own words: its picture says them */
+    }
+    const int two = g_slides[0].slide != g_slides[1].slide;
+    openrac_game_ui_rect q;
+    memset(&q, 0, sizeof(q));
+    const int ofx = SCREEN_OFX, ofy = SCREEN_OFY;
+    rect(&q, x * 16 + ofx - 8, y * 16 + ofy - 8, (x + w) * 16 + ofx - 8, (y + h) * 16 + ofy - 8, 0, 0, 4 * 16, 4 * 16);
+    q.z = 0xFFFFF0u;
+    q.rgba = (uint32_t)rgba;
+    q.tex0 = (1ull << 34) | (2ull << 26) | (2ull << 30); /* TCC, MODULATE, 4 x 4 */
+    q.key = black;
+    if (!emit(&q)) {
+        return 0;
+    }
+    const float cx = (float)x + (float)w / 2.0f;
+    float cy = (float)y + (float)h / 2.0f;
+    if (two) {
+        cy += k == 0 ? (float)CLOSER : -(float)CLOSER;
+    }
+    if (two && k == 1 && upper.slide == g_slides[0].slide) {
+        caption(upper.slide, upper.cx, upper.cy, upper.alpha);
+    }
+    caption(g_slides[k].slide, cx, cy, g_band_alpha);
+    if (k == 0) {
+        upper.slide = g_slides[0].slide, upper.cx = cx, upper.cy = cy, upper.alpha = g_band_alpha;
+    }
     return 1;
 }
 
