@@ -13,7 +13,9 @@
 // from the French and Spanish strings), drawn as the letter with an accent over it; 0xa8.. a few
 // more letters whose order is not known. In the files a colour or a button is a word in brackets
 // ([orange], [cross]), a byte without a name [xNN], and a '[' of the text "[[". The game's fonts
-// have no other letters: a letter they lack is written as its plain one (ą a, ł l, ß ss).
+// have no other letters. Polish ones are the plain letter and a mark byte (kMark*: ś is 's', 0x02),
+// which the port draws over or under it from the fonts' own glyphs (game/rac1/host/ui2d.c) and the
+// game skips; any other letter the fonts lack is written as its plain one (ß ss).
 #pragma once
 
 #include <span>
@@ -27,6 +29,12 @@
 namespace openrac::assets::disc {
 
 class Disc;
+
+// The mark bytes after a Polish letter's plain one: bytes the game's texts never hold.
+inline constexpr u8 kMarkAcute = 0x02;   // ć ń ś ź
+inline constexpr u8 kMarkDot = 0x03;     // ż
+inline constexpr u8 kMarkOgonek = 0x04;  // ą ę
+inline constexpr u8 kMarkStroke = 0x05;  // ł
 
 // The game's bytes as a translator reads them.
 std::string game_text_to_utf8(std::string_view game);
@@ -69,8 +77,11 @@ struct TextBlocks {
 std::vector<GameText> pair_texts(const std::vector<TextBlocks>& blocks);
 
 // Every text of the disc in LANGUAGE (the PAL gameplay files where the disc has them). Throws
-// AssetError when the disc is not what its layout says.
-std::vector<GameText> read_game_texts(const Disc& disc, Language language);
+// AssetError when the disc is not what its layout says. NOTES, when given, gets a line a level on
+// what was read there, for the log.
+std::vector<GameText> read_game_texts(
+    const Disc& disc, Language language, std::vector<std::string>* notes = nullptr
+);
 
 // Whether the disc has any text in LANGUAGE (an NTSC-U disc is English only).
 bool has_game_texts(const Disc& disc, Language language);

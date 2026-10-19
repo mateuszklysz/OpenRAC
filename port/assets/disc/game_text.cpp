@@ -48,6 +48,33 @@ constexpr std::array<std::string_view, 40> kAccented = {
     "ó", "ò", "ô", "ö", "Ú", "Ù", "Û", "Ü", "ú", "ù", "û", "ü",
 };
 
+// The letters the fonts lack that the port draws (game/rac1/host/ui2d.c): the plain letter, then a
+// mark byte the game's texts never use, for the mark the port adds over or under it.
+struct Marked {
+    std::string_view letter;
+    char plain;
+    u8 mark;
+};
+
+constexpr Marked kMarked[] = {
+    {"ą", 'a', kMarkOgonek},
+    {"ć", 'c', kMarkAcute},
+    {"ę", 'e', kMarkOgonek},
+    {"ł", 'l', kMarkStroke},
+    {"ń", 'n', kMarkAcute},
+    {"ś", 's', kMarkAcute},
+    {"ź", 'z', kMarkAcute},
+    {"ż", 'z', kMarkDot},
+    {"Ą", 'A', kMarkOgonek},
+    {"Ć", 'C', kMarkAcute},
+    {"Ę", 'E', kMarkOgonek},
+    {"Ł", 'L', kMarkStroke},
+    {"Ń", 'N', kMarkAcute},
+    {"Ś", 'S', kMarkAcute},
+    {"Ź", 'Z', kMarkAcute},
+    {"Ż", 'Z', kMarkDot},
+};
+
 const GameLanguage kLanguages[] = {
     {Language::English, "en", "English"},
     {Language::French, "fr", "Français"},
@@ -55,6 +82,17 @@ const GameLanguage kLanguages[] = {
     {Language::Spanish, "es", "Español"},
     {Language::Italian, "it", "Italiano"},
 };
+
+// The marked letter that OUT's last character and MARK make, if any.
+const Marked* marked(const std::string& out, u8 mark) {
+    for (const Marked& m : kMarked) {
+        if (m.mark == mark && !out.empty() && out.back() == m.plain
+            && (out.size() < 2 || out[out.size() - 2] != '[')) {
+            return &m;
+        }
+    }
+    return nullptr;
+}
 
 // The length of the UTF-8 character starting at `lead`.
 std::size_t utf8_length(unsigned char lead) {
@@ -109,6 +147,9 @@ std::string game_text_to_utf8(std::string_view game) {
             out += '\n';
         } else if (c >= kFirstAccent && c < kFirstAccent + kAccented.size()) {
             out += kAccented[c - kFirstAccent];
+        } else if (const Marked* m = marked(out, c)) {
+            out.back() = m->letter[0];
+            out.append(m->letter.substr(1));
         } else {
             std::string name = std::format("x{:02X}", c);
             for (const auto& [byte, word] : kNamed) {
@@ -195,6 +236,13 @@ std::string game_text_from_utf8(std::string_view utf8) {
                 accented = true;
             }
         }
+        for (const Marked& m : kMarked) {
+            if (m.letter == letter) {
+                out += m.plain;
+                out += static_cast<char>(m.mark);
+                accented = true;
+            }
+        }
         if (!accented) {
             out += i18n::game_font(letter);  // the plain letter, or '?'
         }
@@ -221,7 +269,9 @@ std::vector<GameText> pair_texts(const std::vector<TextBlocks>& blocks) {
     return out;
 }
 
-std::vector<GameText> read_game_texts(const Disc& disc, Language language) {
+std::vector<GameText> read_game_texts(
+    const Disc& disc, Language language, std::vector<std::string>* notes
+) {
     std::vector<TextBlocks> blocks;
     const std::vector<u8> all = all_text_lump(disc);
     blocks.push_back(
@@ -230,6 +280,9 @@ std::vector<GameText> read_game_texts(const Disc& disc, Language language) {
     for (const u32 id : disc.level_ids()) {
         const auto g = gameplay(disc, id);
         if (!g) {
+            if (notes) {
+                notes->push_back(std::format("level {:02}: no gameplay file", id));
+            }
             continue;
         }
         const ByteView view(*g);
@@ -240,6 +293,16 @@ std::vector<GameText> read_game_texts(const Disc& disc, Language language) {
         };
         blocks.push_back({std::format("level {:02}", id), block(Language::English), block(language)}
         );
+        if (notes) {
+            notes->push_back(std::format(
+                "level {:02}: gameplay {} bytes, English at {:#x} ({} texts), language at {:#x}",
+                id,
+                g->size(),
+                view.u32_at(0x10),
+                blocks.back().english.size(),
+                view.u32_at(0x10 + 4 * static_cast<std::size_t>(language))
+            ));
+        }
     }
     return pair_texts(blocks);
 }

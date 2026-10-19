@@ -330,10 +330,10 @@ struct Native {
 };
 Native n;
 
-// In the game's font, which has no Polish letters (common/i18n.h).
+// In the game's font, Polish letters drawn with their marks (game_text.h).
 void put_text(gaddr at, const std::string& text) {
     char* p = static_cast<char*>(G(at));
-    std::snprintf(p, kTextBytes, "%s", i18n::game_font(text).c_str());
+    std::snprintf(p, kTextBytes, "%s", game_text::for_font(text).c_str());
 }
 
 void build() {

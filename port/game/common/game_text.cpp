@@ -15,6 +15,7 @@
 
 #include "common/i18n_files.h"
 #include "common/log.h"
+#include "openrac/game_host.h"
 #include "openrac/guest.h"
 
 #ifdef OPENRAC_HAS_DISC
@@ -139,7 +140,13 @@ bool export_from_disc(const fs::path& image, const fs::path& folder, bool force,
             if (!disc::has_game_texts(d, l.slot)) {
                 continue;
             }
-            const std::vector<disc::GameText> texts = disc::read_game_texts(d, l.slot);
+            std::vector<std::string> notes;
+            const std::vector<disc::GameText> texts = disc::read_game_texts(d, l.slot, &notes);
+            if (l.slot == disc::Language::English) {
+                for (const std::string& n : notes) {
+                    log::info("the game's texts: {}", n);
+                }
+            }
             i18n::PoFile po{l.code, l.name, {}};
             for (const disc::GameText& t : texts) {
                 po.entries.push_back(
@@ -275,6 +282,22 @@ bool use(const std::string& code) {
     return !g_texts.empty() || !g_keyed.empty();
 #else
     return false;
+#endif
+}
+
+std::string for_font(const std::string& utf8) {
+#ifdef OPENRAC_HAS_DISC
+    // Only RAC1's FontPrint draws the marks (game/rac1/host/ui2d.c).
+    if (std::string_view(openrac_game.game) != "rac1") {
+        return i18n::game_font(utf8);
+    }
+    std::string escaped;  // a '[' of the text is not a button
+    for (const char c : utf8) {
+        escaped += c == '[' ? std::string("[[") : std::string(1, c);
+    }
+    return assets::disc::game_text_from_utf8(escaped);
+#else
+    return i18n::game_font(utf8);
 #endif
 }
 

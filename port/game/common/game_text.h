@@ -40,6 +40,10 @@ std::vector<i18n::LanguageInfo> languages();
 // when neither is there. True when one was read.
 bool use(const std::string& code);
 
+// UTF8 as the game's font draws it: Polish letters as their letter and mark (the port draws the
+// mark), other letters it lacks plain.
+std::string for_font(const std::string& utf8);
+
 // The game's lookup asked for ID, which gave ORIGINAL (a game address): the address of the
 // translation, or 0 to keep the game's.
 std::uint32_t translate(int id, std::uint32_t original);

@@ -104,16 +104,22 @@ int main() {
     }
     CHECK(game_text_from_utf8(game_text_to_utf8(all)) == all);
 
-    // A translator's text.
+    // A translator's text: Polish letters as the plain one and a mark the port draws.
     CHECK(
         game_text_from_utf8("Wciśnij [cross], żeby skoczyć.\nGotowe?")
-        == "Wcisnij \x10, zeby skoczyc.\x01Gotowe?"
+        == "Wcis\x02nij \x10, z\x03"
+           "eby skoczyc\x02.\x01Gotowe?"
     );
     CHECK(
-        game_text_from_utf8("Łódź")
-        == "L\x9c"
-           "dz"
+        game_text_from_utf8("Łódź ąę")
+        == "L\x05\x9c"
+           "dz\x02 a\x04"
+           "e\x04"
     );  // ó is the fonts' o acute
+    CHECK(
+        game_text_to_utf8(game_text_from_utf8("Zażółć gęślą jaźń ŻÓŁW")) == "Zażółć gęślą jaźń ŻÓŁW"
+    );
+    CHECK(game_text_to_utf8("\x02x\x02") == "[x02]x[x02]");  // a mark after no letter of its own
     CHECK(game_text_from_utf8("[[cross] [nope] [x4] [xZZ]") == "[cross] [nope] [x4] [xZZ]");
     CHECK(game_text_from_utf8("→ ß") == "? ss");
 
