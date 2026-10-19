@@ -160,10 +160,13 @@ def prepared(save: bytes, planet: int) -> bytes:
 
 
 def player_card(game: str) -> Path:
+    """The player's card: in the launcher's install folder (by default ~/OpenRAC; the port keeps
+    it there, main.cpp's player_home), else where earlier versions kept it."""
     home = Path(os.environ.get("HOME", "."))
-    base = (home / "Library/Application Support/OpenRAC" if os.uname().sysname == "Darwin"
-            else Path(os.environ.get("XDG_DATA_HOME", home / ".local/share")) / "openrac")
-    return base / "memcard" / SERIALS[game]
+    legacy = (home / "Library/Application Support/OpenRAC" if os.uname().sysname == "Darwin"
+              else Path(os.environ.get("XDG_DATA_HOME", home / ".local/share")) / "openrac")
+    cards = [base / "memcard" / SERIALS[game] for base in (home / "OpenRAC", legacy)]
+    return next((c for c in cards if c.is_dir()), cards[0])
 
 
 def game_folder(card: Path) -> Path:

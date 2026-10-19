@@ -139,33 +139,28 @@ std::string program_name() {
     std::exit(64);
 }
 
-// OpenRAC's folder in the player's data home, as the launcher finds it
-// (launcher/core/src/saves.rs, get_memcard_dir).
-fs::path data_home() {
-#if defined(__APPLE__)
-    const char* home = std::getenv("HOME");
-    fs::path base = fs::path(home != nullptr ? home : ".") / "Library/Application Support/OpenRAC";
-#else
-    fs::path base;
-    if (const char* xdg = std::getenv("XDG_DATA_HOME"); xdg != nullptr && xdg[0] != '\0') {
-        base = fs::path(xdg) / "openrac";
-    } else {
-        const char* home = std::getenv("HOME");
-        base = fs::path(home != nullptr ? home : ".") / ".local/share/openrac";
+// The player's folder: what the port keeps of its own (memory cards, settings, the game's texts),
+// all in one place with the games. The launcher's install folder when DATA is the data of a game it
+// set up (<install>/active/<game>/data), where it reads them too (launcher/core/src/saves.rs,
+// player_dir); DATA itself otherwise.
+fs::path player_home(const fs::path& data) {
+    const fs::path full = fs::absolute(data).lexically_normal();
+    const fs::path dir = full.filename().empty() ? full.parent_path() : full;
+    if (dir.filename() == "data" && dir.parent_path().parent_path().filename() == "active") {
+        return dir.parent_path().parent_path().parent_path();
     }
-#endif
-    return base;
+    return dir;
 }
 
-// Where the first memory card lives unless --cards says otherwise: the folder
-// the launcher's save manager reads and backs up: <data home>/openrac/memcard/<serial>.
-fs::path default_cards() {
-    return data_home() / "memcard" / openrac_game.serial;
+// Where the first memory card lives unless --cards says otherwise: the folder the launcher's save
+// manager reads and backs up: <player home>/memcard/<serial>.
+fs::path default_cards(const fs::path& data) {
+    return player_home(data) / "memcard" / openrac_game.serial;
 }
 
-// The player's settings unless --settings says otherwise: <data home>/openrac/settings/<id>.ini.
-fs::path default_settings() {
-    return data_home() / "settings" / (std::string(openrac_game.id) + ".ini");
+// The player's settings unless --settings says otherwise: <player home>/settings/<id>.ini.
+fs::path default_settings(const fs::path& data) {
+    return player_home(data) / "settings" / (std::string(openrac_game.id) + ".ini");
 }
 
 // This program's version: "rac1-pal" -> pal.
@@ -254,10 +249,10 @@ Options parse(int argc, char** argv) {
         }
     }
     if (o.cards.empty()) {
-        o.cards = default_cards();
+        o.cards = default_cards(o.data);
     }
     if (o.settings.empty()) {
-        o.settings = default_settings();
+        o.settings = default_settings(o.data);
     }
     return o;
 }

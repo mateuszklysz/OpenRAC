@@ -3,9 +3,11 @@
 
 //! Save file management prototype for OpenRAC games.
 //!
-//! The PC runtime answers memory card requests from a directory on the host:
-//! - macOS: `~/Library/Application Support/OpenRAC/memcard/<SERIAL>`
-//! - Linux/other: `~/.local/share/openrac/memcard/<SERIAL>` (or `$XDG_DATA_HOME/openrac/memcard/<SERIAL>`)
+//! The PC runtime answers memory card requests from a directory on the host, in the install
+//! folder with the games it plays (port/game/common/main.cpp, player_home):
+//! `<install>/memcard/<SERIAL>`. Its settings sit beside them in `<install>/settings`. Earlier
+//! versions kept both in the system's data folder ([`legacy_dir`]); [`move_legacy`] brings them
+//! over.
 //!
 //! Inside each game's serial folder, the PS2 memory card folder (e.g. `BESCES-50916RATCHET`)
 //! holds `icon.sys`, `static.ico`, and save files `save0.bin` ... `save4.bin`.
@@ -62,8 +64,14 @@ pub struct GameSaveStatus {
     pub backups: Vec<SaveBackupInfo>,
 }
 
-/// Returns the host directory where OpenRAC stores memory cards for the given serial.
-pub fn get_memcard_dir(serial: &str) -> PathBuf {
+/// Returns the host directory where OpenRAC stores memory cards for the given serial: in the
+/// install folder, or the earlier place when none is set.
+pub fn get_memcard_dir(install: Option<&Path>, serial: &str) -> PathBuf {
+    install.map(Path::to_path_buf).unwrap_or_else(legacy_dir).join("memcard").join(serial)
+}
+
+/// Where earlier versions kept the memory cards and the port's settings: the system's data folder.
+pub fn legacy_dir() -> PathBuf {
     #[cfg(target_os = "macos")]
     let base = dirs_home().join("Library/Application Support/OpenRAC");
     #[cfg(not(target_os = "macos"))]
@@ -71,8 +79,40 @@ pub fn get_memcard_dir(serial: &str) -> PathBuf {
         .map(PathBuf::from)
         .unwrap_or_else(|| dirs_home().join(".local/share"))
         .join("openrac");
+    base
+}
 
-    base.join("memcard").join(serial)
+/// Moves what [`legacy_dir`] holds (memory cards, the port's settings) into INSTALL, so one folder
+/// has it all. Nothing already in INSTALL is replaced: an entry found in both stays where it is.
+/// Returns what was moved, for the log; the legacy folder is removed once empty.
+pub fn move_legacy(legacy: &Path, install: &Path) -> Vec<String> {
+    let mut moved = Vec::new();
+    if legacy == install {
+        return moved;
+    }
+    for sub in ["memcard", "settings"] {
+        let Ok(entries) = fs::read_dir(legacy.join(sub)) else { continue };
+        for entry in entries.flatten() {
+            let to = install.join(sub).join(entry.file_name());
+            if to.exists() || fs::create_dir_all(install.join(sub)).is_err() {
+                continue;
+            }
+            let from = entry.path();
+            // A rename where both are on one disk, else a copy, and the original removed after.
+            let done = fs::rename(&from, &to).is_ok()
+                || if from.is_dir() {
+                    copy_dir_recursive(&from, &to).is_ok() && fs::remove_dir_all(&from).is_ok()
+                } else {
+                    fs::copy(&from, &to).is_ok() && fs::remove_file(&from).is_ok()
+                };
+            if done {
+                moved.push(format!("{} -> {}", from.display(), to.display()));
+            }
+        }
+        let _ = fs::remove_dir(legacy.join(sub));
+    }
+    let _ = fs::remove_dir(legacy);
+    moved
 }
 
 fn dirs_home() -> PathBuf {
@@ -218,8 +258,8 @@ fn parse_save_gameplay_info(bytes: &[u8]) -> SaveGameplayInfo {
 
     info
 }
-pub fn inspect_saves(serial: &str) -> GameSaveStatus {
-    let card_dir = get_memcard_dir(serial);
+pub fn inspect_saves(install: Option<&Path>, serial: &str) -> GameSaveStatus {
+    let card_dir = get_memcard_dir(install, serial);
     let exists = card_dir.is_dir();
 
     let mut game_folder_name = None;
@@ -333,8 +373,8 @@ pub fn inspect_saves(serial: &str) -> GameSaveStatus {
 }
 
 /// Creates a snapshot backup of the current save state.
-pub fn backup_saves(serial: &str, note: Option<&str>) -> Result<SaveBackupInfo, String> {
-    let card_dir = get_memcard_dir(serial);
+pub fn backup_saves(install: Option<&Path>, serial: &str, note: Option<&str>) -> Result<SaveBackupInfo, String> {
+    let card_dir = get_memcard_dir(install, serial);
     if !card_dir.is_dir() {
         return Err(format!("no save directory for {serial}"));
     }
@@ -424,15 +464,15 @@ pub fn backup_note(name: &str) -> Option<String> {
 }
 
 /// Restores a snapshot backup, replacing current saves.
-pub fn restore_backup(serial: &str, backup_name: &str) -> Result<(), String> {
-    let card_dir = get_memcard_dir(serial);
+pub fn restore_backup(install: Option<&Path>, serial: &str, backup_name: &str) -> Result<(), String> {
+    let card_dir = get_memcard_dir(install, serial);
     let backup_path = card_dir.join(backup_name);
     if !backup_path.is_dir() {
         return Err(format!("backup {backup_name} not found"));
     }
 
     // First, automatically backup current state as safety fallback
-    let _ = backup_saves(serial, Some("auto_safety_before_restore"));
+    let _ = backup_saves(install, serial, Some("auto_safety_before_restore"));
 
     // Remove current non-backup directories
     for entry in fs::read_dir(&card_dir).map_err(|e| e.to_string())?.flatten() {
@@ -605,5 +645,27 @@ mod tests {
         ];
         let decoded = decode_shift_jis_or_ascii(&bytes);
         assert_eq!(decoded, Some("Ratchet & Clank".to_string()));
+    }
+
+    #[test]
+    fn moves_the_legacy_folder_into_the_install_folder() {
+        let legacy = tempfile::tempdir().unwrap();
+        let install = tempfile::tempdir().unwrap();
+        let card = legacy.path().join("memcard/SCES_509.16/BESCES-50916RATCHET");
+        fs::create_dir_all(&card).unwrap();
+        fs::write(card.join("save0.bin"), b"save").unwrap();
+        fs::create_dir_all(legacy.path().join("settings")).unwrap();
+        fs::write(legacy.path().join("settings/rac1-pal.ini"), b"old").unwrap();
+        fs::create_dir_all(install.path().join("settings")).unwrap();
+        fs::write(install.path().join("settings/rac1-pal.ini"), b"new").unwrap();
+
+        let moved = move_legacy(legacy.path(), install.path());
+        assert_eq!(moved.len(), 1);
+        let card_dir = get_memcard_dir(Some(install.path()), "SCES_509.16");
+        assert_eq!(fs::read(card_dir.join("BESCES-50916RATCHET/save0.bin")).unwrap(), b"save");
+        // What the install folder has stays; the legacy copy is left where it was.
+        assert_eq!(fs::read(install.path().join("settings/rac1-pal.ini")).unwrap(), b"new");
+        assert!(legacy.path().join("settings/rac1-pal.ini").exists());
+        assert!(!legacy.path().join("memcard").exists());
     }
 }

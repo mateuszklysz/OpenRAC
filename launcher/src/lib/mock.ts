@@ -862,7 +862,7 @@ export async function mockCall(command: string, args: Record<string, unknown> = 
       const serial = typeof args.serial === "string" ? args.serial : "SCES_509.16";
       return delay({
         serial,
-        memcardDir: `/home/you/.local/share/openrac/memcard/${serial}`,
+        memcardDir: `/home/you/OpenRAC/memcard/${serial}`,
         exists: true,
         gameFolderName: "BESCES-50916RATCHET",
         title: "Ratchet & Clank",
@@ -870,7 +870,7 @@ export async function mockCall(command: string, args: Record<string, unknown> = 
           {
             slotIndex: 0,
             filename: "save0.bin",
-            path: `/home/you/.local/share/openrac/memcard/${serial}/BESCES-50916RATCHET/save0.bin`,
+            path: `/home/you/OpenRAC/memcard/${serial}/BESCES-50916RATCHET/save0.bin`,
             size: 59912,
             exists: true,
             isEmpty: false,
@@ -884,7 +884,7 @@ export async function mockCall(command: string, args: Record<string, unknown> = 
           {
             slotIndex: 1,
             filename: "save1.bin",
-            path: `/home/you/.local/share/openrac/memcard/${serial}/BESCES-50916RATCHET/save1.bin`,
+            path: `/home/you/OpenRAC/memcard/${serial}/BESCES-50916RATCHET/save1.bin`,
             size: 59912,
             exists: true,
             isEmpty: false,
@@ -898,7 +898,7 @@ export async function mockCall(command: string, args: Record<string, unknown> = 
           {
             slotIndex: 2,
             filename: "save2.bin",
-            path: `/home/you/.local/share/openrac/memcard/${serial}/BESCES-50916RATCHET/save2.bin`,
+            path: `/home/you/OpenRAC/memcard/${serial}/BESCES-50916RATCHET/save2.bin`,
             size: 59912,
             exists: true,
             isEmpty: true,
@@ -912,7 +912,7 @@ export async function mockCall(command: string, args: Record<string, unknown> = 
           {
             slotIndex: 3,
             filename: "save3.bin",
-            path: `/home/you/.local/share/openrac/memcard/${serial}/BESCES-50916RATCHET/save3.bin`,
+            path: `/home/you/OpenRAC/memcard/${serial}/BESCES-50916RATCHET/save3.bin`,
             size: 59912,
             exists: true,
             isEmpty: true,
@@ -926,7 +926,7 @@ export async function mockCall(command: string, args: Record<string, unknown> = 
           {
             slotIndex: 4,
             filename: "save4.bin",
-            path: `/home/you/.local/share/openrac/memcard/${serial}/BESCES-50916RATCHET/save4.bin`,
+            path: `/home/you/OpenRAC/memcard/${serial}/BESCES-50916RATCHET/save4.bin`,
             size: 59912,
             exists: true,
             isEmpty: true,
@@ -941,7 +941,7 @@ export async function mockCall(command: string, args: Record<string, unknown> = 
         backups: [
           {
             name: ".backup_1791560000_checkpoint",
-            path: `/home/you/.local/share/openrac/memcard/${serial}/.backup_1791560000_checkpoint`,
+            path: `/home/you/OpenRAC/memcard/${serial}/.backup_1791560000_checkpoint`,
             note: "checkpoint",
             createdMillis: Date.now() - 86400000,
             totalSize: 364544,
@@ -955,7 +955,7 @@ export async function mockCall(command: string, args: Record<string, unknown> = 
       const name = `.backup_${Math.floor(Date.now() / 1000)}${note ? `_${note.replace(/\s+/g, "_")}` : ""}`;
       return delay({
         name,
-        path: `/home/you/.local/share/openrac/memcard/${serial}/${name}`,
+        path: `/home/you/OpenRAC/memcard/${serial}/${name}`,
         note,
         createdMillis: Date.now(),
         totalSize: 364544,
@@ -1012,7 +1012,7 @@ export async function mockCall(command: string, args: Record<string, unknown> = 
       return delay<WriteResult>({
         backup: {
           name,
-          path: `/home/you/.local/share/openrac/memcard/${String(args.serial)}/${name}`,
+          path: `/home/you/OpenRAC/memcard/${String(args.serial)}/${name}`,
           note: `Before editing slot ${Number(args.slot) + 1}`,
           createdMillis: Date.now(),
           totalSize: 364544,

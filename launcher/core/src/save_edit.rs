@@ -1669,7 +1669,7 @@ mod tests {
 
     #[test]
     fn tells_which_processes_use_the_card() {
-        let card = Path::new("/Users/you/Library/Application Support/OpenRAC/memcard/SCES_509.16");
+        let card = Path::new("/Users/you/OpenRAC/memcard/SCES_509.16");
         let s = "SCES_509.16";
         let bundle = "/x/apps/openrac-rac1-pal/Ratchet & Clank (PAL).app/Contents/MacOS/Ratchet & Clank (PAL) --data /d --window";
         assert!(uses_card(bundle, card, s));

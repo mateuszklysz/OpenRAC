@@ -84,7 +84,9 @@ filled; [game/README.md](game/README.md) says what each needs.
 ## The player's settings
 
 What the port adds to a game's own options is kept in a small text file,
-`<data home>/openrac/settings/<id>.ini` (`--settings FILE` names another):
+`settings/<id>.ini` in the launcher's install folder, beside the games and
+the memory cards (in the data folder when `--data` is not the launcher's;
+`--settings FILE` names another):
 the window (a window, borderless or fullscreen; the monitor; the
 resolution), the picture (its shape up to 32:9, where the HUD goes in a wide
 one, the render scale), anti-aliasing and the textures' filter, vsync and the

@@ -241,7 +241,7 @@ things.
 ### The prepared card
 
 `regress.py card --game G` copies a memory card (the player's,
-`~/Library/Application Support/OpenRAC/memcard/<serial>` on macOS, only
+`~/OpenRAC/memcard/<serial>`, the launcher's default install folder, only
 read; `--from DIR` another) to `build/regress/cards/G/card` and rewrites the
 copy's five slots from the first saved game on it: every weapon and gadget
 owned with full ammo, Ultra Nanotech, the planets the ship reaches unlocked,

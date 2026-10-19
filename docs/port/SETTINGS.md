@@ -15,7 +15,9 @@ modes, the context, the graphics card).
 
 ## 1. The settings
 
-The file is `<data home>/openrac/settings/<id>.ini` (`--settings FILE` names
+The file is `<install>/settings/<id>.ini`, in the launcher's install folder
+with the games and the memory cards (`settings/<id>.ini` in the data folder
+when `--data` is not `<install>/active/<game>/data`; `--settings FILE` names
 another), `key = value` a line, `#` for a comment. It is read at start and
 written whenever a setting changes. An unknown value is reported in the log
 and the default used; an unknown key is ignored.

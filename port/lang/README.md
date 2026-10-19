@@ -22,8 +22,8 @@ for it.
 ## The game's texts
 
 At its first start the port reads every text of your disc and writes it to
-`settings/lang/game/` in the port's data folder (`~/.local/share/openrac` on
-Linux, `~/Library/Application Support/OpenRAC` on macOS; the log's first lines
+`settings/lang/game/` in the launcher's install folder, beside the games and
+the memory cards (`~/OpenRAC` unless you chose another; the log's first lines
 say where):
 
 | File | |
@@ -55,7 +55,7 @@ To edit one beside the English, make it a file of the kind above from your
 
 ```sh
 cd port
-python3 tools/game_text_po.py unpack ~/.local/share/openrac/settings/lang/game/game.pot lang/game/pl.po pl.po
+python3 tools/game_text_po.py unpack ~/OpenRAC/settings/lang/game/game.pot lang/game/pl.po pl.po
 # edit pl.po in a PO editor; put it in settings/lang/game/ to try it in the game
 python3 tools/game_text_po.py pack pl.po lang/game/pl.po
 python3 tools/game_text_po.py --check
@@ -122,9 +122,8 @@ Keep:
 ### Trying a translation without building
 
 Put the `.po` file in a `lang` folder beside the port's settings file:
-`settings/lang/` in the port's data folder (`~/.local/share/openrac` on Linux,
-`~/Library/Application Support/OpenRAC` on macOS), or beside the file
-`--settings` names; the launcher passes its own, and the log's first lines
+`settings/lang/` in the launcher's install folder (`~/OpenRAC` unless you
+chose another), or beside the file `--settings` names; the log's first lines
 say which. The port reads every `.po` there at start, in place
 of a built-in one of the same language. Then choose it on the Language row of
 the Video options page, or set `language = <code>` in the settings file.

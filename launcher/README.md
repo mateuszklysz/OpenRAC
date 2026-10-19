@@ -87,8 +87,8 @@ the disc image and saves are kept.
   menu beside it. Every game has this page, the same for all of them; the
   list on the left switches between them, and the Games tab opens on the one
   you used last.
-- **Save files**: the port's memory card (`~/.local/share/openrac/memcard/<serial>/`
-  on Linux) with each slot's planet, bolts and save time, backups you can
+- **Save files**: the port's memory card (`<install folder>/memcard/<serial>/`,
+  beside the games) with each slot's planet, bolts and save time, backups you can
   restore, and the folder. **Edit** opens a slot of Ratchet & Clank in the save
   editor: the planet it loads on, bolts, health upgrades, weapons and gadgets,
   ammo, gold weapons, gold bolts, planets and skill points. **Advanced save

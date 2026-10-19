@@ -540,25 +540,35 @@ async fn apply_progress_json(state: State<'_, AppState>, json: String) -> Result
     tauri::async_runtime::spawn_blocking(move || library::library(&config)).await.map_err(|e| e.to_string())?
 }
 
-#[tauri::command]
-fn inspect_saves(serial: String) -> openrac_launcher_core::saves::GameSaveStatus {
-    openrac_launcher_core::saves::inspect_saves(&serial)
+/// The install folder in Settings, where the memory cards are (core/src/saves.rs).
+fn install_dir(state: &State<'_, AppState>) -> Option<PathBuf> {
+    state.config.lock().unwrap().install_dir.clone()
 }
 
 #[tauri::command]
-fn backup_saves(serial: String, note: Option<String>) -> Result<openrac_launcher_core::saves::SaveBackupInfo, String> {
-    openrac_launcher_core::saves::backup_saves(&serial, note.as_deref())
+fn inspect_saves(state: State<'_, AppState>, serial: String) -> openrac_launcher_core::saves::GameSaveStatus {
+    openrac_launcher_core::saves::inspect_saves(install_dir(&state).as_deref(), &serial)
+}
+
+#[tauri::command]
+fn backup_saves(
+    state: State<'_, AppState>,
+    serial: String,
+    note: Option<String>,
+) -> Result<openrac_launcher_core::saves::SaveBackupInfo, String> {
+    openrac_launcher_core::saves::backup_saves(install_dir(&state).as_deref(), &serial, note.as_deref())
 }
 
 /// Restores a backup of the card; refused while the game runs with it, as an edit is.
 #[tauri::command]
-async fn restore_backup(serial: String, backup_name: String) -> Result<(), String> {
+async fn restore_backup(state: State<'_, AppState>, serial: String, backup_name: String) -> Result<(), String> {
+    let install = install_dir(&state);
     tauri::async_runtime::spawn_blocking(move || {
-        let card = openrac_launcher_core::saves::get_memcard_dir(&serial);
+        let card = openrac_launcher_core::saves::get_memcard_dir(install.as_deref(), &serial);
         if let Some(game) = openrac_launcher_core::save_edit::card_in_use(&card, &serial)? {
             return Err(format!("{game} is running with this memory card: close it first"));
         }
-        openrac_launcher_core::saves::restore_backup(&serial, &backup_name)
+        openrac_launcher_core::saves::restore_backup(install.as_deref(), &serial, &backup_name)
     })
     .await
     .map_err(|e| e.to_string())?
@@ -580,9 +590,9 @@ async fn read_save(
     serial: String,
     slot: usize,
 ) -> Result<openrac_launcher_core::save_edit::SaveView, String> {
-    let install = state.config.lock().unwrap().install_dir.clone();
+    let install = install_dir(&state);
     tauri::async_runtime::spawn_blocking(move || {
-        let card = openrac_launcher_core::saves::get_memcard_dir(&serial);
+        let card = openrac_launcher_core::saves::get_memcard_dir(install.as_deref(), &serial);
         let mut view = openrac_launcher_core::save_edit::read_save(&card, &serial, slot)?;
         view.skill_names = skill_names(install);
         Ok(view)
@@ -611,7 +621,7 @@ async fn write_save(
         return Err("raw edits need the advanced save editor (Settings)".into());
     }
     tauri::async_runtime::spawn_blocking(move || {
-        let card = openrac_launcher_core::saves::get_memcard_dir(&serial);
+        let card = openrac_launcher_core::saves::get_memcard_dir(install.as_deref(), &serial);
         let mut result = save_edit::write_save(&card, &serial, slot, &fingerprint, &change, || {
             save_edit::card_in_use(&card, &serial)
         })?;
@@ -670,8 +680,8 @@ fn open_game_folder(app: AppHandle, state: State<'_, AppState>, game: String, pa
 }
 
 #[tauri::command]
-fn open_saves_folder(app: AppHandle, serial: String) -> Result<(), String> {
-    let dir = openrac_launcher_core::saves::get_memcard_dir(&serial);
+fn open_saves_folder(app: AppHandle, state: State<'_, AppState>, serial: String) -> Result<(), String> {
+    let dir = openrac_launcher_core::saves::get_memcard_dir(install_dir(&state).as_deref(), &serial);
     if !dir.exists() {
         let _ = std::fs::create_dir_all(&dir);
     }
@@ -951,6 +961,14 @@ pub fn run() {
                     app.package_info().version,
                     Platform::current()
                 ));
+            }
+            // The memory cards and the port's settings live in the install folder with the games
+            // (core/src/saves.rs); bring over what earlier versions kept in the system's data folder.
+            if let Some(install) = &config.install_dir {
+                let legacy = openrac_launcher_core::saves::legacy_dir();
+                for moved in openrac_launcher_core::saves::move_legacy(&legacy, install) {
+                    launcher_log::line(&format!("moved {moved}"));
+                }
             }
             app.manage(AppState { config: Mutex::new(config), config_file, jobs: Jobs::default(), discord, bundled });
             Ok(())

@@ -16,8 +16,8 @@ build/release/openrac-rac1-pal --data <install>/active/rac1/data
 ([tools/extractor.py](../../../tools/extractor.py), or the launcher's "Set
 up from your disc"): it holds `iso_data/rac1/SCES_509.16` and `disc.iso`.
 The first memory card is the folder the launcher's save manager shows
-(`~/.local/share/openrac/memcard/SCES_509.16`, or under `$XDG_DATA_HOME`;
-`~/Library/Application Support/OpenRAC/memcard/SCES_509.16` on macOS) unless
+(`<install>/memcard/SCES_509.16` when `--data` is the launcher's
+`<install>/active/rac1/data`, else `memcard/SCES_509.16` in the data folder) unless
 `--cards` says otherwise; the game's save folder and files are ordinary files
 in it. `--frames N` stops after N frames; `--keep-going` logs a
 function without C and carries on instead of stopping at it. `--mods DIR`
