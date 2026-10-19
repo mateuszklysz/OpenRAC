@@ -40,6 +40,14 @@ std::vector<i18n::LanguageInfo> languages();
 // when neither is there. True when one was read.
 bool use(const std::string& code);
 
+// The language used now (use's code).
+const std::string& code();
+
+// The code of the disc's language in the game's slot SLOT (0 English, 2 French, ...), empty for
+// none; and whether CODE is one of the disc's.
+std::string disc_language(int slot);
+bool on_disc(const std::string& code);
+
 // UTF8 as the game's font draws it: Polish letters as their letter and mark (the port draws the
 // mark), other letters it lacks plain.
 std::string for_font(const std::string& utf8);

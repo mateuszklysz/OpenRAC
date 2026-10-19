@@ -44,7 +44,6 @@ enum Row {
     kMuteUnfocused,
     kSkipCutscenes,
     kStrafe,
-    kLanguage,
     kRows
 };
 using i18n::N_;
@@ -52,7 +51,7 @@ constexpr const char* kLabels[kRows] = {
     N_("Display mode"),   N_("Monitor"),    N_("Resolution"),    N_("Picture"),
     N_("HUD"),            N_("Render scale"), N_("Anti-aliasing"), N_("Texture filter"),
     N_("VSync"),          N_("Frame rate"), N_("Frame cap"),     N_("Frame counter"),
-    N_("Mute in background"), N_("Skip cutscenes"), N_("Strafe (experimental)"), N_("Language"),
+    N_("Mute in background"), N_("Skip cutscenes"), N_("Strafe (experimental)"),
 };
 
 // The value after `current` in a list (before it, for by = -1), around the ends; the first when
@@ -134,18 +133,6 @@ std::string value_of(int row) {
             return s.skip_cutscenes ? i18n::tr("Start") : i18n::tr("Off");
         case kStrafe:
             return settings::name(s.strafe);
-        case kLanguage: {
-            // A language in its own words, as language menus write it; System in the language now.
-            if (s.language == "auto") {
-                return i18n::tr("System");
-            }
-            for (const i18n::LanguageInfo& l : all_languages()) {
-                if (l.code == s.language) {
-                    return l.name;
-                }
-            }
-            return s.language;
-        }
         default:
             return {};
     }
@@ -253,19 +240,6 @@ void step_value(int row, int by) {
         case kStrafe:
             s.strafe = stepped_enum(s.strafe, by);
             break;
-        case kLanguage: {
-            // The system's, then each language there is a translation for (English first).
-            std::vector<std::string> codes{"auto"};
-            for (const i18n::LanguageInfo& l : all_languages()) {
-                codes.push_back(l.code);
-            }
-            const auto at = std::find(codes.begin(), codes.end(), s.language);
-            const int count = static_cast<int>(codes.size());
-            const int index = at == codes.end() ? 0 : static_cast<int>(at - codes.begin());
-            s.language = codes[static_cast<std::size_t>((index + by + count) % count)];
-            apply_language();
-            break;
-        }
         default:
             break;
     }
@@ -476,6 +450,149 @@ std::uint32_t text(int id) {
 }
 
 }  // namespace page
+
+/* The game's Language page (title, Options): the disc's languages, each an item whose action (9)
+ * puts its slot in the game's language global, the global's item marked (flag 0x800: the item whose
+ * value is the global). The languages the port translates into and the disc lacks (game_text.h)
+ * are added after them, in their own words, with an action the list ignores (0x7F): Cross on one is
+ * taken here, the port's language becomes it and the game's English, which its translation is of.
+ * While it is chosen the mark is moved to it (English's value goes to it, and English's item takes
+ * the ignored action, Cross on it taken here too), and the global is kept at English. A disc's
+ * language chosen in the list becomes the port's language as well. */
+namespace language_page {
+
+constexpr std::int16_t kOwnAction = 0x7F;
+constexpr std::int16_t kSetLanguage = 9;
+constexpr std::int32_t kEnglish = 0;  // the global's English (InitOnce)
+constexpr std::int32_t kNone = -1;    // a value the global never has: no mark
+constexpr std::uint32_t kPadCross = 0x40;
+constexpr int kMaxExtra = 4;
+constexpr int kTextFirst = page::kPauseRowText + 2 * page::kPauseRows;  // the added items' labels
+
+struct Made {
+    gaddr game_items = 0;  // the list's own items
+    int game_count = 0;
+    gaddr items = 0;  // those, then the added ones, and the end
+    gaddr labels = 0;
+    std::vector<std::string> codes;  // the added languages
+    std::string built_for;           // the language they were marked for
+    std::int32_t seen = kNone - 1;   // the global as last seen
+};
+Made m;
+
+std::string current() {
+    return game_text::code();
+}
+
+bool is_added(const std::string& code) {
+    return std::find(m.codes.begin(), m.codes.end(), code) != m.codes.end();
+}
+
+void put_item(gaddr at, std::int16_t label, std::int16_t action, std::int32_t value) {
+    GREF(std::int16_t, at) = label;
+    GREF(std::int16_t, at + 2) = action;
+    GREF(std::int32_t, at + 4) = value;
+    GREF(std::int16_t, at + 8) = 0;
+    GREF(std::int16_t, at + 10) = 0;
+}
+
+// The items, marked for the language now.
+void build(const openrac_front_end& fe) {
+    const gaddr own = GREF(std::uint32_t, fe.language_list + 0x34);
+    if (m.items == 0) {
+        if (own == 0) {
+            return;
+        }
+        m.game_items = own;
+        while (m.game_count < page::kMaxItems
+               && GREF(std::int16_t, own + page::kItemBytes * static_cast<gaddr>(m.game_count)) != 0) {
+            ++m.game_count;
+        }
+        for (const i18n::LanguageInfo& l : game_text::languages()) {
+            if (!game_text::on_disc(l.code) && m.codes.size() < kMaxExtra) {
+                m.codes.push_back(l.code);
+                if (m.labels == 0) {
+                    m.labels = openrac_guest_static(page::kTextBytes * kMaxExtra);
+                }
+                page::put_text(m.labels + page::kTextBytes * static_cast<gaddr>(m.codes.size() - 1), l.name);
+            }
+        }
+        m.items = openrac_guest_static(page::kItemBytes * static_cast<gaddr>(m.game_count + kMaxExtra + 1));
+    }
+    const std::string now = current();
+    if (m.built_for == now && GREF(std::int16_t, m.items) != 0) {
+        return;
+    }
+    m.built_for = now;
+    const bool added = is_added(now);
+    std::memcpy(G(m.items), G(m.game_items), page::kItemBytes * static_cast<gaddr>(m.game_count));
+    for (int i = 0; i < m.game_count; ++i) {
+        const gaddr it = m.items + page::kItemBytes * static_cast<gaddr>(i);
+        if (added && GREF(std::int16_t, it + 2) == kSetLanguage && GREF(std::int32_t, it + 4) == kEnglish) {
+            GREF(std::int16_t, it + 2) = kOwnAction;
+            GREF(std::int32_t, it + 4) = kNone;
+        }
+    }
+    for (std::size_t k = 0; k < m.codes.size(); ++k) {
+        put_item(m.items + page::kItemBytes * static_cast<gaddr>(m.game_count + static_cast<int>(k)),
+                 static_cast<std::int16_t>(kTextFirst + static_cast<int>(k)), kOwnAction,
+                 m.codes[k] == now ? kEnglish : kNone);
+    }
+    put_item(m.items + page::kItemBytes * static_cast<gaddr>(m.game_count + static_cast<int>(m.codes.size())), 0, 0, 0);
+}
+
+void choose(const std::string& code) {
+    settings::get().language = code;
+    settings::save();
+    apply_language();
+}
+
+// FRONT: the boot program is loaded (its menus' data are where fe says; a level's program is
+// elsewhere and over them).
+void update(const openrac_front_end& fe, bool front) {
+    if (fe.language == 0) {
+        return;
+    }
+    std::int32_t& global = GREF(std::int32_t, fe.language);
+    if (front && fe.language_list != 0) {
+        build(fe);
+        const gaddr shown = GREF(std::uint32_t, fe.language_list + 0x34);
+        if (m.items != 0 && shown == m.game_items) {
+            GREF(std::uint32_t, fe.language_list + 0x34) = m.items;
+        }
+        // Cross on an item of the port's, on the Language page.
+        const std::uint32_t pressed = GREF(std::uint32_t, fe.pad + 0x1C4);
+        if (m.items != 0 && (pressed & kPadCross) != 0 && GREF(std::uint32_t, fe.page_menu + 4) == fe.language_page
+            && GREF(std::uint32_t, fe.language_list + 0x34) == m.items) {
+            const int at = GREF(std::int32_t, fe.language_list + 0x40);
+            const int count = m.game_count + static_cast<int>(m.codes.size());
+            const gaddr it = m.items + page::kItemBytes * static_cast<gaddr>(at);
+            if (at >= 0 && at < count && GREF(std::int16_t, it + 2) == kOwnAction) {
+                choose(at >= m.game_count ? m.codes[static_cast<std::size_t>(at - m.game_count)] : "en");
+                global = kEnglish;
+                if (fe.menu_sound != nullptr) {
+                    fe.menu_sound(0x11, GREF(std::uint32_t, fe.language_list + 0x14));
+                }
+            }
+        }
+    }
+    // The global changed by the game (its list, a save): its language becomes the port's. While
+    // one of the port's languages is chosen, it stays English.
+    if (m.seen != kNone - 1 && global != m.seen) {
+        const std::string code = game_text::disc_language(global);
+        choose(code.empty() ? "en" : code);
+    } else if (is_added(current())) {
+        global = kEnglish;
+    }
+    m.seen = global;
+}
+
+std::uint32_t text(int id) {
+    const int k = id - kTextFirst;
+    return k >= 0 && k < static_cast<int>(m.codes.size()) ? m.labels + page::kTextBytes * static_cast<gaddr>(k) : 0;
+}
+
+}  // namespace language_page
 
 /* In a level, the pause menu's Options page (HelpDesk, Save, Load, Sound, Camera, Subtitles, Quit
  * Game) is level code with no Video page, so one is made: a copy of the Camera page (with the Sound
@@ -759,6 +876,7 @@ bool update(int loaded_overlay) {
         // level's time base, as choosing 60 Hz in its menu would.
         GREF(std::uint8_t, fe->video_mode) = 0;
     }
+    language_page::update(*fe, loaded_overlay == OPENRAC_OVERLAY_EXE);
     if (loaded_overlay != OPENRAC_OVERLAY_EXE) {
         // In a level: the pause menu's own Options page, on the level program's menu data.
         return loaded_overlay >= 0 && pause_page::update(OPENRAC_DATA(fe->page_menu), fe->pad);
@@ -767,7 +885,11 @@ bool update(int loaded_overlay) {
 }
 
 std::uint32_t text(int id) {
-    return front_end() != nullptr ? page::text(id) : 0;
+    if (front_end() == nullptr) {
+        return 0;
+    }
+    const std::uint32_t own = language_page::text(id);
+    return own != 0 ? own : page::text(id);
 }
 
 std::uint32_t options_items() {

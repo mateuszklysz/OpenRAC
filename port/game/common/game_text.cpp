@@ -297,6 +297,34 @@ bool use(const std::string& code) {
 #endif
 }
 
+const std::string& code() {
+    return g_code;
+}
+
+std::string disc_language(int slot) {
+#ifdef OPENRAC_HAS_DISC
+    for (const assets::disc::GameLanguage& l : assets::disc::game_languages()) {
+        if (static_cast<int>(l.slot) == slot) {
+            return l.code;
+        }
+    }
+#endif
+    (void)slot;
+    return {};
+}
+
+bool on_disc(const std::string& code) {
+#ifdef OPENRAC_HAS_DISC
+    for (const assets::disc::GameLanguage& l : assets::disc::game_languages()) {
+        if (code == l.code) {
+            return true;
+        }
+    }
+#endif
+    (void)code;
+    return false;
+}
+
 std::string for_font(const std::string& utf8) {
 #ifdef OPENRAC_HAS_DISC
     // Only RAC1's FontPrint draws the marks (game/rac1/host/ui2d.c).

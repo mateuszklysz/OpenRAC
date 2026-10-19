@@ -66,10 +66,6 @@ msgid "Strafe (experimental)"
 msgstr "Strafe (eksperym.)"
 
 #: game/common/options_menu.cpp
-msgid "Language"
-msgstr "Język"
-
-#: game/common/options_menu.cpp
 msgid "Window's own"
 msgstr "Monitor okna"
 
@@ -152,10 +148,6 @@ msgstr "Trzymaj L2-R2"
 #: game/common/settings.cpp
 msgid "Lock with weapons"
 msgstr "Stały z bronią"
-
-#: game/common/options_menu.cpp
-msgid "System"
-msgstr "Systemowy"
 
 #: game/common/settings.cpp
 msgid "Original"
