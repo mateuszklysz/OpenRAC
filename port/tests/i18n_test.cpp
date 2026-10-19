@@ -10,6 +10,7 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "check.h"
@@ -125,6 +126,9 @@ int main() {
 
     // Every built-in translation of a short text (the Video options page's) fits the page's slot.
     for (const auto& f : i18n::files::all()) {
+        if (std::string_view(f.name).starts_with("game/")) {
+            continue;  // the game's texts, by key (tools/game_text_po.py checks them)
+        }
         const auto po = i18n::parse_po(f.text, why);
         CHECK(po.has_value());
         if (!po) {

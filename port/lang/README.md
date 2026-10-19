@@ -50,6 +50,10 @@ English (`1000/2ec6618e`), so the file translates every copy of the game and
 quotes none. A file in your `settings/lang/game/` folder for the same language
 comes first; a text it leaves empty comes from the built-in one.
 
+| File | |
+|---|---|
+| [game/pl.po](game/pl.po) | Polski: every text of `all_text` (menus, the HUD, missions, help, goodies) |
+
 To edit one beside the English, make it a file of the kind above from your
 `game.pot`, edit it, and turn it back:
 

@@ -1,0 +1,7292 @@
+# The game's texts, translated: built into the port. Each msgid is a text's key, its id and
+# the CRC-32 of its English; port/lang/README.md says how to edit this file beside the English.
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: pl\n"
+"X-Language-Name: Polski\n"
+
+#: all_text
+msgid "20021/d4a5d55c"
+msgstr "przycisk kółko"
+
+#: all_text
+msgid "20022/237ab4d9"
+msgstr "przycisk kwadrat"
+
+#: all_text
+msgid "20023/c10b9a7f"
+msgstr "przycisk X"
+
+#: all_text
+msgid "20024/c14cb1b4"
+msgstr "przycisk trójkąt"
+
+#: all_text
+msgid "20025/64037ddd"
+msgstr "przycisk R1"
+
+#: all_text
+msgid "20026/ea8c7a3e"
+msgstr "przycisk R2"
+
+#: all_text
+msgid "20027/0001e43e"
+msgstr "przycisk L1"
+
+#: all_text
+msgid "20028/8e8ee3dd"
+msgstr "przycisk L2"
+
+#: all_text
+msgid "20029/e297a316"
+msgstr "przycisk SELECT"
+
+#: all_text
+msgid "20030/ea107d14"
+msgstr "przycisk START"
+
+#: all_text
+msgid "20031/50ead1eb"
+msgstr "prawa gałka analogowa"
+
+#: all_text
+msgid "20032/b8fb23ba"
+msgstr "lewa gałka analogowa"
+
+#: all_text
+msgid "20033/9b8253fc"
+msgstr "[[x jedn.]"
+
+#: all_text
+msgid "20075/5945e05e"
+msgstr "Maska O2"
+
+#: all_text
+msgid "20076/a9360ecf"
+msgstr "Hełm pilota"
+
+#: all_text
+msgid "20081/c84de015"
+msgstr "Nanotech Premium"
+
+#: all_text
+msgid "20082/443ef5f0"
+msgstr "Nanotech Ultra"
+
+#: all_text
+msgid "20086/8db013c5"
+msgstr "CodeBoty"
+
+#: all_text
+msgid "20089/1d4d122d"
+msgstr "Infoboty"
+
+#: all_text
+msgid "20090/44281ed9"
+msgstr "Pomoc"
+
+#: all_text
+msgid "20093/38b1b7d9"
+msgstr "Invinco-Locki"
+
+#: all_text
+msgid "20095/37925fb8"
+msgstr "Insta-Drainy"
+
+#: all_text
+msgid "20096/7597aff6"
+msgstr "Insta-Faucety"
+
+#: all_text
+msgid "20097/79237a0e"
+msgstr "Versa-Targety"
+
+#: all_text
+msgid "20098/adb7f8dc"
+msgstr "Szyny do grindowania"
+
+#: all_text
+msgid "20099/33f377ab"
+msgstr "Pasy magnetyczne"
+
+#: all_text
+msgid "20100/144eea22"
+msgstr "Myśliwiec"
+
+#: all_text
+msgid "20101/d3de6780"
+msgstr "Hiper-cios"
+
+#: all_text
+msgid "20102/59e39fd8"
+msgstr "Skok z wybiciem"
+
+#: all_text
+msgid "20103/264ef024"
+msgstr "Szybowanie"
+
+#: all_text
+msgid "20104/f030ced9"
+msgstr "Cios komety"
+
+#: all_text
+msgid "20105/5fe5c8e1"
+msgstr "Gadge-Boty"
+
+#: all_text
+msgid "20106/8e5174e2"
+msgstr "Porty botów"
+
+#: all_text
+msgid "20108/e69f987e"
+msgstr "Multi-cios"
+
+#: all_text
+msgid "20109/0b64e3b9"
+msgstr "Długi skok"
+
+#: all_text
+msgid "20110/f6e40d45"
+msgstr "Potężne uderzenie"
+
+#: all_text
+msgid "20111/c6380351"
+msgstr "Invinco-Vaulty"
+
+#: all_text
+msgid "20112/27da9209"
+msgstr "Tri-Ringi"
+
+#: all_text
+msgid "20113/b00a887a"
+msgstr "Złoty Bomb Glove"
+
+#: all_text
+msgid "20114/8a7649de"
+msgstr "Złoty Pyrocitor"
+
+#: all_text
+msgid "20115/4b23196e"
+msgstr "Złoty Blaster"
+
+#: all_text
+msgid "20116/cccc86d6"
+msgstr "Złoty Glove of Doom"
+
+#: all_text
+msgid "20117/79339310"
+msgstr "Złoty Mine Glove"
+
+#: all_text
+msgid "20118/ae5245df"
+msgstr "Złoty Devastator"
+
+#: all_text
+msgid "20119/86ea8729"
+msgstr "Złoty Decoy Glove"
+
+#: all_text
+msgid "20120/d5a12d74"
+msgstr "Złoty Tesla Claw"
+
+#: all_text
+msgid "20121/7376006b"
+msgstr "Złoty Suck Cannon"
+
+#: all_text
+msgid "20122/7f20dd2e"
+msgstr "Złoty Morph-o-ray"
+
+#: all_text
+msgid "20123/0d4da431"
+msgstr "Punkty umiejętności"
+
+#: all_text
+msgid "20124/2fa47fdf"
+msgstr "Punkt umiejętności"
+
+#: all_text
+msgid "20125/185e3b39"
+msgstr "Szybki wybór"
+
+#: all_text
+msgid "20126/61c3a0a2"
+msgstr "Złote śruby"
+
+#: all_text
+msgid "20127/a735018b"
+msgstr "Złota śruba"
+
+#: all_text
+msgid "21277/6ad8205a"
+msgstr ""
+"Dzięki twojemu wspaniałemu pilotażowi utknąłeś bez statku. Na domiar złego "
+"krater Tobruk najeżdża armia robotów Dreka. Ale przy całym tym sprzęcie "
+"wojskowym gdzieś tu musi być jakiś statek..."
+
+#: all_text
+msgid "21278/c25f9c57"
+msgstr ""
+"Te wodociągi to jedna z rzeczy, które Drek chce ukraść z tej planety. "
+"Przeszukaj je dokładnie, zanim zostaną z niej wyrwane."
+
+#: all_text
+msgid "21279/02b786fb"
+msgstr ""
+"Dobra robota, znalazłeś mechanika. Poważnie zastanów się nad kupnem "
+"[orange]Infobota[default], którego sprzedaje. Poda współrzędne nowej "
+"planety."
+
+#: all_text
+msgid "21280/e82dc82c"
+msgstr "Znajdź nowy statek"
+
+#: all_text
+msgid "21281/43dd94ac"
+msgstr "Zbadaj wodociągi"
+
+#: all_text
+msgid "21282/7fffffe9"
+msgstr "Kup [orange]Infobota[default] od mechanika"
+
+#: all_text
+msgid "21283/9517b730"
+msgstr ""
+"Z sygnału alarmowego wynika, że Skid McMarx katapultował się ze swojego "
+"skazanego na zagładę statku. Jeśli żyje, warto go odnaleźć. Może dostaniesz "
+"autograf[xAD]"
+
+#: all_text
+msgid "21284/41273870"
+msgstr ""
+"Zniszcz wszystkie piaskowe rekiny i ich gniazda w kanionie prowadzącym do "
+"statku Skida. Przyda się [orange]Pyrocitor[default] - te rekiny są "
+"paskudne. Pamiętaj, w nagrodę dostaniesz [orange]Hoverboard[default]."
+
+#: all_text
+msgid "21285/cc4e4385"
+msgstr ""
+"Ten gadatliwy gość z [orange]Infobota[default] to pewnie agent Skida. Jeśli "
+"bezpiecznie wylądował, odszukaj go - agenci zawsze mają przydatne "
+"informacje."
+
+#: all_text
+msgid "21286/3a8b5041"
+msgstr ""
+"Agent wspomniał, że na planecie Rilgar odbywają się wyścigi na "
+"[orange]Hoverboardach[default]. Jeśli zdobędziesz główną nagrodę, przynieś "
+"mu ją na dowód swoich umiejętności. Może da ci w zamian coś przydatnego. "
+"Zanim wystartujesz, upewnij się, że masz [orange]Hoverboard[default]."
+
+#: all_text
+msgid "21287/174aada3"
+msgstr ""
+"Zachodnia część fabryki jest pełna [orange]Versa-Targetów[default] do "
+"[orange]Swingshota[default]. Warto ją zbadać, ale najpierw potrzebujesz "
+"[orange]Swingshota[default]."
+
+#: all_text
+msgid "21288/839285ed"
+msgstr ""
+"Zachodnia część fabryki jest pełna celów do swingshota. Do jej zbadania "
+"przyda ci się twój swingshot."
+
+#: all_text
+msgid "21289/ca05b84b"
+msgstr "Odnajdź Skida McMarxa"
+
+#: all_text
+msgid "21290/53ea000d"
+msgstr "Pomóż Skidowi dotrzeć do statku"
+
+#: all_text
+msgid "21291/83be1f94"
+msgstr "Znajdź agenta Skida"
+
+#: all_text
+msgid "21292/038278ba"
+msgstr "Zanieś nagrodę agentowi"
+
+#: all_text
+msgid "21293/fdb4ad31"
+msgstr "Użyj [orange]Swingshota[default]"
+
+#: all_text
+msgid "21294/7c7c0d43"
+msgstr ""
+"Kapitan Qwark wystąpił w reklamie Robosklepu Ala. Może Al wie, gdzie go "
+"szukać."
+
+#: all_text
+msgid "21295/5859c5c7"
+msgstr ""
+"Al sprzeda ci ulepszenie [orange]Heli-Pack[default], które zwiększy "
+"możliwości Clanka."
+
+#: all_text
+msgid "21296/ff065471"
+msgstr "W tak wielkim mieście na pewno znajdziesz coś ciekawego!"
+
+#: all_text
+msgid "21297/124e4d57"
+msgstr ""
+"Podobno Kapitan Qwark sponsoruje park fitness w zachodniej części miasta. "
+"Poszukaj Qwark-bota, żeby dowiedzieć się więcej."
+
+#: all_text
+msgid "21298/8c061fee"
+msgstr ""
+"Al ma magazyn za swoim sklepem. Może prowadzi do innej części miasta[xAD]"
+
+#: all_text
+msgid "21299/f4071d59"
+msgstr ""
+"Pociąg woził kiedyś turystów po Metropolis, ale po inwazji Blargów wszystko "
+"się zmieniło. Mimo to warto się przejechać[xAD]"
+
+#: all_text
+msgid "21300/46f239d0"
+msgstr "Ukończ tor fitness Kapitana Qwarka, a może dostaniesz nagrodę"
+
+#: all_text
+msgid "21301/200ea1f7"
+msgstr ""
+"Trener żąda pieniędzy za [orange]Swingshot[default]. Kup go, na pewno się "
+"później przyda."
+
+#: all_text
+msgid "21302/78427ef0"
+msgstr "Odwiedź Robosklep Ala"
+
+#: all_text
+msgid "21303/0ecb9f84"
+msgstr "Kup [orange]Heli-Pack[default] od Ala"
+
+#: all_text
+msgid "21304/9060ea80"
+msgstr "Zbadaj resztę miasta"
+
+#: all_text
+msgid "21305/deda4f86"
+msgstr "Przejedź się Robopociągiem"
+
+#: all_text
+msgid "21306/a3a2f65d"
+msgstr "Ukończ tor fitness"
+
+#: all_text
+msgid "21307/964b88b7"
+msgstr "Kup [orange]Swingshot[default] od trenera"
+
+#: all_text
+msgid "21308/db135a18"
+msgstr ""
+"Wytrop robota, który jest prawą ręką Dreka. Na pewno ma przydatne "
+"informacje."
+
+#: all_text
+msgid "21309/7123bdc2"
+msgstr ""
+"Przy tylu biegających robotach pewnie da się tu zdobyć niezły sprzęt[xAD]"
+
+#: all_text
+msgid "21310/432763ed"
+msgstr "Zmierz się z robotem porucznikiem"
+
+#: all_text
+msgid "21311/f54ccb2e"
+msgstr "Zbadaj młyny"
+
+#: all_text
+msgid "21312/a25a067d"
+msgstr ""
+"Kapitan Qwark wręcza główną nagrodę wyścigu. Jeśli wygrasz, będziesz miał "
+"dowód, że jesteś zawodowcem!"
+
+#: all_text
+msgid "21313/e76b9bf8"
+msgstr ""
+"Skoro Kapitan Qwark przyjechał na wyścigi, warto go odnaleźć i poprosić o "
+"pomoc."
+
+#: all_text
+msgid "21314/81c0d0da"
+msgstr "Ochroniarz nie wpuści cię, dopóki nie posmarujesz mu łapy śrubami"
+
+#: all_text
+msgid "21315/ce57e2f2"
+msgstr "Oto ona, broń ostateczna. W ostatecznej cenie."
+
+#: all_text
+msgid "21316/74e8f29b"
+msgstr "Wygraj wyścig hoverboardów"
+
+#: all_text
+msgid "21317/18c235d4"
+msgstr "Odnajdź Kapitana Qwarka"
+
+#: all_text
+msgid "21318/4410daaf"
+msgstr "Przekup ochroniarza"
+
+#: all_text
+msgid "21319/ce12325c"
+msgstr "Kup RYNO"
+
+#: all_text
+msgid "21320/80503664"
+msgstr ""
+"[orange]Infobot[default] tej stacji pokazał mnóstwo nowego sprzętu w "
+"produkcji. Jeśli dobrze poszukasz, może coś znajdziesz."
+
+#: all_text
+msgid "21321/4991358c"
+msgstr ""
+"To zdecydowanie warty zakup. [orange]Grindboots[default] są rzadkie, ale "
+"bardzo przydatne."
+
+#: all_text
+msgid "21322/bff9c24a"
+msgstr ""
+"Blargowie wyłączyli ten okręt wojenny, gdy opanowały go mutanty z "
+"laboratoriów. Jest dość nowy, więc może coś na nim zostawili."
+
+#: all_text
+msgid "21323/f1661f39"
+msgstr "Zadaj cios Drekowi i uruchom sekwencję samozniszczenia okrętu."
+
+#: all_text
+msgid "21324/81e71474"
+msgstr "Poza stacją kosmiczną nie ma powietrza, więc Clank musi badać ją sam."
+
+#: all_text
+msgid "21325/7ebc64a9"
+msgstr "Zbadaj stację kosmiczną"
+
+#: all_text
+msgid "21326/7224e53d"
+msgstr "Kup [orange]Grindboots[default]"
+
+#: all_text
+msgid "21327/fb8fa02c"
+msgstr "Zbadaj okręt Blargów"
+
+#: all_text
+msgid "21328/c1ab6088"
+msgstr "Zniszcz okręt wojenny"
+
+#: all_text
+msgid "21329/732a1fc4"
+msgstr "Wyjdź za śluzę"
+
+#: all_text
+msgid "21330/7710674b"
+msgstr ""
+"Qwark może ci pomóc, jeśli dotrzesz do wewnętrznych komnat jego fortecy."
+
+#: all_text
+msgid "21331/e88a50c9"
+msgstr ""
+"Qwark cię zdradził! Jedynym sposobem, by go wytropić, jest pokonanie jego "
+"pupila, Snagglebestii."
+
+#: all_text
+msgid "21332/15e430f9"
+msgstr ""
+"Teraz musisz znaleźć sposób, by opuścić tę planetę. Może Qwark trzyma "
+"zapasowy statek w garażu przy tej jaskini[xAD]"
+
+#: all_text
+msgid "21333/022a0e38"
+msgstr "Przetrwaj tor przeszkód Qwarka"
+
+#: all_text
+msgid "21334/e342212c"
+msgstr "Zniszcz Snagglebestię"
+
+#: all_text
+msgid "21335/e82dc82c"
+msgstr "Znajdź nowy statek"
+
+#: all_text
+msgid "21336/03b8f178"
+msgstr ""
+"Jeśli zdołasz oderwać się od walk, warto zbadać spokojniejsze rejony tego "
+"świata."
+
+#: all_text
+msgid "21337/402def0d"
+msgstr ""
+"Te szyny transportowe wyglądają na świetne miejsce do wypróbowania "
+"[orange]Grindboots[default]."
+
+#: all_text
+msgid "21338/44dd3f54"
+msgstr ""
+"Ten gość to tchórz, ale jego [orange]Infobot[default] może być kluczowy w "
+"tropieniu Dreka."
+
+#: all_text
+msgid "21339/f1bedaec"
+msgstr "Komandos z [orange]Infobota[default] potrzebuje twojej pomocy"
+
+#: all_text
+msgid "21340/d97e5726"
+msgstr ""
+"Komandos potrzebuje twojej pomocy. Spotkaj się z nim na platformie przed "
+"miastem."
+
+#: all_text
+msgid "21341/5b832db0"
+msgstr ""
+"Żeby dostać się do otoczonego murem miasta, musisz wspiąć się szybem "
+"wentylacyjnym w [orange]Magneboots[default]"
+
+#: all_text
+msgid "21342/2fcc039b"
+msgstr ""
+"Ci goście potrzebują kogoś z dobrym celem do obsługi działka za miastem. "
+"Strzelaj celnie, a może pomożesz powstrzymać inwazję. Porozmawiaj z "
+"wodociągowcem na urwisku za miastem."
+
+#: all_text
+msgid "21343/6e6345e9"
+msgstr "Zbadaj okolicę"
+
+#: all_text
+msgid "21344/66af59ca"
+msgstr "Przejedź się po szynie"
+
+#: all_text
+msgid "21345/0bcc5221"
+msgstr "Kup [orange]Infobota[default] od dezertera"
+
+#: all_text
+msgid "21346/8d125568"
+msgstr "Porozmawiaj z komandosem"
+
+#: all_text
+msgid "21347/6288f29a"
+msgstr "Spotkaj komandosa w mieście"
+
+#: all_text
+msgid "21348/755780be"
+msgstr "Zbadaj miasto za murami"
+
+#: all_text
+msgid "21349/fcb58b4b"
+msgstr "Zniszcz bombowce"
+
+#: all_text
+msgid "21350/31338bfe"
+msgstr ""
+"Ten teren testowy, który widziałeś w [orange]Infobocie[default], musi być "
+"gdzieś w tej bazie[xAD]"
+
+#: all_text
+msgid "21351/934375b9"
+msgstr "Okręty Blargów zadokowały do tankowania. Zniszcz je, jak tylko się da."
+
+#: all_text
+msgid "21352/c97237fe"
+msgstr "Znajdź [orange]Hełm pilota[default]"
+
+#: all_text
+msgid "21353/547b2df0"
+msgstr "Zniszcz flotę Blargów"
+
+#: all_text
+msgid "21354/5444bd70"
+msgstr ""
+"Tym zajmie się Clank. Opuszczone laboratoria Blargów są w jaskiniach i "
+"pewnie kryją przydatne przedmioty."
+
+#: all_text
+msgid "21355/47fc68bf"
+msgstr ""
+"Za laboratoriami rozciąga się wrogi teren, gdzie Clank przeżyje tylko z "
+"pomocą swoich kumpli Gadge-Botów."
+
+#: all_text
+msgid "21356/807deead"
+msgstr ""
+"W fabryce stacjonują żołnierze Blargów, a do tego zmutowane zwierzęta. "
+"Jeśli przebijesz się przez hordy, możesz znaleźć przydatną technologię "
+"pozostawioną przez Blargów. Ratchet potrzebuje do tego [orange]Maski "
+"O2[default]."
+
+#: all_text
+msgid "21357/616363ba"
+msgstr "Złap tego [orange]Infobota[default]. Ale uważaj, jest szybki!"
+
+#: all_text
+msgid "21358/861e66d0"
+msgstr ""
+"[orange]Nanotech Premium[default] zwiększy twoje zdrowie. To zdecydowanie "
+"warty zakup."
+
+#: all_text
+msgid "21359/a4574db2"
+msgstr ""
+"To najpotężniejszy dostępny Nanotech. Jest drogi, ale da ci OGROMNY stały "
+"przyrost zdrowia."
+
+#: all_text
+msgid "21360/2e403dd8"
+msgstr "Przeszukaj laboratoria"
+
+#: all_text
+msgid "21361/6f0f6d31"
+msgstr "Przemierz dzicz"
+
+#: all_text
+msgid "21362/dc727997"
+msgstr "Złap [orange]Infobota[default]"
+
+#: all_text
+msgid "21363/00911e32"
+msgstr "Zbadaj teren jako Ratchet"
+
+#: all_text
+msgid "21364/06c6b246"
+msgstr "Kup [orange]Nanotech Premium[default]"
+
+#: all_text
+msgid "21365/e8f87182"
+msgstr "Kup [orange]Nanotech Ultra[default]"
+
+#: all_text
+msgid "21366/469dcb76"
+msgstr ""
+"Wygląda na to, że [orange]Infobot[default] tej planety trochę wprowadzał w "
+"błąd. Statki Blargów zrzucające toksyczne odpady zmieniły morza w "
+"wylęgarnie mutantów. Wszyscy turyści uciekli, więc to dobry moment na "
+"zwiedzanie."
+
+#: all_text
+msgid "21367/4a414ff0"
+msgstr ""
+"Właściciel kurortu potrzebuje pomocy, by dotrzeć do swojego odrzutowca "
+"ratunkowego. Oczyść ścieżkę z wrogów."
+
+#: all_text
+msgid "21368/9ad52425"
+msgstr ""
+"Zanim otworzysz hangar myśliwców, zajrzyj do Robosklepu Boba. Bob może mieć "
+"coś, co ci pomoże."
+
+#: all_text
+msgid "21369/6e27f25c"
+msgstr ""
+"Teraz, gdy masz [orange]Thruster-Pack[default], możesz otworzyć hangar "
+"odrzutowców i zestrzelić tych Blargów z nieba! Pamiętaj, jeśli ci się uda, "
+"dostaniesz [orange]Maskę O2[default]!"
+
+#: all_text
+msgid "21370/836df665"
+msgstr ""
+"Witaj w kanałach kurortu Jowai! To z pewnością jeden z czystszych systemów "
+"na tej planecie. Może jest tu na dole coś, co Ratchet może wykorzystać."
+
+#: all_text
+msgid "21371/5188fd30"
+msgstr ""
+"Wynalazca potrzebuje trochę [orange]Raritanium[default]. Może znajdziesz je "
+"na innym świecie."
+
+#: all_text
+msgid "21372/cb0de5b1"
+msgstr "Rozejrzyj się po kurorcie"
+
+#: all_text
+msgid "21373/4a1d72d1"
+msgstr "Pomóż właścicielowi kurortu"
+
+#: all_text
+msgid "21374/ec8164c3"
+msgstr "Kup Thruster-Pack od Boba"
+
+#: all_text
+msgid "21375/d3d22886"
+msgstr "Zniszcz statki Blargów"
+
+#: all_text
+msgid "21376/57a9ad6a"
+msgstr "Przejdź przez kanały"
+
+#: all_text
+msgid "21377/12356dae"
+msgstr "Zanieś [orange]Raritanium[default] Wynalazcy"
+
+#: all_text
+msgid "21378/153badf3"
+msgstr ""
+"Bomba Dreka, niszczyciel planet, zaraz zostanie wyniesiona z planety. "
+"Musisz ją powstrzymać, bo inaczej jakaś nieszczęsna planeta zostanie "
+"rozerwana na strzępy."
+
+#: all_text
+msgid "21379/a287ee6d"
+msgstr ""
+"Zanim przybyli komandosi Dreka, tutejsze fabryki słynęły z rafinacji "
+"[orange]Raritanium[default]. Na pewno wciąż jest tu sporo zaawansowanego "
+"sprzętu do znalezienia[xAD]"
+
+#: all_text
+msgid "21380/e828b8f8"
+msgstr ""
+"Z [orange]Hydro-Packiem[default] Ratchet porusza się szybciej pod wodą. "
+"Zdobądź go, przyda się."
+
+#: all_text
+msgid "21381/23a62b82"
+msgstr "Zniszcz niszczyciela planet"
+
+#: all_text
+msgid "21382/ae270e12"
+msgstr "Zbadaj lodowe pustkowia"
+
+#: all_text
+msgid "21383/c7a6f078"
+msgstr "Kup [orange]Hydro-Pack[default] od Eda"
+
+#: all_text
+msgid "21384/a30c7940"
+msgstr ""
+"Wprawdzie Drek ci uciekł, ale w tej bazie może być statek dość szybki, by "
+"go dogonić. Rozejrzyj się."
+
+#: all_text
+msgid "21385/f2da6809"
+msgstr ""
+"To twoja wielka szansa, by zemścić się na Qwarku za to, co ci zrobił. "
+"Znajdź statek i zestrzel go!"
+
+#: all_text
+msgid "21386/d1dea194"
+msgstr "Zbadaj bazę"
+
+#: all_text
+msgid "21387/3ddee790"
+msgstr "Zestrzel Kapitana Qwarka"
+
+#: all_text
+msgid "21388/381cf685"
+msgstr ""
+"Większość mieszkańców uciekła przed atakiem Blargów, ale pewnie kilku "
+"jeszcze zostało. Mogą mieć informacje, które pomogą ci powstrzymać Dreka."
+
+#: all_text
+msgid "21389/ec791bfb"
+msgstr ""
+"Ten [orange]Infobot[default] może zawierać cenne informacje, które pomogą "
+"ci powstrzymać Dreka. A za pół ceny jak można go nie wziąć?"
+
+#: all_text
+msgid "21390/5e0384d7"
+msgstr ""
+"Warto się tu rozejrzeć. W ruinach miasta mogło zostać trochę przydatnego "
+"sprzętu."
+
+#: all_text
+msgid "21391/49b42129"
+msgstr ""
+"[orange]Gadgetron PDA[default] pozwala kupować amunicję w dowolnej chwili. "
+"To ogromna pomoc z dala od automatu Gadgetronu."
+
+#: all_text
+msgid "21392/6035057d"
+msgstr "Znajdź ocalałych z ataku Blargów"
+
+#: all_text
+msgid "21393/903609fd"
+msgstr "Kup [orange]Infobota[default] od złomiarza"
+
+#: all_text
+msgid "21394/9851efa6"
+msgstr "Przeszukaj zniszczone miasto"
+
+#: all_text
+msgid "21395/e16a6421"
+msgstr "Kup [orange]Gadgetron PDA[default] od 'Steve'a'"
+
+#: all_text
+msgid "21396/21624e4d"
+msgstr ""
+"Ultra-Mech wygląda na potężną broń. Ktoś tu musi wiedzieć o nim więcej."
+
+#: all_text
+msgid "21397/e8cdbdcd"
+msgstr ""
+"Zniszczenie tych Ultra-Mechów pokrzyżowałoby plany Dreka. Są za duże dla "
+"Ratcheta, ale Gigant Clank da im radę."
+
+#: all_text
+msgid "21398/fdda870d"
+msgstr ""
+"Gigant Clank nie przejdzie przez tę przepaść. Inżynier powinien przywrócić "
+"Clankowi normalny rozmiar."
+
+#: all_text
+msgid "21399/1b567cc9"
+msgstr ""
+"Systemy chłodzenia fabryki to najnowsza technologia Blargów. Warto się "
+"rozejrzeć, czy nie zostawili tam czegoś ciekawego."
+
+#: all_text
+msgid "21400/c094e9da"
+msgstr ""
+"Clank uciekł ze strzeżonej wewnętrznej części tej fabryki! Jeśli zdołasz "
+"się tam zakraść, dowiesz się więcej o tym, gdzie jest Drek."
+
+#: all_text
+msgid "21401/33be93c5"
+msgstr ""
+"Jeśli przemkniesz obok robotów patrolowych, możesz znaleźć niezłe łupy."
+
+#: all_text
+msgid "21402/57c2536a"
+msgstr ""
+"Jeśli Blargowie przyjmują zamówienia na Ultra-Mechy, w tym skarbcu na pewno "
+"mają mnóstwo śrub. Do wyłączenia zamka potrzebujesz CodeBota."
+
+#: all_text
+msgid "21403/5a9fdc55"
+msgstr "Dowiedz się więcej o Ultra-Mechu"
+
+#: all_text
+msgid "21404/0ef11ba1"
+msgstr "Zniszcz Ultra-Mechy"
+
+#: all_text
+msgid "21405/49a5b31d"
+msgstr "Wróć do inżyniera"
+
+#: all_text
+msgid "21406/7930c4c9"
+msgstr "Zbadaj system chłodzenia"
+
+#: all_text
+msgid "21407/ea148b7d"
+msgstr "Przeniknij do strzeżonej strefy"
+
+#: all_text
+msgid "21408/9e2d4369"
+msgstr "Zbadaj fabrykę"
+
+#: all_text
+msgid "21409/c81d122d"
+msgstr "Otwórz skarbiec"
+
+#: all_text
+msgid "21410/c7ba8953"
+msgstr ""
+"W siedzibie Gadgetronu musi być mnóstwo świetnego sprzętu. "
+"[orange]Hologuise[default] z filmu [orange]Infobota[default] bardzo by się "
+"przydał. Ktoś w siedzibie Gadgetronu na pewno go ma[xAD]"
+
+#: all_text
+msgid "21411/3176150e"
+msgstr ""
+"W siedzibie Gadgetronu musi być mnóstwo świetnego sprzętu. Masz już "
+"[orange]Hologuise[default], może są tu też inne nowe produkty Gadgetronu."
+
+#: all_text
+msgid "21412/7fe708b5"
+msgstr ""
+"Drek wysłał za tobą swoich komandosów. Uruchomili automatyczną obronę "
+"Gadgetronu i wszystko oszalało. Znajdź kogoś z kierownictwa i ostrzeż go "
+"przed Blargami!"
+
+#: all_text
+msgid "21413/8c73d468"
+msgstr ""
+"Wygraj wyścig na [orange]Hoverboardach[default], a Ratchet może zostać nową "
+"gwiazdą Gadgetronu. Może nawet dostaniesz w nagrodę trochę sprzętu "
+"Gadgetronu."
+
+#: all_text
+msgid "21414/87293442"
+msgstr ""
+"W Grindboots pomkniesz po systemie transportowym Gadgetronu. Ale uważaj na "
+"jadące wagony!"
+
+#: all_text
+msgid "21415/34cdbb74"
+msgstr "Znajdź nowy sprzęt"
+
+#: all_text
+msgid "21416/f7734c59"
+msgstr "Przedostań się obok Blargów"
+
+#: all_text
+msgid "21417/d35d6da0"
+msgstr "Wygraj wyścig na [orange]Hoverboardach[default]"
+
+#: all_text
+msgid "21418/89c0f524"
+msgstr "Przejedź się po szynie"
+
+#: all_text
+msgid "21419/df60fd1d"
+msgstr ""
+"Położenie lasera, który ma zniszczyć planetę Ratcheta, musi być zapisane "
+"gdzieś na statku Dreka. Dostań się na okręt dowodzenia i ustal, gdzie jest "
+"laser, żeby zdążyć go powstrzymać."
+
+#: all_text
+msgid "21420/96316cc9"
+msgstr ""
+"Ten olbrzymi tankowiec wiezie wodę dla nowej planety Dreka. W środku może "
+"być ciekawa technologia, ale przez coś tak wielkiego przedostaniesz się "
+"tylko z [orange]Hydro-Packiem[default]."
+
+#: all_text
+msgid "21421/85f497e1"
+msgstr "Znajdź współrzędne lasera Dreka"
+
+#: all_text
+msgid "21422/cae34eba"
+msgstr "Przepłyń przez tankowiec"
+
+#: all_text
+msgid "21423/ec3f73b5"
+msgstr ""
+"Laser Dreka jest wymierzony w rodzinną planetę Ratcheta! Zniszcz laser i "
+"pokrzyżuj plany Dreka."
+
+#: all_text
+msgid "21424/d1669569"
+msgstr "Ocal planetę Ratcheta"
+
+#: all_text
+msgid "21425/7cc7f22a"
+msgstr ""
+"Wygląda na to, że ten statek rozbił się gdzieś w pobliżu! Znajdź miejsce "
+"katastrofy, może dowiesz się, co się stało."
+
+#: all_text
+msgid "21426/7e8daad9"
+msgstr "Zbadaj miejsce katastrofy"
+
+#: all_text
+msgid "20128/780b8e58"
+msgstr "Kup [orange]Infobota[default] za 500 śrub"
+
+#: all_text
+msgid "20129/73d2b4a0"
+msgstr "Zabij piaskowe rekiny za [orange]Hoverboard[default]"
+
+#: all_text
+msgid "20130/cf2a6f89"
+msgstr "Porozmawiaj z agentem po wygranym wyścigu"
+
+#: all_text
+msgid "20131/554386ff"
+msgstr "Kup [orange]Heli-Pack[default] za 1000 śrub"
+
+#: all_text
+msgid "20132/5d26b8b3"
+msgstr "Kup [orange]Swingshot[default] za 1000 śrub"
+
+#: all_text
+msgid "20133/72ffd40f"
+msgstr "Wyścig o [orange]Zoomerator[default]"
+
+#: all_text
+msgid "20134/e5ecb4ec"
+msgstr "Przekup ochroniarza 4000 śrub"
+
+#: all_text
+msgid "20135/8d498140"
+msgstr "Kup [orange]R.Y.N.O.[default] za 150 000 śrub"
+
+#: all_text
+msgid "20136/28edf5b4"
+msgstr "Kup [orange]Grindboots[default] za 2000 śrub"
+
+#: all_text
+msgid "20137/c1ab6088"
+msgstr "Zniszcz okręt wojenny"
+
+#: all_text
+msgid "20138/f7210b84"
+msgstr "Zgładź Snagglebestię"
+
+#: all_text
+msgid "20139/b6e000a0"
+msgstr "Kup [orange]Infobota[default] za 2000 śrub"
+
+#: all_text
+msgid "20140/fcb58b4b"
+msgstr "Zniszcz bombowce"
+
+#: all_text
+msgid "20141/03d4c9c0"
+msgstr "Kup [orange]Nanotech Premium[default] za 4000 śrub"
+
+#: all_text
+msgid "20142/2d7b15c3"
+msgstr "Kup [orange]Nanotech Ultra[default] za 30 000 śrub"
+
+#: all_text
+msgid "20143/c5731414"
+msgstr "Pomóż właścicielowi za maskę O2"
+
+#: all_text
+msgid "20144/8e7b218f"
+msgstr "Zniszcz statki Blargów za [orange]Maskę O2[default]"
+
+#: all_text
+msgid "20145/e8dedadd"
+msgstr "Kup [orange]Thruster-Pack[default] za 2000 śrub"
+
+#: all_text
+msgid "20146/fd2be305"
+msgstr "Wymień [orange]Raritanium[default] na [orange]Persuader[default]"
+
+#: all_text
+msgid "20147/fbc749bb"
+msgstr "Kup [orange]Hydro-Pack[default] za 2000 śrub"
+
+#: all_text
+msgid "20148/b6e000a0"
+msgstr "Kup [orange]Infobota[default] za 2000 śrub"
+
+#: all_text
+msgid "20149/f66e3b00"
+msgstr "Kup [orange]Gadgetron PDA[default] za 1000 śrub"
+
+#: all_text
+msgid "20150/0ef11ba1"
+msgstr "Zniszcz Ultra-Mechy"
+
+#: all_text
+msgid "20151/b8c039c6"
+msgstr "Otwórz skarbiec CodeBotem"
+
+#: all_text
+msgid "20152/15b17125"
+msgstr "Wyścig o [orange]Hologuise[default]"
+
+#: all_text
+msgid "20153/90f47ffa"
+msgstr "Płaskowyż Kyzil"
+
+#: all_text
+msgid "20154/e2b085de"
+msgstr "Krater Tobruk"
+
+#: all_text
+msgid "20155/964cc382"
+msgstr "Posterunek X11"
+
+#: all_text
+msgid "20157/ae81488c"
+msgstr "Tartak"
+
+#: all_text
+msgid "20159/9087cfde"
+msgstr "Stacja Blargów"
+
+#: all_text
+msgid "20160/32f1ab4b"
+msgstr "Kwatera Qwarka"
+
+#: all_text
+msgid "20162/82dfd2ce"
+msgstr "Skład Blargów"
+
+#: all_text
+msgid "20163/3c25bf5a"
+msgstr "Rafineria Kogor"
+
+#: all_text
+msgid "20164/5dcd0ef5"
+msgstr "Kurort Jowai"
+
+#: all_text
+msgid "20165/62bc3151"
+msgstr "Fabryka bomb"
+
+#: all_text
+msgid "20166/754cf65b"
+msgstr "Baza Gemlik"
+
+#: all_text
+msgid "20167/61e775c9"
+msgstr "Ruiny Gorda City"
+
+#: all_text
+msgid "20168/a38cb5a4"
+msgstr "Fabryka robotów"
+
+#: all_text
+msgid "20169/66113c05"
+msgstr "Teren Gadgetronu"
+
+#: all_text
+msgid "20170/8924130e"
+msgstr "Flota Dreka"
+
+#: all_text
+msgid "20171/90f47ffa"
+msgstr "Płaskowyż Kyzil"
+
+#: all_text
+msgid "20172/6fbf6f93"
+msgstr "Planeta"
+
+#: all_text
+msgid "20178/82cff7e6"
+msgstr "Mgławica G34"
+
+#: all_text
+msgid "20185/fab79e86"
+msgstr "Orbita Oltanis"
+
+#: all_text
+msgid "20189/e35463bb"
+msgstr "Orbita Veldin"
+
+#: all_text
+msgid "20191/47a655ac"
+msgstr "[cross] Przełącz"
+
+#: all_text
+msgid "20192/473c65c2"
+msgstr "[triangle] Wyjście"
+
+#: all_text
+msgid "20193/0d4da431"
+msgstr "Punkty umiejętności"
+
+#: all_text
+msgid "20194/9db3827d"
+msgstr "Bronie"
+
+#: all_text
+msgid "20195/d968c3fe"
+msgstr "Gadżety"
+
+#: all_text
+msgid "20196/a4c27742"
+msgstr "Szybki wybór"
+
+#: all_text
+msgid "20197/20dfc649"
+msgstr "Przedmioty"
+
+#: all_text
+msgid "20198/a8b5f392"
+msgstr "Pomoc"
+
+#: all_text
+msgid "20199/1f88c31b"
+msgstr "Opcje"
+
+#: all_text
+msgid "20200/7e3654d8"
+msgstr "Do rąk"
+
+#: all_text
+msgid "20201/5cb92843"
+msgstr "Plecaki"
+
+#: all_text
+msgid "20202/fafa1778"
+msgstr "Na głowę"
+
+#: all_text
+msgid "20203/034923a9"
+msgstr "Na nogi"
+
+#: all_text
+msgid "20204/63963bec"
+msgstr "[cross] Załóż"
+
+#: all_text
+msgid "20205/3f30576a"
+msgstr "[R1] - pomoc"
+
+#: all_text
+msgid "20206/402bea9d"
+msgstr "[cross] Misje"
+
+#: all_text
+msgid "20207/748f9e5f"
+msgstr "[circle] Odtwórz [orange]Infobota[default]"
+
+#: all_text
+msgid "20208/6d0e3ae9"
+msgstr "Mapa galaktyki"
+
+#: all_text
+msgid "20209/039bee69"
+msgstr "Sterowanie"
+
+#: all_text
+msgid "20210/84fe2736"
+msgstr "Ruchy"
+
+#: all_text
+msgid "20211/e25036f4"
+msgstr "Zakupy"
+
+#: all_text
+msgid "20212/0a3ca065"
+msgstr "Przełączniki"
+
+#: all_text
+msgid "20213/abe0ec5b"
+msgstr "Mapa"
+
+#: all_text
+msgid "20214/b7bf73a2"
+msgstr "Wrogowie"
+
+#: all_text
+msgid "20215/28992642"
+msgstr "Wskazówki"
+
+#: all_text
+msgid "20216/7267b29a"
+msgstr "Planety"
+
+#: all_text
+msgid "20217/d5c5d703"
+msgstr ""
+"Gadgetrón prowadzi szczegółowe archiwum wszystkich zamieszkanych światów. "
+"Wybierz tę opcję, by zajrzeć do naszej bazy danych."
+
+#: all_text
+msgid "20218/64eb69c5"
+msgstr "[L1] Poprzednia mapa"
+
+#: all_text
+msgid "20219/eca1f10d"
+msgstr "[R1] Następna mapa"
+
+#: all_text
+msgid "20220/1891b89a"
+msgstr "[lstick] [rstick] Ruch/Zoom"
+
+#: all_text
+msgid "20221/6ded8a49"
+msgstr ""
+"My, w Gadgetronie, jesteśmy tu, by ci pomóc. Ta opcja pokaże, do czego "
+"służą przyciski."
+
+#: all_text
+msgid "20222/a0e7cd14"
+msgstr ""
+"Masz bogaty zestaw akrobacji. Dowiedz się, jak odbijać się od ścian, pływać "
+"czy rzucać kluczem."
+
+#: all_text
+msgid "20223/3f3d7bf0"
+msgstr ""
+"Masz pytanie o broń? Gadgetron zna odpowiedź. Tu dowiesz się, jak działa "
+"broń i jak jej używać."
+
+#: all_text
+msgid "20224/004a97cb"
+msgstr ""
+"Mamy informacje o wszystkich urządzeniach, Gadgetronu i nie tylko. Pomożemy "
+"ci poznać możliwości twojego sprzętu!"
+
+#: all_text
+msgid "20225/06e3cb64"
+msgstr ""
+"Jeśli chcesz dowiedzieć się więcej o korbach, zagłuszaczach częstotliwości "
+"i innych specjalnych przełącznikach, wybierz tę pozycję."
+
+#: all_text
+msgid "20226/e0c80440"
+msgstr ""
+"Opatentowany system [orange]Szybkiego wyboru[default] Gadgetronu sprawia, "
+"że zakładanie gadżetów i broni to bułka z masłem. Pokażemy ci, jak go "
+"używać!"
+
+#: all_text
+msgid "20227/8cb42b96"
+msgstr ""
+"Gadgetron prowadzi spis wszystkich wrogów spotkanych w twoich podróżach. "
+"Jeśli chcesz dowiedzieć się więcej o wrogu, z którym walczyłeś, wybierz tę "
+"opcję."
+
+#: all_text
+msgid "20228/9378c8c7"
+msgstr "Nadal utknąłeś? Zajrzyj do działu wskazówek po kilka dobrych rad."
+
+#: all_text
+msgid "20229/29be12e7"
+msgstr "[cross] Wybierz"
+
+#: all_text
+msgid "20230/986d878a"
+msgstr "Odbicie od ściany"
+
+#: all_text
+msgid "20231/2fa77436"
+msgstr "Obrót w kucki"
+
+#: all_text
+msgid "20232/2e7ecc8e"
+msgstr "Pływanie"
+
+#: all_text
+msgid "20233/3fc930df"
+msgstr "Przewrót w bok"
+
+#: all_text
+msgid "20234/a83a22a6"
+msgstr "Salto w tył"
+
+#: all_text
+msgid "20235/dc6e0f62"
+msgstr "Chwyt krawędzi"
+
+#: all_text
+msgid "20236/e1cca0d0"
+msgstr "Ruch po krawędzi"
+
+#: all_text
+msgid "20237/42ed61ea"
+msgstr ""
+"Twój [orange]OmniWrench[default] 8000 ma szybkie kombo: wystarczy trzy razy "
+"z rzędu nacisnąć [square]."
+
+#: all_text
+msgid "20238/8e02f9c0"
+msgstr ""
+"[orange]Hiper-cios[default] zadaje więcej obrażeń niż zwykły cios kluczem. "
+"Skocz [cross], a potem naciśnij [square], by zadać potężny cios w dół."
+
+#: all_text
+msgid "20239/c4d5ebb9"
+msgstr ""
+"[orange]Cios komety[default] to jedna z najprzydatniejszych funkcji "
+"[orange]OmniWrencha[default] 8000. Kucnij [R1], a potem naciśnij [square]. "
+"Tym ruchem zbierzesz też odległe śruby!"
+
+#: all_text
+msgid "20240/71cab044"
+msgstr ""
+"Szukaj \"szczelin do skakania\" z teksturą jak na obrazku powyżej. Skocz "
+"[cross] w stronę jednej ściany i naciśnij [cross] ponownie w chwili, gdy "
+"jej dotkniesz. Odbijaj się między ścianami, by dostać się na szczyt "
+"szczeliny."
+
+#: all_text
+msgid "20241/3a74a4fa"
+msgstr ""
+"Kucnij [R1] i obracaj się w miejscu [lstick]. W ten sposób możesz obracać "
+"się w miejscu i strzelać."
+
+#: all_text
+msgid "20242/17f878cc"
+msgstr ""
+"W wodzie naciśnij [square], by zanurkować, i [cross], by się wynurzyć. "
+"Wciśnij [cross] mocniej, by wynurzać się szybciej. Pilnuj wskaźnika "
+"powietrza! Gdy skończą się bąbelki, utoniesz."
+
+#: all_text
+msgid "20243/31ecdffd"
+msgstr ""
+"Spróbuj przewrotu w bok! Przytrzymaj [R1], by kucnąć, i szarpnij [lstick] w "
+"prawo lub w lewo, naciskając [cross]. Dla stylu strzelaj podczas przewrotu!"
+
+#: all_text
+msgid "20244/1b9b8059"
+msgstr ""
+"Ten ruch świetnie sprawdza się przy wycofywaniu się przed wrogami. "
+"Przytrzymaj [R1], by kucnąć, i szarpnij [lstick] do tyłu, naciskając "
+"[cross]. Spróbuj rzucać bomby, robiąc salta w tył!"
+
+#: all_text
+msgid "20245/9b9b6547"
+msgstr ""
+"Ratchet sam chwyta się krawędzi, gdy do nich doskoczy. Aby się podciągnąć, "
+"naciśnij [cross]. Aby zeskoczyć, naciśnij [R1] lub [R2]."
+
+#: all_text
+msgid "20246/64e5cbb2"
+msgstr ""
+"Wisząc na krawędzi, możesz się po niej przesuwać, ruszając [lstick] w lewo "
+"lub w prawo."
+
+#: all_text
+msgid "20247/101cd199"
+msgstr ""
+"Masz już ulepszenie [orange]Heli-Pack[default] od Gadgetronu, więc możesz "
+"używać [orange]Szybowania[default]! Skocz [cross], a potem naciśnij [cross] "
+"ponownie, by szybować. [orange]Szybować[default] możesz też z "
+"[orange]Thruster-Packiem[default]."
+
+#: all_text
+msgid "20248/09cb1ee0"
+msgstr ""
+"Aby wykonać [orange]Długi skok[default], rozpędź się, a potem naciśnij i "
+"przytrzymaj razem [R1] i [cross]. By skoczyć jak najdalej nad przepaścią, "
+"wybij się z samej krawędzi."
+
+#: all_text
+msgid "20249/e55d678c"
+msgstr ""
+"[orange]Skok z wybiciem[default] to kolejna przydatna funkcja ulepszeń "
+"[orange]Heli-Pack[default] i [orange]Thruster-Pack[default]. Przytrzymaj "
+"[R1], by kucnąć, i naciśnij [cross], by skoczyć. Ze [orange]Skoku z "
+"wybiciem[default] przejdziesz w [orange]Szybowanie[default], naciskając "
+"ponownie [cross]."
+
+#: all_text
+msgid "20250/6b7392e5"
+msgstr ""
+"Aby [orange]Szybować[default], musisz najpierw zdobyć specjalne ulepszenie "
+"dla Clanka."
+
+#: all_text
+msgid "20251/14c6de5d"
+msgstr ""
+"Aby wykonać [orange]Długi skok[default], musisz najpierw zdobyć specjalne "
+"ulepszenie dla Clanka."
+
+#: all_text
+msgid "20252/d0b4cf56"
+msgstr ""
+"Aby wykonać [orange]Skok z wybiciem[default], musisz najpierw zdobyć "
+"specjalne ulepszenie dla Clanka."
+
+#: all_text
+msgid "20253/1f88c31b"
+msgstr "Opcje"
+
+#: all_text
+msgid "20254/44281ed9"
+msgstr "Pomoc"
+
+#: all_text
+msgid "20255/f55495e0"
+msgstr "Zapisz"
+
+#: all_text
+msgid "20256/85344b23"
+msgstr "Wczytaj"
+
+#: all_text
+msgid "20257/bd06f528"
+msgstr "Obraz"
+
+#: all_text
+msgid "20258/394fec80"
+msgstr "Dźwięk"
+
+#: all_text
+msgid "20259/3cb0eb33"
+msgstr "Kamera"
+
+#: all_text
+msgid "20260/25c84b25"
+msgstr "Napisy"
+
+#: all_text
+msgid "20261/3d40c46a"
+msgstr "Wibracje"
+
+#: all_text
+msgid "20262/8a91f624"
+msgstr "Wyjdź z gry"
+
+#: all_text
+msgid "20263/415af93f"
+msgstr "[cross] Wybierz plik"
+
+#: all_text
+msgid "20264/0a5c321d"
+msgstr "Wczytaj grę"
+
+#: all_text
+msgid "20265/058adc6a"
+msgstr "Zapisz grę"
+
+#: all_text
+msgid "20266/f5003f27"
+msgstr "Nowa gra"
+
+#: all_text
+msgid "20267/2dad13e3"
+msgstr "Język"
+
+#: all_text
+msgid "20268/e33e3b9c"
+msgstr "Angielski"
+
+#: all_text
+msgid "20269/a8d9cb68"
+msgstr "Francuski"
+
+#: all_text
+msgid "20270/fba5cca8"
+msgstr "Hiszpański"
+
+#: all_text
+msgid "20271/a5984597"
+msgstr "Niemiecki"
+
+#: all_text
+msgid "20272/98045053"
+msgstr "Włoski"
+
+#: all_text
+msgid "20273/04e275da"
+msgstr "Włącz lub wyłącz komunikaty [orange]Pomocy[default]"
+
+#: all_text
+msgid "20274/02667ada"
+msgstr "Zapisz postęp"
+
+#: all_text
+msgid "20275/eba7b028"
+msgstr "Wczytaj zapisaną grę"
+
+#: all_text
+msgid "20276/7707d70a"
+msgstr "Zmień ustawienia obrazu"
+
+#: all_text
+msgid "20277/1f3dbb9a"
+msgstr "Zmień ustawienia dźwięku"
+
+#: all_text
+msgid "20278/b4395fcc"
+msgstr "Zmień ustawienia kamery"
+
+#: all_text
+msgid "20279/65416593"
+msgstr "Włącz lub wyłącz napisy"
+
+#: all_text
+msgid "20280/4f91ea28"
+msgstr "Włącz lub wyłącz wibracje pada"
+
+#: all_text
+msgid "20281/64d32b43"
+msgstr "Zakończ grę i wróć do menu startowego"
+
+#: all_text
+msgid "20282/3c6be27f"
+msgstr "Opcje obrazu"
+
+#: all_text
+msgid "20283/eaa6c9ac"
+msgstr "Tryb obrazu (50 Hz lub 60 Hz)"
+
+#: all_text
+msgid "20286/83d6067f"
+msgstr "Specjalne"
+
+#: all_text
+msgid "20287/58edb797"
+msgstr "Wyjść z gry?"
+
+#: all_text
+msgid "20288/768f522c"
+msgstr "Opcje Pomocy"
+
+#: all_text
+msgid "20289/4f788725"
+msgstr "Zacząć poziom od nowa?"
+
+#: all_text
+msgid "20290/6a4e41db"
+msgstr "Opcje kamery"
+
+#: all_text
+msgid "20291/dbb48aad"
+msgstr "Opcje dźwięku"
+
+#: all_text
+msgid "20292/bad56667"
+msgstr ""
+"Oto [orange]Hoverboard[default] Z3000 Deluxe produkcji Gadgetronu. Możesz "
+"go używać w wyścigach w całej galaktyce. Hoverboard zakłada się sam, gdy "
+"tylko wejdziesz na Oficjalny HoverTor Gadgetronu. \n\nW wyścigu skaczesz "
+"[cross]. Triki wykonasz, skacząc i naciskając kombinacje [R1], [R2], [L1] i "
+"[L2]. W powietrzu spróbuj też kręcić się [lstick]. \n\nZnajdź "
+"[orange]Zoomerator[default], a zamienisz triki w turbo!"
+
+#: all_text
+msgid "20293/1343cc05"
+msgstr ""
+"[orange]Persuader[default] to urządzenie z czarnego rynku, zakazane na "
+"większości planet, i to nie bez powodu. Używa nielegalnej technologii do "
+"mieszania w głowach. My, w Gadgetronie, nie popieramy tego urządzenia, bo "
+"nasze automaty są podatne na jego moc. \n\nGdy je znajdziesz, zostaje "
+"założone na stałe. [orange]Persuader[default] jest zasilany "
+"[orange]Raritanium[default]."
+
+#: all_text
+msgid "20294/afe13b6c"
+msgstr ""
+"[orange]Bolt Grabber[default] to jeden z najpopularniejszych gadżetów "
+"Gadgetronu. Gdy go zdobędziesz, zostaje na stałe i przyciąga śruby z dużo "
+"większej odległości."
+
+#: all_text
+msgid "20295/18c33879"
+msgstr ""
+"Opracowany przez naukowców Blargów [orange]Nanotech Premium[default] "
+"zwiększa twoje maksymalne zdrowie o jedną kulę nanotechu."
+
+#: all_text
+msgid "20296/004f90d0"
+msgstr ""
+"[orange]Nanotech Ultra[default] to szczytowe osiągnięcie inżynierii "
+"Blargów. To niesamowite wzmocnienie zwiększa twoje maksymalne zdrowie o "
+"trzy kule nanotechu."
+
+#: all_text
+msgid "20297/db29667d"
+msgstr ""
+"[orange]Map-o-matic[default] to owoc nieustannych starań Gadgetronu, by "
+"zmapować każdy centymetr galaktyki. Wystarczy go mieć, by widzieć na mapie "
+"wcześniej niezbadane obszary."
+
+#: all_text
+msgid "20298/362c9be4"
+msgstr ""
+"[orange]Zoomerator[default] to nakładka na [orange]Hoverboard[default] "
+"Gadgetron Z3000 Deluxe, która dzięki specjalnej technologii kwantowej "
+"zamienia triki w turbo. \n\n[orange]Zoomerator[default] jest niezbędny, by "
+"wygrać niektóre trudniejsze wyścigi hoverboardów w tej galaktyce. A jeśli "
+"musisz kogoś przekonać o swoich umiejętnościach, po prostu pokaż mu "
+"[orange]Zoomerator[default]."
+
+#: all_text
+msgid "20299/5dc6cf4d"
+msgstr ""
+"Jak sama nazwa wskazuje, [orange]Raritanium[default] jest... rzadkie. "
+"Blargowie używają go do produkcji niszczycielskich urządzeń, można je też "
+"znaleźć w niektórych urządzeniach z czarnego rynku. Gadgetron nie popiera "
+"takich urządzeń."
+
+#: all_text
+msgid "20300/4a94d217"
+msgstr ""
+"[orange]CodeBoty[default] Gadgetronu są niezbędne do otwierania "
+"Invinco-Vaultów. Do każdego skarbca jest jeden [orange]CodeBot[default], "
+"więc każdego [orange]CodeBota[default] można użyć tylko raz."
+
+#: all_text
+msgid "20301/927a89f6"
+msgstr "Bez amunicji"
+
+#: all_text
+msgid "20302/ad034ee3"
+msgstr "[orange]Złote śruby[default]"
+
+#: all_text
+msgid "20303/aa9469db"
+msgstr "Znalezione:"
+
+#: all_text
+msgid "20304/c6dac60e"
+msgstr "Wydane:"
+
+#: all_text
+msgid "20305/e953f5a7"
+msgstr "Zostało:"
+
+#: all_text
+msgid "20306/edd579f2"
+msgstr "(bez amunicji)"
+
+#: all_text
+msgid "20307/076da1fa"
+msgstr "z"
+
+#: all_text
+msgid "20309/2e7d2224"
+msgstr "[L1]/[R1] inne planety"
+
+#: all_text
+msgid "20310/74cf3730"
+msgstr "[rstick] przybliża"
+
+#: all_text
+msgid "20311/5aaaa95f"
+msgstr "[lstick] przesuwa"
+
+#: all_text
+msgid "20312/806b1aba"
+msgstr "[cross] misje"
+
+#: all_text
+msgid "20313/cd87b628"
+msgstr "Misje"
+
+#: all_text
+msgid "20314/09b629c8"
+msgstr "wł."
+
+#: all_text
+msgid "20315/2bbc5d43"
+msgstr "wył."
+
+#: all_text
+msgid "20316/5616c572"
+msgstr "anuluj"
+
+#: all_text
+msgid "20317/4fbdd114"
+msgstr "Amunicja"
+
+#: all_text
+msgid "20318/61ce558b"
+msgstr "Menu pomocy"
+
+#: all_text
+msgid "20319/647dedb5"
+msgstr "DZIĘKUJĘ"
+
+#: all_text
+msgid "20320/152bc02a"
+msgstr "Nie stać cię na to"
+
+#: all_text
+msgid "20321/7e247904"
+msgstr ""
+"HEJ, TY! TAK, TY, Z ROBOTEM NA PLECACH! CHODŹ TU I ZOBACZ, ILE FAJNYCH "
+"RZECZY MAM NA SPRZEDAŻ."
+
+#: all_text
+msgid "20322/613e5951"
+msgstr "ODWIEDŹ GADGETRON! ZOBACZ NAJNOWSZĄ TECHNOLOGIĘ DO GROMIENIA WROGÓW!"
+
+#: all_text
+msgid "20323/eee970ae"
+msgstr "WPADNIJ DZIŚ DO JEDNEGO Z NASZYCH SALONÓW NA JAZDĘ PRÓBNĄ!"
+
+#: all_text
+msgid "20324/2c71a273"
+msgstr "ZJEDZ U JOEGO"
+
+#: all_text
+msgid "20325/24d5477b"
+msgstr ""
+"GADGETRON TO JEDEN SKLEP NA WSZYSTKIE TWOJE POTRZEBY GADŻETOWE I AMUNICYJNE."
+
+#: all_text
+msgid "20326/8b75a6f4"
+msgstr ""
+"GADGETRON MA SALONY W DOGODNYCH MIEJSCACH NA WSZYSTKICH ZAMIESZKANYCH "
+"ŚWIATACH, A TAKŻE NA ZUPEŁNIE NIEZAMIESZKANYCH BAGNACH TRACHEI PIĄTEJ. SAMI "
+"NIE WIEMY, SKĄD SIĘ TAM WZIĄŁ. INŻYNIEROWIE WINIĄ MARKETING, MARKETING WINI "
+"PRAWNIKÓW, A PRAWNICY OD SZEŚCIU MIESIĘCY SĄ NA ''KONFERENCJI'' NA "
+"TROPIKALNEJ PLANECIE BAHAMIA I NIE ODBIERAJĄ TELEFONÓW."
+
+#: all_text
+msgid "20327/5da1ba3b"
+msgstr ""
+"ODWIEDŹ NASZĄ SIEDZIBĘ NA KALEBO III! PODZIWIAJ SPRAWNOŚĆ NASZYCH BOTÓW "
+"OCHRONY! ZACHWYĆ SIĘ BUJNĄ ZIELENIĄ! UCIEKAJ PRZED HORDAMI SZALEJĄCYCH "
+"SPRZĄTOBOTÓW!"
+
+#: all_text
+msgid "20328/c2c3c319"
+msgstr ""
+"POZNAJ NASZĄ ZUPEŁNIE NOWĄ LINIĘ GADŻETÓW ŚREDNIEGO I DALEKIEGO ZASIĘGU!"
+
+#: all_text
+msgid "20329/ce4440e4"
+msgstr "POMOCY! UTKNĄŁEM W TYM PUDLE!"
+
+#: all_text
+msgid "20330/921e6b7d"
+msgstr ""
+"GADGETRON TO WIODĄCY W KWADRANCIE SPRZEDAWCA NAJNOWOCZEŚNIEJSZYCH GADŻETÓW!"
+
+#: all_text
+msgid "20331/ca2cc720"
+msgstr "ZAPYTAJ O NASZ WYBÓR WYSOKIEJ JAKOŚCI AMUNICJI!"
+
+#: all_text
+msgid "20332/02ae5ac3"
+msgstr "GADGETRON! U NAS ZAWSZE OSZCZĘDZASZ WIĘCEJ!"
+
+#: all_text
+msgid "20333/c12cdf6a"
+msgstr "Na pewno chcesz wyjść z obecnej gry?"
+
+#: all_text
+msgid "20334/fa73826f"
+msgstr "Przerwać wyścig?"
+
+#: all_text
+msgid "20335/1db0d046"
+msgstr "Opcje napisów"
+
+#: all_text
+msgid "20336/4ea1cc95"
+msgstr "[triangle] Mapa lokalna"
+
+#: all_text
+msgid "20337/6d722dcf"
+msgstr "[cross] Start"
+
+#: all_text
+msgid "20338/f265349b"
+msgstr ""
+"[orange]Bomb Glove[default] to niedroga broń na początek. Właściwie jest ZA "
+"DARMO! Tak bardzo wierzymy w ten produkt, że dajemy go nowym klientom w "
+"prezencie!\n\nSkuteczna z bliska i ze średniej odległości, szczególnie "
+"przydaje się przeciw grupom wrogów. \n\nPrzytrzymaj [L1], by precyzyjnie "
+"celować. Świetny pomysł na prezent!"
+
+#: all_text
+msgid "20339/176c3431"
+msgstr ""
+"Masz kłopot z rojami małych stworzeń? Odpowiedzią jest "
+"[orange]Pyrocitor[default] Gadgetronu! Ten miotacz ognia szybko je "
+"przypiecze! \n\nRada: przytrzymaj [circle], by ziać ciągłym strumieniem "
+"ognia."
+
+#: all_text
+msgid "20340/b44f93b5"
+msgstr ""
+"[orange]Blaster[default] to świetna broń do wszystkiego. Ma ograniczony "
+"zasięg, ale dzięki szybkostrzelności idealnie nadaje się na twardych wrogów "
+"z bliska i ze średniej odległości. Przytrzymaj [L1], by użyć trybu "
+"snajperskiego. \n\nTa broń szybko zjada amunicję, więc zbieraj tyle "
+"amunicji do [orange]Blastera[default], ile uniesiesz"
+
+#: all_text
+msgid "20341/4800598c"
+msgstr ""
+"Chcesz mieć wybuchowych nowych przyjaciół? Wypróbuj [orange]Glove of "
+"Doom[default]! To poręczne urządzenie rzuca DoomJaja Gadgetronu, z których "
+"wykluwają się cztery Agenty Zagłady. \n\nTe zawzięte małe roboty wytropią i "
+"zniszczą każde zagrożenie w pobliżu! Naraz może działać do 8 Agentów!"
+
+#: all_text
+msgid "20342/072cb86d"
+msgstr ""
+"[orange]Mine Glove[default] zrzuca unoszące się miny, które wybuchają, gdy "
+"zbliży się do nich wróg. Zastawiaj miny jako pułapki na wrogów! Albo połącz "
+"je z [orange]Taunterem[default] Gadgetronu! \n\n[L1] pozwala precyzyjnie "
+"rozmieszczać miny."
+
+#: all_text
+msgid "20343/aa157479"
+msgstr ""
+"[orange]Taunter[default] nie zadaje obrażeń, ale świetnie wabi wrogów na "
+"miny, w pola siłowe albo po prostu w zasięg innej broni. "
+"[orange]Taunter[default] uruchamia też rozmieszczone miny, zwiększając ich "
+"zasięg. \n\nRazem [orange]Mine Glove[default] i [orange]Taunter[default] "
+"Gadgetronu to zabójcze połączenie!"
+
+#: all_text
+msgid "20344/ec7a5ec3"
+msgstr ""
+"[orange]Devastator[default] to idealne połączenie skuteczności na dystans i "
+"oszczędności. Tańszy od niektórych innych broni dalekiego zasięgu "
+"Gadgetronu, z łatwością strąca latających wrogów. \n\nWypróbuj nową funkcję "
+"automatycznego namierzania [orange]Devastatora[default]! Przytrzymaj [L1], "
+"a celownik zrobi się zielony, gdy namierzy cel. Po namierzeniu pociski "
+"[orange]Devastatora[default] same podążają za ruchomymi celami."
+
+#: all_text
+msgid "20345/7dcb9867"
+msgstr ""
+"Najpopularniejsza broń krótkiego zasięgu Gadgetronu, "
+"[orange]Walloper[default], ma naprawdę mocny cios! Ta \"rękawica "
+"bokserska\" idealnie sprawdza się w walce wręcz, gdy broń strzelająca nie "
+"wystarcza."
+
+#: all_text
+msgid "20346/db9484d6"
+msgstr ""
+"[orange]Visibomb[default] Gun to najskuteczniejsza broń dalekiego zasięgu "
+"Gadgetronu! Wystrzel zdalnie sterowaną [orange]Visibombę[default] i "
+"dostarcz potężny ładunek z idealną precyzją! \n\nUwaga: zawsze strzelaj z "
+"bezpiecznego miejsca, bo obrażenia u strzelca przerywają lot pocisku."
+
+#: all_text
+msgid "20347/6d641f28"
+msgstr ""
+"Chcesz odwrócić uwagę wrogów i przemknąć obok bez szwanku? [orange]Decoy "
+"Glove[default] tworzy nadmuchiwane manekiny na twoje podobieństwo! Wrogowie "
+"zaatakują manekina, a ty przemkniesz obok (albo zaatakujesz ich od tyłu!)"
+
+#: all_text
+msgid "20348/59d68afd"
+msgstr ""
+"Gdy wybierzesz to urządzenie w menu [orange]Szybkiego wyboru[default] lub "
+"menu broni, samo wypuści ochronne drony obronne. Drony przyjmują na siebie "
+"obrażenia, a ty masz wolne ręce dla innej broni. \n\nJeśli któryś dron "
+"zostanie zniszczony, wybierz urządzenie ponownie, by uzupełnić krążących "
+"przyjaciół."
+
+#: all_text
+msgid "20349/f41c1a73"
+msgstr ""
+"[orange]Tesla Claw[default], oparty na najnowszej technologii "
+"elektrostatycznej, to szczyt technologii broni Gadgetronu. Wysyła potężny "
+"strumień naładowanych cząstek w najbliższego wroga i niszczy go z zabójczą "
+"skutecznością. \n\n[orange]Tesla Claw[default] sam szuka nowego celu, gdy "
+"obecny zostanie unicestwiony."
+
+#: all_text
+msgid "20350/b072e7d7"
+msgstr ""
+"[orange]Suck Cannon[default] to prototyp broni rozwijany przez Blargów. "
+"Wiemy tylko, że dzięki nowej technologii kwantowej wsysa małych wrogów i "
+"zamienia ich w wybuchowe pociski. \n\nPrzytrzymaj [circle], by wessać "
+"wrogów do działa. Potem stuknij [circle] ponownie, by wystrzelić wroga z "
+"powrotem! Trzymaj [circle], by strzelać seriami!"
+
+#: all_text
+msgid "20351/7c1cc3fd"
+msgstr ""
+"[orange]Morph-o-ray[default] powstał jako nieudana próba stworzenia "
+"promienia dezintegrującego, a dziś jest jednym z najpopularniejszych "
+"urządzeń Gadgetronu. Poświeć promieniem [orange]Morph-o-raya[default] na "
+"wrogów i patrz, jak zmieniają się w niegroźne kurczaki! Przytrzymaj promień "
+"na wrogu przez chwilę, by go przemienić. \n\nUwaga: przemiana większych "
+"wrogów może trwać dłużej."
+
+#: all_text
+msgid "20352/c252fbce"
+msgstr ""
+"[orange]R.Y.N.O.[default] (\"Rip You a New One\", czyli \"zrobię ci nową "
+"dziurę\"), pierwotnie produkowany przez Gadgetron jako ostateczna broń "
+"taktyczna, jest dziś dostępny tylko na czarnym rynku. \n\nPojemne, "
+"szybkostrzelne, samonaprowadzające się pociski sprawiły, że uznano go za "
+"zbyt niebezpieczny dla cywilów."
+
+#: all_text
+msgid "20353/81ab1951"
+msgstr ""
+"Założony [orange]Swingshot[default] Gadgetronu pozwala używać "
+"[orange]Versa-Targetów[default], by dotrzeć w nowe miejsca. "
+"[orange]Versa-Targety[default] są dwóch rodzajów: zielone służą do "
+"przyciągania się, a żółte do huśtania. \n\nUwaga: aby uniknąć obrażeń, nie "
+"puszczaj [circle], dopóki nie znajdziesz się w zasięgu celu."
+
+#: all_text
+msgid "20354/5a7e8df0"
+msgstr ""
+"Dzięki technologii kompresji kwantowej [orange]Hydrodisplacer[default] "
+"mieści do 50 000 litrów wody. Jest nieoceniony przy opróżnianiu i "
+"napełnianiu dużych basenów. Aby napełnić [orange]Hydrodisplacer[default], "
+"znajdź Hydro-Kran Gadgetronu, stań na płycie aktywacyjnej i naciśnij "
+"[circle]. \n\nUżyty Hydro-Kran sam zmienia się w Hydro-Odpływ. Zawartość "
+"[orange]Hydrodisplacera[default] możesz wylać w dowolnym Hydro-Odpływie."
+
+#: all_text
+msgid "20355/45c0686d"
+msgstr ""
+"[orange]Trespasser[default] Gadgetronu to idealne urządzenie do pokonywania "
+"[orange]Invinco-Locków[default]. Stań na płycie aktywacyjnej "
+"[orange]Invinco-Locka[default] i naciśnij [circle], by otworzyć jego "
+"interfejs. \n\nNa każdym pierścieniu [orange]Invinco-Locka[default] są "
+"lasery. Ruszaj [lstick] w górę i w dół, by wybrać pierścień, a w lewo i w "
+"prawo, by go obracać. Wyceluj lasery w odbiorniki na zewnętrznym "
+"pierścieniu, aby zrobiły się zielone. \n\n[orange]Invinco-Lock[default] "
+"otworzy się dopiero, gdy wszystkie odbiorniki będą zielone."
+
+#: all_text
+msgid "20356/2b6abe9a"
+msgstr ""
+"[orange]Hologuise[default] Gadgetronu to idealne urządzenie do infiltracji "
+"dla wszystkich naszych klientów, którzy nie są robotami! Załóż je i "
+"naciśnij [circle]. Natychmiast przebierzesz się za robota i większość "
+"robotycznych systemów ochrony cię nie wykryje. Naciśnij [circle] ponownie, "
+"by pomachać innym robotom, a wyłączą dla ciebie pola siłowe.\n\nUwaga: "
+"użycie dowolnej broni w przebraniu wyłącza [orange]Hologuise[default]!"
+
+#: all_text
+msgid "20357/b9bfe12a"
+msgstr ""
+"Ten [orange]Metal Detector[default] nie jest produktem Gadgetronu, ale mamy "
+"obszerne informacje o jego używaniu. Niezależnie od tego, czy masz go "
+"założonego, na ekranie pojawi się ikona śruby, gdy będziesz w pobliżu "
+"zakopanych śrub. \n\nZałożony [orange]Metal Detector[default] daje sygnały "
+"wskazujące, jak blisko są zakopane śruby. Im bliżej, tym czerwieńsze "
+"pierścienie i tym szybsze piszczenie. Płytka detektora wskazuje kierunek do "
+"zakopanych śrub."
+
+#: all_text
+msgid "20358/24b75d07"
+msgstr ""
+"Osobistego Asystenta Dostaw Gadgetronu możesz wezwać wszędzie, by "
+"natychmiast dostać amunicję! Załóż urządzenie i naciśnij [circle]. "
+"Gadgetron od razu jest do twoich usług!"
+
+#: all_text
+msgid "20359/f413fef2"
+msgstr ""
+"[orange]Magneboots[default] są wciąż w fazie rozwoju w Gadgetronie i na "
+"razie nie są w sprzedaży. Kilka prototypów trafiło do testów beta. Buty "
+"mocno przylegają do specjalnie zjonizowanych [orange]Pasów "
+"magnetycznych[default], dzięki czemu można chodzić po ścianach, a nawet do "
+"góry nogami! \n\nUważaj jednak: [orange]Magneboots[default] nie uchronią "
+"cię przed upadkiem, jeśli zejdziesz z [orange]Pasów magnetycznych[default]!"
+
+#: all_text
+msgid "20360/b857c902"
+msgstr ""
+"Przez krótki czas krążyły plotki, że ktoś wynalazł urządzenie zwane "
+"\"[orange]Grindboots[default]\", które pozwala z dużą prędkością sunąć po "
+"cienkich, wąskich szynach. Po dalszym dochodzeniu uważamy, że takie "
+"urządzenie nigdy nie istniało."
+
+#: all_text
+msgid "20361/2aaa70b5"
+msgstr ""
+"[orange]Sonic Summoner[default] pozwala porozumiewać się z tajemniczymi i "
+"inteligentnymi Piaskowymi Myszami. Mimo niewinnego wyglądu Piaskowe Myszy "
+"to bardzo skuteczne i agresywne łowczynie.\n\nZałóż [orange]Sonic "
+"Summoner[default] w pobliżu Mysiego Domku, a wyjdzie z niego mysz, by cię "
+"powitać. Jeśli cię polubi, może zaoferować solidne wsparcie taktyczne."
+
+#: all_text
+msgid "20362/45c12b98"
+msgstr ""
+"Chcesz oddychać pod wodą? Albo pospacerować w kosmosie? Z [orange]Maską "
+"O2[default] od Gadgetronu przetrwasz nawet w trującej atmosferze! Maska "
+"zakłada się sama, gdy wyczuje, że potrzebujesz tlenu! A jeśli wolisz, "
+"możesz ją założyć w każdej chwili i nosić dla stylowego wyglądu."
+
+#: all_text
+msgid "20363/24e36dfd"
+msgstr ""
+"[orange]Hełm pilota[default], opracowany przez Blargów, to bezpośredni "
+"interfejs nerwowy do pilotowania myśliwców Blargów. Sterowanie jest tak "
+"proste, że poradzi sobie nawet Blarg: [square]: karabiny maszynowe. "
+"[circle]: rakiety. [cross]: dopalacze."
+
+#: all_text
+msgid "20364/0b96116a"
+msgstr ""
+"Ulepszenie [orange]Thruster-Pack[default] ma, tak jak "
+"[orange]Heli-Pack[default], [orange]Skok z wybiciem[default], [orange]Długi "
+"skok[default] i [orange]Szybowanie[default]. Do tego "
+"[orange]Thruster-Pack[default] daje specjalny manewr: [orange]Potężne "
+"uderzenie[default]. Naciśnij [R1] w trakcie skoku, by go wykonać. \n\n"
+"[orange]Potężne uderzenie[default] otwiera specjalne zamki i rozbija "
+"przedmioty w otoczeniu."
+
+#: all_text
+msgid "20365/970763c9"
+msgstr ""
+"Z ulepszeniem [orange]Heli-Pack[default] wykonasz [orange]Skok z "
+"wybiciem[default], skacząc z przysiadu. [orange]Długi skok[default] "
+"wykonasz, naciskając [R1] w biegu, a zaraz potem [cross]. \n\nAby szybować, "
+"naciśnij i przytrzymaj [cross] w powietrzu. Odwiedź najbliższy Robosklep, "
+"by założyć to ulepszenie!"
+
+#: all_text
+msgid "20366/c33b3fba"
+msgstr ""
+"Ulepszenie [orange]Hydro-Pack[default] pochodzi z czarnego rynku i "
+"Gadgetron go nie popiera. Znacznie zwiększa szybkość pływania i pozwala "
+"nawet płynąć pod prąd"
+
+#: all_text
+msgid "20367/49cd0126"
+msgstr ""
+"Złoty [orange]Bomb Glove[default] zastępuje twój zwykły [orange]Bomb "
+"Glove[default] i daje bombom więcej mocy i większe wybuchy! W trybie "
+"celowania ma też większy zasięg! Prawdziwa okazja za kilka [orange]Złotych "
+"śrub[default]!"
+
+#: all_text
+msgid "20368/9b493bd5"
+msgstr ""
+"Złoty [orange]Pyrocitor[default] to luksusowa wersja popularnego miotacza "
+"ognia Gadgetronu. Zadaje więcej obrażeń i robi to szybciej niż oryginał. Ma "
+"też większy zasięg i kojący zielony płomień."
+
+#: all_text
+msgid "20369/ab7928be"
+msgstr ""
+"Po co zadowalać się zwykłym [orange]Blasterem[default], skoro możesz mieć "
+"Złoty [orange]Blaster[default]? Ta pozłacana piękność daje większy zasięg, "
+"szybkostrzelność i moc. \n\nA na dodatek twoje pociski odbijają się od "
+"przedmiotów, zadając jeszcze więcej obrażeń!"
+
+#: all_text
+msgid "20370/c3702f25"
+msgstr ""
+"Zwykły [orange]Glove of Doom[default] stał się ulubieńcem galaktycznych "
+"poszukiwaczy przygód, a Złoty [orange]Glove of Doom[default] dodaje temu "
+"klasykowi nowych możliwości. \n\nZłota wersja daje większych, szybszych i "
+"silniejszych Agentów! A w nowej błyszczącej czarnej obudowie twoi Agenci "
+"będą dobrze wyglądać na każdym przyjęciu!"
+
+#: all_text
+msgid "20371/ccaf2814"
+msgstr ""
+"Złoty [orange]Mine Glove[default] to proste, ale skuteczne ulepszenie "
+"oryginału. Twoje miny zadają więcej obrażeń, uruchamiają się z większej "
+"odległości, a w trybie celowania można je rzucać dalej. Solidny dodatek do "
+"arsenału każdego poszukiwacza przygód!"
+
+#: all_text
+msgid "20372/3c1f01d3"
+msgstr ""
+"Gdy w Gadgetronie zabraliśmy się za Złoty [orange]Devastator[default], na "
+"chwilę nas zatkało. Jak ulepszyć ideał? Wtedy nasi inżynierowie opracowali "
+"nową technologię namierzania, dzięki której każdy pocisk trafia kilka celów "
+"i zadaje jeszcze WIĘCEJ obrażeń! Śmiało... oddaj kilka strzałów i ciesz się "
+"widowiskiem!"
+
+#: all_text
+msgid "20373/dbe0f000"
+msgstr ""
+"[orange]Decoy Glove[default] zawsze był jedną z zabawniejszych broni "
+"Gadgetronu, a Złoty [orange]Decoy Glove[default] na pewno na stałe zagości "
+"w twojej zbrojowni. Nie tylko ma zupełnie nowy wygląd, ale też sam rani "
+"każdego wroga, który go zaatakuje!"
+
+#: all_text
+msgid "20374/b1e32924"
+msgstr ""
+"Złoty [orange]Tesla Claw[default] to mocniejsza wersja jednej z "
+"najskuteczniejszych broni Gadgetronu. Smaż wrogów jeszcze szybciej z tym "
+"dynamem!"
+
+#: all_text
+msgid "20375/65f53540"
+msgstr ""
+"[orange]Suck Cannon[default] nigdy nie wszedł do produkcji, ale dzięki "
+"popularności prototypu postanowiliśmy wydać Złotą wersję. \n\nZłoty "
+"[orange]Suck Cannon[default] ma większą pojemność, a jego pociski zadają "
+"więcej obrażeń."
+
+#: all_text
+msgid "20376/6407eb58"
+msgstr ""
+"Gdy zobaczyliśmy, jak popularny stał się Morph-o-ray, nie mogliśmy się "
+"doczekać Złotego Morph-o-raya. Tak, to idealna broń dla miłośników "
+"kurczaków na całym świecie. Teraz z jeszcze szybszą technologią "
+"przemiany! \n\nA na życzenie klientów powiększyliśmy kurczaki. WIELKIE "
+"KURCZAKI! Czego chcieć więcej?"
+
+#: all_text
+msgid "20377/cbf71a47"
+msgstr "Pomoc: bronie"
+
+#: all_text
+msgid "20378/0bd0bf8d"
+msgstr "Pomoc: gadżety"
+
+#: all_text
+msgid "20379/cbc05271"
+msgstr ""
+"Gratulacje! Konto prezesa Dreka zostało zamknięte, więc teraz to ty jesteś "
+"najcenniejszym klientem Gadgetronu!\n\nMamy dla ciebie nowe przedmioty! "
+"Zajrzyj do nowego menu Bonusy na ekranie pauzy."
+
+#: all_text
+msgid "20380/1851d332"
+msgstr ""
+"Jeśli chcesz, możesz zacząć nową grę ze wszystkimi obecnymi broniami i "
+"śrubami. \n\nMożesz też wrócić do ostatniego zapisu. Śmiało, wybierz!"
+
+#: all_text
+msgid "20381/8fab4523"
+msgstr ""
+"Jestem pod wrażeniem! Znowu pokonałeś Dreka! Jeśli zaczniesz kolejną nową "
+"grę, utworzę dla ciebie kolejny nowy zapis!"
+
+#: all_text
+msgid "20382/d782c968"
+msgstr ""
+"Gratulacje! Konto prezesa Dreka zostało zamknięte, więc teraz to ty jesteś "
+"najcenniejszym klientem Gadgetronu!\n\nMamy dla ciebie nowe przedmioty! "
+"Zajrzyj do nowego menu Bonusy na ekranie pauzy.\n\nJeśli chcesz, możesz "
+"zacząć nową grę ze wszystkimi obecnymi broniami i śrubami. \n\nMożesz też "
+"wrócić do ostatniego zapisu. Śmiało, wybierz!"
+
+#: all_text
+msgid "20383/263a773f"
+msgstr "Głos"
+
+#: all_text
+msgid "20384/9bb908f9"
+msgstr "Tekst"
+
+#: all_text
+msgid "20385/288685fe"
+msgstr "Wibracje pada"
+
+#: all_text
+msgid "20386/6241beaf"
+msgstr "Ruch lewo/prawo"
+
+#: all_text
+msgid "20387/efdcfb6f"
+msgstr "Ruch góra/dół"
+
+#: all_text
+msgid "20388/26296dd2"
+msgstr "Normalny"
+
+#: all_text
+msgid "20389/e2d2dacc"
+msgstr "Odwrócony"
+
+#: all_text
+msgid "20390/324aa451"
+msgstr ""
+"Karta pamięci (PS2) została wyjęta z gniazda MEMORY CARD 1.\n\nAutozapis "
+"został wyłączony.\n\nZapisz grę ręcznie, by ponownie włączyć autozapis."
+
+#: all_text
+msgid "20391/60f15122"
+msgstr ""
+"Włóż do gniazda MEMORY CARD 1 kartę pamięci (PS2) z danymi gry Ratchet and "
+"Clank."
+
+#: all_text
+msgid "20392/f698bb63"
+msgstr "[triangle] Wrócić?"
+
+#: all_text
+msgid "20393/79046f25"
+msgstr ""
+"Za mało miejsca na karcie pamięci (PS2) w gnieździe MEMORY CARD 1.\n\n"
+"Ratchet and Clank potrzebuje 350 KB do zapisu.\n\nWłóż kartę pamięci (PS2) "
+"z wystarczającą ilością miejsca, inaczej nie zapiszesz gry."
+
+#: all_text
+msgid "20394/94903d2b"
+msgstr "Kontynuować mimo to?"
+
+#: all_text
+msgid "20395/0cb07114"
+msgstr ""
+"Brak karty pamięci (PS2).\n\nRatchet and Clank potrzebuje 350 KB wolnego "
+"miejsca.\n\nWłóż kartę pamięci (PS2) z wystarczającą ilością miejsca, "
+"inaczej nie zapiszesz gry.\n\nKontynuować mimo to?"
+
+#: all_text
+msgid "20396/4287c7b3"
+msgstr ""
+"Brak karty pamięci (PS2).\n\nRatchet and Clank potrzebuje 350 KB wolnego "
+"miejsca.\n\nWłóż kartę pamięci (PS2) z wystarczającą ilością miejsca, "
+"inaczej nie zapiszesz gry."
+
+#: all_text
+msgid "20397/445bb077"
+msgstr ""
+"Na karcie pamięci (PS2) w gnieździe MEMORY CARD 1 nie ma danych gry Ratchet "
+"and Clank.\n\nUtworzyć plik zapisu Ratchet and Clank?"
+
+#: all_text
+msgid "20398/69adec6c"
+msgstr ""
+"Na karcie pamięci (PS2) w gnieździe MEMORY CARD 1 nie ma danych gry Ratchet "
+"and Clank.\n\nBez pliku zapisu nie zapiszesz gry."
+
+#: all_text
+msgid "20399/1db94ce9"
+msgstr ""
+"Karta pamięci (PS2) w gnieździe MEMORY CARD 1 nie jest sformatowana.\n\nBez "
+"formatowania nie zapiszesz gry.\n\nSformatować?"
+
+#: all_text
+msgid "20400/1b395718"
+msgstr "Karta pamięci (PS2) w gnieździe MEMORY CARD 1 nie jest sformatowana."
+
+#: all_text
+msgid "20401/315395ff"
+msgstr ""
+"Karta pamięci (PS2) w gnieździe MEMORY CARD 1 nie jest sformatowana.\n\nBez "
+"formatowania nie zapiszesz gry.\n\nKontynuować mimo to?"
+
+#: all_text
+msgid "20402/f203681d"
+msgstr ""
+"Na karcie pamięci (PS2) w gnieździe MEMORY CARD 1 jest już zapis Ratchet "
+"and Clank.\n\nNadpisać go?"
+
+#: all_text
+msgid "20403/9d41ce6e"
+msgstr ""
+"W wybranym pliku jest już zapis Ratchet and Clank.\n\nNadpisać go?"
+
+#: all_text
+msgid "20404/459863d6"
+msgstr ""
+"Autozapis nie powiódł się.\n\nW gnieździe 1 jest inna karta pamięci (PS2)."
+
+#: all_text
+msgid "20405/e9a7965e"
+msgstr ""
+"Zapisywanie danych.\n\nNie wyjmuj karty pamięci (PS2) z gniazda MEMORY CARD "
+"1 i nie wyłączaj konsoli."
+
+#: all_text
+msgid "20406/6ec4a5de"
+msgstr ""
+"Wczytywanie danych.\n\nNie wyjmuj karty pamięci (PS2) z gniazda MEMORY CARD "
+"1 i nie wyłączaj konsoli."
+
+#: all_text
+msgid "20407/bbd8bf8d"
+msgstr ""
+"Formatowanie\n\nNie wyjmuj karty pamięci (PS2) z gniazda MEMORY CARD 1 i "
+"nie wyłączaj konsoli."
+
+#: all_text
+msgid "20408/f83b329a"
+msgstr ""
+"Tworzenie pliku zapisu\n\nNie wyjmuj karty pamięci (PS2) z gniazda MEMORY "
+"CARD 1 i nie wyłączaj konsoli."
+
+#: all_text
+msgid "20409/22a1a307"
+msgstr ""
+"Sprawdzanie karty pamięci (PS2)\n\nNie wyjmuj karty pamięci (PS2) z gniazda "
+"MEMORY CARD 1 i nie wyłączaj konsoli."
+
+#: all_text
+msgid "20410/f2e0fba1"
+msgstr ""
+"Formatowanie nie powiodło się! Sprawdź kartę pamięci (PS2) i spróbuj "
+"ponownie."
+
+#: all_text
+msgid "20411/3ec52052"
+msgstr ""
+"Wczytywanie nie powiodło się! Sprawdź kartę pamięci (PS2) i spróbuj "
+"ponownie."
+
+#: all_text
+msgid "20412/7cf20101"
+msgstr "Zapis nie powiódł się! Sprawdź kartę pamięci (PS2) i spróbuj ponownie."
+
+#: all_text
+msgid "20413/cbbc1713"
+msgstr ""
+"Zapis nie powiódł się! Sprawdź kartę pamięci (PS2) i spróbuj ponownie.\n\n"
+"Autozapis został wyłączony.\n\nZapisz grę ręcznie, by ponownie włączyć "
+"autozapis."
+
+#: all_text
+msgid "20414/68da59cc"
+msgstr "Kod włączony"
+
+#: all_text
+msgid "20415/fcc184a3"
+msgstr "Kod wyłączony"
+
+#: all_text
+msgid "20416/3655acd9"
+msgstr "Brak aktywnych kodów"
+
+#: all_text
+msgid "20417/65e0c4b6"
+msgstr "Odczyt karty pamięci (PS2)"
+
+#: all_text
+msgid "20418/dcc4e605"
+msgstr "Bonusy"
+
+#: all_text
+msgid "20419/7b4fb7b3"
+msgstr "Menu bonusów"
+
+#: all_text
+msgid "20420/566971cf"
+msgstr "[orange]Punkty umiejętności[default]"
+
+#: all_text
+msgid "20421/8eaae8e2"
+msgstr "Twórcy"
+
+#: all_text
+msgid "20422/56fedfbf"
+msgstr "Kody"
+
+#: all_text
+msgid "20423/4e97af1e"
+msgstr "Przerywniki"
+
+#: all_text
+msgid "20424/198eaa25"
+msgstr "Filmy z poziomu"
+
+#: all_text
+msgid "20425/22302df6"
+msgstr "Szkicownik"
+
+#: all_text
+msgid "20426/da432581"
+msgstr "Epilog"
+
+#: all_text
+msgid "20427/c740ab50"
+msgstr "Film \"Jak powstała gra\""
+
+#: all_text
+msgid "20428/ac8a9dc0"
+msgstr "Reklamy"
+
+#: all_text
+msgid "20430/12b617ae"
+msgstr ""
+"[orange]Punkty umiejętności[default] to specjalne zadania, za które "
+"odblokujesz dodatki!"
+
+#: all_text
+msgid "20431/ee2bf527"
+msgstr "Zobacz, kto stworzył tę grę!"
+
+#: all_text
+msgid "20432/3394a3cd"
+msgstr "Jeśli udało ci się wpisać kod, tutaj go włączysz lub wyłączysz."
+
+#: all_text
+msgid "20433/2fc1e8aa"
+msgstr "Obejrzyj filmy z przelotów między światami."
+
+#: all_text
+msgid "20434/2273fae8"
+msgstr "Obejrzyj filmy ze świata, na którym jesteś."
+
+#: all_text
+msgid "20435/eb00343f"
+msgstr "Obejrzyj grafiki, które powstały przy tworzeniu gry!"
+
+#: all_text
+msgid "20436/63135ac7"
+msgstr "Zobacz, co się stało po pokonaniu Dreka!"
+
+#: all_text
+msgid "20437/28311294"
+msgstr "Dziennik pomocy"
+
+#: all_text
+msgid "20438/ebbedcc0"
+msgstr "Przejrzyj pomocne wiadomości od Gadgetronu."
+
+#: all_text
+msgid "20439/e4515b22"
+msgstr "Obejrzyj specjalny film zza kulis z Insomniac Games!"
+
+#: all_text
+msgid "20440/844f66b6"
+msgstr "Obejrzyj zabawne reklamy telewizyjne Ratchet and Clank!"
+
+#: all_text
+msgid "20441/34c8327a"
+msgstr ""
+"Aby to odblokować, zdobądź dowolne 15 [orange]Punktów "
+"umiejętności[default][xAD]"
+
+#: all_text
+msgid "20442/ce082fd7"
+msgstr ""
+"Aby to odblokować, zdobądź wszystkie [orange]Punkty "
+"umiejętności[default][xAD]"
+
+#: all_text
+msgid "20443/5454ff87"
+msgstr "Aby to odblokować, kup wszystkie Złote bronie[xAD]"
+
+#: all_text
+msgid "20444/fc38e762"
+msgstr "Celuj!"
+
+#: all_text
+msgid "20445/d4c28808"
+msgstr "Huśtawka!"
+
+#: all_text
+msgid "20446/d27ed852"
+msgstr "Przewiezieni"
+
+#: all_text
+msgid "20447/2d6124a2"
+msgstr "Poza"
+
+#: all_text
+msgid "20448/af57c01c"
+msgstr "Sterowiec"
+
+#: all_text
+msgid "20449/94e90824"
+msgstr "Qwarktastyczne"
+
+#: all_text
+msgid "20450/c02bb7c8"
+msgstr "Dowolne dziesięć"
+
+#: all_text
+msgid "20451/06a0eee9"
+msgstr "Sztuczka"
+
+#: all_text
+msgid "20452/3971fe33"
+msgstr "Ko, ko"
+
+#: all_text
+msgid "20453/a8a652f4"
+msgstr "Szybciej"
+
+#: all_text
+msgid "20454/cc1a0a80"
+msgstr "Kłopoty z dziewczyną"
+
+#: all_text
+msgid "20455/150f2f6a"
+msgstr "Skoczek"
+
+#: all_text
+msgid "20456/d4c17160"
+msgstr "Liczy się celność"
+
+#: all_text
+msgid "20457/d10b258b"
+msgstr "Zjedz ołów"
+
+#: all_text
+msgid "20458/596d509d"
+msgstr "Zniszczone"
+
+#: all_text
+msgid "20459/ad9c1d20"
+msgstr "Strzelec"
+
+#: all_text
+msgid "20460/a9844dfd"
+msgstr "Snajper"
+
+#: all_text
+msgid "20461/13ac9139"
+msgstr "Hej, tutaj!"
+
+#: all_text
+msgid "20462/a2724cd3"
+msgstr "Inwazja obcych"
+
+#: all_text
+msgid "20463/92de40e6"
+msgstr "Zakopany skarb"
+
+#: all_text
+msgid "20464/9060a2a4"
+msgstr "Deratyzacja"
+
+#: all_text
+msgid "20465/bc8848fa"
+msgstr "Helikoptery"
+
+#: all_text
+msgid "20466/378cf4a8"
+msgstr "Kaczki na strzelnicy"
+
+#: all_text
+msgid "20467/5b8c04ac"
+msgstr "Potłuczone szkło"
+
+#: all_text
+msgid "20468/84af1a03"
+msgstr "Rozwal ich!"
+
+#: all_text
+msgid "20469/90c17471"
+msgstr "Korek"
+
+#: all_text
+msgid "20470/c3d1db21"
+msgstr "Magik"
+
+#: all_text
+msgid "20471/f7e7cf04"
+msgstr "Podstępny"
+
+#: all_text
+msgid "20472/d033276c"
+msgstr "Ostrożna jazda"
+
+#: all_text
+msgid "20473/c8b4afcc"
+msgstr "Na komandosa"
+
+#: all_text
+msgid "20474/e9073480"
+msgstr "Zniszcz myśliwiec albo bombowiec"
+
+#: all_text
+msgid "20475/271c0360"
+msgstr ""
+"Pokonaj sześć ostatnich celów swingshota w fabryce, nie dotykając ziemi"
+
+#: all_text
+msgid "20476/fc18b2bb"
+msgstr "Zniszcz trzy latające transportowce"
+
+#: all_text
+msgid "20477/ea1838da"
+msgstr "Stań między nogami pomnika z Robosklepu Ala"
+
+#: all_text
+msgid "20478/217bcb16"
+msgstr "Zestrzel sterowiec, dowolny"
+
+#: all_text
+msgid "20479/a409f126"
+msgstr "Zniszcz pomnik Qwarkbota"
+
+#: all_text
+msgid "20480/643d7ea4"
+msgstr "Wysadź dziesięć pojazdów"
+
+#: all_text
+msgid "20481/10d72c8f"
+msgstr "Zrób Twisty McMarx w wyścigu hoverboardów"
+
+#: all_text
+msgid "20482/86628857"
+msgstr "Zamień czołg w kurczaka"
+
+#: all_text
+msgid "20483/7ac5047b"
+msgstr "Pokonaj wyzwanie hoverboardowe w 1:35 lub mniej"
+
+#: all_text
+msgid "20484/434838be"
+msgstr "Pokonaj wyzwanie hoverboardowe w 1:36 lub mniej"
+
+#: all_text
+msgid "20485/1af93385"
+msgstr "Pokonaj Królową Obcych samym kluczem!"
+
+#: all_text
+msgid "20486/cdc779d4"
+msgstr "Przejedź szynę, nie tracąc ani punktu zdrowia"
+
+#: all_text
+msgid "20487/01f5df1d"
+msgstr "Zniszcz mały myśliwiec z działka"
+
+#: all_text
+msgid "20488/30e8dd72"
+msgstr "Zniszcz wszystkie czołgi Piaskową Myszą"
+
+#: all_text
+msgid "20489/06a5fe36"
+msgstr "Wysadź wszystkie niszczyciele Blargów"
+
+#: all_text
+msgid "20490/09cb8e7b"
+msgstr "Zestrzel pięć statków z działka"
+
+#: all_text
+msgid "20491/a5ffa364"
+msgstr "Zastrzel Krzykacza przez otwór snajperski"
+
+#: all_text
+msgid "20492/8751b2f3"
+msgstr "Zwab dowolnego wroga w pole siłowe"
+
+#: all_text
+msgid "20493/63a45cd2"
+msgstr "Zestrzel trzy spodki Blargów visibombami"
+
+#: all_text
+msgid "20494/4d0d1c81"
+msgstr "Znajdź i zniszcz wszystkie skrzynie w oceanie."
+
+#: all_text
+msgid "20495/0c69d250"
+msgstr "Zabij wszystkie kąsacze w zalesionej części"
+
+#: all_text
+msgid "20496/835bdae9"
+msgstr "Zniszcz pięć helikopterów dowolną bronią poza działkiem"
+
+#: all_text
+msgid "20497/43c40722"
+msgstr "Zniszcz wszystkie statki towarowe w bazie"
+
+#: all_text
+msgid "20498/bb64e7f5"
+msgstr "Rozwal wszystkie latarnie w mieście"
+
+#: all_text
+msgid "20499/346fc5af"
+msgstr "Zniszcz trzy grasujące statki Blargów"
+
+#: all_text
+msgid "20500/c6fb1ccd"
+msgstr "Przejedź długą szynę, nie trafiając w żadną minę ani wagon"
+
+#: all_text
+msgid "20501/31370dee"
+msgstr "Zdobądź co najmniej 4500 punktów za triki w wyścigu hoverboardów"
+
+#: all_text
+msgid "20502/e70b2e5a"
+msgstr "Zabij wszystkich wrogów na trasie z [orange]Hologuise[default]"
+
+#: all_text
+msgid "20503/d407c6b2"
+msgstr "Przejdź trasę wodną, nie tracąc punktów zdrowia"
+
+#: all_text
+msgid "20504/bad2fa66"
+msgstr ""
+"Zabij dziesięciu elitarnych strażników na płaskowyżu Kyzil samym kluczem"
+
+#: all_text
+msgid "20505/49183abc"
+msgstr "Wszystkie poziomy"
+
+#: all_text
+msgid "20506/7f9f7e17"
+msgstr "Ratchet ma wielką głowę"
+
+#: all_text
+msgid "20507/21f062a0"
+msgstr "Clank ma wielki łeb"
+
+#: all_text
+msgid "20508/f3eb501d"
+msgstr "Postacie mają przerośnięte czaszki"
+
+#: all_text
+msgid "20509/6c65761d"
+msgstr "Wrogowie mają ogromne kopuły"
+
+#: all_text
+msgid "20510/8000c022"
+msgstr "Poziomy w lustrzanym odbiciu"
+
+#: all_text
+msgid "20511/0608f0e3"
+msgstr "Leworęczny Ratchet"
+
+#: all_text
+msgid "20512/9fc44a44"
+msgstr "Pełne zdrowie daje nietykalność"
+
+#: all_text
+msgid "20513/48dbe666"
+msgstr "Odjechane smugi"
+
+#: all_text
+msgid "20514/ed7114bb"
+msgstr "Clank się zawiesza"
+
+#: all_text
+msgid "20515/9536e668"
+msgstr "Nieźle radzisz sobie z kluczem[xAD]"
+
+#: all_text
+msgid "20516/69b69550"
+msgstr "Ludzie na tych planetach mają przechlapane!"
+
+#: all_text
+msgid "20517/f7bb39bf"
+msgstr "Przepraszam za to."
+
+#: all_text
+msgid "20518/03a4ec2a"
+msgstr "Kim wy jesteście? Najemnikami? Oprawcami?"
+
+#: all_text
+msgid "20519/3e0e593c"
+msgstr "Kapitan Qwark naprawdę się sprzedał."
+
+#: all_text
+msgid "20520/9047a57f"
+msgstr "Patrz - hydraulik się schylił!"
+
+#: all_text
+msgid "20522/9c32e2c8"
+msgstr "Widziałeś tego gościa po lewej?"
+
+#: all_text
+msgid "20523/3e10875a"
+msgstr "To on! Skid McMarx!"
+
+#: all_text
+msgid "20524/8ca6729a"
+msgstr "Masz, łap!"
+
+#: all_text
+msgid "20525/86246da1"
+msgstr "Zero sygnału!"
+
+#: all_text
+msgid "20526/8f705827"
+msgstr "Świetna robota, młody!"
+
+#: all_text
+msgid "20527/7f428057"
+msgstr "Hej, ty jesteś tym gościem z robotem, co?"
+
+#: all_text
+msgid "20528/0c249548"
+msgstr "Dobra, to nie będzie wcale bolało."
+
+#: all_text
+msgid "20529/f4b1b8d2"
+msgstr "Słuchać, wy grubasy!"
+
+#: all_text
+msgid "20530/5e401d75"
+msgstr "Niedobrze mi się robi na wasz widok."
+
+#: all_text
+msgid "20531/1db8cb64"
+msgstr "Ten porucznik nie wygląda na takiego twardziela."
+
+#: all_text
+msgid "20532/3542b4d2"
+msgstr "Witaj!"
+
+#: all_text
+msgid "20533/f87d5912"
+msgstr "Przepraszam, Kapitanie[xAD]"
+
+#: all_text
+msgid "20534/7468809a"
+msgstr "Ale mu pokazałeś."
+
+#: all_text
+msgid "20535/3ee4f549"
+msgstr "No i o to chodzi!"
+
+#: all_text
+msgid "20536/3542b4d2"
+msgstr "Witaj!"
+
+#: all_text
+msgid "20537/d3989f52"
+msgstr "Cześć wszystkim, tu Kapitan Qwark."
+
+#: all_text
+msgid "20538/80606742"
+msgstr "Hej, hej, hej! Konferencja prasowa skończona!"
+
+#: all_text
+msgid "20539/395f6b87"
+msgstr "Kapitan[xAD]Qwark?"
+
+#: all_text
+msgid "20540/e7bac696"
+msgstr "Spotkajmy się w[xAD]eee..."
+
+#: all_text
+msgid "20541/0dea5224"
+msgstr "Uff, myślałem, że już po mnie..."
+
+#: all_text
+msgid "20542/4808263b"
+msgstr "No to dzięki!"
+
+#: all_text
+msgid "20543/63e2d4e7"
+msgstr "Witaj na moim torze przeszkód."
+
+#: all_text
+msgid "20544/6422dedf"
+msgstr "Wejdź do Kręgu Bohaterów[xAD]"
+
+#: all_text
+msgid "20545/4be47417"
+msgstr "Złaź ze mnie, idioto!"
+
+#: all_text
+msgid "20546/611c7764"
+msgstr "Dość tego! Spadam stąd!"
+
+#: all_text
+msgid "20547/6663b8df"
+msgstr "Baczność, wy dezerterskie robaki!"
+
+#: all_text
+msgid "20548/62871e87"
+msgstr "Przeklęte ustrojstwo. Ani drgnie!"
+
+#: all_text
+msgid "20549/104a1436"
+msgstr "Mam ważniejsze sprawy na głowie."
+
+#: all_text
+msgid "20550/80e7b458"
+msgstr "Stój! Kim jesteś?"
+
+#: all_text
+msgid "20551/01f41274"
+msgstr "MUSZĘ to mieć!"
+
+#: all_text
+msgid "20552/bc7cd139"
+msgstr "Hej, znam was dwóch."
+
+#: all_text
+msgid "20553/b148c30b"
+msgstr "No proszę, proszę."
+
+#: all_text
+msgid "20554/72f0517f"
+msgstr "Ratchet dostaje [orange]Nanotech Premium[default]"
+
+#: all_text
+msgid "20555/d1f82013"
+msgstr "Ratchet dostaje [orange]Nanotech Ultra[default]"
+
+#: all_text
+msgid "20556/fd3f46a8"
+msgstr "Jesteś przyjazny, prawda?"
+
+#: all_text
+msgid "20557/fab3372e"
+msgstr "[xAD]gdzie ten myśliwiec?"
+
+#: all_text
+msgid "20558/015660c4"
+msgstr "Co my tu mamy?"
+
+#: all_text
+msgid "20559/bd8e6df2"
+msgstr "JA tu rządzę!"
+
+#: all_text
+msgid "20560/d2c6565d"
+msgstr "Hej, co ty tu robisz?"
+
+#: all_text
+msgid "20561/6c4f5cc3"
+msgstr "Dokładnie tego mi trzeba"
+
+#: all_text
+msgid "20562/8b640f4c"
+msgstr "Musimy dostać się do bazy!"
+
+#: all_text
+msgid "20563/825d9c06"
+msgstr "A niech to!"
+
+#: all_text
+msgid "20564/13db653f"
+msgstr "Hej, kolego, co słychać?"
+
+#: all_text
+msgid "20565/2f93f94b"
+msgstr "Proszę bardzo, skarbie!"
+
+#: all_text
+msgid "20566/a2a57fa4"
+msgstr "Nie widziałem statku Dreka."
+
+#: all_text
+msgid "20567/07f98e81"
+msgstr "Witaj, Kapitanie Ratchet!"
+
+#: all_text
+msgid "20568/072d1033"
+msgstr "Tak! Z Qwarkiem koniec!"
+
+#: all_text
+msgid "20569/609dabc4"
+msgstr "Słuchaj, może miałeś rację."
+
+#: all_text
+msgid "20570/47b408d6"
+msgstr "No dalej! Obudź się!"
+
+#: all_text
+msgid "20571/0321b2f0"
+msgstr "Kapitan Qwark!"
+
+#: all_text
+msgid "20572/9b69d41e"
+msgstr "Dziękuję!"
+
+#: all_text
+msgid "20573/e2975c8c"
+msgstr "Hej! Witaj w moim sklepie!"
+
+#: all_text
+msgid "20574/ff52b42c"
+msgstr "To by było na tyle."
+
+#: all_text
+msgid "20575/164b30b3"
+msgstr "Hmm[xAD]to było pi przez nieskończoność czy[xAD]?"
+
+#: all_text
+msgid "20576/ebaae520"
+msgstr "Dobra robota."
+
+#: all_text
+msgid "20577/9f8d7a54"
+msgstr "Robotów nie tak łatwo oszukać."
+
+#: all_text
+msgid "20578/6d84eb36"
+msgstr "Mamo?"
+
+#: all_text
+msgid "20579/54d59965"
+msgstr "Wszystko[xAD]w porządku?"
+
+#: all_text
+msgid "20580/09fa64e2"
+msgstr "Jeździłeś kiedyś na hoverboardzie?"
+
+#: all_text
+msgid "20581/2061ae83"
+msgstr "To było wspaniałe!"
+
+#: all_text
+msgid "20582/391c1fbc"
+msgstr "Mam nadzieję, że jest ładna."
+
+#: all_text
+msgid "20583/fc25524f"
+msgstr "Hej, co do[xAD]?"
+
+#: all_text
+msgid "20584/3275f0b8"
+msgstr "Więc do tego doszło."
+
+#: all_text
+msgid "20585/86cbb674"
+msgstr "JA myślę o tym samym co ty!"
+
+#: all_text
+msgid "20586/5bb116b4"
+msgstr "To nie wróży nic dobrego."
+
+#: all_text
+msgid "20587/9a9dcdb5"
+msgstr "Finał"
+
+#: all_text
+msgid "20588/b5ccc01c"
+msgstr "Ratchet pracuje nad statkiem"
+
+#: all_text
+msgid "20589/7dffc1fd"
+msgstr "Clank ucieka z fabryki"
+
+#: all_text
+msgid "20590/d6abca39"
+msgstr "Infobot - plan Dreka"
+
+#: all_text
+msgid "20591/1f70baa5"
+msgstr "''To może być problem''"
+
+#: all_text
+msgid "20592/6b676b61"
+msgstr "''Nie zgadzam się na to!''"
+
+#: all_text
+msgid "20593/cc48118e"
+msgstr "''Ojej! To jest świetne!''"
+
+#: all_text
+msgid "20594/24b8a684"
+msgstr "Infobot - wezwanie pomocy od Skida"
+
+#: all_text
+msgid "20595/f779439a"
+msgstr "Infobot - reklama Robosklepu Ala"
+
+#: all_text
+msgid "20596/31833923"
+msgstr "Infobot - Drek każe wyciąć lasy"
+
+#: all_text
+msgid "20597/3ec50a44"
+msgstr "''Tak, całkiem urocze.''"
+
+#: all_text
+msgid "20598/ff6d66ae"
+msgstr "Infobot - reklama werbunkowa"
+
+#: all_text
+msgid "20599/5ab98f35"
+msgstr "Infobot - wiadomości z Rilgar"
+
+#: all_text
+msgid "20600/131124ee"
+msgstr "Infobot - reklama kwatery Qwarka"
+
+#: all_text
+msgid "20601/3a433983"
+msgstr "Infobot - SOS z Batalii"
+
+#: all_text
+msgid "20602/e141c978"
+msgstr "''Już z powrotem?''"
+
+#: all_text
+msgid "20603/724ee47a"
+msgstr "Infobot - pokaz Hełmu pilota"
+
+#: all_text
+msgid "20604/f56cc244"
+msgstr "Infobot - historia Orxon"
+
+#: all_text
+msgid "20605/c8fd6436"
+msgstr "Infobot - reklama kurortu Jowai"
+
+#: all_text
+msgid "20606/12c988ca"
+msgstr "Infobot - plany niszczyciela planet"
+
+#: all_text
+msgid "20607/9736509a"
+msgstr "Naprawdę jesteś idiotą."
+
+#: all_text
+msgid "20608/966fe6be"
+msgstr "Infobot - atak na Gorda City"
+
+#: all_text
+msgid "20609/ccb2d122"
+msgstr "Infobot - wiadomości z Oltanis"
+
+#: all_text
+msgid "20610/f52d13dd"
+msgstr "''Jakiś ty spostrzegawczy.''"
+
+#: all_text
+msgid "20611/e012fcb9"
+msgstr "Infobot - reklama mecha"
+
+#: all_text
+msgid "20612/acda6fca"
+msgstr "Infobot - promocja Hologuise"
+
+#: all_text
+msgid "20613/1bfe3add"
+msgstr "''To zaczyna być irytujące.''"
+
+#: all_text
+msgid "20614/b200eb22"
+msgstr "Infobot - Drek ogłasza Deplanetyzator"
+
+#: all_text
+msgid "20615/fc07a471"
+msgstr "Infobot - pokaz Deplanetyzatora"
+
+#: all_text
+msgid "20616/b1c6fadb"
+msgstr "Reklama Osobistego Higienizatora"
+
+#: all_text
+msgid "20617/ae763051"
+msgstr "[cross] Odtwórz film"
+
+#: all_text
+msgid "20618/85bbdb72"
+msgstr "[cross] Dalej"
+
+#: all_text
+msgid "20619/f6d407e4"
+msgstr "[circle] Wstecz"
+
+#: all_text
+msgid "20620/36caca86"
+msgstr "Reklamy telewizyjne"
+
+#: all_text
+msgid "20621/fccb187e"
+msgstr "Reklama [orange]Decoy Glove[default]"
+
+#: all_text
+msgid "20622/636e8828"
+msgstr "Reklama [orange]Devastatora[default]"
+
+#: all_text
+msgid "20623/c01edcc6"
+msgstr "Reklama Morph-o-raya"
+
+#: all_text
+msgid "20624/cee83a91"
+msgstr "Reklama europejska"
+
+#: all_text
+msgid "20625/82cf15e9"
+msgstr "[cross] Odtwórz reklamę"
+
+#: all_text
+msgid "20626/9eefb260"
+msgstr "Mów mi Sally"
+
+#: all_text
+msgid "20627/25389fdc"
+msgstr "Hydraulik"
+
+#: all_text
+msgid "20628/48d877d7"
+msgstr "Piaskowy rekin"
+
+#: all_text
+msgid "20629/0a4e422a"
+msgstr "Linie Blarg"
+
+#: all_text
+msgid "20630/09eb6faa"
+msgstr "Komandos"
+
+#: all_text
+msgid "20631/3a6ebbd4"
+msgstr "Podwójna Darla"
+
+#: all_text
+msgid "20632/0fd17c4f"
+msgstr "Snagglebestia"
+
+#: all_text
+msgid "20634/6b6ac290"
+msgstr "Taniec robota"
+
+#: all_text
+msgid "20635/ad40c91d"
+msgstr "Rewolwerator"
+
+#: all_text
+msgid "20636/2c76154d"
+msgstr "Kłapacz"
+
+#: all_text
+msgid "20637/54aac595"
+msgstr "Wielki Al"
+
+#: all_text
+msgid "20638/ceefbddd"
+msgstr "Zemsta Dreka"
+
+#: all_text
+msgid "20639/94e90824"
+msgstr "Qwarktastyczne"
+
+#: all_text
+msgid "20641/cddc8112"
+msgstr "Spróbuj ponownie"
+
+#: all_text
+msgid "20642/913917dc"
+msgstr "Brak nowego czasu"
+
+#: all_text
+msgid "20643/b0b52711"
+msgstr "Nowy najlepszy czas!"
+
+#: all_text
+msgid "20644/bbb4b13e"
+msgstr "Brak nowego wyniku"
+
+#: all_text
+msgid "20645/a6003a73"
+msgstr "Nowy rekord!"
+
+#: all_text
+msgid "20646/f3581855"
+msgstr "Wynik"
+
+#: all_text
+msgid "20647/9afee455"
+msgstr "salto"
+
+#: all_text
+msgid "20648/00959494"
+msgstr "salta"
+
+#: all_text
+msgid "20649/b0847c2a"
+msgstr ""
+"Twórcy\n\nInsomniac Games"
+
+#: all_text
+msgid "20693/3fec7651"
+msgstr ""
+"Mark Cerny\nKonsultant projektu"
+
+#: all_text
+msgid "20694/0e07ce93"
+msgstr ""
+"Wydawca\n\nSony Computer Entertainment America"
+
+#: all_text
+msgid "20695/b8d2a8be"
+msgstr ""
+"Producent\nGrady Hunt\n"
+
+#: all_text
+msgid "20696/26c4120c"
+msgstr ""
+"Producent współpracujący\nSam Thompson\n"
+
+#: all_text
+msgid "20697/4896e19e"
+msgstr ""
+"Asystent producenta\nGreg 'Supergreg' Phillips\n"
+
+#: all_text
+msgid "20698/437ad8a2"
+msgstr ""
+"Dyrektor ds. rozwoju produktu\nConnie Booth\n"
+
+#: all_text
+msgid "20699/c3805b09"
+msgstr ""
+"Wiceprezes ds. rozwoju produktu\nShuhei Yoshida\n"
+
+#: all_text
+msgid "20700/0fe75461"
+msgstr ""
+"Dyrektor marketingu\nAmi Blaire\n"
+
+#: all_text
+msgid "20701/023fe21e"
+msgstr ""
+"Młodszy menedżer produktu\nShelley Ashitomi\n"
+
+#: all_text
+msgid "20702/0a9e41d0"
+msgstr ""
+"Dyrektor PR\nMolly Smith\n"
+
+#: all_text
+msgid "20703/8f08ccb7"
+msgstr ""
+"Menedżer PR\nCharlotte Panther\n"
+
+#: all_text
+msgid "20704/bf018ad0"
+msgstr ""
+"Specjaliści ds. marketingu produktu\nTina Casalino\nAlyssa Casella\n"
+
+#: all_text
+msgid "20705/30861ba9"
+msgstr ""
+"Dyrektor QA\nMichael Blackledge\n"
+
+#: all_text
+msgid "20706/23252aaf"
+msgstr ""
+"Starszy menedżer QA\nRitchard Markelz\n"
+
+#: all_text
+msgid "20707/dea0b4a1"
+msgstr ""
+"Główny menedżer QA\nSam Bradley\n"
+
+#: all_text
+msgid "20708/e489ecc7"
+msgstr ""
+"Koordynator projektu\nEric Ippolito\n"
+
+#: all_text
+msgid "20709/ac94a7fa"
+msgstr ""
+"Menedżer technologii\nKevin Simmons\n"
+
+#: all_text
+msgid "20710/6c78798c"
+msgstr ""
+"Technik laboratorium\nAra Demirjian\n"
+
+#: all_text
+msgid "20711/0eb24d1d"
+msgstr ""
+"Główni analitycy QA\nIan McGuinness\nAndrew Woodworth\n"
+
+#: all_text
+msgid "20712/14030f87"
+msgstr ""
+"Zastępca głównego analityka QA\nJonathan Quilo\n"
+
+#: all_text
+msgid "20713/42354b26"
+msgstr "Analitycy QA"
+
+#: all_text
+msgid "20742/b37e1c32"
+msgstr ""
+"Wydawca\n\nSony Computer Entertainment Europe"
+
+#: all_text
+msgid "20743/4ad132c8"
+msgstr ""
+"Producent\nDaniel Brooke\n"
+
+#: all_text
+msgid "20744/686aefea"
+msgstr ""
+"Europejski menedżer oprogramowania\nIsabelle Tomatis\n"
+
+#: all_text
+msgid "20745/ec57a1f4"
+msgstr ""
+"Europejski menedżer PR\nImogen Baker\n"
+
+#: all_text
+msgid "20746/c17fff9a"
+msgstr ""
+"Menedżer QA\nGeoff Rens\n"
+
+#: all_text
+msgid "20747/070e3ede"
+msgstr ""
+"Menedżer wewnętrznego QA\nDave Parkinson\n"
+
+#: all_text
+msgid "20748/2e335e88"
+msgstr ""
+"Kierownik wewnętrznego QA\nJim McCabe\n"
+
+#: all_text
+msgid "20749/b03c7369"
+msgstr ""
+"Kierownik zespołu\nPhil Green\n"
+
+#: all_text
+msgid "20750/75b730ff"
+msgstr "Testerzy:"
+
+#: all_text
+msgid "20760/12a9138d"
+msgstr ""
+"Główny audytor TRC\nPaul French\n"
+
+#: all_text
+msgid "20761/a0bf17a4"
+msgstr ""
+"Audytorzy TRC\nJohn Hale\nMichael Kennedy\n"
+
+#: all_text
+msgid "20762/055c427a"
+msgstr ""
+"Menedżerowie zgłoszeń QA\nDave Bennett\nMark Pittam\n"
+
+#: all_text
+msgid "20763/0476e363"
+msgstr ""
+"Tekst instrukcji i opakowania\nRussell Coburn\n"
+
+#: all_text
+msgid "20764/5304da08"
+msgstr ""
+"Projekt instrukcji i opakowania\nRichard Turner\n"
+
+#: all_text
+msgid "20765/cc92f08f"
+msgstr ""
+"Zatwierdzenie instrukcji QA\nStephen Griffiths\nKeith Derby"
+
+#: all_text
+msgid "20766/95b5e2f3"
+msgstr ""
+"Menedżer planowania i lokalizacji\nVanessa Wood\n"
+
+#: all_text
+msgid "20767/2504a38a"
+msgstr ""
+"Koordynator operacji oprogramowania\nMary Gorst\n"
+
+#: all_text
+msgid "20768/819c0ef0"
+msgstr ""
+"Koordynator lokalizacji\nGaelle Leysour\n"
+
+#: all_text
+msgid "20769/de9a8fab"
+msgstr ""
+"Główny tester lokalizacji\nNadege Josa\n"
+
+#: all_text
+msgid "20770/cc545d7c"
+msgstr ""
+"Testerzy lokalizacji - francuski\nYannick Paulet\nGaelle Grenapin\n"
+
+#: all_text
+msgid "20771/22ceed3b"
+msgstr ""
+"Testerzy lokalizacji - włoski\nSacha Fellica\nGiancinto Attanasio\n"
+
+#: all_text
+msgid "20772/395c6a03"
+msgstr ""
+"Testerzy lokalizacji - niemiecki\nNadine Martin\nKatharine Tropf\nDeniz "
+"Ulu\n"
+
+#: all_text
+msgid "20773/de55af8b"
+msgstr ""
+"Testerzy lokalizacji - hiszpański\nYolanda Akil\nMonica Bello\nJose Flores\n"
+
+#: all_text
+msgid "20774/0dbe73ee"
+msgstr ""
+"Specjalne podziękowania od SCEE\ndla\n"
+
+#: all_text
+msgid "20776/2127b8b8"
+msgstr "Wszystkich z działu zgłoszeń QA"
+
+#: all_text
+msgid "20777/83fd52cb"
+msgstr "Wszystkich ze studiów lokalizacyjnych"
+
+#: all_text
+msgid "20790/309f16da"
+msgstr ""
+"Muzykę skomponował\ni wykonał"
+
+#: all_text
+msgid "20792/1d500a95"
+msgstr "Aktorzy głosowi"
+
+#: all_text
+msgid "20793/eebca482"
+msgstr ""
+"Mikey Kelley\njako\nRatchet\n"
+
+#: all_text
+msgid "20794/eb6dac3a"
+msgstr ""
+"David Kaye\njako\nClank\nZłomiarz\nBob\nNaukowiec Blargów\n"
+
+#: all_text
+msgid "20795/688c7554"
+msgstr ""
+"Jim Ward\njako\nKapitan Qwark\nDezerter\nPrezes Gadgetronu\n"
+
+#: all_text
+msgid "20796/b5dd2618"
+msgstr ""
+"Kevin Michael Richardson\njako\nDrek\nKomandos\nSpiker\nOchroniarz\n"
+
+#: all_text
+msgid "20797/7db2c9ed"
+msgstr ""
+"Mona Marshal\njako\nDziewczyna z Pomocy\nEd(wina)\nTrenerka fitness Qwarka\n"
+
+#: all_text
+msgid "20798/f2153183"
+msgstr ""
+"Neil Flynn\njako\nWodociągowiec\nSkid McMarx\nRobot porucznik\nWynalazca\n"
+"Brygadzista\n"
+
+#: all_text
+msgid "20799/ef485295"
+msgstr ""
+"Chad Einbinder\njako\nWłaściciel kurortu\nSprzedawca "
+"[orange]R.Y.N.O.[default]\n"
+
+#: all_text
+msgid "20800/c5d30f7a"
+msgstr ""
+"Jack Angel\njako\nBurmistrz\n"
+
+#: all_text
+msgid "20801/ba2693bc"
+msgstr ""
+"Sylvia Amerito\njako\nDarla Gratch\n\nMelissa Disney\njako\nDziewczyna od "
+"[orange]Hoverboardów[default]\n"
+
+#: all_text
+msgid "20802/3acbc598"
+msgstr ""
+"Chris Hatfield\njako\nWielki Al\n"
+
+#: all_text
+msgid "20803/01334da8"
+msgstr ""
+"Silnik tła Ratchet and Clank\npowstał z użyciem autorskich technik\ni kodu "
+"Naughty Dog, Inc."
+
+#: all_text
+msgid "20804/0fd02ff9"
+msgstr ""
+"Specjalne podziękowania od Insomniac\ndla"
+
+#: all_text
+msgid "20811/f5f15dd0"
+msgstr "Wszystkich z Naughty Dog"
+
+#: all_text
+msgid "20816/8fb4ebfb"
+msgstr ""
+"Mike Gollum\ni ekipa produkcji dźwięku z Warner Bros."
+
+#: all_text
+msgid "20820/c8fe644a"
+msgstr ""
+"Naszych cierpliwych małżonków, dzieci, rodziców, dziewczyn, chłopaków i "
+"zwierzaków"
+
+#: all_text
+msgid "20830/27ab9924"
+msgstr ""
+"Dziękujemy każdemu\nz Sony Computer Entertainment America\nza wkład, "
+"wsparcie i\nzaangażowanie w sukces\nRatchet and Clank, ze szczególnym\n"
+"uznaniem dla zespołu\nzarządu, w tym:"
+
+#: all_text
+msgid "20838/dabf8015"
+msgstr ""
+"i Marilyn Weyant\n"
+
+#: all_text
+msgid "20839/21dc222f"
+msgstr "Szczególne podziękowania składamy też:"
+
+#: all_text
+msgid "20843/f5f15dd0"
+msgstr "Wszystkich z Naughty Dog"
+
+#: all_text
+msgid "20848/8fb4ebfb"
+msgstr ""
+"Mike Gollum\ni ekipa produkcji dźwięku z Warner Bros."
+
+#: all_text
+msgid "20852/073c9791"
+msgstr ""
+"No i oczywiście\nnaszym cierpliwym małżonkom, dzieciom, rodzicom,\n"
+"dziewczynom, chłopakom i zwierzakom"
+
+#: all_text
+msgid "20853/c00f78b7"
+msgstr "Przy tworzeniu tej gry nie ucierpiał żaden kurczak"
+
+#: all_text
+msgid "20854/449f2829"
+msgstr "Wynik za triki"
+
+#: all_text
+msgid "20855/9008e341"
+msgstr "Poza"
+
+#: all_text
+msgid "20856/1a45b6ee"
+msgstr "Pozy"
+
+#: all_text
+msgid "20857/9bfeb0dd"
+msgstr "Rekord trasy"
+
+#: all_text
+msgid "20858/5e83b519"
+msgstr "Nowy rekord trasy!"
+
+#: all_text
+msgid "20859/633d4522"
+msgstr "Nowy rekord trików!"
+
+#: all_text
+msgid "20860/bdf61a1b"
+msgstr "[cross] Odbierz nagrodę"
+
+#: all_text
+msgid "20861/0177e92d"
+msgstr "Ścigaj się znowu"
+
+#: all_text
+msgid "20863/8e69d830"
+msgstr "Drapacz"
+
+#: all_text
+msgid "20865/8ac2ae91"
+msgstr "Chrupiący"
+
+#: all_text
+msgid "20866/c4e4cca9"
+msgstr "Za [orange]Złote śruby[default] kupisz Złote bronie!"
+
+#: all_text
+msgid "20867/847174d1"
+msgstr ""
+"Zdobądź wszystkie Złote bronie i [orange]Punkty umiejętności[default], by "
+"odblokować więcej bonusów!"
+
+#: all_text
+msgid "20868/514d6984"
+msgstr "[circle] Nowa gra z obecnymi broniami i śrubami"
+
+#: all_text
+msgid "20869/5b65695d"
+msgstr "[cross] Cofnij się do chwili przed pokonaniem Dreka."
+
+#: all_text
+msgid "20870/f0d623e6"
+msgstr "Zajrzyj do menu bonusów po fajne dodatki!"
+
+#: all_text
+msgid "20871/2dec4720"
+msgstr ""
+"To niektóre szkice koncepcyjne Ratcheta. Wcześnie zdecydowaliśmy, że będzie "
+"dwunożnym, futrzastym kosmitą. A gdyby ktoś pytał, Ratchet jest Lombaxem."
+
+#: all_text
+msgid "20872/800f7ceb"
+msgstr ""
+"Clank też przeszedł wiele wcieleń. Początkowo wyglądał jeszcze młodziej, z "
+"większą głową i mniejszym ciałem. Na początku Clank był nawet trzema "
+"znacznie mniejszymi robotami, ale ostatecznie zostaliśmy przy jednym, żeby "
+"łatwiej rozwinąć jego osobowość."
+
+#: all_text
+msgid "20873/28a923cb"
+msgstr ""
+"A oto ostateczny szkic naszych dwóch głównych bohaterów. Ratchet po raz "
+"pierwszy pojawił się na papierze w ciągu dwóch tygodni od pierwszego "
+"pomysłu na grę. Ten ostateczny szkic powstał mniej więcej trzy miesiące "
+"później."
+
+#: all_text
+msgid "20874/ccb93455"
+msgstr ""
+"Fort Krontos na Batalii wziął się z górnego szkicu. Chcieliśmy stworzyć "
+"zalesione wyspy pod ostrzałem z powietrza. Potem zrobił się z tego raczej "
+"tropikalny fort. Tak to czasem bywa przy tworzeniu gier.\n\nDolny szkic to "
+"jeden z wielu, z których podkradaliśmy elementy do różnych poziomów..."
+
+#: all_text
+msgid "20875/e27bcf40"
+msgstr ""
+"Te przyklejone do urwisk budowle zmieniły się w maszynerię na zboczach, "
+"którą widać w części Tartaku na planecie Eudora. Początkowo były częścią "
+"zamieszkanego miasta, ale postanowiliśmy, że to będzie obszar tylko dla "
+"robotów."
+
+#: all_text
+msgid "20876/06cebe90"
+msgstr ""
+"To element zewnętrznej części fabryki robotów na planecie Quartu. W tej "
+"fabryce na początku gry powstaje Clank."
+
+#: all_text
+msgid "20877/50d1abf6"
+msgstr ""
+"Górny szkic to wczesny rysunek Składu Blargów na planecie Gaspar. Dolny to "
+"projekt produkcyjny Blackwater City na planecie Rilgar."
+
+#: all_text
+msgid "20878/1d4b6e82"
+msgstr ""
+"Fabryka bomb na planecie Hoven wyrosła z tych szkiców. Pierwotnie "
+"mieszkańcy mieli wydobywać lód i wysyłać go na inne planety.\n\nAle potem "
+"uznaliśmy, że Blargowie powinni ją najechać i przerobić wszystkie zakłady "
+"na fabryki amunicji. Blargowie to zawsze złe wieści."
+
+#: all_text
+msgid "20879/dd91d466"
+msgstr "Wiszące źródło zasilania jednej z naszych fabryk. Zgadniesz której?"
+
+#: all_text
+msgid "20880/6bd1c14b"
+msgstr ""
+"Górny rysunek pokazuje wczesne koncepcje Tartaku na planecie Eudora. To był "
+"jeden z naszych pierwszych światów i początkowo chcieliśmy stworzyć leśne "
+"miasto. W trakcie produkcji wszystko się mocno zmieniło\n\nDolny szkic "
+"pokazuje spokojne budowle z Fabryki bomb na planecie Hoven."
+
+#: all_text
+msgid "20881/36af3f80"
+msgstr ""
+"Koncepcje generatorów dla Gorda City na planecie Oltanis. Miasto nękają "
+"burze z piorunami, więc mieszkańcy używają generatorów, by przyciągać "
+"pioruny i zamieniać je w użyteczną energię.\n\nNiestety Drek chce mieć te "
+"generatory dla swoich nowych planet, a mieszkańcy nie mają szans."
+
+#: all_text
+msgid "20882/347cbe3a"
+msgstr ""
+"Jednym z pierwszych prototypowanych poziomów było Metropolis na planecie "
+"Kerwan. Chcieliśmy dużo zieleni wplecionej w retro-futurystyczne budynki, "
+"żeby stworzyć niepowtarzalny kontrast. W końcu usunęliśmy jednak większość "
+"brązowych kopuł, bo zaczęły gryźć się z resztą miasta.\n\nTo był jeden z "
+"pierwszych dużych światów i omal nie wywołał wojny między projektantami a "
+"grafikami."
+
+#: all_text
+msgid "20883/175ec94e"
+msgstr ""
+"To pierwsza koncepcja kwatery Qwarka na planecie Umbris. Usunęliśmy "
+"piorunochrony, gdy zauważyliśmy, że przez nie centralna budowla wygląda na "
+"za małą.\n\nOgólny pomysł był taki, by kwatera Qwarka przypominała pole "
+"bitwy z II wojny światowej, pełne bunkrów, karabinów maszynowych i drutu "
+"kolczastego."
+
+#: all_text
+msgid "20884/92c96780"
+msgstr ""
+"Oto studium jednej z budowli przy przyczepie Qwarka w Blackwater City. "
+"Ostatecznie mocno ją zmieniliśmy i efekt końcowy jest nieco inny[xAD]"
+
+#: all_text
+msgid "20885/7d528dc9"
+msgstr ""
+"To dobry przykład studiów palety barw, które tworzymy dla każdego świata. "
+"To było dla Fortu Krontos na planecie Batalia.\n\nOstatecznie zmieniliśmy "
+"pogodę ze słonecznego dnia na ulewę, ale paleta barw niewiele odbiega od "
+"tego obrazu."
+
+#: all_text
+msgid "20886/8cf89154"
+msgstr ""
+"Dwa przykłady kart postaci, według których modelujemy wrogów w grze. U góry "
+"żołnierz Blargów, na dole dowódca Blargów."
+
+#: all_text
+msgid "20887/a8b609de"
+msgstr ""
+"Kochamy nasze roboty! To niektóre z wielu projektów głów dla robotów, które "
+"walczą z Ratchetem.\n\nA jeśli dobrze się przyjrzysz, wypatrzysz naszego "
+"dyrektora animacji i głównego projektanta postaci."
+
+#: all_text
+msgid "20888/03d9480e"
+msgstr ""
+"Oto pierwszy statek Ratcheta. Szkoda, że rozbija go tak wcześnie. "
+"Chcieliśmy, żeby był naprawdę domowej roboty - trzymał się na gumie do "
+"żucia i drucie. Do dziś nie możemy się zgodzić, dlaczego właściwie rozbił "
+"się na planecie Novalis[xAD]"
+
+#: all_text
+msgid "20889/a531e19d"
+msgstr ""
+"Gotowe szkice statku Qwarka i statku kurierskiego, który zdobywają Ratchet "
+"i Clank. Statek kurierski miał być powolny, toporny i wytrzymały - trochę "
+"jak furgonetka pocztowa.\n\nStatek Qwarka za to zaprojektowano jako "
+"luksusowy - też niezbyt szybki, ale stylowy i wygodny."
+
+#: all_text
+msgid "20890/511de150"
+msgstr ""
+"To pierwotny szkic myśliwca Blargów, który Ratchet i Clank zdobywają w "
+"Bazie Gemlik. Chodziło nam o smukły, ale zabójczy kształt[xAD]"
+
+#: all_text
+msgid "20891/96cfe272"
+msgstr ""
+"Wielu wrogów w grze kieruje pojazdami. Ten zmienił się w helikopter "
+"pilotowany przez dowódcę Blargów w Metropolis. Paskudny typ."
+
+#: all_text
+msgid "20892/d0724de6"
+msgstr ""
+"[orange]Grindboots[default], [orange]Mine Glove[default] i coś, co "
+"pierwotnie było rękawicą dronów obronnych. W połowie projektu zmieniliśmy "
+"działanie dronów obronnych, więc ta rękawica przestała być potrzebna."
+
+#: all_text
+msgid "20893/8addf600"
+msgstr ""
+"Oto jedna z koncepcji Giganta Clanka. Niestety wielkie działa na ramionach "
+"nie weszły do gry, bo po prostu nie były praktyczne. Ale udało nam się "
+"zostawić Ratcheta na plecach Clanka."
+
+#: all_text
+msgid "20894/ac784532"
+msgstr ""
+"Kilka zabawnych projektów wrogów. Jeden trafił do gry, cztery nie. "
+"Zgadniesz, który wygrał?"
+
+#: all_text
+msgid "20895/56ae1a43"
+msgstr ""
+"Wiele twarzy Wielkiego Ala. To była pierwsza postać niezależna (NPC), którą "
+"umieściliśmy w grze. Pewnie tak większość ludzi wyobraża sobie twórców "
+"gier[xAD]"
+
+#: all_text
+msgid "20896/41926335"
+msgstr ""
+"Jedną z broni, która przeszła na papierze wiele wersji, był klucz Ratcheta. "
+"Nie chcieliśmy niczego zbyt typowego, a do tego musiał być naraz narzędziem "
+"i bronią.\n\nWiele osób błędnie nazywa go \"toporem\", ale ta nazwa jest "
+"pod pewnymi względami trafna, bo raczej nie chciałbyś nim oberwać."
+
+#: all_text
+msgid "20897/de6af0d3"
+msgstr ""
+"Projekty [orange]Visibomb[default] Gun (u góry) i [orange]Suck "
+"Cannon[default] (na dole). [orange]Suck Cannon[default] był jedną z "
+"pierwszych zaprojektowanych broni i jedną z nielicznych, których nazwa nie "
+"zmieniła się przez całą produkcję. Po prostu fajnie brzmiała[xAD]"
+
+#: all_text
+msgid "20898/e76456f1"
+msgstr ""
+"Dwa górne projekty to ostateczne wersje [orange]Hydro-Packa[default]. Dolne "
+"szkice to projekty [orange]Glove of Doom[default] i [orange]Bomb "
+"Glove[default].\n\n[orange]Glove of Doom[default] to ulubieniec całego "
+"biura[xAD]"
+
+#: all_text
+msgid "20899/069a2cd5"
+msgstr ""
+"Kolejna wczesna wersja Ratcheta. Zwróć uwagę na inne proporcje, brak brwi i "
+"pasków. To była też wczesna koncepcja okładki[xAD]"
+
+#: all_text
+msgid "20900/624c7673"
+msgstr ""
+"Ten powinien wyglądać znajomo - z niego powstała okładka amerykańskiego "
+"wydania gry. Ale co ważniejsze, to pierwszy obraz Ratcheta pokazany światu "
+"w marcu 2002 roku."
+
+#: all_text
+msgid "20901/acf2603b"
+msgstr "Brak filmów."
+
+#: all_text
+msgid "20902/4bbf5272"
+msgstr "KRONIKI BATALII"
+
+#: all_text
+msgid "20903/50b9818e"
+msgstr "SAMOTNY KOMANDOS WYGRYWA WOJNĘ[xAD]"
+
+#: all_text
+msgid "20904/fa55a159"
+msgstr "[xAD]tak przynajmniej twierdzi"
+
+#: all_text
+msgid "20905/be65732a"
+msgstr "PRZYBYŁY POSIŁKI!"
+
+#: all_text
+msgid "20906/2ae39de6"
+msgstr "CZEMU TAK DŁUGO?"
+
+#: all_text
+msgid "20907/23076c79"
+msgstr "WIEŚCI Z POSTERUNKU X11"
+
+#: all_text
+msgid "20908/dfb0f973"
+msgstr "Przegląd Strawiony"
+
+#: all_text
+msgid "20909/fc5ff7ee"
+msgstr "Jak długi jest twój klucz?"
+
+#: all_text
+msgid "20910/fabd68f1"
+msgstr "Jakiego Nanotechu naprawdę potrzebujesz?"
+
+#: all_text
+msgid "20911/fdd626ce"
+msgstr "Zjadła ją ameba, a teraz jest ZAKOCHANA"
+
+#: all_text
+msgid "20912/7c9116ad"
+msgstr "Film kinowy"
+
+#: all_text
+msgid "20914/577b569b"
+msgstr "Robot roku!"
+
+#: all_text
+msgid "20915/de83ff42"
+msgstr "Ekskluzywnie: jak Clank nas wszystkich uratował"
+
+#: all_text
+msgid "20916/9be43182"
+msgstr "Popularny Hydraulik"
+
+#: all_text
+msgid "20917/59fe5be5"
+msgstr "101 SPOSOBÓW NA CZYSTE RURY"
+
+#: all_text
+msgid "20918/325b8cd1"
+msgstr "Czy hydraulika będzie jeszcze taka sama?"
+
+#: all_text
+msgid "20919/84b65a00"
+msgstr "Wodociągowiec zadaje to pytanie codziennie"
+
+#: all_text
+msgid "20920/6cad6e3a"
+msgstr "PRAWDZIWA HISTORIA"
+
+#: all_text
+msgid "20921/d4f0c288"
+msgstr "OCALIŁEM GALAKTYKĘ PRZED ZŁYM ZMUTOWANYM SZCZEPEM GRZYBA"
+
+#: all_text
+msgid "20922/b9f21910"
+msgstr "SERIO MÓWIĘ"
+
+#: all_text
+msgid "20923/af215ff4"
+msgstr "JAK NAPRAWIAĆ PORZUCONE DZIAŁKA"
+
+#: all_text
+msgid "20924/b4b23060"
+msgstr "Higienizator"
+
+#: all_text
+msgid "20926/bf7bf787"
+msgstr "GORĄCE BOTY"
+
+#: all_text
+msgid "20927/b6836220"
+msgstr "ROZRYWKA DLA ROBOTÓW"
+
+#: all_text
+msgid "20928/a4f4607b"
+msgstr "OLEJ I TRYBY"
+
+#: all_text
+msgid "20929/9861577f"
+msgstr "NAJLEPSZE SMAROWANIE DLA TWOICH WRAŻLIWYCH CZĘŚCI"
+
+#: all_text
+msgid "20931/f581a6fe"
+msgstr "AKTORZY-ROBOTY"
+
+#: all_text
+msgid "20932/06b4741a"
+msgstr "TURBO BLIŹNIAKI"
+
+#: all_text
+msgid "20933/8562e056"
+msgstr "PLAN TRENINGOWY HELGI"
+
+#: all_text
+msgid "20934/38e84e69"
+msgstr "PODKRĘCANIE CPU"
+
+#: all_text
+msgid "20935/f6b2cac9"
+msgstr "WIĘKSZA WYDAJNOŚĆ I SATYSFAKCJA"
+
+#: all_text
+msgid "20936/478fbd95"
+msgstr "DZIEWCZYNA Z POMOCY"
+
+#: all_text
+msgid "20937/4bab0a18"
+msgstr "POKAZUJE SWOJE"
+
+#: all_text
+msgid "20938/277dca6c"
+msgstr "SERWA"
+
+#: all_text
+msgid "20939/8bdf22db"
+msgstr "WYWIAD"
+
+#: all_text
+msgid "20941/142ef78f"
+msgstr "MODELKI"
+
+#: all_text
+msgid "20942/7ec18c50"
+msgstr "IMPREZA"
+
+#: all_text
+msgid "20943/4dc44821"
+msgstr "W"
+
+#: all_text
+msgid "20944/a4fce146"
+msgstr "REZYDENCJI"
+
+#: all_text
+msgid "20945/db01dd78"
+msgstr "HOTBOT"
+
+#: all_text
+msgid "20946/4d73bf52"
+msgstr "EKSPRES NARZĘDZIOWY"
+
+#: all_text
+msgid "20947/23f1fbe2"
+msgstr "PRZEDŁUŻ ŻYCIE SWOJEGO KLUCZA"
+
+#: all_text
+msgid "20948/48bc3223"
+msgstr "MIĘDZYGWIEZDNE"
+
+#: all_text
+msgid "20949/4f0ae08b"
+msgstr "WŚCIBSKIE WIEŚCI"
+
+#: all_text
+msgid "20950/f4b4271f"
+msgstr "WYPALONY"
+
+#: all_text
+msgid "20951/a6ddb711"
+msgstr "\"\"Zrobię wszystko za kilka śrub\"\" - Qwark"
+
+#: all_text
+msgid "20952/d8370c8b"
+msgstr "SZCZERE ZDJĘCIA W ŚRODKU"
+
+#: all_text
+msgid "20953/9e0644a4"
+msgstr "Robot przyłapany na gorącym uczynku"
+
+#: all_text
+msgid "20954/56f672fe"
+msgstr "Sympatia Ratcheta"
+
+#: all_text
+msgid "20955/397ef2f0"
+msgstr "Szokujące wieści o DREKU"
+
+#: all_text
+msgid "20956/4587495b"
+msgstr "Wyścig był ustawiony"
+
+#: all_text
+msgid "20957/ca96e8a3"
+msgstr "Rady fitness od trenerki Qwarka"
+
+#: all_text
+msgid "20958/30f759df"
+msgstr "Żołnierze Blargów skaczą sobie do gardeł"
+
+#: all_text
+msgid "20959/426091ef"
+msgstr "PRAWDA"
+
+#: all_text
+msgid "20960/201ffaf9"
+msgstr "CZY SKID JEST UZALEŻNIONY OD NANO?"
+
+#: all_text
+msgid "20961/b44ada5a"
+msgstr "Kurier Rilgar"
+
+#: all_text
+msgid "20962/ee93ac07"
+msgstr "Sprzedawca [orange]R.Y.N.O.[default] nie przyznaje się do winy!"
+
+#: all_text
+msgid "20963/b693c578"
+msgstr "Mieszkaniec Novalis twierdzi, że jego brat zmienił się w kurczaka!"
+
+#: all_text
+msgid "20964/b4a011fb"
+msgstr "Atak ameb"
+
+#: all_text
+msgid "20965/b1b2385d"
+msgstr "HOVERBOARDZISTA"
+
+#: all_text
+msgid "20966/286807ab"
+msgstr "\"\"DO SERCA MĘŻCZYZNY NAJLEPIEJ TRAFIĆ PRZEZ ŻEBRA!\"\""
+
+#: all_text
+msgid "20967/ab83e470"
+msgstr "PIERWSZE SPOJRZENIE NA Z400"
+
+#: all_text
+msgid "20968/20193f12"
+msgstr "ZABÓJCZE KOMBOSY"
+
+#: all_text
+msgid "20969/e8e565bd"
+msgstr "RUCHY, OD KTÓRYCH PĘKA KRĘGOSŁUP"
+
+#: all_text
+msgid "20970/1a0bbe23"
+msgstr "ROZDAJEMY ZOOMERATORY"
+
+#: all_text
+msgid "20971/345f2893"
+msgstr "ZA DARMO"
+
+#: all_text
+msgid "20972/cc86af88"
+msgstr "tylko za 2,99"
+
+#: all_text
+msgid "20973/51cce5f6"
+msgstr "JAK SKID ZDOBYWA DODATKOWĄ \"\"WYSOKOŚĆ\"\""
+
+#: all_text
+msgid "20974/2a462c9d"
+msgstr "WYGRAJ!"
+
+#: all_text
+msgid "20975/69c5c4ad"
+msgstr "CIĘŻKA ARTYLERIA"
+
+#: all_text
+msgid "20976/f8fad370"
+msgstr "Morph-o-ray kończy z głodem w galaktyce"
+
+#: all_text
+msgid "20977/510855c0"
+msgstr "Gadżety jutra"
+
+#: all_text
+msgid "20978/b5f85c6d"
+msgstr "Najnowsze wynalazki"
+
+#: all_text
+msgid "20979/d97f8557"
+msgstr "Recenzja [orange]Visibomby[default]"
+
+#: all_text
+msgid "20980/fb5d1314"
+msgstr "10 najlepszych broni"
+
+#: all_text
+msgid "20982/af94f6c0"
+msgstr "Myślisz, że poradzisz sobie z [orange]R.Y.N.O.[default]?"
+
+#: all_text
+msgid "20983/8bdf22db"
+msgstr "WYWIAD"
+
+#: all_text
+msgid "20984/2abb946c"
+msgstr "Ofiary [orange]R.Y.N.O.[default]"
+
+#: all_text
+msgid "20985/20e8cc49"
+msgstr "ULEPSZENIA"
+
+#: all_text
+msgid "20986/969b7960"
+msgstr "Jak tanio zdobyć części zamienne"
+
+#: all_text
+msgid "20987/5e90ba17"
+msgstr "Ogonki"
+
+#: all_text
+msgid "20988/8bed8ca5"
+msgstr "FUTRZASTY MECHANIK, KTÓRY WYWOŁAŁ PANIKĘ"
+
+#: all_text
+msgid "20989/f3a61b34"
+msgstr "ZABÓJCZE GADŻETY"
+
+#: all_text
+msgid "20990/0250e26a"
+msgstr "10 POMYSŁÓW NA ŚWIĄTECZNE PREZENTY"
+
+#: all_text
+msgid "20991/fd08856d"
+msgstr "JECHAŁEM NA WSTECZNYM"
+
+#: all_text
+msgid "20992/1674b22e"
+msgstr "TRAGEDIA NA TORZE: NIE ŻYJE PIĘĆ ROBOTÓW"
+
+#: all_text
+msgid "20993/19ce5316"
+msgstr "DOMY I BUNKRY"
+
+#: all_text
+msgid "20994/e11d54eb"
+msgstr ""
+"Przewodnik nr \n1 po układzie Umbris"
+
+#: all_text
+msgid "20995/db93e851"
+msgstr "BANK ZAJMUJE"
+
+#: all_text
+msgid "20996/d668866b"
+msgstr "POSIADŁOŚĆ QWARKA"
+
+#: all_text
+msgid "20997/318fe12b"
+msgstr "AUKCJA RUSZA"
+
+#: all_text
+msgid "20998/98dae122"
+msgstr "TERAZ!"
+
+#: all_text
+msgid "20999/6fd226f4"
+msgstr "NOWE SEKTORY"
+
+#: all_text
+msgid "21000/5abc6b8f"
+msgstr "Wschodni Umbris"
+
+#: all_text
+msgid "21001/07f2498b"
+msgstr "Centralny Umbris"
+
+#: all_text
+msgid "21002/1daf791c"
+msgstr "Parówkowo"
+
+#: all_text
+msgid "21003/f0ef3622"
+msgstr "Południowy X6B"
+
+#: all_text
+msgid "21004/bd840b1c"
+msgstr "Blargowo"
+
+#: all_text
+msgid "21005/25a91f77"
+msgstr "3. Księżyc"
+
+#: all_text
+msgid "21006/89a9d31d"
+msgstr "Stacja Umbris"
+
+#: all_text
+msgid "21007/bfe27639"
+msgstr "Dzielnica Qwarka"
+
+#: all_text
+msgid "21008/7bbb2c7c"
+msgstr "ZA DARMO"
+
+#: all_text
+msgid "21009/efcef8a8"
+msgstr "Posiadłość Qwarka za 850 970 000,99"
+
+#: all_text
+msgid "21010/15968d42"
+msgstr "Głośność efektów"
+
+#: all_text
+msgid "21011/2e53751d"
+msgstr "Głośność muzyki"
+
+#: all_text
+msgid "21012/52527f7f"
+msgstr "Przełącz stereo/mono"
+
+#: all_text
+msgid "21015/9f93ff74"
+msgstr "PUSTE"
+
+#: all_text
+msgid "21016/8554e6fa"
+msgstr "Szybko"
+
+#: all_text
+msgid "21017/c1df4081"
+msgstr "Średnio"
+
+#: all_text
+msgid "21018/9535dee3"
+msgstr "Wolno"
+
+#: all_text
+msgid "21019/0bef5698"
+msgstr "Zmień szybkość obrotu kamery"
+
+#: all_text
+msgid "21020/dddc2cdb"
+msgstr "Czekaj"
+
+#: all_text
+msgid "21021/6f984146"
+msgstr "Za mną"
+
+#: all_text
+msgid "21022/78b1ef6a"
+msgstr "Wejdź"
+
+#: all_text
+msgid "21023/406c280d"
+msgstr "Atakuj"
+
+#: all_text
+msgid "21024/66f5e903"
+msgstr "Twórcy"
+
+#: all_text
+msgid "21025/93c0509c"
+msgstr ""
+"Ratchet and Clank jest znakiem towarowym Sony Computer Entertainment "
+"America, Inc."
+
+#: all_text
+msgid "21026/971829e3"
+msgstr "Naciśnij Start"
+
+#: all_text
+msgid "21027/4a966340"
+msgstr "Sony Computer Entertainment Europe przedstawia"
+
+#: all_text
+msgid "21028/8992c9a5"
+msgstr "1."
+
+#: all_text
+msgid "21029/690f0b84"
+msgstr "2."
+
+#: all_text
+msgid "21030/8eba3cee"
+msgstr "3."
+
+#: all_text
+msgid "21031/d419c1c6"
+msgstr "4."
+
+#: all_text
+msgid "21032/d5dbabf1"
+msgstr "5."
+
+#: all_text
+msgid "21033/258320a8"
+msgstr "Wyjść?"
+
+#: all_text
+msgid "21034/73a85d8a"
+msgstr ""
+"Obraz przełączy się teraz w tryb 60 Hz. Jeśli wyświetla się nieprawidłowo, "
+"twój telewizor nie obsługuje tego trybu. W takim razie odczekaj 10 sekund, "
+"a obraz wróci do poprzedniego trybu."
+
+#: all_text
+msgid "21035/13f79d05"
+msgstr "Obraz jest teraz w trybie 60 Hz. Zachować ten tryb?"
+
+#: all_text
+msgid "21036/876445df"
+msgstr "Przywrócono tryb 50 Hz."
+
+#: all_text
+msgid "21037/27ee8120"
+msgstr "Naciśnij dowolny przycisk[xAD]"
+
+#: all_text
+msgid "21038/7f7a927e"
+msgstr "Masz:"
+
+#: all_text
+msgid "21039/6838f6e7"
+msgstr "%d z %d [orange]Złotych śrub[default]"
+
+#: all_text
+msgid "21040/e7bf0135"
+msgstr "%d z %d Złotych broni"
+
+#: all_text
+msgid "21041/f7bf4a4e"
+msgstr "%d z %d [orange]Punktów umiejętności[default]"
+
+#: all_text
+msgid "21042/2265ab0f"
+msgstr "[circle] Dalej bez zapisu"
+
+#: all_text
+msgid "6/88ee5326"
+msgstr "Zdobyto [orange]Infobota[default] planety Novalis"
+
+#: all_text
+msgid "1009/ff266c76"
+msgstr "Zdobyto [orange]Infobota[default] planety Aridia"
+
+#: all_text
+msgid "1010/f8d61b71"
+msgstr "Zdobyto [orange]Infobota[default] planety Kerwan"
+
+#: all_text
+msgid "2015/4373c39a"
+msgstr "Znalazłeś [orange]Trespasser[default]!"
+
+#: all_text
+msgid "2016/6e5525dc"
+msgstr "Masz [orange]Sonic Summoner[default]!"
+
+#: all_text
+msgid "2017/f389ac31"
+msgstr "Masz [orange]Hoverboard[default]!"
+
+#: all_text
+msgid "3014/abfe242a"
+msgstr "Zdobyto [orange]Infobota[default] planety Eudora"
+
+#: all_text
+msgid "3015/b3fd727d"
+msgstr "Masz ulepszenie [orange]Heli-Pack[default]!"
+
+#: all_text
+msgid "3016/f1ccfb41"
+msgstr "Kupiłeś [orange]Swingshot[default]!"
+
+#: all_text
+msgid "4006/753108d2"
+msgstr "Masz [orange]Infobota[default] Stacji Taktycznej Blargów"
+
+#: all_text
+msgid "4007/78bf2e17"
+msgstr "Znalazłeś [orange]Suck Cannon[default]!"
+
+#: all_text
+msgid "5012/26a9b8aa"
+msgstr "Zdobyto [orange]Infobota[default] planety Umbris"
+
+#: all_text
+msgid "5013/34a560f9"
+msgstr "Wygrałeś Platynowy [orange]Zoomerator[default]!"
+
+#: all_text
+msgid "5014/b8519f63"
+msgstr "Kupiłeś [orange]R.Y.N.O.[default]!"
+
+#: all_text
+msgid "5015/409049e3"
+msgstr "Właśnie ustanowiłeś nowy rekord trasy!"
+
+#: all_text
+msgid "6011/9f58248c"
+msgstr "Zdobyto [orange]Infobota[default] planety Rilgar"
+
+#: all_text
+msgid "6012/47f38fc7"
+msgstr "Znalazłeś [orange]Hydrodisplacer[default]!"
+
+#: all_text
+msgid "6013/4082c63e"
+msgstr "Kupiłeś [orange]Grindboots[default]!"
+
+#: all_text
+msgid "7000/008a0de3"
+msgstr "Zdobyto [orange]Infobota[default] planety Batalia"
+
+#: all_text
+msgid "8007/30136ce2"
+msgstr "Zdobyto [orange]Infobota[default] planety Gaspar"
+
+#: all_text
+msgid "8008/c350cf4d"
+msgstr "Zdobyto [orange]Infobota[default] planety Orxon"
+
+#: all_text
+msgid "8009/bc199847"
+msgstr "Zdobyłeś [orange]Metal Detector[default]!"
+
+#: all_text
+msgid "9002/4ab6af19"
+msgstr "Znalazłeś [orange]Hełm pilota[default]!"
+
+#: all_text
+msgid "10009/23c5d318"
+msgstr "Zdobyto [orange]Infobota[default] planety Pokitaru"
+
+#: all_text
+msgid "10010/5e2828b3"
+msgstr "Zdobyto [orange]Infobota[default] planety Hoven"
+
+#: all_text
+msgid "10011/52ec2cc6"
+msgstr "Znalazłeś [orange]Magneboots[default]!"
+
+#: all_text
+msgid "10012/263ac88b"
+msgstr "Masz [orange]Nanotech Premium[default]!"
+
+#: all_text
+msgid "10013/1c97ad2a"
+msgstr "Masz [orange]Nanotech Ultra[default]!"
+
+#: all_text
+msgid "11012/00868fd2"
+msgstr "Masz ulepszenie [orange]Thruster-Pack[default]!"
+
+#: all_text
+msgid "11013/5f556f37"
+msgstr "Dostałeś [orange]Maskę O2[default]!"
+
+#: all_text
+msgid "11014/cd46b1d3"
+msgstr "Masz [orange]Persuader[default]!"
+
+#: all_text
+msgid "12005/64ec50d2"
+msgstr "Masz [orange]Infobota[default] Bazy Księżycowej Gemlik"
+
+#: all_text
+msgid "12006/af41affc"
+msgstr "Kupiłeś [orange]Hydro-Pack[default]!"
+
+#: all_text
+msgid "12007/061c9cb6"
+msgstr "Zdobyłeś trochę [orange]Raritanium[default]!"
+
+#: all_text
+msgid "13001/3aaef2fc"
+msgstr "Zdobyto [orange]Infobota[default] planety Oltanis"
+
+#: all_text
+msgid "14001/2c886ad6"
+msgstr "Zdobyto [orange]Infobota[default] planety Quartu"
+
+#: all_text
+msgid "14002/72ec291a"
+msgstr "Znalazłeś [orange]Morph-o-ray[default]!"
+
+#: all_text
+msgid "14003/18296f75"
+msgstr "Kupiłeś [orange]Gadgetron PDA[default]!"
+
+#: all_text
+msgid "15009/9bf29a18"
+msgstr "Zdobyto [orange]Infobota[default] planety Kalebo III"
+
+#: all_text
+msgid "15010/ba41a886"
+msgstr "Zdobyto [orange]Infobota[default] Floty Dreka"
+
+#: all_text
+msgid "15011/1dddd388"
+msgstr "Znalazłeś [orange]Bolt Grabber[default]!"
+
+#: all_text
+msgid "16005/db24742c"
+msgstr "Masz [orange]Map-o-matic[default]!"
+
+#: all_text
+msgid "16006/4bc417d9"
+msgstr "Zdobyłeś [orange]Hologuise[default]!"
+
+#: all_text
+msgid "17001/cf1e8211"
+msgstr "Zdobyto [orange]Infobota[default] planety Veldin"
+
+#: all_text
+msgid "17002/7066f4a1"
+msgstr "Podniosłeś [orange]CodeBota[default]!"
+
+#: all_text
+msgid "21427/4a164ea5"
+msgstr "Zdobyto [orange]Złotą śrubę[default]"
+
+#: all_text
+msgid "21428/26a0ccdd"
+msgstr "Zebrano amunicję"
+
+#: all_text
+msgid "21429/19b7b84d"
+msgstr "+%d amunicji do [orange]Bomb Glove[default]"
+
+#: all_text
+msgid "21430/19b7b84d"
+msgstr "+%d amunicji do [orange]Bomb Glove[default]"
+
+#: all_text
+msgid "21431/4f3f56e7"
+msgstr "+%d amunicji do [orange]Devastatora[default]"
+
+#: all_text
+msgid "21432/4f3f56e7"
+msgstr "+%d amunicji do [orange]Devastatora[default]"
+
+#: all_text
+msgid "21433/0421e804"
+msgstr "+%d amunicji do [orange]Visibomby[default]"
+
+#: all_text
+msgid "21434/0421e804"
+msgstr "+%d amunicji do [orange]Visibomby[default]"
+
+#: all_text
+msgid "21435/6e7945dd"
+msgstr "+%d amunicji do [orange]Blastera[default]"
+
+#: all_text
+msgid "21436/6e7945dd"
+msgstr "+%d amunicji do [orange]Blastera[default]"
+
+#: all_text
+msgid "21437/00c5c511"
+msgstr "+%d amunicji do [orange]Pyrocitora[default]"
+
+#: all_text
+msgid "21438/00c5c511"
+msgstr "+%d amunicji do [orange]Pyrocitora[default]"
+
+#: all_text
+msgid "21439/47f7eae6"
+msgstr "+%d amunicji do [orange]Mine Glove[default]"
+
+#: all_text
+msgid "21440/47f7eae6"
+msgstr "+%d amunicji do [orange]Mine Glove[default]"
+
+#: all_text
+msgid "21441/0ffbb80f"
+msgstr "+%d amunicji do Tesla Claw"
+
+#: all_text
+msgid "21442/0ffbb80f"
+msgstr "+%d amunicji do Tesla Claw"
+
+#: all_text
+msgid "21443/44b7751c"
+msgstr "+%d amunicji do [orange]Glove of Doom[default]"
+
+#: all_text
+msgid "21444/44b7751c"
+msgstr "+%d amunicji do [orange]Glove of Doom[default]"
+
+#: all_text
+msgid "21445/0b97c4f1"
+msgstr "+%d amunicji do [orange]R.Y.N.O.[default]"
+
+#: all_text
+msgid "21446/0b97c4f1"
+msgstr "+%d amunicji do [orange]R.Y.N.O.[default]"
+
+#: all_text
+msgid "21447/3e4b75e3"
+msgstr "+%d amunicji do Drone Glove"
+
+#: all_text
+msgid "21448/3e4b75e3"
+msgstr "+%d amunicji do Drone Glove"
+
+#: all_text
+msgid "21449/42882712"
+msgstr "+%d amunicji do [orange]Decoy Glove[default]"
+
+#: all_text
+msgid "21450/42882712"
+msgstr "+%d amunicji do [orange]Decoy Glove[default]"
+
+#: all_text
+msgid "21451/ebb7bd18"
+msgstr "Masz Złoty [orange]Bomb Glove[default]!"
+
+#: all_text
+msgid "21452/7ab1b66c"
+msgstr "Masz Złoty [orange]Pyrocitor[default]!"
+
+#: all_text
+msgid "21453/7b517da5"
+msgstr "Masz Złoty [orange]Blaster[default]!"
+
+#: all_text
+msgid "21454/debc41e9"
+msgstr "Masz Złoty [orange]Glove of Doom[default]!"
+
+#: all_text
+msgid "21455/c0e06703"
+msgstr "Masz Złoty [orange]Mine Glove[default]!"
+
+#: all_text
+msgid "21456/5c6c9772"
+msgstr "Masz Złoty [orange]Devastator[default]!"
+
+#: all_text
+msgid "21457/adf49a84"
+msgstr "Masz Złoty [orange]Decoy Glove[default]!"
+
+#: all_text
+msgid "21458/75e4d290"
+msgstr "Masz Złoty [orange]Tesla Claw[default]!"
+
+#: all_text
+msgid "21459/7be6945f"
+msgstr "Masz Złoty [orange]Suck Cannon[default]!"
+
+#: all_text
+msgid "21460/71b59352"
+msgstr "Masz Złoty [orange]Morph-o-ray[default]!"
+
+#: all_text
+msgid "21461/de24274b"
+msgstr "Otworzyłeś skarbiec CodeBotem!"
+
+#: all_text
+msgid "21462/b7e0e185"
+msgstr "Zdobyłeś [orange]Punkt umiejętności[default]!"
+
+#: all_text
+msgid "21463/3b58d836"
+msgstr ""
+"Gratulacje! Masz już 15 [orange]Punktów umiejętności[default]!\nW menu "
+"Bonusy jest nowa opcja!"
+
+#: all_text
+msgid "21464/8d977aa8"
+msgstr ""
+"Gratulacje! Masz wszystkie [orange]Punkty umiejętności[default]!\nW menu "
+"Bonusy jest nowa opcja!"
+
+#: all_text
+msgid "21465/0fe66037"
+msgstr ""
+"Gratulacje! Zebrałeś wszystkie [orange]Złote śruby[default]!\nKup za nie "
+"Złote bronie!"
+
+#: all_text
+msgid "21466/53881749"
+msgstr ""
+"Gratulacje! Masz wszystkie Złote bronie!\nW menu Bonusy jest nowa opcja!"
+
+#: all_text
+msgid "21467/6e2fbf0a"
+msgstr "Znowu masz [orange]Bolt Grabber[default][xAD]"
+
+#: all_text
+msgid "21468/8b42ffc1"
+msgstr "Znowu masz [orange]Map-o-matic[default][xAD]"
+
+#: all_text
+msgid "21469/22212dfc"
+msgstr "Znowu masz [orange]Gadgetron PDA[default][xAD]"
+
+#: all_text
+msgid "21470/0e9560e0"
+msgstr "Znowu masz [orange]Persuader[default][xAD]"
+
+#: all_text
+msgid "21471/6fed55a9"
+msgstr "Znowu masz [orange]Suck Cannon[default][xAD]"
+
+#: all_text
+msgid "21472/f7b3b5e1"
+msgstr "Znowu masz Morph-o-ray[xAD]"
+
+#: all_text
+msgid "21473/c57bd2c6"
+msgstr "Znowu masz [orange]Raritanium[default][xAD]"
+
+#: all_text
+msgid "21474/f6c9896e"
+msgstr "Znowu masz [orange]R.Y.N.O.[default][xAD]"
+
+#: all_text
+msgid "1011/73444e38"
+msgstr "[triangle] Kup [orange]Infobota[default] za 500 śrub"
+
+#: all_text
+msgid "1012/281b9dc4"
+msgstr "Na [orange]Infobota[default] potrzebujesz 500 śrub"
+
+#: all_text
+msgid "2018/b745056e"
+msgstr "Przynieś nagrodę z wyścigów hoverboardów"
+
+#: all_text
+msgid "2019/726e9f2b"
+msgstr "Zniszcz piaskowe rekiny"
+
+#: all_text
+msgid "3017/4387f434"
+msgstr "[triangle] Wróć na statek"
+
+#: all_text
+msgid "3018/20a9c505"
+msgstr "[triangle] Przejedź się taksówką"
+
+#: all_text
+msgid "3019/1a8034d3"
+msgstr "[triangle] Idź na start toru fitness"
+
+#: all_text
+msgid "3020/20a9c505"
+msgstr "[triangle] Przejedź się taksówką"
+
+#: all_text
+msgid "3021/b9867793"
+msgstr "[triangle] Idź na koniec toru fitness"
+
+#: all_text
+msgid "3022/c10ee8c9"
+msgstr "[triangle] Wróć do sprzedawcy"
+
+#: all_text
+msgid "3023/c22e301a"
+msgstr "[triangle] Odwiedź Robosklep Wielkiego Ala"
+
+#: all_text
+msgid "3024/1ff96dfe"
+msgstr "[triangle] Kup [orange]Heli-Pack[default] za 1000 śrub"
+
+#: all_text
+msgid "3025/179c53b2"
+msgstr "[triangle] Kup [orange]Swingshot[default] za 1000 śrub"
+
+#: all_text
+msgid "3026/97fff8ef"
+msgstr "Na [orange]Heli-Pack[default] potrzebujesz 1000 śrub"
+
+#: all_text
+msgid "3027/ba92744d"
+msgstr "Na [orange]Swingshot[default] potrzebujesz 1000 śrub"
+
+#: all_text
+msgid "5016/2b72748f"
+msgstr "[triangle] Jedź do centrum"
+
+#: all_text
+msgid "5017/5a01ff31"
+msgstr "[triangle] Wpadnij na Plac Wyścigowy"
+
+#: all_text
+msgid "5018/e48541e8"
+msgstr "[triangle] Idź do statku"
+
+#: all_text
+msgid "5019/20a9c505"
+msgstr "[triangle] Przejedź się taksówką"
+
+#: all_text
+msgid "5020/f042056a"
+msgstr "[triangle] Odwiedź przyczepę Kapitana Qwarka"
+
+#: all_text
+msgid "5021/b31df306"
+msgstr "[triangle] Przekup ochroniarza 4000 śrub"
+
+#: all_text
+msgid "5022/fa040b3d"
+msgstr "[triangle] Kup [orange]R.Y.N.O.[default] za 150 000 śrub"
+
+#: all_text
+msgid "5023/4b58526e"
+msgstr "Do wyścigu potrzebujesz [orange]Hoverboardu[default]"
+
+#: all_text
+msgid "5024/01765a25"
+msgstr "Do Kapitana Qwarka potrzebujesz 4000 śrub"
+
+#: all_text
+msgid "5025/4e8b1dcf"
+msgstr "Na [orange]R.Y.N.O.[default] potrzebujesz 150 000 śrub"
+
+#: all_text
+msgid "5026/f6d5557b"
+msgstr "[triangle] Weź udział w wyścigu"
+
+#: all_text
+msgid "5027/cfe02a04"
+msgstr "[triangle] Pobij rekord trasy"
+
+#: all_text
+msgid "6014/5d31f858"
+msgstr "[triangle] Wyślij Clanka na zewnątrz stacji"
+
+#: all_text
+msgid "6015/178d8fc5"
+msgstr "[triangle] Na dół?"
+
+#: all_text
+msgid "6016/498d031b"
+msgstr "[triangle] Na górę?"
+
+#: all_text
+msgid "6017/22b976b8"
+msgstr "[triangle] Wróć do Ratcheta"
+
+#: all_text
+msgid "6018/6d7bf057"
+msgstr "[triangle] Wejdź na okręt"
+
+#: all_text
+msgid "6019/ea929587"
+msgstr "[triangle] Nacisnąć wielki czerwony błyszczący guzik?"
+
+#: all_text
+msgid "6020/c5f46633"
+msgstr "[triangle] Leć do kryjówki wynalazcy"
+
+#: all_text
+msgid "6021/d9654954"
+msgstr "[triangle] Wróć do doku"
+
+#: all_text
+msgid "6022/21bdc121"
+msgstr "Uciekaj ze statku"
+
+#: all_text
+msgid "6023/5fa07fc9"
+msgstr "[triangle] Kup [orange]Grindboots[default] za 2000 śrub"
+
+#: all_text
+msgid "6024/5ea0b4ee"
+msgstr "Na [orange]Grindboots[default] potrzebujesz 2000 śrub"
+
+#: all_text
+msgid "6025/7fe4a45c"
+msgstr "[triangle] Wyjść na zewnątrz?"
+
+#: all_text
+msgid "8010/4879a2f8"
+msgstr "[triangle] Kup [orange]Infobota[default] za 2000 śrub"
+
+#: all_text
+msgid "8011/0cd3ed67"
+msgstr "Na [orange]Infobota[default] potrzebujesz 2000 śrub"
+
+#: all_text
+msgid "8012/a34093ad"
+msgstr "[triangle] Siądź za działkiem i strzelaj do statków"
+
+#: all_text
+msgid "10014/77fe81d9"
+msgstr "[triangle] Kup [orange]Nanotech Premium[default] za 4000 śrub"
+
+#: all_text
+msgid "10015/b6e19640"
+msgstr "[triangle] Kup [orange]Nanotech Ultra[default] za 30 000 śrub"
+
+#: all_text
+msgid "10016/46d44988"
+msgstr "Na [orange]Nanotech Premium[default] potrzebujesz 4000 śrub"
+
+#: all_text
+msgid "10017/115f3fb6"
+msgstr "Na [orange]Nanotech Ultra[default] potrzebujesz 30 000 śrub"
+
+#: all_text
+msgid "11015/3a04d8e7"
+msgstr "[triangle] Zapłać 2000 śrub za [orange]Thruster-Pack[default]"
+
+#: all_text
+msgid "11016/c065f3e8"
+msgstr "Na [orange]Thruster-Pack[default] potrzebujesz 2000 śrub"
+
+#: all_text
+msgid "11017/b7c07da4"
+msgstr "[triangle] Leć odrzutowcem"
+
+#: all_text
+msgid "11018/e1f6abdc"
+msgstr "Do lotu tym samolotem potrzebujesz [orange]Hełmu pilota[default]"
+
+#: all_text
+msgid "11019/7f7c6cec"
+msgstr "[triangle] Idź do Robosklepu Boba"
+
+#: all_text
+msgid "11020/4387f434"
+msgstr "[triangle] Wróć na statek"
+
+#: all_text
+msgid "11021/26a34438"
+msgstr "[triangle] Zwiedź malownicze kanały kurortu Jowai"
+
+#: all_text
+msgid "11022/304b9403"
+msgstr "Potrzebujesz [orange]Raritanium[default]"
+
+#: all_text
+msgid "11023/9a38c948"
+msgstr ""
+"[triangle] Wymień [orange]Raritanium[default] na [orange]Persuader[default]"
+
+#: all_text
+msgid "12008/d883571c"
+msgstr "[triangle] Zapłać 2000 śrub za [orange]Hydro-Pack[default]"
+
+#: all_text
+msgid "12009/b5e47193"
+msgstr "Na [orange]Hydro-Pack[default] potrzebujesz 2000 śrub"
+
+#: all_text
+msgid "21475/06445499"
+msgstr "[triangle] Włącz automat Gadgetronu"
+
+#: all_text
+msgid "21476/d68a05f0"
+msgstr "[triangle] Wsiądź do statku"
+
+#: all_text
+msgid "21477/4c113477"
+msgstr "[triangle] Rozmawiaj"
+
+#: all_text
+msgid "5028/2bd60881"
+msgstr "[triangle] Leć do Metropolis"
+
+#: all_text
+msgid "3028/e0a60788"
+msgstr "[triangle] Leć do Blackwater City"
+
+#: all_text
+msgid "21478/63e63ea4"
+msgstr "[triangle] Leć do krateru Tobruk"
+
+#: all_text
+msgid "21479/832f24c5"
+msgstr "[triangle] Leć do Posterunku X11"
+
+#: all_text
+msgid "17003/ecc750a2"
+msgstr "[triangle] Wróć do hangaru startowego"
+
+#: all_text
+msgid "21480/4879a2f8"
+msgstr "[triangle] Kup [orange]Infobota[default] za 2000 śrub"
+
+#: all_text
+msgid "21481/0cd3ed67"
+msgstr "Na [orange]Infobota[default] potrzebujesz 2000 śrub"
+
+#: all_text
+msgid "21482/63468d98"
+msgstr "[triangle] Kup [orange]Gadgetron PDA[default] za 1000 śrub"
+
+#: all_text
+msgid "21483/87b6b062"
+msgstr "Na [orange]Gadgetron PDA[default] potrzebujesz 1000 śrub"
+
+#: all_text
+msgid "21484/348162b5"
+msgstr "Do otwarcia tego skarbca potrzebujesz CodeBota"
+
+#: all_text
+msgid "21485/04658e9b"
+msgstr "[triangle] Jedź taksówką do górnego miasta"
+
+#: all_text
+msgid "21486/2ed524d1"
+msgstr "[triangle] Jedź taksówką do statku"
+
+#: all_text
+msgid "16007/f6d5557b"
+msgstr "[triangle] Weź udział w wyścigu"
+
+#: all_text
+msgid "16008/4b58526e"
+msgstr "Do wyścigu potrzebujesz [orange]Hoverboardu[default]"
+
+#: all_text
+msgid "16009/3cc63cdb"
+msgstr "[triangle] Odwiedź biura Pomocy Gadgetronu"
+
+#: all_text
+msgid "16010/c7a2a6fe"
+msgstr "[triangle] Wróć do holu Gadgetronu"
+
+#: all_text
+msgid "17004/fb0fbec2"
+msgstr "[triangle] Idź na pokład obserwacyjny statku"
+
+#: all_text
+msgid "1013/9946ec34"
+msgstr ""
+"Zanim zdobędziesz złotą wersję,\nmusisz mieć [orange]Tesla Claw[default]"
+
+#: all_text
+msgid "1014/9b0d278f"
+msgstr ""
+"Zanim zdobędziesz złotą wersję,\nmusisz mieć [orange]Bomb Glove[default]"
+
+#: all_text
+msgid "1015/4c93da4d"
+msgstr ""
+"Zanim zdobędziesz złotą wersję,\nmusisz mieć [orange]Devastator[default]"
+
+#: all_text
+msgid "1016/f28c3868"
+msgstr ""
+"Zanim zdobędziesz złotą wersję,\nmusisz mieć [orange]Pyrocitor[default]"
+
+#: all_text
+msgid "1017/78cce34d"
+msgstr ""
+"Zanim zdobędziesz złotą wersję,\nmusisz mieć [orange]Mine Glove[default]"
+
+#: all_text
+msgid "1018/fa957a3c"
+msgstr ""
+"Zanim zdobędziesz złotą wersję,\nmusisz mieć [orange]Blaster[default]"
+
+#: all_text
+msgid "1019/b18384ed"
+msgstr ""
+"Zanim zdobędziesz złotą wersję,\nmusisz mieć [orange]Morph-o-ray[default]"
+
+#: all_text
+msgid "1020/74481894"
+msgstr ""
+"Zanim zdobędziesz złotą wersję,\nmusisz mieć [orange]Glove of Doom[default]"
+
+#: all_text
+msgid "1021/56885bb1"
+msgstr ""
+"Zanim zdobędziesz złotą wersję,\nmusisz mieć [orange]Decoy Glove[default]"
+
+#: all_text
+msgid "1022/98947b60"
+msgstr ""
+"Zanim zdobędziesz złotą wersję,\nmusisz mieć [orange]Suck Cannon[default]"
+
+#: all_text
+msgid "1023/1c08a6d5"
+msgstr "Potrzebujesz 4 [orange]Złotych śrub[default]"
+
+#: all_text
+msgid "1024/1826c234"
+msgstr "Potrzebujesz %d śrub"
+
+#: all_text
+msgid "1025/855a196d"
+msgstr ""
+"[triangle] Kup Złoty [orange]Tesla Claw[default] za\n%d śrub i 4 "
+"[orange]Złote śruby[default]"
+
+#: all_text
+msgid "1026/2cd1edf4"
+msgstr ""
+"[triangle] Kup Złoty [orange]Bomb Glove[default]\nza %d śrub i 4 "
+"[orange]Złote śruby[default]"
+
+#: all_text
+msgid "1027/841ffc11"
+msgstr ""
+"[triangle] Kup Złoty [orange]Devastator[default] za\n%d śrub i 4 "
+"[orange]Złote śruby[default]"
+
+#: all_text
+msgid "1028/f834da3e"
+msgstr ""
+"[triangle] Kup Złoty [orange]Pyrocitor[default] za\n%d śrub i 4 "
+"[orange]Złote śruby[default]"
+
+#: all_text
+msgid "1029/be3a4aae"
+msgstr ""
+"[triangle] Kup Złoty [orange]Mine Glove[default]\nza %d śrub i 4 "
+"[orange]Złote śruby[default]"
+
+#: all_text
+msgid "1030/aa24df5e"
+msgstr ""
+"[triangle] Kup Złoty [orange]Blaster[default] za\n%d śrub i 4 [orange]Złote "
+"śruby[default]"
+
+#: all_text
+msgid "1031/9cd225d9"
+msgstr ""
+"[triangle] Kup Złoty [orange]Morph-o-ray[default] za\n%d śrub i 4 "
+"[orange]Złote śruby[default]"
+
+#: all_text
+msgid "1032/7db3eb4b"
+msgstr ""
+"[triangle] Kup Złoty [orange]Glove of Doom[default] za\n%d śrub i 4 "
+"[orange]Złote śruby[default]"
+
+#: all_text
+msgid "1033/1ddc0098"
+msgstr ""
+"[triangle] Kup Złoty [orange]Decoy Glove[default] za\n%d śrub i 4 "
+"[orange]Złote śruby[default]"
+
+#: all_text
+msgid "1034/b301789d"
+msgstr ""
+"[triangle] Kup Złoty [orange]Suck Cannon[default] za\n%d śrub i 4 "
+"[orange]Złote śruby[default]"
+
+#: all_text
+msgid "13002/504d2c29"
+msgstr "[triangle] Idź do hangaru myśliwców"
+
+#: all_text
+msgid "13003/4387f434"
+msgstr "[triangle] Wróć na statek"
+
+#: all_text
+msgid "5029/44ae9328"
+msgstr "[triangle] Wróć do portu miejskiego"
+
+#: all_text
+msgid "1035/93fb3fcf"
+msgstr "[triangle] Teleport do sali Złotych broni"
+
+#: all_text
+msgid "1036/03ad394a"
+msgstr "[triangle] Wróć na punkt widokowy"
+
+#: all_text
+msgid "8013/4387f434"
+msgstr "[triangle] Wróć na statek"
+
+#: all_text
+msgid "8014/aa4b895e"
+msgstr "[triangle] Idź do działka"
+
+#: all_text
+msgid "8015/614544ba"
+msgstr "[triangle] Idź do dezertera"
+
+#: all_text
+msgid "8016/5418ce34"
+msgstr "[triangle] Idź do wejścia do miasta"
+
+#: all_text
+msgid "15012/e22de9d2"
+msgstr "[triangle] Zmień się w Giganta Clanka"
+
+#: all_text
+msgid "15013/240151eb"
+msgstr "[triangle] Zmniejsz się z powrotem"
+
+#: all_text
+msgid "17005/61eae8db"
+msgstr "[triangle] Leć na okręt flagowy Dreka"
+
+#: all_text
+msgid "17006/3b053520"
+msgstr "[triangle] Leć na krążownik rakietowy"
+
+#: all_text
+msgid "17007/fd391305"
+msgstr "[triangle] Leć na pancernik"
+
+#: all_text
+msgid "17008/bf7d99c7"
+msgstr "[triangle] Leć na lekki krążownik"
+
+#: all_text
+msgid "7001/4387f434"
+msgstr "[triangle] Wróć na statek"
+
+#: all_text
+msgid "7002/44c92389"
+msgstr "[triangle] Idź do jamy Snagglebestii"
+
+#: all_text
+msgid "10018/6a69170a"
+msgstr "[triangle] Doładuj nanotech"
+
+#: all_text
+msgid "14004/bdceb4f5"
+msgstr "[triangle] Po [orange]Gadgetron PDA[default]"
+
+#: all_text
+msgid "11024/e1928586"
+msgstr "[triangle] Porozmawiaj jeszcze z wynalazcą[xAD]"
+
+#: all_text
+msgid "18003/4387f434"
+msgstr "[triangle] Wróć na statek"
+
+#: all_text
+msgid "18004/760464b2"
+msgstr "[triangle] Idź do anteny odbijającej"
+
+#: all_text
+msgid "21487/bc489d0c"
+msgstr "[triangle] Odwiedź pokój socjalny pracowników Gadgetronu"
+
+#: all_text
+msgid "21488/c26c5deb"
+msgstr "[triangle] Wróć do biura Pomocy Gadgetronu"
+
+#: all_text
+msgid "12010/87593e70"
+msgstr "[triangle] Idź do chatki Edwiny"
+
+#: all_text
+msgid "12011/e2790e7e"
+msgstr "[triangle] Wróć do wejścia do jaskini"
+
+#: all_text
+msgid "21489/f74e213c"
+msgstr "UWAGA: organiczne formy życia potrzebują [orange]Maski O2[default]."
+
+#: all_text
+msgid "21490/4a7b47d4"
+msgstr ""
+"Na Złoty [orange]Tesla Claw[default] potrzebujesz\n60 000 śrub i 4 "
+"[orange]Złotych śrub[default]"
+
+#: all_text
+msgid "21491/a7e697c0"
+msgstr ""
+"Na Złoty [orange]Bomb Glove[default] potrzebujesz\n20 000 śrub i 4 "
+"[orange]Złotych śrub[default]"
+
+#: all_text
+msgid "21492/1bf73dad"
+msgstr ""
+"Na Złoty [orange]Devastator[default] potrzebujesz\n60 000 śrub i 4 "
+"[orange]Złotych śrub[default]"
+
+#: all_text
+msgid "21493/48f9d83d"
+msgstr ""
+"Na Złoty [orange]Pyrocitor[default] potrzebujesz\n30 000 śrub i 4 "
+"[orange]Złotych śrub[default]"
+
+#: all_text
+msgid "21494/69105ca7"
+msgstr ""
+"Na Złoty [orange]Mine Glove[default] potrzebujesz\n10 000 śrub i 4 "
+"[orange]Złotych śrub[default]"
+
+#: all_text
+msgid "21495/03668f42"
+msgstr ""
+"Na Złoty [orange]Blaster[default] potrzebujesz\n20 000 śrub i 4 "
+"[orange]Złotych śrub[default]"
+
+#: all_text
+msgid "21496/e563cdaf"
+msgstr ""
+"Na Złoty [orange]Morph-o-ray[default] potrzebujesz\n20 000 śrub i 4 "
+"[orange]Złotych śrub[default]"
+
+#: all_text
+msgid "21497/a0d795b8"
+msgstr ""
+"Na Złoty [orange]Glove of Doom[default] potrzebujesz\n10 000 śrub i 4 "
+"[orange]Złotych śrub[default]"
+
+#: all_text
+msgid "21498/8a280caa"
+msgstr ""
+"Na Złoty [orange]Decoy Glove[default] potrzebujesz\n10 000 śrub i 4 "
+"[orange]Złotych śrub[default]"
+
+#: all_text
+msgid "21499/4e853f0a"
+msgstr ""
+"Na Złoty [orange]Suck Cannon[default] potrzebujesz\n10 000 śrub i 4 "
+"[orange]Złotych śrub[default]"
+
+#: all_text
+msgid "21500/39be5d71"
+msgstr "[triangle] Po [orange]R.Y.N.O.[default] jeszcze raz"
+
+#: all_text
+msgid "0/098c63a5"
+msgstr ""
+"Aby użyć [orange]Bomb Glove[default], naciśnij [circle], by go założyć, i "
+"[circle] ponownie, by rzucić. Możesz też używać go w widoku z oczu, "
+"trzymając [L1]."
+
+#: all_text
+msgid "1/6784404b"
+msgstr ""
+"Właśnie podniosłeś Nanotech! Gdy odniesiesz obrażenia, opatentowany system "
+"Nanotech Gadgetronu odbuduje twoje ciało od środka!"
+
+#: all_text
+msgid "2/8432a019"
+msgstr ""
+"To Nanotech! Gdy odniesiesz obrażenia, opatentowany system Nanotech "
+"Gadgetronu odbuduje twoje ciało od środka!"
+
+#: all_text
+msgid "3/2fd63933"
+msgstr ""
+"Witaj w [orange]Pomocy[default] Gadgetronu! Służymy radą podczas twoich "
+"międzyplanetarnych podróży. [orange]Pomoc[default] to bezpłatna usługa "
+"firmy Gadgetron."
+
+#: all_text
+msgid "1000/3e2107a3"
+msgstr ""
+"[orange]Infoboty[default] Gadgetronu podają współrzędne nowych planet. "
+"Naciśnij przycisk SELECT, by otworzyć mapę, i idź do swojego statku. Jest "
+"oznaczony gwiazdką."
+
+#: all_text
+msgid "1001/52628fa6"
+msgstr ""
+"[orange]Infoboty[default] Gadgetronu podają współrzędne nowych planet. Masz "
+"już [orange]Infobota[default] planety Aridia, teraz musisz znaleźć statek, "
+"by tam dolecieć."
+
+#: all_text
+msgid "1002/1e8f8bc9"
+msgstr ""
+"Masz współrzędne dwóch nowych planet, więc możesz użyć statku. Naciśnij "
+"przycisk SELECT, by otworzyć mapę - statek jest oznaczony gwiazdką."
+
+#: all_text
+msgid "1003/efc70e83"
+msgstr "Rozpędź się i skocz w ostatniej chwili, by skoczyć dalej."
+
+#: all_text
+msgid "4/a289de29"
+msgstr ""
+"Aby wykonać potężny [orange]Hiper-cios[default] "
+"[orange]OmniWrenchem[default] 8000 Gadgetronu, naciśnij [square] w trakcie "
+"skoku."
+
+#: all_text
+msgid "5/85624ee0"
+msgstr ""
+"[orange]OmniWrench[default] 8000 Gadgetronu ma nową funkcję [orange]Ciosu "
+"komety[default]! Aby jej użyć, kucnij [R1], a potem naciśnij [square]."
+
+#: all_text
+msgid "2000/44c3f065"
+msgstr ""
+"Właśnie zdobyłeś [orange]Hoverboard[default] Gadgetron Z3000! Wypróbuj go "
+"na torze w Blackwater City na planecie Rilgar."
+
+#: all_text
+msgid "2001/5978aba8"
+msgstr ""
+"Automat Gadgetronu obok lądowiska sprzeda ci więcej amunicji. Wygląda na "
+"to, że się przyda!"
+
+#: all_text
+msgid "2002/4f078069"
+msgstr ""
+"Kłopoty z miejscową fauną? Wypróbuj [orange]Pyrocitor[default] Gadgetronu! "
+"Ta broń idealnie nadaje się na stworzenia takie jak te piaskowe rekiny!"
+
+#: all_text
+msgid "2003/bfa5c5ee"
+msgstr ""
+"Kłopoty z miejscową fauną? Wypróbuj [orange]Pyrocitor[default] Gadgetronu! "
+"Kupisz go w każdym automacie Gadgetronu."
+
+#: all_text
+msgid "2004/fa660fe6"
+msgstr ""
+"Jeśli chcesz zaimponować temu agentowi, musisz wygrać wyścig na "
+"[orange]Hoverboardach[default]. Najbliższy wyścig odbywa się w Blackwater "
+"City na planecie Rilgar."
+
+#: all_text
+msgid "2005/6295c207"
+msgstr ""
+"Jesteś dumnym właścicielem [orange]Sonic Summonera[default] Gadgetronu. "
+"Załóż to poręczne urządzenie, gdy tylko znajdziesz się przy domku piaskowej "
+"myszy."
+
+#: all_text
+msgid "2006/f0b172ef"
+msgstr "Aby huśtać się dalej, wychylaj [lstick] w kierunku huśtania."
+
+#: all_text
+msgid "2007/0a4157ef"
+msgstr ""
+"Do przejścia tego obszaru potrzebujesz [orange]Swingshota[default] "
+"Gadgetronu. Według naszych danych na tej planecie nie ma "
+"[orange]Swingshota[default]."
+
+#: all_text
+msgid "2008/2c307035"
+msgstr ""
+"Przed tobą są standardowe [orange]Versa-Targety[default] Gadgetronu. "
+"Pokonaj przepaście [orange]Swingshotem[default]."
+
+#: all_text
+msgid "2009/6f24bc0f"
+msgstr ""
+"[orange]Trespasser[default] Gadgetronu, oparty na najnowszej precyzyjnej "
+"technologii laserowej, gwarantuje działanie na drzwiach "
+"[orange]Invinco-Lock[default] Gadgetronu."
+
+#: all_text
+msgid "3000/b03ed718"
+msgstr ""
+"Wypróbuj [orange]Szybowanie[default] nowym [orange]Heli-Packiem[default]. "
+"Skocz, a potem naciśnij i przytrzymaj przycisk X w powietrzu, by szybować."
+
+#: all_text
+msgid "3001/9b5546a1"
+msgstr ""
+"Wejdź na te skrzynie [orange]Skokiem z wybiciem[default] z "
+"[orange]Heli-Packa[default]. Naciśnij [R1], by kucnąć, a potem skocz."
+
+#: all_text
+msgid "3002/e02fcb0a"
+msgstr ""
+"To szczelina do skakania. Skacz raz za razem, odbijając się od ścian w "
+"powietrzu, aż dotrzesz na górę."
+
+#: all_text
+msgid "3003/0c58adcd"
+msgstr ""
+"Do pokonania tej przepaści potrzebujesz [orange]Długiego skoku[default] z "
+"nowego [orange]Heli-Packa[default]. W biegu kucnij [R1], a potem skocz."
+
+#: all_text
+msgid "3004/62d38f45"
+msgstr ""
+"Wiesz, że mapę masz zawsze pod ręką? Naciśnij przycisk SELECT, by zobaczyć "
+"mapę tej planety."
+
+#: all_text
+msgid "3005/1fa3dbee"
+msgstr ""
+"Gratulujemy nowego [orange]Swingshota[default] Gadgetronu! Używaj go na "
+"standardowych [orange]Versa-Targetach[default], takich jak te w pobliżu. "
+"Jeśli cel jest poza widokiem, celuj [L1]."
+
+#: all_text
+msgid "3006/68782fc8"
+msgstr ""
+"Używając [orange]Swingshota[default], trzymaj [circle], dopóki bezpiecznie "
+"nie dotrzesz do celu. Zbyt wczesne puszczenie przycisku grozi obrażeniami!"
+
+#: all_text
+msgid "3007/070e7cd2"
+msgstr "Z tyrolki skorzystasz, stając pod liną i skacząc."
+
+#: all_text
+msgid "4000/64ac546c"
+msgstr ""
+"Może użyjesz tu [orange]Glove of Doom[default]? Usiądź wygodnie, a "
+"robotyczni Agenci Zagłady Gadgetronu odwalą za ciebie brudną robotę!"
+
+#: all_text
+msgid "4001/50a2bbfe"
+msgstr ""
+"Może spróbujesz [orange]Glove of Doom[default] Gadgetronu? Ten ratujący "
+"życie gadżet pozwala atakować wrogów z bezpiecznej odległości małymi "
+"zabójczymi robotami! Kup go teraz w automacie Gadgetronu!"
+
+#: all_text
+msgid "4002/5deaa605"
+msgstr ""
+"[orange]Suck Cannon[default] potrafi wessać kilku wrogów naraz, a potem "
+"wystrzelić ich jak pociski dużego kalibru! Uwaga: wróg musi zmieścić się w "
+"lufie."
+
+#: all_text
+msgid "4003/38a0e5dc"
+msgstr ""
+"Do przejścia przez te drzwi potrzebujesz [orange]Trespassera[default] "
+"Gadgetronu. Niestety nasze skany nie wykazują [orange]Trespassera[default] "
+"na tej planecie."
+
+#: all_text
+msgid "4004/d057a000"
+msgstr "Otwórz te drzwi [orange]Trespasserem[default] Gadgetronu."
+
+#: all_text
+msgid "5000/062c3161"
+msgstr "Ścigajmy się! Skręcasz [lstick], skaczesz [cross]."
+
+#: all_text
+msgid "5001/9387b521"
+msgstr ""
+"Masz [orange]Zoomerator[default], więc możesz zamieniać triki w turbo! "
+"Naciśnij [square], by użyć turbo."
+
+#: all_text
+msgid "5002/a971f174"
+msgstr ""
+"Aby iść dalej, potrzebujesz [orange]Hydrodisplacera[default] Gadgetronu. "
+"Według naszych danych sprzedaży znajdziesz go na innej planecie."
+
+#: all_text
+msgid "5003/80971b76"
+msgstr ""
+"Jeśli założysz [orange]Hydrodisplacer[default], możesz użyć tutejszych "
+"[orange]Insta-Faucetów[default]."
+
+#: all_text
+msgid "5004/b7bcf134"
+msgstr ""
+"Nasze skanery pokazują, że kończy ci się amunicja. Weź taksówkę do "
+"pobliskiego automatu Gadgetronu."
+
+#: all_text
+msgid "5005/73ad5f29"
+msgstr ""
+"Potrzebujesz czegoś mocniejszego niż klucz? Kup najnowszą broń w automacie "
+"Gadgetronu i zamień wrogów w kosmiczną breję!"
+
+#: all_text
+msgid "6000/1e424702"
+msgstr ""
+"[orange]Gadge-Boty[default] nie umieją się wspinać, ale poleceniem WEJDŹ "
+"wyślesz je do Portów botów."
+
+#: all_text
+msgid "6001/4d695a3e"
+msgstr ""
+"Wydaj [orange]Gadge-Botom[default] polecenie WEJDŹ, by uruchomiły Bot "
+"Device. Bot Device włączy się, gdy wejdzie do niego odpowiednia liczba "
+"botów."
+
+#: all_text
+msgid "6002/25cecc9c"
+msgstr ""
+"Właśnie aktywowałeś Gadge-Bota. Aby wydać mu polecenie, przytrzymaj "
+"[triangle] i wybierz CZEKAJ, ZA MNĄ, ATAKUJ lub WEJDŹ."
+
+#: all_text
+msgid "6003/41464314"
+msgstr ""
+"Skocz, a potem w powietrzu naciśnij i przytrzymaj [cross], by szybować."
+
+#: all_text
+msgid "6004/411c6caf"
+msgstr "To pole siłowe wyłączysz, niszcząc jego generator."
+
+#: all_text
+msgid "6005/fff6df81"
+msgstr ""
+"Masz [orange]Grindboots[default]! Pozwalają jeździć po takich szynach. "
+"Wskocz na szynę i jedź!"
+
+#: all_text
+msgid "6006/42ac67aa"
+msgstr ""
+"[orange]Hydrodisplacer[default] Gadgetronu korzysta z "
+"[orange]Insta-Faucetów[default] i [orange]Insta-Drainów[default]. Napełnisz "
+"nim i opróżnisz baseny. Nasze czujniki nie wykrywają ich na tej stacji "
+"kosmicznej."
+
+#: all_text
+msgid "6007/35732579"
+msgstr "Potrzebujesz pomocy z tymi wrogami? Spróbuj [orange]Tauntera[default]!"
+
+#: all_text
+msgid "6008/b3e2db30"
+msgstr ""
+"Potrzebujesz pomocy z tymi wrogami? Spróbuj [orange]Tauntera[default] "
+"Gadgetronu - dostępnego w każdym automacie Gadgetronu."
+
+#: all_text
+msgid "8000/ec4f06dd"
+msgstr ""
+"Bez [orange]Grindboots[default] nic tu nie zdziałasz. Nasze czujniki nie "
+"wykrywają [orange]Grindboots[default] na tej planecie."
+
+#: all_text
+msgid "8001/ea365b99"
+msgstr ""
+"Tu możesz użyć [orange]Grindboots[default]. Wskocz na szynę, by je "
+"uruchomić."
+
+#: all_text
+msgid "8002/8747addc"
+msgstr ""
+"Do przejścia tym szybem wentylacyjnym potrzebujesz "
+"[orange]Magneboots[default] Gadgetronu. Niestety nasze skanery nie "
+"wykrywają [orange]Magneboots[default] na tej planecie."
+
+#: all_text
+msgid "8003/b0f2aa69"
+msgstr ""
+"Masz [orange]Metal Detector[default]! Gdy będziesz w pobliżu zakopanych "
+"śrub, na ekranie pojawi się ikona śruby. Załóż [orange]Metal "
+"Detector[default] i przytrzymaj [circle], by je wytropić."
+
+#: all_text
+msgid "9000/49b37d94"
+msgstr ""
+"Zdobyłeś [orange]Hełm pilota[default] produkcji Blargów. Pozwoli ci "
+"pilotować myśliwce dzięki indukcji nerwowej."
+
+#: all_text
+msgid "10000/3a586a81"
+msgstr "Śpiących wrogów możesz minąć na palcach - przytrzymaj [R1], idąc."
+
+#: all_text
+msgid "10001/6dd74059"
+msgstr ""
+"[orange]Magneboots[default] służą do chodzenia po specjalnych metalowych "
+"powierzchniach. Niestety twoje stopy wydają się za małe, by je założyć."
+
+#: all_text
+msgid "10002/1d336a51"
+msgstr ""
+"To automat z [orange]Nanotechem Premium[default]. Kup puszkę, by zwiększyć "
+"swoje maksymalne zdrowie."
+
+#: all_text
+msgid "10003/9ce33421"
+msgstr ""
+"W tym automacie jest też [orange]Nanotech Ultra[default], najnowsze "
+"osiągnięcie technologii Gadgetronu! [orange]Nanotech Ultra[default] działa "
+"trzy razy mocniej niż [orange]Nanotech Premium[default]."
+
+#: all_text
+msgid "10004/21c64711"
+msgstr ""
+"Atmosfera na Orxon jest trująca. Aby przeżyć poza statkiem, potrzebujesz "
+"[orange]Maski O2[default]. Jeśli musisz zbadać planetę, radzimy wysłać "
+"robota lub inne urządzenie, którego nie szkoda."
+
+#: all_text
+msgid "11000/5de7a62c"
+msgstr ""
+"[orange]Maska O2[default] pozwala oddychać pod wodą, w trującej atmosferze, "
+"a nawet w otwartym kosmosie. Zakłada się sama, gdy jej potrzebujesz."
+
+#: all_text
+msgid "11001/8f86e0bf"
+msgstr ""
+"[orange]Persuader[default] to nielegalne urządzenie z czarnego rynku, które "
+"nakłania automaty Gadgetronu do dużych zniżek na wszystko. My, w "
+"Gadgetronie, ufamy, że nie wykorzystasz tego nieobsługiwanego produktu."
+
+#: all_text
+msgid "11002/ac5fb5ff"
+msgstr ""
+"Do sterowania tym myśliwcem potrzebujesz blargańskiego [orange]Hełmu "
+"pilota[default]. Nasze skanery nie wykrywają takiego urządzenia na tej "
+"planecie."
+
+#: all_text
+msgid "11003/501afdc7"
+msgstr ""
+"Twój [orange]Thruster-Pack[default] ma nową funkcję [orange]Potężnego "
+"uderzenia[default]! Naciśnij [R1] w trakcie skoku i ciesz się nowymi "
+"niszczycielskimi możliwościami."
+
+#: all_text
+msgid "12000/07440723"
+msgstr ""
+"[orange]Hydro-Pack[default] zakłada się sam, gdy pływasz. Pozwala płynąć "
+"pod prąd."
+
+#: all_text
+msgid "12001/400283a0"
+msgstr ""
+"[orange]Raritanium[default] to cenny minerał, który zasila wiele urządzeń "
+"Gadgetronu. Użyte w niszczycielskich celach, nawet w małych ilościach może "
+"być niezwykle groźne. ((TA WIADOMOŚĆ ZOSTAŁA OCENZUROWANA))"
+
+#: all_text
+msgid "1004/959597bd"
+msgstr "Aby rozejrzeć się dookoła, naciśnij i przytrzymaj [L1]."
+
+#: all_text
+msgid "1005/72353ba8"
+msgstr "W tym trybie możesz też używać broni i klucza."
+
+#: all_text
+msgid "1006/5d7b808c"
+msgstr ""
+"Aby użyć korby, naciśnij [square], by założyć na nią klucz, a potem chodź "
+"dookoła platformy."
+
+#: all_text
+msgid "1007/4a030aef"
+msgstr "Mapę świata zobaczysz, naciskając przycisk SELECT lub R3."
+
+#: all_text
+msgid "1008/9b00c8a3"
+msgstr ""
+"Naciśnij [square], by zanurkować, i [cross], by się wynurzyć. Wciśnij "
+"[cross] mocniej, by wynurzać się szybciej."
+
+#: all_text
+msgid "2010/c46800d0"
+msgstr ""
+"Według naszych tłumaczy ta piaskowa mysz potrzebuje pomocy w znalezieniu "
+"drugiego domku."
+
+#: all_text
+msgid "2011/52f8eaf3"
+msgstr ""
+"Na każdym pierścieniu [orange]Invinco-Locka[default] są lasery. Wyceluj je "
+"w odbiorniki na zewnętrznym pierścieniu, by zrobiły się zielone. "
+"[orange]Invinco-Lock[default] otworzy się dopiero, gdy wszystkie odbiorniki "
+"będą zielone."
+
+#: all_text
+msgid "2012/7919f3cd"
+msgstr ""
+"[orange]Trespasserem[default] sterujesz [lstick]. Ruch w górę i w dół "
+"wybiera pierścień, w lewo i w prawo go obraca."
+
+#: all_text
+msgid "2013/fbe40b83"
+msgstr ""
+"Naciśnij przycisk SELECT lub R3, by otworzyć mapę. Pomoże ci ustalić, gdzie "
+"jesteś."
+
+#: all_text
+msgid "4005/49ce209b"
+msgstr "Od ściany odbijesz się, skacząc w chwili, gdy do niej dotrzesz."
+
+#: all_text
+msgid "20000/ebcc12ce"
+msgstr "Przytrzymaj [L1], by precyzyjnie celować z [orange]Blastera[default]."
+
+#: all_text
+msgid "20001/0e5d472a"
+msgstr "Masz mnóstwo śrub. Może wydasz trochę w automacie Gadgetronu?"
+
+#: all_text
+msgid "20002/e57403d0"
+msgstr "Kamerą sterujesz [rstick]."
+
+#: all_text
+msgid "20003/b2a87b51"
+msgstr ""
+"Nie możesz wybić się wysoko [orange]Skokiem z wybiciem[default]? Nie "
+"naciskaj [cross], dopóki nie osiągniesz szczytu skoku."
+
+#: all_text
+msgid "20004/8ed6820f"
+msgstr "Aby użyć [orange]Pyrocitora[default], przytrzymaj [circle]."
+
+#: all_text
+msgid "20005/e17ae055"
+msgstr ""
+"Wybieraj broń i gadżety systemem [orange]Szybkiego wyboru[default] "
+"Gadgetronu! Przytrzymaj [triangle] i wybierz ikonę lewą gałką."
+
+#: all_text
+msgid "20006/d03afb28"
+msgstr ""
+"Wiesz, że na [orange]Szybki wybór[default] możesz dać dowolny gadżet lub "
+"broń? Zapauzuj grę i wybierz z menu [orange]Szybki wybór[default]."
+
+#: all_text
+msgid "20007/c2fe948c"
+msgstr "Pod wodą wciśnij [cross] mocniej, by wynurzać się szybciej."
+
+#: all_text
+msgid "6009/3c5717fd"
+msgstr ""
+"Niestety bez [orange]Maski O2[default] Gadgetronu nie przejdziesz za te "
+"drzwi."
+
+#: all_text
+msgid "6010/afcf0bfe"
+msgstr ""
+"Ten wahadłowiec ma autopilota, który zawiezie cię na wycofany z użytku "
+"okręt Blargów. Według naszych skanerów na pokładzie może być przydatna "
+"technologia."
+
+#: all_text
+msgid "3008/81fabb13"
+msgstr ""
+"Te ruchome ściany też działają jak szczeliny do skakania. Skacz raz za "
+"razem, odbijając się od ścian w powietrzu, aż dotrzesz na górę."
+
+#: all_text
+msgid "11004/d148b450"
+msgstr ""
+"Naciśnij [square], by strzelać z karabinów, i [circle], by odpalać rakiety "
+"samonaprowadzające. Aby lecieć szybciej, przytrzymaj [cross]."
+
+#: all_text
+msgid "11005/a35acba3"
+msgstr ""
+"Ustaw celownik na wrogu. Gdy cel przestanie migać i zrobi się czerwony, "
+"odpal rakiety samonaprowadzające [circle]."
+
+#: all_text
+msgid "11006/62814291"
+msgstr "Zestrzeliwuj te małe wrogie statki, by zdobyć więcej rakiet."
+
+#: all_text
+msgid "11007/2ffb156f"
+msgstr "Zestrzeliwuj te małe wrogie statki, by odzyskać zdrowie."
+
+#: all_text
+msgid "11008/b2b9881b"
+msgstr "Aby lecieć szybciej, przytrzymaj przycisk kwadrat."
+
+#: all_text
+msgid "8004/cc108e2c"
+msgstr ""
+"[orange]Devastator[default] to świetna broń na twardych wrogów. Kupisz go w "
+"automacie Gadgetronu na tym świecie."
+
+#: all_text
+msgid "9001/b26724cd"
+msgstr ""
+"[orange]Devastator[default] Gadgetronu jest bardzo skuteczny przeciw "
+"spadochroniarzom Blargów. Kupisz go w każdym automacie Gadgetronu."
+
+#: all_text
+msgid "10005/54e880aa"
+msgstr ""
+"[orange]Devastator[default], produkowany wyłącznie przez Gadgetron, daje "
+"siłę potrzebną do zestrzelenia spodków Blargów!"
+
+#: all_text
+msgid "12002/caf462ee"
+msgstr ""
+"Do zestrzelenia tego helikoptera potrzebujesz [orange]Devastatora[default]!"
+
+#: all_text
+msgid "5006/16ae9731"
+msgstr ""
+"Do pokonania tej przepaści potrzebujesz [orange]Długiego skoku[default]. W "
+"biegu kucnij [R1], a potem skocz."
+
+#: all_text
+msgid "5007/ea3aa422"
+msgstr "Aby wykonać trik, w powietrzu przytrzymaj [L1], [L2], [R1] lub [R2]."
+
+#: all_text
+msgid "3009/f761eb0c"
+msgstr ""
+"To wiadomość [orange]Pomocy[default] Gadgetronu. [orange]Pomoc[default] "
+"wyłączysz w menu pomocy. Wiadomość przerwiesz, naciskając [triangle]."
+
+#: all_text
+msgid "5008/43c41da9"
+msgstr ""
+"Aby pokonać tę przepaść [orange]Heli-Packiem[default], kucnij [R1], skocz i "
+"szybuj, naciskając ponownie [cross]."
+
+#: all_text
+msgid "3010/1f9b69e9"
+msgstr ""
+"Naciśnij [circle], by założyć [orange]Blaster[default]. Naciśnij [circle] "
+"ponownie, by strzelić."
+
+#: all_text
+msgid "3011/7c38618c"
+msgstr ""
+"Do następnej barki dostaniesz się [orange]Swingshotem[default]. Przytrzymaj "
+"[triangle], by wybrać go na ekranie [orange]Szybkiego wyboru[default], a "
+"potem przytrzymaj [circle], by wystrzelić go w żółty cel."
+
+#: all_text
+msgid "5009/68782fc8"
+msgstr ""
+"Używając [orange]Swingshota[default], trzymaj [circle], dopóki bezpiecznie "
+"nie dotrzesz do celu. Zbyt wczesne puszczenie przycisku grozi obrażeniami!"
+
+#: all_text
+msgid "3012/e17ae055"
+msgstr ""
+"Wybieraj broń i gadżety systemem [orange]Szybkiego wyboru[default] "
+"Gadgetronu! Przytrzymaj [triangle] i wybierz ikonę lewą gałką."
+
+#: all_text
+msgid "5010/25b74fc0"
+msgstr "Aby rozejrzeć się dookoła, naciśnij i przytrzymaj [L1]"
+
+#: all_text
+msgid "5011/62d38f45"
+msgstr ""
+"Wiesz, że mapę masz zawsze pod ręką? Naciśnij przycisk SELECT, by zobaczyć "
+"mapę tej planety."
+
+#: all_text
+msgid "3013/93de57d6"
+msgstr ""
+"Gratulacje! Ukończyłeś wszystkie misje na tym świecie! Możesz zebrać więcej "
+"śrub na broń albo wrócić na statek i polecieć na drugi świat tego dema."
+
+#: all_text
+msgid "10006/3e349f1f"
+msgstr ""
+"Rozważ zakup [orange]Devastatora[default] Gadgetronu. Bardzo przyda się "
+"przeciw wrogom na tym świecie."
+
+#: all_text
+msgid "10007/1e424702"
+msgstr ""
+"[orange]Gadge-Boty[default] nie umieją się wspinać, ale poleceniem WEJDŹ "
+"wyślesz je do Portów botów."
+
+#: all_text
+msgid "10008/4d695a3e"
+msgstr ""
+"Wydaj [orange]Gadge-Botom[default] polecenie WEJDŹ, by uruchomiły Bot "
+"Device. Bot Device włączy się, gdy wejdzie do niego odpowiednia liczba "
+"botów."
+
+#: all_text
+msgid "11009/84d2d2d3"
+msgstr ""
+"Z [orange]Thruster-Packiem[default] wciśniesz takie przełączniki "
+"[orange]Potężnym uderzeniem[default]: skocz, a potem naciśnij [R1]."
+
+#: all_text
+msgid "12003/83b96bb1"
+msgstr ""
+"Ulepszenie [orange]Thruster-Pack[default] pozwala unosić się w miejscu i "
+"robić uniki na boki. Stuknij dwa razy [R1], by unieść się w powietrzu, i "
+"przytrzymaj [L2] lub [R2], by przesuwać się na boki."
+
+#: all_text
+msgid "12004/062a6bb9"
+msgstr ""
+"Unosząc się, używaj [R2] lub [L2] razem z [lstick], by przesuwać się na "
+"boki."
+
+#: all_text
+msgid "13000/c5e48006"
+msgstr ""
+"Te pulsujące wieże sterują polami siłowymi. Aby wyłączyć je wszystkie, "
+"potrzebujesz [orange]Devastatora[default] Gadgetronu albo "
+"[orange]Visibomb[default] Gun."
+
+#: all_text
+msgid "8005/648c05c4"
+msgstr "Szybem wentylacyjnym przejdziesz w [orange]Magneboots[default]."
+
+#: all_text
+msgid "11010/04de767b"
+msgstr ""
+"Do uruchomienia tego przełącznika potrzebujesz specjalnych funkcji "
+"[orange]Thruster-Packa[default] Gadgetronu. Kupisz go w Robosklepie Boba, "
+"tuż za rogiem."
+
+#: all_text
+msgid "20008/d99ae2d2"
+msgstr ""
+"Pod wodą nie stukaj [cross]; naciśnij i przytrzymaj [cross], by się "
+"wynurzyć."
+
+#: all_text
+msgid "20009/fcbe2300"
+msgstr ""
+"Gratulacje! Ukończyłeś wszystkie znane misje na tym świecie! Ale mogą tu "
+"być jeszcze inne sekrety[xAD]"
+
+#: all_text
+msgid "20010/01893b92"
+msgstr ""
+"Wiadomości [orange]Pomocy[default] przerwiesz, naciskając [triangle]. Aby "
+"je wyłączyć, wybierz Opcje w menu pauzy."
+
+#: all_text
+msgid "20011/930ce2d8"
+msgstr ""
+"Gdy pojawia się ta ikona, twój postęp jest zapisywany.\n\nDopóki ikona jest "
+"na ekranie, nie wyjmuj karty pamięci (PS2) i nie wyłączaj zasilania."
+
+#: all_text
+msgid "20012/836bf148"
+msgstr ""
+"Jeśli chcesz, możesz odwrócić sterowanie kamerą. Wybierz Kamera w menu "
+"Opcje."
+
+#: all_text
+msgid "20013/62bad07f"
+msgstr ""
+"Stukając dwa razy [triangle], szybko przełączysz się między dwiema ostatnio "
+"używanymi broniami lub gadżetami."
+
+#: all_text
+msgid "20014/bee0ef5a"
+msgstr ""
+"Masz [orange]Hydro-Pack[default], więc możesz włączyć jego turbodysze, "
+"przytrzymując [R1]."
+
+#: all_text
+msgid "20015/e8d248ed"
+msgstr "Aby szybko wycentrować kamerę, stuknij [L1]."
+
+#: all_text
+msgid "14000/bd779ca5"
+msgstr ""
+"Gratulacje, znalazłeś [orange]Morph-o-ray[default] Gadgetronu! Przytrzymaj "
+"[circle] i trzymaj promień na wrogu. Gdy wskaźnik się zapełni, wróg się "
+"przemieni!"
+
+#: all_text
+msgid "15000/b934ee60"
+msgstr ""
+"Do zbadania fabryki potrzebujesz [orange]Hologuise[default] Gadgetronu. "
+"Niestety nasze skanery nie wykrywają [orange]Hologuise[default] na tej "
+"planecie."
+
+#: all_text
+msgid "15001/13504541"
+msgstr ""
+"Czas użyć [orange]Hologuise[default]! W przebraniu naciśnij [circle], by "
+"pomachać Strażbotowi, a wyłączy pola siłowe."
+
+#: all_text
+msgid "15002/a18dfbba"
+msgstr ""
+"W [orange]Hologuise[default] naciśnij [circle], by pomachać Strażbotowi, a "
+"wyłączy pole siłowe."
+
+#: all_text
+msgid "16000/f75ab87f"
+msgstr ""
+"[orange]Hologuise[default] to holograficzne przebranie, które oszukuje "
+"Strażboty i daje dostęp do specjalnie strzeżonych miejsc. Według naszych "
+"danych na tej planecie nie ma Strażbotów."
+
+#: all_text
+msgid "15003/b65e8ee8"
+msgstr ""
+"Gigant Clank ma własny zestaw superataków. Naciśnij [square], by zadać "
+"megacios, i [circle], by odpalić rakiety samonaprowadzające. Skocz, by "
+"wywołać potężną falę uderzeniową, która zmiecie małych wrogów."
+
+#: all_text
+msgid "15004/84a75405"
+msgstr ""
+"Gdy pasek energii się zapełni, naciśnij [triangle], by uwolnić atomowy "
+"wybuch energii."
+
+#: all_text
+msgid "20016/c3ff6034"
+msgstr "Aby użyć [orange]Tesla Claw[default], przytrzymaj [circle]."
+
+#: all_text
+msgid "15005/0039333d"
+msgstr ""
+"Aby przepłynąć przez te [orange]Tri-Ringi[default] i otworzyć drzwi, "
+"potrzebujesz ulepszenia [orange]Hydro-Pack[default]. Niestety nasze skanery "
+"nie wykrywają na tej planecie nikogo, kto by je montował."
+
+#: all_text
+msgid "16001/c01195ba"
+msgstr "Aby odpalić rakietę, naciśnij [circle]."
+
+#: all_text
+msgid "16002/53be4ce9"
+msgstr ""
+"[orange]Map-o-matic[default] Gadgetronu pomaga znaleźć sekretne miejsca. "
+"Wejdź na ekran mapy, a wszystkie sekrety zostaną na niej zaznaczone."
+
+#: all_text
+msgid "18000/2d3d6b73"
+msgstr ""
+"Wciśnij ten przycisk [orange]Potężnym uderzeniem[default], by przerwać "
+"odliczanie! Aby wykonać [orange]Potężne uderzenie[default], skocz i "
+"naciśnij [R1]."
+
+#: all_text
+msgid "11011/91b42289"
+msgstr ""
+"Nasze czujniki dalekiego zasięgu nie wykrywają [orange]Raritanium[default] "
+"na tej planecie. Według naszej bazy danych najlepiej szukać tego minerału "
+"na planecie Hoven."
+
+#: all_text
+msgid "16003/4fe9a4ee"
+msgstr ""
+"Do udziału w wyścigu potrzebujesz hoverboardu. Według naszych czujników "
+"jest jeden na planecie Aridia."
+
+#: all_text
+msgid "15006/6d25ab55"
+msgstr ""
+"Musisz zniszczyć te Strażboty. Nie pozwól im nacisnąć przycisku alarmowego!"
+
+#: all_text
+msgid "15007/b7320398"
+msgstr ""
+"Jeśli Strażbot naciśnie przycisk alarmowy, automatyczny system obrony "
+"fabryki cię zlikwiduje."
+
+#: all_text
+msgid "15008/5ba08ea6"
+msgstr ""
+"Świecące anteny [orange]Hologuise[default] zmieniają kolor, gdy grozi ci "
+"niebezpieczeństwo. Zielony znaczy, że jesteś bezpieczny, a czerwony, że cię "
+"nakryto!"
+
+#: all_text
+msgid "17000/41597b11"
+msgstr "Ogień z tych działek jest zabójczy. Musisz znaleźć objazd."
+
+#: all_text
+msgid "18001/3be3ce73"
+msgstr ""
+"Wciśnij ten przycisk resetu [orange]Potężnym uderzeniem[default], zanim "
+"skończy się czas! Aby wykonać [orange]Potężne uderzenie[default], skocz i "
+"naciśnij [R1]."
+
+#: all_text
+msgid "18002/49bdde32"
+msgstr ""
+"Wciśnij ten przycisk resetu [orange]Potężnym uderzeniem[default], zanim "
+"skończy się czas!"
+
+#: all_text
+msgid "8006/5b3854ed"
+msgstr ""
+"Masz [orange]Metal Detector[default], więc gdy będziesz w pobliżu "
+"zakopanych śrub, na ekranie pojawi się ikona śruby.\n\nZałożony "
+"[orange]Metal Detector[default] daje sygnały wskazujące, jak blisko są "
+"zakopane śruby. Płytka detektora zawsze wskazuje kierunek do śrub. "
+"Przytrzymaj [circle], by włączyć urządzenie. Im bliżej śrub, tym "
+"czerwieńsze pierścienie i tym szybsze piszczenie. Trzymaj [circle], a gdy "
+"staniesz dokładnie nad śrubami, wykrywacz wyssie je z ziemi!"
+
+#: all_text
+msgid "16004/5bec1323"
+msgstr ""
+"[orange]Hologuise[default] Gadgetronu to idealne urządzenie do infiltracji "
+"dla wszystkich naszych klientów, którzy nie są robotami! Załóż je i "
+"naciśnij [circle]. Natychmiast przebierzesz się za Strażbota i żaden system "
+"ochrony Strażbotów cię nie wykryje. Naciśnij [circle] ponownie, by pomachać "
+"innym Strażbotom, a wyłączą dla ciebie pola siłowe.\n\nUwaga: użycie "
+"dowolnej broni w przebraniu wyłącza [orange]Hologuise[default]!"
+
+#: all_text
+msgid "2014/2aaa70b5"
+msgstr ""
+"[orange]Sonic Summoner[default] pozwala porozumiewać się z tajemniczymi i "
+"inteligentnymi Piaskowymi Myszami. Mimo niewinnego wyglądu Piaskowe Myszy "
+"to bardzo skuteczne i agresywne łowczynie.\n\nZałóż [orange]Sonic "
+"Summoner[default] w pobliżu Mysiego Domku, a wyjdzie z niego mysz, by cię "
+"powitać. Jeśli cię polubi, może zaoferować solidne wsparcie taktyczne."
+
+#: all_text
+msgid "20017/482dd9db"
+msgstr "Za punkty umiejętności dostaniesz specjalną nagrodę."
+
+#: all_text
+msgid "20018/7703694a"
+msgstr ""
+"[orange]Złote śruby[default] wymienisz na Złote bronie w Bazie Gemlik w "
+"Mgławicy G34."
+
+#: all_text
+msgid "20019/d715d76b"
+msgstr ""
+"[orange]Złote śruby[default] wymienisz na Złote bronie tutaj, na planecie "
+"Novalis, albo w Bazie Gemlik w Mgławicy G34."
+
+#: all_text
+msgid "21043/befb20fb"
+msgstr "[triangle] Wstecz"
+
+#: all_text
+msgid "21044/e55e01a3"
+msgstr "[cross] Kup"
+
+#: all_text
+msgid "21045/e3407723"
+msgstr "TAK"
+
+#: all_text
+msgid "21046/8989f821"
+msgstr "Masz już maksimum!"
+
+#: all_text
+msgid "21047/4c01c607"
+msgstr "Ile?"
+
+#: all_text
+msgid "21048/7ad23fe1"
+msgstr "Nie stać cię!"
+
+#: all_text
+msgid "21049/57ffbee6"
+msgstr "Kupić?"
+
+#: all_text
+msgid "21051/d0a5b4bf"
+msgstr "Cele dema:"
+
+#: all_text
+msgid "21052/6944877f"
+msgstr "[cross] dalej"
+
+#: all_text
+msgid "21053/ba5dd858"
+msgstr "Wszystkie misje ukończone"
+
+#: all_text
+msgid "21054/9925660f"
+msgstr "Misja ukończona."
+
+#: all_text
+msgid "21055/aa22866c"
+msgstr "Okrążenie"
+
+#: all_text
+msgid "21056/b5dc7cc9"
+msgstr "Miejsce"
+
+#: all_text
+msgid "21057/cfa6377b"
+msgstr "Czas"
+
+#: all_text
+msgid "21058/41c32aca"
+msgstr "Cel"
+
+#: all_text
+msgid "21059/0d3fd971"
+msgstr "Najlepszy"
+
+#: all_text
+msgid "21060/62eea012"
+msgstr "Graj w Metropolis"
+
+#: all_text
+msgid "21061/f51c2bc6"
+msgstr "Graj w Blackwater City"
+
+#: all_text
+msgid "21062/52440e46"
+msgstr "Obejrzyj film"
+
+#: all_text
+msgid "21063/343b2b30"
+msgstr "Wyjście"
+
+#: all_text
+msgid "21064/c23e1cdb"
+msgstr "[cross] Wyjdź"
+
+#: all_text
+msgid "21065/e7f8b0e7"
+msgstr "[circle] Dalej"
+
+#: all_text
+msgid "21066/7a4080d8"
+msgstr "[cross] Dalej"
+
+#: all_text
+msgid "21067/11965d97"
+msgstr "[triangle] Nie"
+
+#: all_text
+msgid "21068/321a1b54"
+msgstr "[circle] Nie"
+
+#: all_text
+msgid "21069/d50268e4"
+msgstr "[cross] Nie"
+
+#: all_text
+msgid "21070/5f3ab67d"
+msgstr "[cross] Tak"
+
+#: all_text
+msgid "21071/94bc1d82"
+msgstr "[circle] Tak"
+
+#: all_text
+msgid "21072/4b90722a"
+msgstr "Celowanie z oczu"
+
+#: all_text
+msgid "21073/9dd45292"
+msgstr "Machnięcie kluczem"
+
+#: all_text
+msgid "21075/87daf62e"
+msgstr "Kucnięcie"
+
+#: all_text
+msgid "21076/a4c27742"
+msgstr "Szybki wybór"
+
+#: all_text
+msgid "21077/4a2ef0c9"
+msgstr "Strzał / użycie gadżetu"
+
+#: all_text
+msgid "21078/96bb6feb"
+msgstr "Rozglądanie się"
+
+#: all_text
+msgid "21079/e9ff6fc0"
+msgstr "Chód/bieg"
+
+#: all_text
+msgid "21080/0781a928"
+msgstr "Skok"
+
+#: all_text
+msgid "21081/ce8670a0"
+msgstr "[L1] Góra"
+
+#: all_text
+msgid "21082/bb987ce8"
+msgstr "[L2] Dół"
+
+#: all_text
+msgid "21083/06409d86"
+msgstr "BOMB GLOVE! RZUCAJ BOMBAMI WE WROGÓW! bBbUbMb!"
+
+#: all_text
+msgid "21084/91a0a4a7"
+msgstr "DEVASTATOR! ODPALAJ KIEROWANE bRbAbKbIbEbTbYb W ZŁYCH."
+
+#: all_text
+msgid "21085/f49c70ab"
+msgstr ""
+"VISIBOMB! STERUJ POCISKAMI Z ZABÓJCZĄ PRECYZJĄ DZIĘKI WBUDOWANEJ KAMERZE!"
+
+#: all_text
+msgid "21086/41ec3363"
+msgstr ""
+"TAUNTER! DENERWUJ WROGÓW I WAB ICH W PUŁAPKI I ZASADZKI TYM NIEZNOŚNYM "
+"HAŁASOWNIKIEM!"
+
+#: all_text
+msgid "21087/fb31c40d"
+msgstr "BLASTER! WYCELUJ MNIEJ WIĘCEJ W ZŁYCH I KOŚ ICH!"
+
+#: all_text
+msgid "21088/c77c6410"
+msgstr ""
+"PYROCITOR! TA STRASZNA BROŃ NAJLEPIEJ SPRAWDZA SIĘ Z BLISKA. ŚWIETNA NA "
+"UPIERDLIWYCH MAŁYCH WROGÓW."
+
+#: all_text
+msgid "21089/31524c2d"
+msgstr ""
+"MINE GLOVE! BĄDŹ PODSTĘPNY I ZASTAWIAJ NA WROGÓW bWbYbBbUbCbHbObWbEb "
+"PUŁAPKI!"
+
+#: all_text
+msgid "21090/83a8a8a3"
+msgstr "WALLOPER! WAL LUDZI MOCNO."
+
+#: all_text
+msgid "21091/836ee1e7"
+msgstr "TESLA CLAW! RAŻ ZŁYCH PIORUNAMI!"
+
+#: all_text
+msgid "21092/a229770f"
+msgstr ""
+"GLOVE OF DOOM! WYPUŚĆ HORDĘ WYBUCHOWYCH bKbUbMbPbLbIb, KTÓRZY DOPADNĄ "
+"TWOICH WROGÓW!"
+
+#: all_text
+msgid "21093/a78e916d"
+msgstr ""
+"R.Y.N.O! NISZCZY WSZYSTKO, CO WIDZISZ, I PEWNIE SPORO TEGO, CZEGO NIE "
+"WIDZISZ."
+
+#: all_text
+msgid "21094/65016671"
+msgstr "DEFENSE DRONE GLOVE! OTOCZ SIĘ TARCZĄ BOTÓW OBRONY PUNKTOWEJ."
+
+#: all_text
+msgid "21095/4e38fbf6"
+msgstr ""
+"DECOY GLOVE! OSZUKAJ WROGÓW TĄ NIESAMOWICIE REALISTYCZNĄ bPbRbZbYbNbĘbTbĄb."
+
+#: all_text
+msgid "21097/fadf37ba"
+msgstr "UWAGA: STATEK WYMAGA NAPRAWY!"
+
+#: all_text
+msgid "21098/bbddf901"
+msgstr "Synu_"
+
+#: all_text
+msgid "21099/08473961"
+msgstr "Dobrze się spisałeś_"
+
+#: all_text
+msgid "21100/b54a322f"
+msgstr "Wciąż jest wiele do zrobienia_"
+
+#: all_text
+msgid "21101/083c7237"
+msgstr "To pomoże ci w podróży."
+
+#: all_text
+msgid "21102/3af8b918"
+msgstr "Masz już_"
+
+#: all_text
+msgid "21103/ff8aba27"
+msgstr "Użycie [orange]Bomb Glove[default]"
+
+#: all_text
+msgid "21104/0244856a"
+msgstr "Co to Nanotech?"
+
+#: all_text
+msgid "21105/6b441fba"
+msgstr "To jest Nanotech"
+
+#: all_text
+msgid "21106/3542b4d2"
+msgstr "Witaj!"
+
+#: all_text
+msgid "21107/907b8ffa"
+msgstr "Co to [orange]Infoboty[default]?"
+
+#: all_text
+msgid "21108/e9529d47"
+msgstr "Wskazówka o [orange]Infobocie[default]"
+
+#: all_text
+msgid "21109/ef5e3864"
+msgstr "Przypomnienie o statku"
+
+#: all_text
+msgid "21110/b7b3d2e4"
+msgstr "Dłuższe skoki"
+
+#: all_text
+msgid "21111/6eeee824"
+msgstr "Pomoc: [orange]Hiper-cios[default]"
+
+#: all_text
+msgid "21112/b4ccc6db"
+msgstr "Wyjaśnienie [orange]Ciosu komety[default]"
+
+#: all_text
+msgid "21113/46cc6d92"
+msgstr "Gdzie użyć [orange]Hoverboardu[default]"
+
+#: all_text
+msgid "21114/ec412b94"
+msgstr "Brak amunicji?"
+
+#: all_text
+msgid "21115/53d9be24"
+msgstr "Wskazówka o piaskowych rekinach"
+
+#: all_text
+msgid "21116/64afa9df"
+msgstr "Wypróbuj [orange]Pyrocitor[default]"
+
+#: all_text
+msgid "21117/f1d77442"
+msgstr "Zaimponuj agentowi"
+
+#: all_text
+msgid "21118/f9feefa1"
+msgstr "Pomoc: [orange]Sonic Summoner[default]"
+
+#: all_text
+msgid "21119/6e0fab73"
+msgstr "Huśtanie ze [orange]Swingshotem[default]"
+
+#: all_text
+msgid "21120/9e22e5be"
+msgstr "Potrzebny [orange]Swingshot[default]"
+
+#: all_text
+msgid "21121/6d6dcdc0"
+msgstr "Przypomnienie o [orange]Swingshocie[default]"
+
+#: all_text
+msgid "21122/956fc9de"
+msgstr "Opis [orange]Trespassera[default]"
+
+#: all_text
+msgid "21123/7287ce19"
+msgstr "Jak [orange]Szybować[default]"
+
+#: all_text
+msgid "21124/8be32889"
+msgstr "Jak wykonać [orange]Skok z wybiciem[default]"
+
+#: all_text
+msgid "21125/602e7a86"
+msgstr "Wskazówka o odbiciu od ściany"
+
+#: all_text
+msgid "21126/4eafff37"
+msgstr "Jak wykonać [orange]Długi skok[default]"
+
+#: all_text
+msgid "21127/f11e0509"
+msgstr "Użyj mapy"
+
+#: all_text
+msgid "21128/931e1155"
+msgstr "Instrukcja [orange]Swingshota[default]"
+
+#: all_text
+msgid "21129/66f1cbea"
+msgstr "Ostrzeżenie o [orange]Swingshocie[default]"
+
+#: all_text
+msgid "21130/5249ca1d"
+msgstr "Wskazówka o tyrolce"
+
+#: all_text
+msgid "21131/fce6156e"
+msgstr "Przypomnienie o [orange]Glove of Doom[default]"
+
+#: all_text
+msgid "21132/0b778fc4"
+msgstr "Wyjaśnienie [orange]Glove of Doom[default]"
+
+#: all_text
+msgid "21133/e2ba627c"
+msgstr "Opis [orange]Suck Cannon[default]"
+
+#: all_text
+msgid "21134/9d08e407"
+msgstr "Drzwi zabezpieczające"
+
+#: all_text
+msgid "21135/9d08e407"
+msgstr "Drzwi zabezpieczające"
+
+#: all_text
+msgid "21136/ee35d9ff"
+msgstr "Podstawy wyścigów"
+
+#: all_text
+msgid "21137/8e0cd349"
+msgstr "Używanie turbo"
+
+#: all_text
+msgid "21138/4613a847"
+msgstr "Wskazówka o [orange]Hydrodisplacerze[default]"
+
+#: all_text
+msgid "21139/04cfe884"
+msgstr "Rada o [orange]Hydrodisplacerze[default]"
+
+#: all_text
+msgid "21140/c5daf502"
+msgstr "Przypomnienie o amunicji"
+
+#: all_text
+msgid "21141/077156ee"
+msgstr "Kup trochę broni!"
+
+#: all_text
+msgid "21142/6eb65f7f"
+msgstr "Używanie Gadge-Botów"
+
+#: all_text
+msgid "21143/dd577d88"
+msgstr "Co to Bot Device?"
+
+#: all_text
+msgid "21144/f5d763eb"
+msgstr "Polecenia Gadge-Botów"
+
+#: all_text
+msgid "21145/aae5f795"
+msgstr "Przypomnienie o [orange]Szybowaniu[default]"
+
+#: all_text
+msgid "21146/fe7eaf7b"
+msgstr "Wskazówka o polu siłowym"
+
+#: all_text
+msgid "21147/8b93ecd1"
+msgstr "Opis [orange]Grindboots[default]"
+
+#: all_text
+msgid "21148/0d8d81e8"
+msgstr "Opis [orange]Hydrodisplacera[default]"
+
+#: all_text
+msgid "21149/033cd4f2"
+msgstr "Strategia na Blargów"
+
+#: all_text
+msgid "21150/3471f70e"
+msgstr "Rada bojowa"
+
+#: all_text
+msgid "21151/74c57eb1"
+msgstr "Potrzebne [orange]Grindboots[default]"
+
+#: all_text
+msgid "21152/ca45a615"
+msgstr "Jak używać [orange]Grindboots[default]"
+
+#: all_text
+msgid "21153/352ac7c1"
+msgstr "Potrzebne [orange]Magneboots[default]"
+
+#: all_text
+msgid "21154/474b92c2"
+msgstr "Opis [orange]Metal Detectora[default]"
+
+#: all_text
+msgid "21155/03472e71"
+msgstr "Opis [orange]Hełmu pilota[default]"
+
+#: all_text
+msgid "21156/9b6e621e"
+msgstr "Pomoc: chodzenie na palcach"
+
+#: all_text
+msgid "21157/e8b5e168"
+msgstr "Clank i [orange]Magneboots[default]"
+
+#: all_text
+msgid "21158/375fb68d"
+msgstr "O [orange]Nanotechu Premium[default]"
+
+#: all_text
+msgid "21159/311c24c5"
+msgstr "O [orange]Nanotechu Ultra[default]"
+
+#: all_text
+msgid "21160/32ddaa5b"
+msgstr "Badanie Orxon"
+
+#: all_text
+msgid "21161/84a1915e"
+msgstr "Opis [orange]Maski O2[default]"
+
+#: all_text
+msgid "21162/de1549b3"
+msgstr "Opis [orange]Persuadera[default]"
+
+#: all_text
+msgid "21163/36967ad4"
+msgstr "Potrzebny [orange]Hełm pilota[default]"
+
+#: all_text
+msgid "21164/34e9e6e6"
+msgstr "Wyjaśnienie [orange]Potężnego uderzenia[default]"
+
+#: all_text
+msgid "21165/1555687c"
+msgstr "Opis [orange]Hydro-Packa[default]"
+
+#: all_text
+msgid "21166/ad6ebb30"
+msgstr "Opis [orange]Raritanium[default]"
+
+#: all_text
+msgid "21167/fd936cb6"
+msgstr "Tryb rozglądania się"
+
+#: all_text
+msgid "21168/f1a6d6c0"
+msgstr "Widok z oczu i bronie"
+
+#: all_text
+msgid "21169/854b0707"
+msgstr "Wyjaśnienie korby"
+
+#: all_text
+msgid "21170/e1a82462"
+msgstr "Włączanie mapy"
+
+#: all_text
+msgid "21171/a0942bb6"
+msgstr "Pomoc w pływaniu"
+
+#: all_text
+msgid "21172/821fcd0c"
+msgstr "Pomoc z myszą"
+
+#: all_text
+msgid "21173/8b7f1aaa"
+msgstr "Wskazówki do [orange]Invinco-Locka[default]"
+
+#: all_text
+msgid "21174/3eced139"
+msgstr "Pomoc z [orange]Invinco-Lockiem[default]"
+
+#: all_text
+msgid "21175/06f92422"
+msgstr "Jak włączyć mapę"
+
+#: all_text
+msgid "21176/f03cb93d"
+msgstr "Przypomnienie o odbiciu od ściany"
+
+#: all_text
+msgid "21177/f16e2eea"
+msgstr "Celowanie z [orange]Blastera[default]"
+
+#: all_text
+msgid "21178/e5d249a9"
+msgstr "Wydaj śruby!"
+
+#: all_text
+msgid "21179/981dae8b"
+msgstr "Sterowanie kamerą"
+
+#: all_text
+msgid "21180/b1b99530"
+msgstr "Pomoc: [orange]Skok z wybiciem[default]"
+
+#: all_text
+msgid "21181/ce0f379c"
+msgstr "Ciągły płomień"
+
+#: all_text
+msgid "21182/b9b9f8a9"
+msgstr "Pomoc: [orange]Szybki wybór[default]"
+
+#: all_text
+msgid "21183/1dd3ea44"
+msgstr "Wprowadzenie do [orange]Szybkiego wyboru[default]"
+
+#: all_text
+msgid "21184/713ec4a5"
+msgstr "Wynurzanie się"
+
+#: all_text
+msgid "21185/2828752f"
+msgstr "Potrzebna maska O2"
+
+#: all_text
+msgid "21186/8e853245"
+msgstr "Wyjaśnienie wahadłowca"
+
+#: all_text
+msgid "21187/7e5adb3f"
+msgstr "Szczeliny do skakania"
+
+#: all_text
+msgid "21188/9fa51c74"
+msgstr "Instrukcja myśliwca"
+
+#: all_text
+msgid "21189/d2db451b"
+msgstr "Rakiety z namierzaniem"
+
+#: all_text
+msgid "21190/d39f69ae"
+msgstr "Zdobądź rakiety"
+
+#: all_text
+msgid "21191/11a79402"
+msgstr "Zdobądź zdrowie"
+
+#: all_text
+msgid "21192/a7351d95"
+msgstr "Turbo odrzutowca"
+
+#: all_text
+msgid "21193/8534bd0e"
+msgstr "Kup [orange]Devastator[default]!"
+
+#: all_text
+msgid "21194/0cddbf47"
+msgstr "Strategia na spadochroniarzy"
+
+#: all_text
+msgid "21195/47c7297b"
+msgstr "Strategia na spodki Blargów"
+
+#: all_text
+msgid "21196/ab4f88c1"
+msgstr "Strategia na helikoptery"
+
+#: all_text
+msgid "21197/f454dfeb"
+msgstr "Przez przepaść"
+
+#: all_text
+msgid "21198/4b00568e"
+msgstr "Triki na [orange]Hoverboardzie[default]"
+
+#: all_text
+msgid "21199/51bb658c"
+msgstr "Wyłącz [orange]Pomoc[default]"
+
+#: all_text
+msgid "21200/71fa309a"
+msgstr "Wskazówki do [orange]Heli-Packa[default]"
+
+#: all_text
+msgid "21201/b8bd6300"
+msgstr "Załóż [orange]Blaster[default]"
+
+#: all_text
+msgid "21202/c4455c6f"
+msgstr "Użyj [orange]Swingshota[default]"
+
+#: all_text
+msgid "21203/66f1cbea"
+msgstr "Ostrzeżenie o [orange]Swingshocie[default]"
+
+#: all_text
+msgid "21204/71ae3f4b"
+msgstr "Instrukcja [orange]Szybkiego wyboru[default]"
+
+#: all_text
+msgid "21205/96bb6feb"
+msgstr "Rozglądanie się"
+
+#: all_text
+msgid "21206/a5173c7c"
+msgstr "Wskazówki do mapy"
+
+#: all_text
+msgid "21207/1b6c1d5e"
+msgstr "Gratulacje"
+
+#: all_text
+msgid "21208/093b5ad2"
+msgstr "Potrzebny [orange]Devastator[default]"
+
+#: all_text
+msgid "21209/32cf673c"
+msgstr "Porty botów"
+
+#: all_text
+msgid "21210/c32e24b3"
+msgstr "Bot Device"
+
+#: all_text
+msgid "21211/34e9e6e6"
+msgstr "Wyjaśnienie [orange]Potężnego uderzenia[default]"
+
+#: all_text
+msgid "21212/46f90359"
+msgstr "Jak robić uniki"
+
+#: all_text
+msgid "21213/e826abcc"
+msgstr "Uniki w lewo i w prawo"
+
+#: all_text
+msgid "21214/9e89b3f6"
+msgstr "Zniszcz wieże"
+
+#: all_text
+msgid "21215/71da86fd"
+msgstr "Użyj [orange]Magneboots[default]"
+
+#: all_text
+msgid "21216/50601d9d"
+msgstr "Przełącznik do uderzenia"
+
+#: all_text
+msgid "21217/309d77ab"
+msgstr "Przetrwanie w wodzie"
+
+#: all_text
+msgid "21218/6ee2c4d5"
+msgstr "Misje ukończone"
+
+#: all_text
+msgid "21219/7254c8e7"
+msgstr "Przerywanie [orange]Pomocy[default]"
+
+#: all_text
+msgid "21220/e3076b03"
+msgstr "Ikona zapisu"
+
+#: all_text
+msgid "21221/080c7384"
+msgstr "Odwrócona kamera"
+
+#: all_text
+msgid "21222/c2dbaee8"
+msgstr "Podwójne stuknięcie trójkąta"
+
+#: all_text
+msgid "21223/6dce9ccf"
+msgstr "Turbodysze Hydro-Packa"
+
+#: all_text
+msgid "21224/ff201c1f"
+msgstr "Centrowanie kamery"
+
+#: all_text
+msgid "21225/0ea81154"
+msgstr "Wprowadzenie do [orange]Morph-o-raya[default]"
+
+#: all_text
+msgid "21226/258aa284"
+msgstr "Potrzebny [orange]Hologuise[default]"
+
+#: all_text
+msgid "21227/72128c6c"
+msgstr "Użyj [orange]Hologuise[default]"
+
+#: all_text
+msgid "21228/25e17a2c"
+msgstr "Machanie"
+
+#: all_text
+msgid "21229/16ad07c5"
+msgstr "Opis [orange]Hologuise[default]"
+
+#: all_text
+msgid "21230/76f5a738"
+msgstr "Instrukcja Giganta Clanka"
+
+#: all_text
+msgid "21231/e9139fc0"
+msgstr "Wybuch atomowy"
+
+#: all_text
+msgid "21232/00ab87a7"
+msgstr "Użycie [orange]Tesla Claw[default]"
+
+#: all_text
+msgid "21233/c01578a4"
+msgstr "Potrzebny [orange]Hydro-Pack[default]"
+
+#: all_text
+msgid "21234/933ec667"
+msgstr "Rakiety w wyścigu"
+
+#: all_text
+msgid "21235/896b2815"
+msgstr "Instrukcja [orange]Map-o-matica[default]"
+
+#: all_text
+msgid "21236/69909bb3"
+msgstr "Zatrzymaj odliczanie!"
+
+#: all_text
+msgid "21237/365af5e2"
+msgstr "Szukanie [orange]Raritanium[default]"
+
+#: all_text
+msgid "21238/6cf4b172"
+msgstr "Potrzebny hoverboard"
+
+#: all_text
+msgid "21239/1aaa5997"
+msgstr "Ostrzeżenie o Strażbotach"
+
+#: all_text
+msgid "21240/dcfa8794"
+msgstr "Natychmiastowa śmierć"
+
+#: all_text
+msgid "21241/5603298d"
+msgstr "Kolory [orange]Hologuise[default]"
+
+#: all_text
+msgid "21242/0650f62b"
+msgstr "Znajdź inną drogę"
+
+#: all_text
+msgid "21243/9ec793fb"
+msgstr "Zresetuj licznik"
+
+#: all_text
+msgid "21244/0141c8fb"
+msgstr "Mało czasu"
+
+#: all_text
+msgid "21245/8b2125b1"
+msgstr "Pomoc: [orange]Metal Detector[default]"
+
+#: all_text
+msgid "21246/0f4b0945"
+msgstr "Pomoc: [orange]Hologuise[default]"
+
+#: all_text
+msgid "21247/f9feefa1"
+msgstr "Pomoc: [orange]Sonic Summoner[default]"
+
+#: all_text
+msgid "21248/0ae1a107"
+msgstr "Punkty umiejętności"
+
+#: all_text
+msgid "21249/7f957993"
+msgstr "Zakup Złotej broni"
+
+#: all_text
+msgid "21250/7f957993"
+msgstr "Zakup Złotej broni"
+
+#: all_text
+msgid "21251/d2bba011"
+msgstr "Płaskowyż Kyzil, planeta Veldin"
+
+#: all_text
+msgid "21252/d19358a3"
+msgstr "(11:13 czasu lokalnego)"
+
+#: all_text
+msgid "21253/73071743"
+msgstr "Tymczasem w fabryce na pobliskiej planecie[xAD]"
+
+#: all_text
+msgid "21254/d07b7219"
+msgstr "Zbliżanie się do planety Veldin[xAD]"
+
+#: all_text
+msgid "21255/f10cf8a8"
+msgstr "(11:47 czasu lokalnego)"
+
+#: all_text
+msgid "21256/7a4f5733"
+msgstr "Okręt flagowy prezesa Dreka"
+
+#: all_text
+msgid "21257/b53cf122"
+msgstr "Orbita Veldin"
+
+#: all_text
+msgid "21258/341e322a"
+msgstr "Znowu na okręcie flagowym prezesa Dreka"
+
+#: all_text
+msgid "21259/fc727197"
+msgstr "Wejście w atmosferę planety Novalis"
+
+#: all_text
+msgid "21260/1540e3d3"
+msgstr "Tymczasem na okręcie flagowym prezesa zarządu Dreka[xAD]"
+
+#: all_text
+msgid "21261/057f0278"
+msgstr "Orbita Eudory"
+
+#: all_text
+msgid "21262/0e2829b4"
+msgstr ""
+"Gdzie indziej, na okręcie flagowym Najwyższego Prezesa Zarządu Dreka[xAD]"
+
+#: all_text
+msgid "21263/6fdf4971"
+msgstr "Okręt flagowy Najwyższego Prezesa Zarządu Dreka"
+
+#: all_text
+msgid "21264/ed4d5ece"
+msgstr "Orbita Oltanis"
+
+#: all_text
+msgid "21265/cb6f3502"
+msgstr "Okręt flagowy Ostatecznego Najwyższego Prezesa Zarządu Dreka[xAD]"
+
+#: all_text
+msgid "21266/cb6f3502"
+msgstr "Okręt flagowy Ostatecznego Najwyższego Prezesa Zarządu Dreka[xAD]"
+
+#: all_text
+msgid "21267/3e1fa6ec"
+msgstr "Orbita Kalebo III"
+
+#: all_text
+msgid "21268/e4f43a2a"
+msgstr "Automat Gadgetronu"
+
+#: all_text
+msgid "21269/e6209283"
+msgstr "Ikona śruby"
+
+#: all_text
+msgid "21270/f5b49f6d"
+msgstr "Boty ochrony"
+
+#: all_text
+msgid "21271/70482de0"
+msgstr "Mysi Domek"
+
+#: all_text
+msgid "21272/0337d941"
+msgstr "Myśliwiec Blargów"
+
+#: all_text
+msgid "21273/8af56e81"
+msgstr "Szyna"
+
+#: all_text
+msgid "21274/4cdc43d1"
+msgstr "Zły kierunek !"
+
+#: all_text
+msgid "21275/ec76d3f2"
+msgstr "Najlepszy czas"
+
+#: all_text
+msgid "21276/671ff335"
+msgstr "Najlepszy wynik"
