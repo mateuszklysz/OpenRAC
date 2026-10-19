@@ -51,6 +51,8 @@
  * get_help_message_text and find_help_message_index read them. */
 #define RAC1_ADDR_0x0015F780u 0x0015F6A0u
 #define RAC1_ADDR_0x001997FCu 0x001996FCu
+/* The language the game's menu chose (its texts' slot), as the title's draw (FUN_001eb410) reads it. */
+#define RAC1_ADDR_0x0015EE88u 0x0015ED88u
 
 /* Where this version's decompilation declares a function otherwise: the type in its prototypes. */
 /* ParseBin's result, the loaded level's entry. */

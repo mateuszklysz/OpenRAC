@@ -327,12 +327,58 @@ void func_001F5BB8(float x, float y, float w, float h, int u, int v, int uw, int
     func_001F5BB8__game(x, y, w, h, u, v, uw, vh, rgba, tex);
 }
 
+/* The title's "PRESS START", a picture per language the disc has (effect texture 4 + the
+ * language, drawn 192 x 96 at (160, screen height - 80) by the title's draw, func_001EB7C0). In a
+ * language the port translates into, its text "Press Start" (21026) is printed there instead, in
+ * capitals with a shadow, centred on the picture's place. True when it was. */
+static int press_start(int x, int y, int w, int h, unsigned long long rgba, unsigned long long tex) {
+    if (x != 0xA0 || w != 0xC0 || h != 0x60) {
+        return 0;
+    }
+    int n = GREF(int, OPENRAC_DATA(RAC1_ADDR(0x0015EE88u))) - 1;
+    n = n < 0 ? 0 : n;
+    if (tex != (unsigned long long)func_001F4868(n + 4)) {
+        return 0;
+    }
+    const gaddr original = (gaddr)func_001FE540__game(21026);
+    const gaddr translated = openrac_game_text_translated(21026, original);
+    if (translated == 0 || strcmp((const char*)G(translated), (const char*)G(original)) == 0) {
+        return 0; /* the game's own words: its picture says them */
+    }
+    static gaddr text = 0;
+    enum { SIZE = 128 };
+    if (text == 0) {
+        text = openrac_guest_static(SIZE);
+    }
+    const uint8_t* src = (const uint8_t*)G(translated);
+    uint8_t* dst = (uint8_t*)G(text);
+    const gaddr glyphs = OPENRAC_DATA(RAC1_ADDR(0x001DF3D0u));
+    int i = 0, width = 0;
+    for (; src[i] != 0 && i < SIZE - 1; ++i) {
+        const unsigned c = src[i];
+        dst[i] = (uint8_t)(c >= 'a' && c <= 'z' ? c - 0x20 : c);
+        if (!is_mark(dst[i]) && dst[i] - 8u >= 8u) {
+            width += cell(glyphs, dst[i]).adv;
+        }
+    }
+    dst[i] = 0;
+    const long long font = (long long)func_001F4868(1);
+    const int tx = x + w / 2 - width / 2, ty = y + h / 2 - 8;
+    const unsigned long long alpha = rgba & 0xFF000000ull;
+    func_001F6668(tx + 1, ty + 1, alpha, text, -1, font, glyphs);
+    func_001F6668(tx, ty, alpha | 0x80F0F0ull, text, -1, font, glyphs);
+    return 1;
+}
+
 /* DrawTexturedQuad: a w x h screen rectangle at (x, y) textured from (u, v) .. (u + uw, v + vh) of
  * the texture tex (TEX0) in colour rgba. */
 void func_001F5800(int x, int y, int w, int h, int u, int v, int uw, int vh,
                    RAC1_TYPE_func_001F5800_u64 rgba_, RAC1_TYPE_func_001F5800_u64 tex_) {
     const unsigned long long rgba = (unsigned long long)rgba_, tex = (unsigned long long)tex_;
     drawn((float)x, (float)y, rgba);
+    if (g_drawn_count < 0 && press_start(x, y, w, h, rgba, tex)) {
+        return;
+    }
     if (skipped(RAC1_NAME(func_001F5800))) {
         func_001F5800__game(x, y, w, h, u, v, uw, vh, rgba, tex);
         return;
