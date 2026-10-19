@@ -35,6 +35,13 @@
 /* Entries the version map cannot pair, checked by hand. */
 /* sceVu0Normalize, an entry inside the VU0 library object, which the map does not cut out. */
 #define func_001252C0 game_FUN_00125180
+/* The fractional textured quad and Font_DrawString, which call each other's neighbours only. */
+#define func_001F5BB8 game_FUN_001f5808
+#define func_001F5BB8__game game_FUN_001f5808__game
+#define func_001F69F0 game_FUN_001f6638
+#define func_001F69F0__game game_FUN_001f6638__game
+/* Font_DrawString's parameters as the NTSC decomp orders them: the floats last. */
+#define RAC1_DRAW_STRING_FLOATS_LAST 1
 
 /* The items the US game's Options list is given (Language, Sound: its enter puts them there each
  * time); PAL's list, 0x1D4810 here (Language, Video, Sound), is still in the data, unused. */

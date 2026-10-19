@@ -105,14 +105,23 @@ static void hud_common(openrac_game_ui_rect* q, unsigned long long tex0, int alp
 /* Inside FontPrint: the quads drawn are glyphs of text. */
 static int g_glyphs = 0;
 
-/* The glyphs FontPrint drew, while it is followed for Polish letters: where each quad went. */
+/* The glyphs a string printer drew, while it is followed for Polish letters: where each quad went. */
 typedef struct {
-    int x, y;
+    float x, y;
     unsigned long long rgba;
 } drawn_glyph;
 
 static drawn_glyph g_drawn[512];
 static int g_drawn_count = -1; /* -1: not followed */
+
+static void drawn(float x, float y, unsigned long long rgba) {
+    if (g_drawn_count >= 0) {
+        if (g_drawn_count < (int)(sizeof(g_drawn) / sizeof(g_drawn[0]))) {
+            g_drawn[g_drawn_count].x = x, g_drawn[g_drawn_count].y = y, g_drawn[g_drawn_count].rgba = rgba;
+        }
+        ++g_drawn_count;
+    }
+}
 
 /* A glyph cell of a font's table (assets/world/font.h): its texel, how far below the line it is
  * drawn, and the pen's advance (0: the byte draws nothing). */
@@ -130,7 +139,7 @@ static glyph_cell cell(gaddr glyphs, unsigned byte) {
  * letters, so the port draws the plain one, then the mark from the fonts' own glyphs: the acute of
  * e (or E) for ć ń ś ź, lower over the stem for ł; a full stop raised for ż; a comma turned round at
  * the foot for ą ę. OPENRAC_PL_MARKS="ACUTE_DX STROKE_DX STROKE_DY DOT_DY DOT_DY_CAPITAL OGONEK_DX
- * OGONEK_DY" moves them, in pixels, to tune them by eye. */
+ * OGONEK_DY" moves them, in pixels of the unscaled font, to tune them by eye. */
 enum { MARK_ACUTE = 2, MARK_DOT = 3, MARK_OGONEK = 4, MARK_STROKE = 5 };
 
 static int is_mark(unsigned byte) {
@@ -151,11 +160,23 @@ static const int* mark_offsets(void) {
     return offsets;
 }
 
-static void draw_mark(unsigned base, unsigned mark, const drawn_glyph* at, long long texture, gaddr glyphs) {
+/* A 16 x 16 cell of the font at (x, y), times scale: through DrawTexturedQuad for FontPrint (scale
+ * 0), through the fractional quad for Font_DrawString. */
+static void mark_quad(float x, float y, float scale, int u, int v, int uw, unsigned long long rgba, long long texture) {
+    if (scale == 0.0f) {
+        func_001F5800((int)x, (int)y, 16, 16, u, v, uw, 16, rgba, texture);
+    } else {
+        func_001F5BB8(x, y, scale * 16.0f, scale * 16.0f, u, v, uw, 16, rgba, texture);
+    }
+}
+
+static void draw_mark(unsigned base, unsigned mark, const drawn_glyph* at, long long texture, gaddr glyphs,
+                      float scale) {
     const int* o = mark_offsets();
+    const float k = scale == 0.0f ? 1.0f : scale;
     const int capital = base >= 'A' && base <= 'Z';
     const glyph_cell letter = cell(glyphs, base);
-    const int line = at->y - letter.top;
+    const float line = at->y - (float)letter.top * k;
     if (mark == MARK_ACUTE || mark == MARK_STROKE) {
         /* The acute FontPrint adds to é (0x8C) or É (0x88): table entry + 0x40, at the pen plus its
          * advance and top, moved by half the width the letters differ by. */
@@ -167,67 +188,70 @@ static void draw_mark(unsigned base, unsigned mark, const drawn_glyph* at, long 
             dx += o[1] - (capital ? letter.adv / 4 : 0);
             dy += o[2] + (capital ? 2 : 0);
         }
-        func_001F5800(at->x + dx, line + dy, 16, 16, accent.u, accent.v, 16, 16, at->rgba, texture);
+        mark_quad(at->x + (float)dx * k, line + (float)dy * k, scale, accent.u, accent.v, 16, at->rgba, texture);
     } else if (mark == MARK_DOT) {
         const glyph_cell stop = cell(glyphs, '.');
-        func_001F5800(at->x + (letter.adv - stop.adv) / 2, line + stop.top + (capital ? o[4] : o[3]), 16, 16,
-                      stop.u, stop.v, 16, 16, at->rgba, texture);
+        mark_quad(at->x + (float)((letter.adv - stop.adv) / 2) * k,
+                  line + (float)(stop.top + (capital ? o[4] : o[3])) * k, scale, stop.u, stop.v, 16, at->rgba,
+                  texture);
     } else if (mark == MARK_OGONEK) {
         /* The comma mirrored: its tail then turns right, at the letter's right foot. */
         const glyph_cell comma = cell(glyphs, ',');
-        func_001F5800(at->x + letter.adv - 16 + o[5], line + comma.top + o[6], 16, 16, comma.u + 16, comma.v, -16,
-                      16, at->rgba, texture);
+        mark_quad(at->x + (float)(letter.adv - 16 + o[5]) * k, line + (float)(comma.top + o[6]) * k, scale,
+                  comma.u + 16, comma.v, -16, at->rgba, texture);
     }
 }
 
-/* FontPrint: a string at (x, y) in colour, glyph by glyph through DrawTexturedQuad. A string with
- * Polish letters is drawn without their marks, then each mark over its letter, where the letter's
- * quad went. */
-void func_001F6668(int x, int y, unsigned long long colour, gaddr text, int limit, long long texture,
-                   gaddr glyphs) {
+/* A string with Polish letters, for a printer: its bytes without the marks, in game memory, and
+ * the mark each kept byte has after it. */
+enum { MARKED_CAPACITY = 4096 };
+typedef struct {
+    gaddr plain;
+    int kept, kept_in_limit;
+    int16_t mark_after[MARKED_CAPACITY];
+} marked_text;
+
+/* The marks of TEXT counted up to LIMIT (negative: the whole string). */
+static int count_marks(gaddr text, int limit) {
     const uint8_t* src = (const uint8_t*)G(text);
     int marks = 0;
-    for (int i = 0; src[i] != 0 && (limit <= 0 || i < limit); ++i) {
+    for (int i = 0; src[i] != 0 && (limit < 0 || i < limit); ++i) {
         marks += is_mark(src[i]);
     }
-    ++g_glyphs;
-    if (marks == 0 || limit == 0) {
-        func_001F6668__game(x, y, colour, text, limit, texture, glyphs);
-        --g_glyphs;
-        return;
+    return marks;
+}
+
+static void strip_marks(marked_text* m, gaddr text, int limit) {
+    if (m->plain == 0) {
+        m->plain = openrac_guest_static(MARKED_CAPACITY);
     }
-    /* The string without its marks, in game memory, and which kept byte each mark follows. */
-    enum { CAPACITY = 4096 };
-    static gaddr plain = 0;
-    static int16_t mark_after[CAPACITY];
-    if (plain == 0) {
-        plain = openrac_guest_static(CAPACITY);
-    }
-    uint8_t* dst = (uint8_t*)G(plain);
-    int kept = 0, kept_in_limit = 0;
-    for (int i = 0; src[i] != 0 && kept < CAPACITY - 1; ++i) {
+    const uint8_t* src = (const uint8_t*)G(text);
+    uint8_t* dst = (uint8_t*)G(m->plain);
+    m->kept = 0, m->kept_in_limit = 0;
+    for (int i = 0; src[i] != 0 && m->kept < MARKED_CAPACITY - 1; ++i) {
         if (is_mark(src[i])) {
-            if (kept > 0) {
-                mark_after[kept - 1] = src[i];
+            if (m->kept > 0) {
+                m->mark_after[m->kept - 1] = src[i];
             }
             continue;
         }
-        mark_after[kept] = 0;
-        dst[kept++] = src[i];
+        m->mark_after[m->kept] = 0;
+        dst[m->kept++] = src[i];
         if (limit < 0 || i < limit) {
-            kept_in_limit = kept;
+            m->kept_in_limit = m->kept;
         }
     }
-    dst[kept] = 0;
-    g_drawn_count = 0;
-    func_001F6668__game(x, y, colour, plain, limit < 0 ? limit : kept_in_limit, texture, glyphs);
-    const int drawn = g_drawn_count;
-    g_drawn_count = -1;
-    /* Which quad each kept byte drew, as FontPrint draws them: colour codes none, a byte of no
-     * advance none, an accented letter its accent first, a space none. */
+    dst[m->kept] = 0;
+}
+
+/* The marks drawn over the letters the printer drew (DRAWN quads, g_drawn): which quad each kept
+ * byte drew, as both printers draw them: colour codes none, a byte of no advance none, an accented
+ * letter its accent first, a space none. Nothing when the count disagrees. */
+static void draw_marks(const marked_text* m, int limit, int drawn, long long texture, gaddr glyphs, float scale) {
+    const uint8_t* dst = (const uint8_t*)G(m->plain);
+    const int end = limit < 0 ? m->kept : m->kept_in_limit;
+    static int at_byte[MARKED_CAPACITY];
     int quad = 0;
-    const int end = limit < 0 ? kept : kept_in_limit;
-    int at_byte[CAPACITY];
     for (int i = 0; i < end; ++i) {
         const unsigned b = dst[i];
         at_byte[i] = -1;
@@ -239,14 +263,68 @@ void func_001F6668(int x, int y, unsigned long long colour, gaddr text, int limi
             at_byte[i] = quad++;
         }
     }
-    if (quad == drawn && drawn <= (int)(sizeof(g_drawn) / sizeof(g_drawn[0]))) {
-        for (int i = 0; i < end; ++i) {
-            if (mark_after[i] != 0 && at_byte[i] >= 0) {
-                draw_mark(dst[i], (unsigned)mark_after[i], &g_drawn[at_byte[i]], texture, glyphs);
-            }
+    if (quad != drawn || drawn > (int)(sizeof(g_drawn) / sizeof(g_drawn[0]))) {
+        return;
+    }
+    for (int i = 0; i < end; ++i) {
+        if (m->mark_after[i] != 0 && at_byte[i] >= 0) {
+            draw_mark(dst[i], (unsigned)m->mark_after[i], &g_drawn[at_byte[i]], texture, glyphs, scale);
         }
     }
+}
+
+/* FontPrint: a string at (x, y) in colour, glyph by glyph through DrawTexturedQuad. A string with
+ * Polish letters is drawn without their marks, then each mark over its letter, where the letter's
+ * quad went. */
+void func_001F6668(int x, int y, unsigned long long colour, gaddr text, int limit, long long texture,
+                   gaddr glyphs) {
+    ++g_glyphs;
+    if (limit == 0 || count_marks(text, limit) == 0) {
+        func_001F6668__game(x, y, colour, text, limit, texture, glyphs);
+        --g_glyphs;
+        return;
+    }
+    static marked_text m;
+    strip_marks(&m, text, limit);
+    g_drawn_count = 0;
+    func_001F6668__game(x, y, colour, m.plain, limit < 0 ? limit : m.kept_in_limit, texture, glyphs);
+    const int drawn = g_drawn_count;
+    g_drawn_count = -1;
+    draw_marks(&m, limit, drawn, texture, glyphs, 0.0f);
     --g_glyphs;
+}
+
+/* Font_DrawString: a string at (x, y) scaled, its glyphs through the fractional quad; the help
+ * window's justified lines. Polish letters as FontPrint draws them. */
+#if RAC1_DRAW_STRING_FLOATS_LAST
+void func_001F69F0(unsigned long long colour, gaddr text, int limit, long long texture, gaddr glyphs, float x,
+                   float y, float scale)
+#define RAC1_DRAW_STRING(t, n) func_001F69F0__game(colour, t, n, texture, glyphs, x, y, scale)
+#else
+void func_001F69F0(unsigned long long colour, gaddr text, float x, int limit, long long texture, gaddr glyphs,
+                   float y, float scale)
+#define RAC1_DRAW_STRING(t, n) func_001F69F0__game(colour, t, x, n, texture, glyphs, y, scale)
+#endif
+{
+    if (limit == 0 || count_marks(text, limit) == 0) {
+        RAC1_DRAW_STRING(text, limit);
+        return;
+    }
+    static marked_text m;
+    strip_marks(&m, text, limit);
+    g_drawn_count = 0;
+    RAC1_DRAW_STRING(m.plain, limit < 0 ? limit : m.kept_in_limit);
+    const int drawn = g_drawn_count;
+    g_drawn_count = -1;
+    draw_marks(&m, limit, drawn, texture, glyphs, scale);
+}
+#undef RAC1_DRAW_STRING
+
+/* The textured quad at a fractional place: only followed, for Font_DrawString's marks. */
+void func_001F5BB8(float x, float y, float w, float h, int u, int v, int uw, int vh, unsigned long long rgba,
+                   unsigned long long tex) {
+    drawn(x, y, rgba);
+    func_001F5BB8__game(x, y, w, h, u, v, uw, vh, rgba, tex);
 }
 
 /* DrawTexturedQuad: a w x h screen rectangle at (x, y) textured from (u, v) .. (u + uw, v + vh) of
@@ -254,12 +332,7 @@ void func_001F6668(int x, int y, unsigned long long colour, gaddr text, int limi
 void func_001F5800(int x, int y, int w, int h, int u, int v, int uw, int vh,
                    RAC1_TYPE_func_001F5800_u64 rgba_, RAC1_TYPE_func_001F5800_u64 tex_) {
     const unsigned long long rgba = (unsigned long long)rgba_, tex = (unsigned long long)tex_;
-    if (g_drawn_count >= 0) {
-        if (g_drawn_count < (int)(sizeof(g_drawn) / sizeof(g_drawn[0]))) {
-            g_drawn[g_drawn_count].x = x, g_drawn[g_drawn_count].y = y, g_drawn[g_drawn_count].rgba = rgba;
-        }
-        ++g_drawn_count;
-    }
+    drawn((float)x, (float)y, rgba);
     if (skipped(RAC1_NAME(func_001F5800))) {
         func_001F5800__game(x, y, w, h, u, v, uw, vh, rgba, tex);
         return;
