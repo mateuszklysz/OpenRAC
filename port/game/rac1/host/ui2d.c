@@ -282,8 +282,13 @@ static void draw_marks(const marked_text* m, int limit, int drawn, long long tex
 /* FontPrint: a string at (x, y) in colour, glyph by glyph through DrawTexturedQuad. A string with
  * Polish letters is drawn without their marks, then each mark over its letter, where the letter's
  * quad went. */
+/* The language the player chose for a text the game prints straight from its text table (the
+ * captions before a movie, "Meanwhile, in a factory…"), which no lookup by id translates (hand.c). */
+gaddr rac1_translated_text(gaddr text);
+
 void func_001F6668(int x, int y, unsigned long long colour, gaddr text, int limit, long long texture,
                    gaddr glyphs) {
+    text = rac1_translated_text(text);
     ++g_glyphs;
     if (limit == 0 || count_marks(text, limit) == 0) {
         func_001F6668__game(x, y, colour, text, limit, texture, glyphs);
@@ -312,6 +317,7 @@ void func_001F69F0(unsigned long long colour, gaddr text, float x, int limit, lo
 #define RAC1_DRAW_STRING(t, n) func_001F69F0__game(colour, t, x, n, texture, glyphs, y, scale)
 #endif
 {
+    text = rac1_translated_text(text);
     if (limit == 0 || count_marks(text, limit) == 0) {
         RAC1_DRAW_STRING(text, limit);
         return;

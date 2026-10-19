@@ -419,12 +419,12 @@ int func_00116248(gaddr buffer, gaddr format, ...) {
     return n;
 }
 
-/* The texts these print in the language the player chose, where the port has it: the scenes'
- * subtitles, which no text id names, by their English (game_text.h, kSubtitleId, -1); and the help
- * window's, which it takes from the text table (D_0015F780, its count the help state's +0x2C)
+/* A text in the language the player chose, where the port has it: the scenes' subtitles, which
+ * no text id names, by their English (game_text.h, kSubtitleId, -1); and a text the game takes
+ * from the text table (the help window's, the captions before a movie; also for ui2d.c's printers) (D_0015F780, its count the help state's +0x2C)
  * without the lookup, by the id of the entry holding it. The table is only read, and only where
  * it lies in game memory: while a level loads it can name memory that is not the table yet. */
-static gaddr translated_text(gaddr text) {
+gaddr rac1_translated_text(gaddr text) {
     if (text == 0) {
         return 0;
     }
@@ -514,10 +514,10 @@ static gaddr unbroken_marks(gaddr text) {
 
 void func_001F7560(gaddr a, gaddr b, gaddr c, gaddr d) {
     const gaddr glyphs = OPENRAC_DATA(RAC1_ADDR(0x001DF3D0u));
-    func_001F7070(a, b, unbroken_marks(translated_text(c)), d, func_001F4868(1), glyphs);
+    func_001F7070(a, b, unbroken_marks(rac1_translated_text(c)), d, func_001F4868(1), glyphs);
 }
 
 void func_001F75D0(gaddr a, gaddr b, gaddr c, gaddr d) {
     const gaddr glyphs = OPENRAC_DATA(RAC1_ADDR(0x001DF770u));
-    func_001F7070(a, b, unbroken_marks(translated_text(c)), d, func_001F4868(2), glyphs);
+    func_001F7070(a, b, unbroken_marks(rac1_translated_text(c)), d, func_001F4868(2), glyphs);
 }
