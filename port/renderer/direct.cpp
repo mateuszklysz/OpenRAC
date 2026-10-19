@@ -952,6 +952,12 @@ void GifInterpreter::ensure_draw() {
             s.clamp_t = true;
         } else if (s.textured && m_key != 0) {
             s.texture = m_textures.placed(m_key);
+            if (m_glyph && s.texture != m_textures.placeholder()) {
+                // A glyph from the port's copy of a font: drawn from its distance field, as the
+                // game's own text is.
+                s.field = m_textures.distance_field(s.texture);
+                s.distance_field = s.field != s.texture;
+            }
             s.texture_full_alpha = m_textures.alpha_scale(s.texture) == AlphaScale::Full;
             s.tcc = c.tex0.tcc;
             s.tfx = c.tex0.tfx;
