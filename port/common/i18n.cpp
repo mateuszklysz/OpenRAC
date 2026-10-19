@@ -25,6 +25,9 @@ std::map<std::string, Catalogue>& catalogues() {
     static std::map<std::string, Catalogue> all = [] {
         std::map<std::string, Catalogue> built;
         for (const files::File& f : files::all()) {
+            if (std::string_view(f.name).starts_with("game/")) {
+                continue;  // the game's texts: game/common/game_text.h
+            }
             std::string why;
             if (auto c = parse_po(f.text, why)) {
                 built.insert_or_assign(c->code, std::move(*c));

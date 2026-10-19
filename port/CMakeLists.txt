@@ -81,10 +81,12 @@ add_executable(i18n_test tests/i18n_test.cpp)
 target_link_libraries(i18n_test PRIVATE openrac_common)
 openrac_warnings(i18n_test)
 add_test(NAME i18n COMMAND i18n_test)
-# The template lists every text the code marks with tr() or N_() (port/lang/README.md).
+# The template lists every text the code marks with tr() or N_(), and the built-in translations
+# of the game's texts are keyed as the port reads them (port/lang/README.md).
 find_package(Python3 COMPONENTS Interpreter)
 if(Python3_FOUND)
   add_test(NAME i18n_template COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/i18n_template.py" --check)
+  add_test(NAME game_text_po COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/game_text_po.py" --check)
 endif()
 
 add_executable(pause_options_test tests/pause_options_test.cpp)

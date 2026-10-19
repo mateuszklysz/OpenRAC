@@ -35,6 +35,11 @@ std::string game_text_to_utf8(std::string_view game);
 // closest the fonts draw, '?' for none).
 std::string game_text_from_utf8(std::string_view utf8);
 
+// A text's key in a translation built into the port (port/lang/game/): "<id>/<crc>", the CRC-32
+// (zlib's) of UTF8_ENGLISH, its English as game_text_to_utf8 writes it, in eight lower-case hex
+// digits. Such a file says which of the disc's texts it translates without holding the English.
+std::string game_text_key(s32 id, std::string_view utf8_english);
+
 // The languages of the disc's text blocks, by slot (messages.h): their codes and names.
 struct GameLanguage {
     Language slot;

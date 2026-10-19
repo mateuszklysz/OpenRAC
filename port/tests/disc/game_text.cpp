@@ -129,6 +129,11 @@ int main() {
     CHECK(t[2].id == 1000 && t[2].text == "Aide" && t[2].where == "level 01");
     CHECK(t[3].id == 1000 && t[3].english == "Other help" && t[3].text.empty());
 
+    // The keys of the built-in translations: zlib's CRC-32, as port/tools/game_text_po.py computes
+    // it.
+    CHECK(game_text_key(1000, "Café [cross]") == "1000/2ec6618e");
+    CHECK(game_text_key(-3, "") == "-3/00000000");
+
     CHECK(game_languages().size() == 5);
     return openrac::test::result();
 }

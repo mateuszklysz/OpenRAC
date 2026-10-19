@@ -9,9 +9,11 @@
 #include <format>
 #include <fstream>
 #include <iterator>
+#include <optional>
 #include <system_error>
 #include <unordered_map>
 
+#include "common/i18n_files.h"
 #include "common/log.h"
 #include "openrac/guest.h"
 
@@ -35,9 +37,17 @@ struct Translated {
     std::string text;
 };
 
+// A text of a translation built into the port: its key (game_text_key) and its words, as the
+// game's bytes.
+struct Keyed {
+    std::string key;
+    std::string text;
+};
+
 fs::path g_folder;
 std::string g_code;
-std::unordered_map<int, std::vector<Translated>> g_texts;
+std::unordered_map<int, std::vector<Translated>> g_texts;  // the folder's, by the English
+std::unordered_map<int, std::vector<Keyed>> g_keyed;       // the port's, by key
 
 // The translations the game is given live in a ring of game memory: a string stays where it is
 // until the ring has gone round, far longer than the game keeps one it was given (it asks again
@@ -67,6 +77,27 @@ gaddr place(const std::string& text) {
     g_where.emplace(&text, at);
     g_ring_next = (g_ring_next + size + 3) & ~3u;
     return at;
+}
+
+// The language of a .po file's header, from its first lines.
+std::optional<i18n::LanguageInfo> header_of(std::string_view text) {
+    std::string why;
+    const auto po = i18n::read_po(text.substr(0, text.find("\n\n")), why);
+    if (!po || po->code.empty()) {
+        return std::nullopt;
+    }
+    return i18n::LanguageInfo{po->code, po->name.empty() ? po->code : po->name};
+}
+
+// The built-in translation of the game's texts in CODE (port/lang/game/<code>.po), empty for none.
+[[maybe_unused]] std::string_view built_in(const std::string& code) {
+    const std::string name = "game/" + code + ".po";
+    for (const i18n::files::File& f : i18n::files::all()) {
+        if (name == f.name) {
+            return f.text;
+        }
+    }
+    return {};
 }
 
 std::string read_file(const fs::path& path) {
@@ -160,6 +191,13 @@ void set_folder(const fs::path& folder) {
 
 std::vector<i18n::LanguageInfo> languages() {
     std::vector<i18n::LanguageInfo> list;
+    const auto add = [&](std::optional<i18n::LanguageInfo> l) {
+        if (l && std::none_of(list.begin(), list.end(), [&](const auto& k) {
+                return k.code == l->code;
+            })) {
+            list.push_back(std::move(*l));
+        }
+    };
     std::error_code error;
     for (const auto& entry : fs::directory_iterator(g_folder, error)) {
         if (entry.path().extension() != ".po") {
@@ -170,10 +208,11 @@ std::vector<i18n::LanguageInfo> languages() {
         std::string head(4096, '\0');
         in.read(head.data(), static_cast<std::streamsize>(head.size()));
         head.resize(static_cast<std::size_t>(in.gcount()));
-        const auto cut = head.find("\n\n");
-        std::string why;
-        if (const auto po = i18n::read_po(head.substr(0, cut), why); po && !po->code.empty()) {
-            list.push_back({po->code, po->name.empty() ? po->code : po->name});
+        add(header_of(head));
+    }
+    for (const i18n::files::File& f : i18n::files::all()) {
+        if (std::string_view(f.name).starts_with("game/")) {
+            add(header_of(f.text));
         }
     }
     std::sort(list.begin(), list.end(), [](const auto& a, const auto& b) {
@@ -184,55 +223,84 @@ std::vector<i18n::LanguageInfo> languages() {
 
 bool use(const std::string& code) {
     if (code == g_code) {
-        return !g_texts.empty();
+        return !g_texts.empty() || !g_keyed.empty();
     }
     g_code = code;
     g_texts.clear();
+    g_keyed.clear();
     g_where.clear();
-    const fs::path path = g_folder / (code + ".po");
-    if (g_folder.empty() || !fs::exists(path)) {
-        return false;
-    }
-    std::string why;
-    const auto po = i18n::read_po(read_file(path), why);
-    if (!po) {
-        log::warn("{}: not a translation the port reads: {}", path.string(), why);
-        return false;
-    }
 #ifdef OPENRAC_HAS_DISC
-    std::size_t count = 0;
-    for (const i18n::PoEntry& e : po->entries) {
-        char* end = nullptr;
-        const long id = std::strtol(e.context.c_str(), &end, 10);
-        if (e.text.empty() || e.context.empty() || *end != '\0') {
-            continue;
+    namespace disc = assets::disc;
+    // The folder's file, by the English: a translator's own, or the disc's language edited.
+    const fs::path path = g_folder / (code + ".po");
+    if (!g_folder.empty() && fs::exists(path)) {
+        std::string why;
+        if (const auto po = i18n::read_po(read_file(path), why)) {
+            std::size_t count = 0;
+            for (const i18n::PoEntry& e : po->entries) {
+                char* end = nullptr;
+                const long id = std::strtol(e.context.c_str(), &end, 10);
+                if (e.text.empty() || e.context.empty() || *end != '\0') {
+                    continue;
+                }
+                g_texts[static_cast<int>(id)].push_back(
+                    {disc::game_text_from_utf8(e.id), disc::game_text_from_utf8(e.text)}
+                );
+                ++count;
+            }
+            log::info("the game's texts from {}: {} translated", path.string(), count);
+        } else {
+            log::warn("{}: not a translation the port reads: {}", path.string(), why);
         }
-        g_texts[static_cast<int>(id)].push_back(
-            {assets::disc::game_text_from_utf8(e.id), assets::disc::game_text_from_utf8(e.text)}
-        );
-        ++count;
     }
-    log::info("the game's texts from {}: {} translated", path.string(), count);
-    return true;
+    // The port's own, by key: what the folder's leaves out.
+    if (const std::string_view text = built_in(code); !text.empty()) {
+        std::string why;
+        if (const auto po = i18n::read_po(text, why)) {
+            std::size_t count = 0;
+            for (const i18n::PoEntry& e : po->entries) {
+                char* end = nullptr;
+                const long id = std::strtol(e.id.c_str(), &end, 10);
+                if (e.text.empty() || end == e.id.c_str() || *end != '/') {
+                    continue;
+                }
+                g_keyed[static_cast<int>(id)].push_back({e.id, disc::game_text_from_utf8(e.text)});
+                ++count;
+            }
+            log::info("the game's texts from port/lang/game/{}.po: {} translated", code, count);
+        } else {
+            log::warn("port/lang/game/{}.po: {}", code, why);
+        }
+    }
+    return !g_texts.empty() || !g_keyed.empty();
 #else
     return false;
 #endif
 }
 
 std::uint32_t translate(int id, std::uint32_t original) {
-    if (g_texts.empty() || original == 0) {
-        return 0;
-    }
-    const auto it = g_texts.find(id);
-    if (it == g_texts.end()) {
+    if (original == 0) {
         return 0;
     }
     const char* shown = static_cast<const char*>(G(original));
-    for (const Translated& t : it->second) {
-        if (std::strcmp(shown, t.english.c_str()) == 0) {
-            return place(t.text);
+    if (const auto it = g_texts.find(id); it != g_texts.end()) {
+        for (const Translated& t : it->second) {
+            if (std::strcmp(shown, t.english.c_str()) == 0) {
+                return place(t.text);
+            }
         }
     }
+#ifdef OPENRAC_HAS_DISC
+    if (const auto it = g_keyed.find(id); it != g_keyed.end()) {
+        const std::string key =
+            assets::disc::game_text_key(id, assets::disc::game_text_to_utf8(shown));
+        for (const Keyed& k : it->second) {
+            if (k.key == key) {
+                return place(k.text);
+            }
+        }
+    }
+#endif
     return 0;
 }
 

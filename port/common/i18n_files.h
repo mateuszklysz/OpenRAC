@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (c) 2026 the OpenRAC contributors
 //
-// The translations built into the program: port/lang/*.po, each file's text as it is, written into
+// The translations built into the program: port/lang/*.po and lang/game/*.po, each file's text as it is, written into
 // a source file by cmake/Lang.cmake when CMake configures (a changed or new file configures again).
 #pragma once
 
@@ -11,7 +11,7 @@
 namespace openrac::i18n::files {
 
 struct File {
-    const char* name;  // "pl.po"
+    const char* name;  // "pl.po": the port's words; "game/pl.po": the game's texts
     std::string_view text;
 };
 

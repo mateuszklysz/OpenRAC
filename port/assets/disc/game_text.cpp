@@ -120,6 +120,25 @@ std::string game_text_to_utf8(std::string_view game) {
     return out;
 }
 
+std::string game_text_key(s32 id, std::string_view utf8_english) {
+    static const std::array<u32, 256> table = [] {
+        std::array<u32, 256> t{};
+        for (u32 n = 0; n < 256; ++n) {
+            u32 c = n;
+            for (int k = 0; k < 8; ++k) {
+                c = (c & 1) != 0 ? 0xEDB88320u ^ (c >> 1) : c >> 1;
+            }
+            t[n] = c;
+        }
+        return t;
+    }();
+    u32 crc = 0xFFFFFFFFu;
+    for (const char ch : utf8_english) {
+        crc = table[(crc ^ static_cast<u8>(ch)) & 0xFF] ^ (crc >> 8);
+    }
+    return std::format("{}/{:08x}", id, crc ^ 0xFFFFFFFFu);
+}
+
 std::string game_text_from_utf8(std::string_view utf8) {
     std::string out;
     std::size_t i = 0;

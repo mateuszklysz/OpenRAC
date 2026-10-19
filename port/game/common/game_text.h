@@ -5,11 +5,13 @@
 // port writes every text of the player's disc to `lang/game/` beside its settings: `game.pot`, the
 // English to translate, and one `<code>.po` for each language the disc has (en, fr, de, es, it),
 // each text's msgctxt its id. Those files stay on the player's computer: they are the disc's.
-// A `<code>.po` there for the language chosen (the Language row; settings.h) then gives the game's
-// texts: the game's lookup (msg_string, host/options.c) answers a text whose id and English are in
-// the file with the file's words instead, so a translation such as pl.po needs no code, and an
-// edited fr.po changes the French. The game itself stays in English underneath (its own Language
-// page set to another language shows that language's texts as the disc has them).
+// The game's lookup (msg_string, host/options.c) then answers a text in the language chosen (the
+// Language row; settings.h) from, first, a `<code>.po` there, by the text's id and English (a
+// translator's own, or an edited fr.po), and else the port's own translation, port/lang/game/
+// <code>.po, built in, which holds no English: each text's msgid is its key, its id and the
+// CRC-32 of its English (assets/disc/game_text.h, game_text_key), so it is the same file for
+// every disc. The game itself stays in English underneath (its own Language page set to another
+// language shows that language's texts as the disc has them).
 #pragma once
 
 #include <cstdint>
@@ -30,12 +32,12 @@ bool export_from_disc(
     std::string& why
 );
 
-// Where the files are, and the languages FOLDER has a .po for.
+// Where the files are, and the languages FOLDER or the port has a .po for.
 void set_folder(const std::filesystem::path& folder);
 std::vector<i18n::LanguageInfo> languages();
 
-// Reads FOLDER/<code>.po for the game's texts; English (none) when it is missing. True when one
-// was read.
+// Reads FOLDER/<code>.po and the built-in game/<code>.po for the game's texts; English (none)
+// when neither is there. True when one was read.
 bool use(const std::string& code);
 
 // The game's lookup asked for ID, which gave ORIGINAL (a game address): the address of the

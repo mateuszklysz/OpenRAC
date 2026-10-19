@@ -6,8 +6,10 @@ file a language, edited with any text editor or a PO editor such as
 [Poedit](https://poedit.net/). Nobody edits code.
 
 - **The game's texts**: menus, the HUD, help boxes, banners and subtitles,
-  every one of them. They come from your disc, so their files are made on your
-  computer and stay there (below, [The game's texts](#the-games-texts)).
+  every one of them. Their English comes from your disc, so the files with it
+  are made on your computer and stay there; a translation into a language the
+  disc lacks is built into the port from [game/](game), which holds only the
+  translation (below, [The game's texts](#the-games-texts)).
 - **The port's own words**: the rows and values of the Video options page it
   adds to the game's menus, and the message boxes a player may see when the
   game cannot start. These files are in this folder and built into the
@@ -37,6 +39,29 @@ language, copy `game.pot` to `<code>.po` in the same folder (`pl.po`), add the
 Language row and the game shows your words; a text left empty stays English.
 Editing `fr.po` changes the French the same way. Delete `game.pot` and the
 port writes the files again at its next start (your own `<code>.po` stays).
+
+### The translations built into the port
+
+[game/](game) holds the port's own translations of the game's texts, one
+`<code>.po` a language, without the English: each `msgid` is the text's key,
+its id and the
+[CRC-32](https://en.wikipedia.org/wiki/Cyclic_redundancy_check) of its
+English (`1000/2ec6618e`), so the file translates every copy of the game and
+quotes none. A file in your `settings/lang/game/` folder for the same language
+comes first; a text it leaves empty comes from the built-in one.
+
+To edit one beside the English, make it a file of the kind above from your
+`game.pot`, edit it, and turn it back:
+
+```sh
+cd port
+python3 tools/game_text_po.py unpack ~/.local/share/openrac/settings/lang/game/game.pot lang/game/pl.po pl.po
+# edit pl.po in a PO editor; put it in settings/lang/game/ to try it in the game
+python3 tools/game_text_po.py pack pl.po lang/game/pl.po
+python3 tools/game_text_po.py --check
+```
+
+Commit only `lang/game/<code>.po`; the unpacked file has your disc's English.
 
 In a game text:
 
@@ -111,6 +136,7 @@ it. The log says which language the port uses and which files it read.
 ```sh
 cd port
 python3 tools/i18n_template.py --check   # the template is the code's; each .po's texts and {} match it
+python3 tools/game_text_po.py --check    # each lang/game/*.po's keys and brackets
 ctest --preset release -R i18n           # the files read, and the Video page's texts fit
 ```
 
