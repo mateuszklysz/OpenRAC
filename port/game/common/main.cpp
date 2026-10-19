@@ -1228,9 +1228,9 @@ int main(int argc, char** argv) {
         const fs::path texts = g_options.settings.parent_path() / "lang" / "game";
         frontend::game_text::set_folder(texts);
         if (std::string(openrac_game.game) == "rac1") {
-            const fs::path image = g_options.data / "iso_data" / openrac_game.game / "disc.iso";
-            if (std::string why; !frontend::game_text::export_from_disc(image, texts, false, why)) {
-                log::warn("the game's texts were not written to {}: {}", texts.string(), why);
+            const fs::path disc_image = g_options.data / "iso_data" / openrac_game.game / "disc.iso";
+            if (std::string failed; !frontend::game_text::export_from_disc(disc_image, texts, false, failed)) {
+                log::warn("the game's texts were not written to {}: {}", texts.string(), failed);
             }
         }
         frontend::options_menu::apply_language();
