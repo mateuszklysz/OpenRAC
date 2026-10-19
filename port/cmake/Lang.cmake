@@ -13,6 +13,8 @@ function(openrac_embed_translations target)
   file(GLOB files CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/lang/*.po"
                                     "${PROJECT_SOURCE_DIR}/lang/game/*.po")
   list(SORT files)
+  # A file's words changing configures again too (the glob alone notices files added or removed).
+  set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${files})
   set(arrays "")
   set(entries "")
   set(index 0)
