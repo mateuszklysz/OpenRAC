@@ -425,10 +425,17 @@ int func_00116248(gaddr buffer, gaddr format, ...) {
  * which is right on the console (the register holds all 64 bits) but cuts it to 32 here, so the
  * glyphs would be drawn with a wrong palette and size; the port passes it whole.
  */
+/* The scenes' subtitles are printed through these with the scene's own text, which no text id
+ * names: they are translated by their English (game_text.h, kSubtitleId, -1). */
+static gaddr subtitle(gaddr text) {
+    const gaddr translated = text != 0 ? openrac_game_text_translated(-1, text) : 0;
+    return translated != 0 ? translated : text;
+}
+
 void func_001F7560(gaddr a, gaddr b, gaddr c, gaddr d) {
-    func_001F7070(a, b, c, d, func_001F4868(1), OPENRAC_DATA(RAC1_ADDR(0x001DF3D0u)));
+    func_001F7070(a, b, subtitle(c), d, func_001F4868(1), OPENRAC_DATA(RAC1_ADDR(0x001DF3D0u)));
 }
 
 void func_001F75D0(gaddr a, gaddr b, gaddr c, gaddr d) {
-    func_001F7070(a, b, c, d, func_001F4868(2), OPENRAC_DATA(RAC1_ADDR(0x001DF770u)));
+    func_001F7070(a, b, subtitle(c), d, func_001F4868(2), OPENRAC_DATA(RAC1_ADDR(0x001DF770u)));
 }

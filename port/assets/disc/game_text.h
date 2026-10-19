@@ -58,6 +58,10 @@ struct GameLanguage {
 std::span<const GameLanguage> game_languages();
 
 // One text of the game in one language.
+// The id the scenes' subtitles have among the game's texts: they have none of their own, so their
+// keys are this id and the CRC of their English.
+inline constexpr s32 kSubtitleId = -1;
+
 struct GameText {
     s32 id;
     std::string where;    // "all_text", or "level 05"

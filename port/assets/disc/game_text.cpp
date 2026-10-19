@@ -10,6 +10,7 @@
 #include <utility>
 
 #include "assets/disc/disc.h"
+#include "assets/disc/scene.h"
 #include "assets/disc/wad.h"
 #include "common/i18n.h"
 
@@ -304,7 +305,53 @@ std::vector<GameText> read_game_texts(
             ));
         }
     }
-    return pair_texts(blocks);
+    std::vector<GameText> out = pair_texts(blocks);
+    // The scenes' subtitles: each line in every language slot of its own (English first, then the
+    // languages from French), under kSubtitleId, once for each English.
+    const std::size_t slot =
+        language == Language::English ? 0 : static_cast<std::size_t>(language) - 1;
+    std::set<std::string> seen;
+    for (const u32 id : disc.level_ids()) {
+        const LevelHeader& h = disc.level_header(id);
+        std::size_t lines = 0;
+        for (std::size_t k = 0; k < h.scenes.size(); ++k) {
+            for (const bool pal : {false, true}) {
+                std::optional<std::vector<u8>> file;
+                try {
+                    file = disc.scene_region(id, k, pal);
+                    if (!file) {
+                        continue;
+                    }
+                    const Scene scene = Scene::load(
+                        h, ByteView(*file), k, pal ? SceneRegion::Pal : SceneRegion::Ntsc
+                    );
+                    for (const SceneChunk& c : scene.chunks) {
+                        for (const Subtitle& s : c.subtitles) {
+                            if (s.text[0].empty() || !seen.insert(s.text[0]).second) {
+                                continue;
+                            }
+                            out.push_back(
+                                {kSubtitleId,
+                                 std::format("level {:02} scene {}", id, k),
+                                 s.text[0],
+                                 slot < kSubtitleLanguages ? s.text[slot] : std::string()}
+                            );
+                            ++lines;
+                        }
+                    }
+                } catch (const std::exception& e) {
+                    if (notes) {
+                        notes->push_back(std::format("level {:02} scene {}: {}", id, k, e.what()));
+                    }
+                }
+                break;  // one region's chunks: the other's subtitles are the same lines
+            }
+        }
+        if (notes && lines > 0) {
+            notes->push_back(std::format("level {:02}: {} subtitle lines", id, lines));
+        }
+    }
+    return out;
 }
 
 bool has_game_texts(const Disc& disc, Language language) {

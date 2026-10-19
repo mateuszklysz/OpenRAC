@@ -125,6 +125,9 @@ public:
     // Scene k's speech VAG of level `id` in language `lang`, or nothing.
     std::optional<std::vector<u8>> scene_speech(u32 id, std::size_t k, std::size_t lang) const;
 
+    // Level `id`'s header, as the table of contents gave it.
+    const LevelHeader& level_header(u32 id) const { return toc_level(id).header; }
+
 private:
     const TocLevel& toc_level(u32 id) const;
     std::optional<std::vector<u8>> sector_range(SectorRange r) const;
