@@ -104,11 +104,11 @@ msgstr "Versa-Targety"
 
 #: all_text
 msgid "20098/adb7f8dc"
-msgstr "Szyny do grindowania"
+msgstr "Szyny"
 
 #: all_text
 msgid "20099/33f377ab"
-msgstr "Pasy magnetyczne"
+msgstr "Magnetopasy"
 
 #: all_text
 msgid "20100/144eea22"
@@ -120,7 +120,7 @@ msgstr "Hiper-cios"
 
 #: all_text
 msgid "20102/59e39fd8"
-msgstr "Skok z wybiciem"
+msgstr "Wybicie"
 
 #: all_text
 msgid "20103/264ef024"
@@ -148,7 +148,7 @@ msgstr "Długi skok"
 
 #: all_text
 msgid "20110/f6e40d45"
-msgstr "Potężne uderzenie"
+msgstr "Potężny cios"
 
 #: all_text
 msgid "20111/c6380351"
@@ -200,7 +200,7 @@ msgstr "Złoty Morph-o-ray"
 
 #: all_text
 msgid "20123/0d4da431"
-msgstr "Punkty umiejętności"
+msgstr "Umiejętności"
 
 #: all_text
 msgid "20124/2fa47fdf"
@@ -1092,7 +1092,7 @@ msgstr "Stacja Blargów"
 
 #: all_text
 msgid "20160/32f1ab4b"
-msgstr "Kwatera Qwarka"
+msgstr "Baza Qwarka"
 
 #: all_text
 msgid "20162/82dfd2ce"
@@ -1120,7 +1120,7 @@ msgstr "Ruiny Gorda City"
 
 #: all_text
 msgid "20168/a38cb5a4"
-msgstr "Fabryka robotów"
+msgstr "Robofabryka"
 
 #: all_text
 msgid "20169/66113c05"
@@ -1160,7 +1160,7 @@ msgstr "[triangle] Wyjście"
 
 #: all_text
 msgid "20193/0d4da431"
-msgstr "Punkty umiejętności"
+msgstr "Umiejętności"
 
 #: all_text
 msgid "20194/9db3827d"
@@ -1176,7 +1176,7 @@ msgstr "Szybki wybór"
 
 #: all_text
 msgid "20197/20dfc649"
-msgstr "Przedmioty"
+msgstr "Rzeczy"
 
 #: all_text
 msgid "20198/a8b5f392"
@@ -1236,7 +1236,7 @@ msgstr "Zakupy"
 
 #: all_text
 msgid "20212/0a3ca065"
-msgstr "Przełączniki"
+msgstr "Dźwignie"
 
 #: all_text
 msgid "20213/abe0ec5b"
@@ -1248,7 +1248,7 @@ msgstr "Wrogowie"
 
 #: all_text
 msgid "20215/28992642"
-msgstr "Wskazówki"
+msgstr "Rady"
 
 #: all_text
 msgid "20216/7267b29a"
@@ -1326,7 +1326,7 @@ msgstr "[cross] Wybierz"
 
 #: all_text
 msgid "20230/986d878a"
-msgstr "Odbicie od ściany"
+msgstr "Skok ze ściany"
 
 #: all_text
 msgid "20231/2fa77436"
@@ -1338,7 +1338,7 @@ msgstr "Pływanie"
 
 #: all_text
 msgid "20233/3fc930df"
-msgstr "Przewrót w bok"
+msgstr "Przewrót"
 
 #: all_text
 msgid "20234/a83a22a6"
@@ -1346,7 +1346,7 @@ msgstr "Salto w tył"
 
 #: all_text
 msgid "20235/dc6e0f62"
-msgstr "Chwyt krawędzi"
+msgstr "Chwyt półki"
 
 #: all_text
 msgid "20236/e1cca0d0"
@@ -2432,7 +2432,7 @@ msgstr "Epilog"
 
 #: all_text
 msgid "20427/c740ab50"
-msgstr "Film \"Jak powstała gra\""
+msgstr "Film \"Jak powstała\""
 
 #: all_text
 msgid "20428/ac8a9dc0"
@@ -2470,7 +2470,7 @@ msgstr "Zobacz, co się stało po pokonaniu Dreka!"
 
 #: all_text
 msgid "20437/28311294"
-msgstr "Dziennik pomocy"
+msgstr "Dziennik"
 
 #: all_text
 msgid "20438/ebbedcc0"
@@ -2526,7 +2526,7 @@ msgstr "Qwarktastyczne"
 
 #: all_text
 msgid "20450/c02bb7c8"
-msgstr "Dowolne dziesięć"
+msgstr "Dowolne 10"
 
 #: all_text
 msgid "20451/06a0eee9"
@@ -2748,7 +2748,7 @@ msgstr ""
 
 #: all_text
 msgid "20505/49183abc"
-msgstr "Wszystkie poziomy"
+msgstr "Wszystkie"
 
 #: all_text
 msgid "20506/7f9f7e17"
@@ -4106,7 +4106,7 @@ msgstr "W"
 
 #: all_text
 msgid "20944/a4fce146"
-msgstr "REZYDENCJI"
+msgstr "GORĄCY BOT"
 
 #: all_text
 msgid "20945/db01dd78"
@@ -6472,7 +6472,7 @@ msgstr "Celowanie z oczu"
 
 #: all_text
 msgid "21073/9dd45292"
-msgstr "Machnięcie kluczem"
+msgstr "Cios kluczem"
 
 #: all_text
 msgid "21075/87daf62e"
@@ -6616,11 +6616,11 @@ msgstr "Co to [orange]Infoboty[default]?"
 
 #: all_text
 msgid "21108/e9529d47"
-msgstr "Wskazówka o [orange]Infobocie[default]"
+msgstr "[orange]Infobot[default]"
 
 #: all_text
 msgid "21109/ef5e3864"
-msgstr "Przypomnienie o statku"
+msgstr "Statek"
 
 #: all_text
 msgid "21110/b7b3d2e4"
@@ -6632,7 +6632,7 @@ msgstr "Pomoc: [orange]Hiper-cios[default]"
 
 #: all_text
 msgid "21112/b4ccc6db"
-msgstr "Wyjaśnienie [orange]Ciosu komety[default]"
+msgstr "[orange]Cios komety[default]"
 
 #: all_text
 msgid "21113/46cc6d92"
@@ -6644,7 +6644,7 @@ msgstr "Brak amunicji?"
 
 #: all_text
 msgid "21115/53d9be24"
-msgstr "Wskazówka o piaskowych rekinach"
+msgstr "Piaskowe rekiny"
 
 #: all_text
 msgid "21116/64afa9df"
@@ -6668,7 +6668,7 @@ msgstr "Potrzebny [orange]Swingshot[default]"
 
 #: all_text
 msgid "21121/6d6dcdc0"
-msgstr "Przypomnienie o [orange]Swingshocie[default]"
+msgstr "[orange]Swingshot[default] - uwaga"
 
 #: all_text
 msgid "21122/956fc9de"
@@ -6680,15 +6680,15 @@ msgstr "Jak [orange]Szybować[default]"
 
 #: all_text
 msgid "21124/8be32889"
-msgstr "Jak wykonać [orange]Skok z wybiciem[default]"
+msgstr "[orange]Skok z wybiciem[default]"
 
 #: all_text
 msgid "21125/602e7a86"
-msgstr "Wskazówka o odbiciu od ściany"
+msgstr "Skok ze ściany"
 
 #: all_text
 msgid "21126/4eafff37"
-msgstr "Jak wykonać [orange]Długi skok[default]"
+msgstr "[orange]Długi skok[default]"
 
 #: all_text
 msgid "21127/f11e0509"
@@ -6700,15 +6700,15 @@ msgstr "Instrukcja [orange]Swingshota[default]"
 
 #: all_text
 msgid "21129/66f1cbea"
-msgstr "Ostrzeżenie o [orange]Swingshocie[default]"
+msgstr "[orange]Swingshot[default] - uwaga"
 
 #: all_text
 msgid "21130/5249ca1d"
-msgstr "Wskazówka o tyrolce"
+msgstr "Tyrolka"
 
 #: all_text
 msgid "21131/fce6156e"
-msgstr "Przypomnienie o [orange]Glove of Doom[default]"
+msgstr "[orange]Glove of Doom[default]"
 
 #: all_text
 msgid "21132/0b778fc4"
@@ -6720,15 +6720,15 @@ msgstr "Opis [orange]Suck Cannon[default]"
 
 #: all_text
 msgid "21134/9d08e407"
-msgstr "Drzwi zabezpieczające"
+msgstr "Drzwi ochrony"
 
 #: all_text
 msgid "21135/9d08e407"
-msgstr "Drzwi zabezpieczające"
+msgstr "Drzwi ochrony"
 
 #: all_text
 msgid "21136/ee35d9ff"
-msgstr "Podstawy wyścigów"
+msgstr "Wyścigi"
 
 #: all_text
 msgid "21137/8e0cd349"
@@ -6736,7 +6736,7 @@ msgstr "Używanie turbo"
 
 #: all_text
 msgid "21138/4613a847"
-msgstr "Wskazówka o [orange]Hydrodisplacerze[default]"
+msgstr "[orange]Hydrodisplacer[default]"
 
 #: all_text
 msgid "21139/04cfe884"
@@ -6744,7 +6744,7 @@ msgstr "Rada o [orange]Hydrodisplacerze[default]"
 
 #: all_text
 msgid "21140/c5daf502"
-msgstr "Przypomnienie o amunicji"
+msgstr "Amunicja"
 
 #: all_text
 msgid "21141/077156ee"
@@ -6752,7 +6752,7 @@ msgstr "Kup trochę broni!"
 
 #: all_text
 msgid "21142/6eb65f7f"
-msgstr "Używanie Gadge-Botów"
+msgstr "Gadge-Boty"
 
 #: all_text
 msgid "21143/dd577d88"
@@ -6760,15 +6760,15 @@ msgstr "Co to Bot Device?"
 
 #: all_text
 msgid "21144/f5d763eb"
-msgstr "Polecenia Gadge-Botów"
+msgstr "Rozkazy Gadge-Botów"
 
 #: all_text
 msgid "21145/aae5f795"
-msgstr "Przypomnienie o [orange]Szybowaniu[default]"
+msgstr "[orange]Szybowanie[default]"
 
 #: all_text
 msgid "21146/fe7eaf7b"
-msgstr "Wskazówka o polu siłowym"
+msgstr "Pole siłowe"
 
 #: all_text
 msgid "21147/8b93ecd1"
@@ -6808,7 +6808,7 @@ msgstr "Opis [orange]Hełmu pilota[default]"
 
 #: all_text
 msgid "21156/9b6e621e"
-msgstr "Pomoc: chodzenie na palcach"
+msgstr "Na palcach"
 
 #: all_text
 msgid "21157/e8b5e168"
@@ -6840,7 +6840,7 @@ msgstr "Potrzebny [orange]Hełm pilota[default]"
 
 #: all_text
 msgid "21164/34e9e6e6"
-msgstr "Wyjaśnienie [orange]Potężnego uderzenia[default]"
+msgstr "[orange]Potężny cios[default]"
 
 #: all_text
 msgid "21165/1555687c"
@@ -6852,7 +6852,7 @@ msgstr "Opis [orange]Raritanium[default]"
 
 #: all_text
 msgid "21167/fd936cb6"
-msgstr "Tryb rozglądania się"
+msgstr "Rozglądanie się"
 
 #: all_text
 msgid "21168/f1a6d6c0"
@@ -6880,7 +6880,7 @@ msgstr "Wskazówki do [orange]Invinco-Locka[default]"
 
 #: all_text
 msgid "21174/3eced139"
-msgstr "Pomoc z [orange]Invinco-Lockiem[default]"
+msgstr "[orange]Invinco-Lock[default]"
 
 #: all_text
 msgid "21175/06f92422"
@@ -6888,7 +6888,7 @@ msgstr "Jak włączyć mapę"
 
 #: all_text
 msgid "21176/f03cb93d"
-msgstr "Przypomnienie o odbiciu od ściany"
+msgstr "Skok ze ściany"
 
 #: all_text
 msgid "21177/f16e2eea"
@@ -6904,7 +6904,7 @@ msgstr "Sterowanie kamerą"
 
 #: all_text
 msgid "21180/b1b99530"
-msgstr "Pomoc: [orange]Skok z wybiciem[default]"
+msgstr "[orange]Skok z wybiciem[default]"
 
 #: all_text
 msgid "21181/ce0f379c"
@@ -6924,15 +6924,15 @@ msgstr "Wynurzanie się"
 
 #: all_text
 msgid "21185/2828752f"
-msgstr "Potrzebna maska O2"
+msgstr "Maska O2"
 
 #: all_text
 msgid "21186/8e853245"
-msgstr "Wyjaśnienie wahadłowca"
+msgstr "Wahadłowiec"
 
 #: all_text
 msgid "21187/7e5adb3f"
-msgstr "Szczeliny do skakania"
+msgstr "Szczeliny"
 
 #: all_text
 msgid "21188/9fa51c74"
@@ -6940,7 +6940,7 @@ msgstr "Instrukcja myśliwca"
 
 #: all_text
 msgid "21189/d2db451b"
-msgstr "Rakiety z namierzaniem"
+msgstr "Rakiety samonaprow."
 
 #: all_text
 msgid "21190/d39f69ae"
@@ -6960,15 +6960,15 @@ msgstr "Kup [orange]Devastator[default]!"
 
 #: all_text
 msgid "21194/0cddbf47"
-msgstr "Strategia na spadochroniarzy"
+msgstr "Na spadochroniarzy"
 
 #: all_text
 msgid "21195/47c7297b"
-msgstr "Strategia na spodki Blargów"
+msgstr "Na spodki Blargów"
 
 #: all_text
 msgid "21196/ab4f88c1"
-msgstr "Strategia na helikoptery"
+msgstr "Na helikoptery"
 
 #: all_text
 msgid "21197/f454dfeb"
@@ -6984,7 +6984,7 @@ msgstr "Wyłącz [orange]Pomoc[default]"
 
 #: all_text
 msgid "21200/71fa309a"
-msgstr "Wskazówki do [orange]Heli-Packa[default]"
+msgstr "[orange]Heli-Pack[default]"
 
 #: all_text
 msgid "21201/b8bd6300"
@@ -6996,11 +6996,11 @@ msgstr "Użyj [orange]Swingshota[default]"
 
 #: all_text
 msgid "21203/66f1cbea"
-msgstr "Ostrzeżenie o [orange]Swingshocie[default]"
+msgstr "[orange]Swingshot[default] - uwaga"
 
 #: all_text
 msgid "21204/71ae3f4b"
-msgstr "Instrukcja [orange]Szybkiego wyboru[default]"
+msgstr "[orange]Szybki wybór[default]"
 
 #: all_text
 msgid "21205/96bb6feb"
@@ -7008,7 +7008,7 @@ msgstr "Rozglądanie się"
 
 #: all_text
 msgid "21206/a5173c7c"
-msgstr "Wskazówki do mapy"
+msgstr "Mapa"
 
 #: all_text
 msgid "21207/1b6c1d5e"
@@ -7028,7 +7028,7 @@ msgstr "Bot Device"
 
 #: all_text
 msgid "21211/34e9e6e6"
-msgstr "Wyjaśnienie [orange]Potężnego uderzenia[default]"
+msgstr "[orange]Potężny cios[default]"
 
 #: all_text
 msgid "21212/46f90359"
@@ -7036,7 +7036,7 @@ msgstr "Jak robić uniki"
 
 #: all_text
 msgid "21213/e826abcc"
-msgstr "Uniki w lewo i w prawo"
+msgstr "Uniki na boki"
 
 #: all_text
 msgid "21214/9e89b3f6"
@@ -7048,11 +7048,11 @@ msgstr "Użyj [orange]Magneboots[default]"
 
 #: all_text
 msgid "21216/50601d9d"
-msgstr "Przełącznik do uderzenia"
+msgstr "Przełącznik"
 
 #: all_text
 msgid "21217/309d77ab"
-msgstr "Przetrwanie w wodzie"
+msgstr "Pływanie"
 
 #: all_text
 msgid "21218/6ee2c4d5"
@@ -7072,19 +7072,19 @@ msgstr "Odwrócona kamera"
 
 #: all_text
 msgid "21222/c2dbaee8"
-msgstr "Podwójne stuknięcie trójkąta"
+msgstr "Dwa razy trójkąt"
 
 #: all_text
 msgid "21223/6dce9ccf"
-msgstr "Turbodysze Hydro-Packa"
+msgstr "Turbo Hydro-Packa"
 
 #: all_text
 msgid "21224/ff201c1f"
-msgstr "Centrowanie kamery"
+msgstr "Kamera na środek"
 
 #: all_text
 msgid "21225/0ea81154"
-msgstr "Wprowadzenie do [orange]Morph-o-raya[default]"
+msgstr "[orange]Morph-o-ray[default]"
 
 #: all_text
 msgid "21226/258aa284"
@@ -7104,7 +7104,7 @@ msgstr "Opis [orange]Hologuise[default]"
 
 #: all_text
 msgid "21230/76f5a738"
-msgstr "Instrukcja Giganta Clanka"
+msgstr "Gigant Clank"
 
 #: all_text
 msgid "21231/e9139fc0"
@@ -7124,7 +7124,7 @@ msgstr "Rakiety w wyścigu"
 
 #: all_text
 msgid "21235/896b2815"
-msgstr "Instrukcja [orange]Map-o-matica[default]"
+msgstr "[orange]Map-o-matic[default]"
 
 #: all_text
 msgid "21236/69909bb3"
@@ -7140,11 +7140,11 @@ msgstr "Potrzebny hoverboard"
 
 #: all_text
 msgid "21239/1aaa5997"
-msgstr "Ostrzeżenie o Strażbotach"
+msgstr "Strażboty"
 
 #: all_text
 msgid "21240/dcfa8794"
-msgstr "Natychmiastowa śmierć"
+msgstr "Pewna śmierć"
 
 #: all_text
 msgid "21241/5603298d"
@@ -7176,7 +7176,7 @@ msgstr "Pomoc: [orange]Sonic Summoner[default]"
 
 #: all_text
 msgid "21248/0ae1a107"
-msgstr "Punkty umiejętności"
+msgstr "Umiejętności"
 
 #: all_text
 msgid "21249/7f957993"
