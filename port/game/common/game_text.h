@@ -48,6 +48,11 @@ std::string for_font(const std::string& utf8);
 // translation, or 0 to keep the game's.
 std::uint32_t translate(int id, std::uint32_t original);
 
+// The translation of ID whatever the game holds now (rac1: the title's picture of "Press Start",
+// drawn before any text table is loaded): its address, or 0 when the language has none other than
+// the game's own words.
+std::uint32_t translate_id(int id);
+
 // The game's text table at TABLE (COUNT entries: +0 the text, +4 its id) pointed at the texts in
 // the language used, for the game's code that reads the table without its lookup. Each frame:
 // entries already given this language's text are left as they are.

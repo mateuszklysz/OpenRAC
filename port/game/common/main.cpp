@@ -959,6 +959,16 @@ gaddr openrac_game_text_translated(int id, gaddr original) {
     return 0;
 }
 
+gaddr openrac_game_text_by_id(int id) {
+#ifdef OPENRAC_FRONTEND
+    if (g_window) {
+        return frontend::game_text::translate_id(id);
+    }
+#endif
+    (void)id;
+    return 0;
+}
+
 void openrac_game_texts_in_table(gaddr table, int count) {
 #ifdef OPENRAC_FRONTEND
     if (g_window) {

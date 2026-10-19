@@ -340,9 +340,9 @@ static int press_start(int x, int y, int w, int h, unsigned long long rgba, unsi
     if (tex != (unsigned long long)func_001F4868(n + 4)) {
         return 0;
     }
-    const gaddr original = (gaddr)func_001FE540__game(21026);
-    const gaddr translated = openrac_game_text_translated(21026, original);
-    if (translated == 0 || strcmp((const char*)G(translated), (const char*)G(original)) == 0) {
+    /* By id: the title draws this before any text table is loaded. */
+    const gaddr translated = openrac_game_text_by_id(21026);
+    if (translated == 0) {
         return 0; /* the game's own words: its picture says them */
     }
     static gaddr text = 0;

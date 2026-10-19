@@ -306,6 +306,10 @@ gaddr openrac_game_text(int id);
  * chose, from the translation files (game/common/game_text.h), or 0 to keep the game's. */
 gaddr openrac_game_text_translated(int id, gaddr original);
 
+/* The translation of ID in the language the player chose, without the game's text (none may be
+ * loaded): its game address, or 0 when there is none but the game's own words. */
+gaddr openrac_game_text_by_id(int id);
+
 /* The game's text table at TABLE, COUNT entries of 16 bytes (+0 the text's address, +4 its id): each
  * text pointed at its translation in the language the player chose, or back at the game's own, for
  * the code that reads the table without the lookup (rac1: the help window). */

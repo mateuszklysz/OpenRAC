@@ -339,6 +339,21 @@ std::uint32_t translate(int id, std::uint32_t original) {
     return 0;
 }
 
+std::uint32_t translate_id(int id) {
+    if (const auto it = g_texts.find(id); it != g_texts.end()) {
+        for (const Translated& t : it->second) {
+            if (t.text != t.english) {
+                return place(t.text);
+            }
+        }
+        return 0;
+    }
+    if (const auto it = g_keyed.find(id); it != g_keyed.end() && !it->second.empty()) {
+        return place(it->second.front().text);
+    }
+    return 0;
+}
+
 void translate_table(std::uint32_t table, int count) {
     if (table == 0 || count <= 0 || count > 0x4000) {
         return;
