@@ -10,6 +10,7 @@
 #include <fstream>
 #include <iterator>
 #include <optional>
+#include <set>
 #include <system_error>
 #include <unordered_map>
 
@@ -381,6 +382,17 @@ std::uint32_t translate(int id, std::uint32_t original) {
         g_answers.clear();
     }
     const gaddr translated = look_up(id, shown);
+#ifdef OPENRAC_HAS_DISC
+    if (translated == 0 && id == assets::disc::kSubtitleId) {
+        // A subtitle the language has no line for: its key, to find why (a changed English, an
+        // export without the scenes).
+        static std::set<std::string> told;
+        const std::string key = assets::disc::game_text_key(id, assets::disc::game_text_to_utf8(shown));
+        if (told.insert(key).second) {
+            log::info("subtitle without a {} translation: {}", g_code, key);
+        }
+    }
+#endif
     g_answers[at] = {shown, translated};
     return translated;
 }
