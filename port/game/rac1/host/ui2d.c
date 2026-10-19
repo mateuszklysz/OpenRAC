@@ -382,13 +382,104 @@ static int press_start(int x, int y, int w, int h, unsigned long long rgba, unsi
     return 1;
 }
 
+/* The captions before the story movies ("Kyzil Plateau, Planet Veldin", "Meanwhile, in a factory
+ * on a nearby planet…"): pictures, one per disc language, of 512 x 64 (play_level_loading_slides,
+ * func_00232EF0, draws slide k of the table, whose words are text 21251 + k). Their textures as
+ * func_00232B90 prepared them, to know them when they are drawn. */
+static struct {
+    unsigned long long tex;
+    int slide;
+} g_slides[2];
+
+void func_00232B90(int language, int first, int second, gaddr shared, gaddr first_out, gaddr second_out) {
+    func_00232B90__game(language, first, second, shared, first_out, second_out);
+    g_slides[0].tex = GREF(uint64_t, first_out), g_slides[0].slide = first;
+    g_slides[1].tex = GREF(uint64_t, second_out), g_slides[1].slide = second;
+}
+
+/* A line of a caption centred on cx, no wider than the picture: Font_DrawString scaled down when
+ * it is wider, with a shadow. */
+static void caption_line(gaddr text, int width, float cx, float cy) {
+    enum { ROOM = 480 };
+    const float scale = width > ROOM ? (float)ROOM / (float)width : 1.0f;
+    const float x = cx - (float)width * scale / 2.0f, y = cy - 8.0f * scale;
+    const gaddr glyphs = OPENRAC_DATA(RAC1_ADDR(0x001DF3D0u));
+    const long long font = (long long)func_001F4868(1);
+#if RAC1_DRAW_STRING_FLOATS_LAST
+    func_001F69F0(0x80000000ull, text, -1, font, glyphs, x + 1.0f, y + 1.0f, scale);
+    func_001F69F0(0x80F0F0F0ull, text, -1, font, glyphs, x, y, scale);
+#else
+    func_001F69F0(0x80000000ull, text, x + 1.0f, -1, font, glyphs, y + 1.0f, scale);
+    func_001F69F0(0x80F0F0F0ull, text, x, -1, font, glyphs, y, scale);
+#endif
+}
+
+/* In a language the port translates into, a caption picture is replaced by its text: on one line,
+ * or two split at the space nearest the middle when it is wider than the picture. True when it
+ * was. */
+static int loading_slide(int x, int y, int w, int h, unsigned long long tex) {
+    if (w != 0x200 || h != 0x40 || tex == 0) {
+        return 0;
+    }
+    int slide = -1;
+    for (int k = 0; k < 2; ++k) {
+        if (g_slides[k].tex == tex) {
+            slide = g_slides[k].slide;
+            break;
+        }
+    }
+    if (slide < 0) {
+        return 0;
+    }
+    const gaddr translated = openrac_game_text_by_id(21251 + slide);
+    if (translated == 0) {
+        return 0; /* the game's own words: its picture says them */
+    }
+    enum { SIZE = 256, ROOM = 480 };
+    static gaddr text = 0;
+    if (text == 0) {
+        text = openrac_guest_static(SIZE);
+    }
+    const uint8_t* src = (const uint8_t*)G(translated);
+    uint8_t* dst = (uint8_t*)G(text);
+    const gaddr glyphs = OPENRAC_DATA(RAC1_ADDR(0x001DF3D0u));
+    int n = 0, width = 0;
+    static int width_before[SIZE];
+    for (; src[n] != 0 && n < SIZE - 1; ++n) {
+        dst[n] = src[n];
+        width_before[n] = width;
+        if (!is_mark(src[n]) && src[n] - 8u >= 8u) {
+            width += cell(glyphs, src[n]).adv;
+        }
+    }
+    dst[n] = 0;
+    width_before[n] = width;
+    const float cx = (float)x + (float)w / 2.0f, cy = (float)y + (float)h / 2.0f;
+    int split = -1;
+    if (width > ROOM) {
+        for (int i = 0; i < n; ++i) {
+            if (dst[i] == ' ' && (split < 0 || abs(2 * width_before[i] - width) < abs(2 * width_before[split] - width))) {
+                split = i;
+            }
+        }
+    }
+    if (split < 0) {
+        caption_line(text, width, cx, cy);
+        return 1;
+    }
+    dst[split] = 0;
+    caption_line(text, width_before[split], cx, cy - 9.0f);
+    caption_line(text + (gaddr)split + 1, width - width_before[split + 1], cx, cy + 9.0f);
+    return 1;
+}
+
 /* DrawTexturedQuad: a w x h screen rectangle at (x, y) textured from (u, v) .. (u + uw, v + vh) of
  * the texture tex (TEX0) in colour rgba. */
 void func_001F5800(int x, int y, int w, int h, int u, int v, int uw, int vh,
                    RAC1_TYPE_func_001F5800_u64 rgba_, RAC1_TYPE_func_001F5800_u64 tex_) {
     const unsigned long long rgba = (unsigned long long)rgba_, tex = (unsigned long long)tex_;
     drawn((float)x, (float)y, rgba);
-    if (g_drawn_count < 0 && press_start(x, y, w, h, rgba, tex)) {
+    if (g_drawn_count < 0 && (press_start(x, y, w, h, rgba, tex) || loading_slide(x, y, w, h, tex))) {
         return;
     }
     if (skipped(RAC1_NAME(func_001F5800))) {

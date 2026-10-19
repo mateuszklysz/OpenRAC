@@ -316,6 +316,7 @@ func_00200A90	hud	func_00200A90	wrap	a HUD texture as a sprite with a texture wi
 func_00200CA0	hud	func_00200CA0	wrap	a sprite of a given texture: drawn natively (rac1/host/ui2d.c)
 func_00200E38	hud	func_00200E38	wrap	a rotated sprite: drawn natively (rac1/host/ui2d.c)
 func_00201190	hud	func_00201190	wrap	a HUD texture as a sprite with explicit texel corners: drawn natively (rac1/host/ui2d.c)
+func_00232B90	text	prepare_loading_slide_textures	wrap	the captions before the story movies, pictures per disc language: in a language the port translates into, rac1/host/ui2d.c prints their texts in their place
 func_001FE540	text	msg_string	wrap	the text of an id: the port's own ids (its rows on the Video options page) have their strings from the port, and the game's the translation the player chose (host/options.c)
 func_L00_00286598	game	func_L00_00286598	host	a place the catalogue folds into another function although its code differs (split_places.tsv, rac1/host/variants.c)	void (void)
 func_L03_002DDD58	game	func_L03_002DDD58	host	a place the catalogue folds into another function although its code differs (split_places.tsv, rac1/host/variants.c)	void (void)
