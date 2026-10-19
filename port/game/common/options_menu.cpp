@@ -469,12 +469,34 @@ constexpr std::uint32_t kPadCross = 0x40;
 constexpr int kMaxExtra = 4;
 constexpr int kTextFirst = page::kPauseRowText + 2 * page::kPauseRows;  // the added items' labels
 
+// The port's languages as each language names them, as the game's list names its own ("Englisch"
+// on the German page). A language missing here is named in its own words.
+struct Name {
+    const char* code;
+    const char* in;  // the language of the page
+    const char* name;
+};
+constexpr Name kNames[] = {
+    {"pl", "en", "Polish"},  {"pl", "fr", "Polonais"}, {"pl", "de", "Polnisch"},
+    {"pl", "es", "Polaco"},  {"pl", "it", "Polacco"},  {"pl", "pl", "Polski"},
+};
+
+std::string name_in(const std::string& code, const std::string& in, const std::string& own) {
+    for (const Name& n : kNames) {
+        if (code == n.code && in == n.in) {
+            return n.name;
+        }
+    }
+    return own;
+}
+
 struct Made {
     gaddr game_items = 0;  // the list's own items
     int game_count = 0;
     gaddr items = 0;  // those, then the added ones, and the end
     gaddr labels = 0;
     std::vector<std::string> codes;  // the added languages
+    std::vector<std::string> names;  // their names in their own words
     std::string built_for;           // the language they were marked for
     std::int32_t seen = kNone - 1;   // the global as last seen
 };
@@ -511,13 +533,11 @@ void build(const openrac_front_end& fe) {
         for (const i18n::LanguageInfo& l : game_text::languages()) {
             if (!game_text::on_disc(l.code) && m.codes.size() < kMaxExtra) {
                 m.codes.push_back(l.code);
-                if (m.labels == 0) {
-                    m.labels = openrac_guest_static(page::kTextBytes * kMaxExtra);
-                }
-                page::put_text(m.labels + page::kTextBytes * static_cast<gaddr>(m.codes.size() - 1), l.name);
+                m.names.push_back(l.name);
             }
         }
         m.items = openrac_guest_static(page::kItemBytes * static_cast<gaddr>(m.game_count + kMaxExtra + 1));
+        m.labels = openrac_guest_static(page::kTextBytes * kMaxExtra);
     }
     const std::string now = current();
     if (m.built_for == now && GREF(std::int16_t, m.items) != 0) {
@@ -525,6 +545,9 @@ void build(const openrac_front_end& fe) {
     }
     m.built_for = now;
     const bool added = is_added(now);
+    for (std::size_t k = 0; k < m.codes.size(); ++k) {
+        page::put_text(m.labels + page::kTextBytes * static_cast<gaddr>(k), name_in(m.codes[k], now, m.names[k]));
+    }
     std::memcpy(G(m.items), G(m.game_items), page::kItemBytes * static_cast<gaddr>(m.game_count));
     for (int i = 0; i < m.game_count; ++i) {
         const gaddr it = m.items + page::kItemBytes * static_cast<gaddr>(i);
@@ -570,6 +593,7 @@ void update(const openrac_front_end& fe, bool front) {
             if (at >= 0 && at < count && GREF(std::int16_t, it + 2) == kOwnAction) {
                 choose(at >= m.game_count ? m.codes[static_cast<std::size_t>(at - m.game_count)] : "en");
                 global = kEnglish;
+                m.seen = global;  // the port's change, not the game's
                 if (fe.menu_sound != nullptr) {
                     fe.menu_sound(0x11, GREF(std::uint32_t, fe.language_list + 0x14));
                 }
