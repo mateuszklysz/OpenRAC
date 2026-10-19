@@ -627,7 +627,7 @@ void func_00232A00(int x, int y, int w, int h, unsigned long long rgba, unsigned
 }
 
 /* A line of a caption centred on cx, SCALE of the font's size and no wider than the slide less a
- * margin, in the band's light blue faded as it is. */
+ * margin, bright, in the band's light blue, faded as it is. */
 static void caption_line(gaddr text, int width, float cx, float cy, float scale, unsigned alpha) {
     enum { ROOM = 480 };
     if ((float)width * scale > (float)ROOM) {
@@ -636,7 +636,7 @@ static void caption_line(gaddr text, int width, float cx, float cy, float scale,
     const float x = cx - (float)width * scale / 2.0f, y = cy - 8.0f * scale;
     const gaddr glyphs = OPENRAC_DATA(RAC1_ADDR(0x001DF3D0u));
     const long long font = (long long)func_001F4868(1);
-    const unsigned long long colour = ((unsigned long long)alpha << 24) | 0x807030ull;
+    const unsigned long long colour = ((unsigned long long)alpha << 24) | 0xF0E0A0ull;
 #if RAC1_DRAW_STRING_FLOATS_LAST
     func_001F69F0(colour, text, -1, font, glyphs, x, y, scale);
 #else
