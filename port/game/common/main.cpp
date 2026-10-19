@@ -959,6 +959,16 @@ gaddr openrac_game_text_translated(int id, gaddr original) {
     return 0;
 }
 
+void openrac_game_texts_in_table(gaddr table, int count) {
+#ifdef OPENRAC_FRONTEND
+    if (g_window) {
+        frontend::game_text::translate_table(table, count);
+    }
+#endif
+    (void)table;
+    (void)count;
+}
+
 // [verbose log] The first pad's buttons each time they change, and its sticks when one moves far.
 static void log_pad(int port, const uint16_t* buttons, const uint8_t analog[4]) {
     static uint16_t last = 0xFFFF;

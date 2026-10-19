@@ -40,6 +40,11 @@
  * time); PAL's list, 0x1D4810 here (Language, Video, Sound), is still in the data, unused. */
 #define RAC1_ADDR_0x001D4B90u 0x001D4840u
 
+/* The text table's address and its count (the help state's +0x2C), as the NTSC decomp's
+ * get_help_message_text and find_help_message_index read them. */
+#define RAC1_ADDR_0x0015F780u 0x0015F6A0u
+#define RAC1_ADDR_0x001997FCu 0x001996FCu
+
 /* Where this version's decompilation declares a function otherwise: the type in its prototypes. */
 /* ParseBin's result, the loaded level's entry. */
 #define RAC1_TYPE_func_0012DA38_result long long

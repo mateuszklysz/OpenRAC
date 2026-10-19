@@ -17,3 +17,13 @@ RAC1_TYPE_func_001FE540_result func_001FE540(int id) {
     const gaddr translated = openrac_game_text_translated(id, (gaddr)text);
     return translated != 0 ? (RAC1_TYPE_func_001FE540_result)translated : text;
 }
+
+/* The text table the game reads now (D_0015F780: the level's, or the menus' while they show the
+ * help texts) and its count (the help state's +0x2C): the help window takes its text from the
+ * table itself, not through func_001FE540, so the table's own pointers are what it draws. Both are
+ * the executable's words, a level's copy while one is loaded. */
+void rac1_translate_texts(void) {
+    const gaddr table = GREF(gaddr, OPENRAC_DATA(RAC1_ADDR(0x0015F780u)));
+    const int count = GREF(int, OPENRAC_DATA(RAC1_ADDR(0x001997FCu)));
+    openrac_game_texts_in_table(table, count);
+}

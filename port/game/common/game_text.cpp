@@ -58,6 +58,16 @@ gaddr g_ring = 0;
 std::uint32_t g_ring_next = 0;
 std::unordered_map<const std::string*, gaddr> g_where;
 
+// The text table's entries the port has pointed at a translation (translate_table), by the entry's
+// address: the game's own text, what the entry was given, and in which language (g_language).
+struct TableEntry {
+    gaddr original = 0;
+    gaddr shown = 0;
+    int language = -1;
+};
+std::unordered_map<gaddr, TableEntry> g_table;
+int g_language = 0;  // counts the languages used
+
 gaddr place(const std::string& text) {
     if (const auto it = g_where.find(&text); it != g_where.end()) {
         return it->second;
@@ -236,6 +246,8 @@ bool use(const std::string& code) {
     g_texts.clear();
     g_keyed.clear();
     g_where.clear();
+    g_ring_next = 0;  // what the ring held was the last language's
+    ++g_language;
 #ifdef OPENRAC_HAS_DISC
     namespace disc = assets::disc;
     // The folder's file, by the English: a translator's own, or the disc's language edited.
@@ -325,6 +337,27 @@ std::uint32_t translate(int id, std::uint32_t original) {
     }
 #endif
     return 0;
+}
+
+void translate_table(std::uint32_t table, int count) {
+    if (table == 0 || count <= 0 || count > 0x4000) {
+        return;
+    }
+    for (int i = 0; i < count; ++i) {
+        const gaddr entry = table + static_cast<gaddr>(i) * 16;
+        const gaddr now = GREF(gaddr, entry);
+        TableEntry& e = g_table[entry];
+        const bool ours = e.shown != 0 && now == e.shown;
+        if (ours && e.language == g_language) {
+            continue;
+        }
+        // An entry the port pointed elsewhere goes back to the game's text before it is translated
+        // again; any other is the game's (a table loaded since).
+        const gaddr original = ours ? e.original : now;
+        const gaddr translated = translate(GREF(std::int32_t, entry + 4), original);
+        e = {original, translated != 0 ? translated : original, g_language};
+        GREF(gaddr, entry) = e.shown;
+    }
 }
 
 }  // namespace openrac::frontend::game_text
