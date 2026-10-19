@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "common/i18n.h"
+#include "game_text.h"
 #include "common/log.h"
 #include "openrac/game_host.h"
 #include "openrac/guest.h"
@@ -133,8 +134,18 @@ std::string value_of(int row) {
             return s.skip_cutscenes ? i18n::tr("Start") : i18n::tr("Off");
         case kStrafe:
             return settings::name(s.strafe);
-        case kLanguage:
-            return settings::language_name(s);
+        case kLanguage: {
+            // A language in its own words, as language menus write it; System in the language now.
+            if (s.language == "auto") {
+                return i18n::tr("System");
+            }
+            for (const i18n::LanguageInfo& l : all_languages()) {
+                if (l.code == s.language) {
+                    return l.name;
+                }
+            }
+            return s.language;
+        }
         default:
             return {};
     }
@@ -245,7 +256,7 @@ void step_value(int row, int by) {
         case kLanguage: {
             // The system's, then each language there is a translation for (English first).
             std::vector<std::string> codes{"auto"};
-            for (const i18n::LanguageInfo& l : i18n::languages()) {
+            for (const i18n::LanguageInfo& l : all_languages()) {
                 codes.push_back(l.code);
             }
             const auto at = std::find(codes.begin(), codes.end(), s.language);
@@ -719,9 +730,22 @@ const openrac_front_end* front_end() {
 
 }  // namespace
 
+std::vector<i18n::LanguageInfo> all_languages() {
+    std::vector<i18n::LanguageInfo> all = i18n::languages();
+    for (const i18n::LanguageInfo& l : game_text::languages()) {
+        if (std::none_of(all.begin(), all.end(), [&](const auto& a) { return a.code == l.code; })) {
+            all.push_back(l);
+        }
+    }
+    return all;
+}
+
 void apply_language() {
     const std::string& chosen = settings::get().language;
-    i18n::set_language(chosen == "auto" ? i18n::from_locales(platform::preferred_languages()) : chosen);
+    const std::string code =
+        chosen == "auto" ? i18n::from_locales(platform::preferred_languages(), all_languages()) : chosen;
+    i18n::set_language(code);
+    game_text::use(code);
 }
 
 bool update(int loaded_overlay) {

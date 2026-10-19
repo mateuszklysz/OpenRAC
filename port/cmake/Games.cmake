@@ -212,6 +212,7 @@ function(openrac_add_game config)
                                          "${OPENRAC_GAME_DIR}/common/debug_menu.cpp"
                                          "${OPENRAC_GAME_DIR}/common/debug_overlay.cpp"
                                          "${OPENRAC_GAME_DIR}/common/fps_counter.cpp"
+                                         "${OPENRAC_GAME_DIR}/common/game_text.cpp"
                                          "${OPENRAC_GAME_DIR}/common/options_menu.cpp"
                                          "${OPENRAC_GAME_DIR}/common/settings.cpp")
     target_link_libraries(openrac-${id} PRIVATE openrac_viewer_lib openrac_platform openrac_imgui)

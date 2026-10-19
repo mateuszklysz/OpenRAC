@@ -60,6 +60,7 @@
 #include "debug_overlay.h"
 #include "common/i18n.h"
 #include "frontend.h"
+#include "game_text.h"
 #include "options_menu.h"
 #include "settings.h"
 #include "openrac/sound_engine.h"
@@ -952,6 +953,17 @@ gaddr openrac_game_text(int id) {
     return 0;
 }
 
+gaddr openrac_game_text_translated(int id, gaddr original) {
+#ifdef OPENRAC_FRONTEND
+    if (g_window) {
+        return frontend::game_text::translate(id, original);
+    }
+#endif
+    (void)id;
+    (void)original;
+    return 0;
+}
+
 // [verbose log] The first pad's buttons each time they change, and its sticks when one moves far.
 static void log_pad(int port, const uint16_t* buttons, const uint8_t analog[4]) {
     static uint16_t last = 0xFFFF;
@@ -1216,6 +1228,16 @@ int main(int argc, char** argv) {
         // The port's words in the player's language: port/lang's translations, and any .po file in
         // a lang folder beside the settings, for a translator to try one without building.
         i18n::load_folder(g_options.settings.parent_path() / "lang");
+        // The game's texts, every language of the disc, as files to translate (game_text.h): written
+        // at the first start, read in the language chosen.
+        const fs::path texts = g_options.settings.parent_path() / "lang" / "game";
+        frontend::game_text::set_folder(texts);
+        if (std::string(openrac_game.game) == "rac1") {
+            const fs::path image = g_options.data / "iso_data" / openrac_game.game / "disc.iso";
+            if (std::string why; !frontend::game_text::export_from_disc(image, texts, false, why)) {
+                log::warn("the game's texts were not written to {}: {}", texts.string(), why);
+            }
+        }
         frontend::options_menu::apply_language();
         log::info("the port's words in {}", i18n::language());
         if (settings::get().verbose_log && log::level() > log::Level::Verbose) {

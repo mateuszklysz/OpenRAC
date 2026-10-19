@@ -8,6 +8,9 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
+
+#include "common/i18n.h"
 
 namespace openrac::frontend::options_menu {
 
@@ -20,6 +23,10 @@ bool update(int loaded_overlay);
 // Sets the language of the port's words (common/i18n.h) from the settings' `language`; Auto: the
 // system's preferred languages. Once the settings are read, and again when the Language row changes.
 void apply_language();
+
+// The languages the Language row offers: the port's words' (common/i18n.h) and the game's texts'
+// (game_text.h), English first.
+std::vector<i18n::LanguageInfo> all_languages();
 
 // The items the Options list is given in place of the game's own (with the Video page's added), or 0
 // while it has the game's.

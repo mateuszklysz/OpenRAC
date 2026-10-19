@@ -1,22 +1,71 @@
-# Translations of the port
+# Translations
 
-The port's own words in other languages: the rows and values of the Video
-options page it adds to the game's menus, and the message boxes a player may
-see when the game cannot start. The game's own texts come from your disc and
-follow the game's Language page; nothing here changes them.
+Two kinds of text can be translated, each as one
+[gettext](https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html)
+file a language, edited with any text editor or a PO editor such as
+[Poedit](https://poedit.net/). Nobody edits code.
 
-Each language is one [gettext](https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html)
-file, `<code>.po`, in this folder. A translation is only text: no code to
-edit, and any editor works, a plain text editor or a PO editor such as
-[Poedit](https://poedit.net/). Every `.po` file here is built into the
-program.
+- **The game's texts**: menus, the HUD, help boxes, banners and subtitles,
+  every one of them. They come from your disc, so their files are made on your
+  computer and stay there (below, [The game's texts](#the-games-texts)).
+- **The port's own words**: the rows and values of the Video options page it
+  adds to the game's menus, and the message boxes a player may see when the
+  game cannot start. These files are in this folder and built into the
+  program.
+
+Both follow the Language row of the Video options page (the settings'
+`language`): `System` picks the system's language when there is a translation
+for it.
+
+## The game's texts
+
+At its first start the port reads every text of your disc and writes it to
+`settings/lang/game/` in the port's data folder (`~/.local/share/openrac` on
+Linux, `~/Library/Application Support/OpenRAC` on macOS; the log's first lines
+say where):
+
+| File | |
+|---|---|
+| `game.pot` | the template: every English text, with its id, empty |
+| `en.po`, `fr.po`, `de.po`, `es.po`, `it.po` | each language your disc has, beside the English (a US disc has English only) |
+
+These files hold the disc's texts: never commit, upload or share them with
+OpenRAC (docs/policy/SOURCING.md). To translate the game into another
+language, copy `game.pot` to `<code>.po` in the same folder (`pl.po`), add the
+`Language:` and `X-Language-Name:` lines to its header as
+[Translating](#translating) shows, and fill in each `msgstr`. Choose the language on the
+Language row and the game shows your words; a text left empty stays English.
+Editing `fr.po` changes the French the same way. Delete `game.pot` and the
+port writes the files again at its next start (your own `<code>.po` stays).
+
+In a game text:
+
+- `msgctxt` is the text's id and `#:` where it is used (`all_text`: menus and
+  the HUD; `level 05`: that level's help and subtitles). Leave both alone.
+- A word in brackets is a button or a colour: `[cross]`, `[circle]`,
+  `[triangle]`, `[square]`, `[L1]`, `[R1]`, `[L2]`, `[R2]`, `[lstick]`,
+  `[rstick]`; `[orange]` (names), `[blue]`, `[green]`, `[purple]`, and
+  `[default]` back to the text's colour. `[xNN]` is another byte the game
+  uses. Keep them, moved to where the sentence needs them. A `[` of the text
+  itself is written `[[`.
+- A new line is `\n`. Help boxes wrap their lines themselves.
+- The game's fonts have the vowels with an accent (á à â ä, é è ê ë and so
+  on); any other letter is drawn plain: ą as a, ł as l, ż as z. Write them
+  normally anyway: a later port may draw them.
+- The game itself is left in English underneath: its own Language page set
+  to another language shows that language from the disc instead.
+
+## The port's own words
+
+Each language is one file, `<code>.po`, in this folder. Every `.po` file
+here is built into the program.
 
 | File | |
 |---|---|
 | [openrac.pot](openrac.pot) | the template: every English text, empty. Generated from the code; do not edit it |
 | [pl.po](pl.po) | Polski |
 
-## Translating
+### Translating
 
 1. Copy `openrac.pot` to `<code>.po`, where the code is the language's
    ([ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes),
@@ -45,7 +94,7 @@ Keep:
   letters is cut.
 - **The file in UTF-8.**
 
-## Trying a translation without building
+### Trying a translation without building
 
 Put the `.po` file in a `lang` folder beside the port's settings file:
 `settings/lang/` in the port's data folder (`~/.local/share/openrac` on Linux,
@@ -57,7 +106,7 @@ the Video options page, or set `language = <code>` in the settings file.
 `auto` (System) picks the system's language when there is a translation for
 it. The log says which language the port uses and which files it read.
 
-## Checking
+### Checking
 
 ```sh
 cd port
@@ -67,7 +116,7 @@ ctest --preset release -R i18n           # the files read, and the Video page's 
 
 The first says how many texts each language still lacks.
 
-## For contributors: a new text in the code
+### For contributors: a new text in the code
 
 Write a text the player sees as `i18n::tr("...")` where it is shown, or
 `i18n::N_("...")` in a table of texts that is passed through `tr()` later

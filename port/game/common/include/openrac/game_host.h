@@ -299,6 +299,10 @@ int openrac_game_pad(int port, uint16_t* buttons, uint8_t analog[4]);
  * rows it adds to the game's options), or 0 when the id is the game's. */
 gaddr openrac_game_text(int id);
 
+/* The game's lookup gave ORIGINAL for ID: the game address of the text in the language the player
+ * chose, from the translation files (game/common/game_text.h), or 0 to keep the game's. */
+gaddr openrac_game_text_translated(int id, gaddr original);
+
 /* ---- Inside the replacements ---- */
 
 /* Interrupt handlers the game installed (AddIntcHandler, sceGsSyncVCallback,

@@ -59,6 +59,23 @@ int main() {
     CHECK(!i18n::parse_po("msgid \"a\"\nmsgstr \"b\"\n", why));  // no header
     CHECK(!i18n::parse_po("msgstr \"b\"\n", why));               // no msgid
 
+    // A file written and read again: contexts, lines, quotes and the header.
+    i18n::PoFile out{"fr", "Français", {}};
+    out.entries.push_back({"20001", "Two\nlines \"quoted\" [cross]", "Deux\nlignes", "all_text"});
+    out.entries.push_back({"20002", "Two\nlines \"quoted\" [cross]", "", "level 01"});
+    const auto back = i18n::read_po(i18n::write_po(out, "A note\non two lines"), why);
+    CHECK(back.has_value());
+    if (back) {
+        CHECK(back->code == "fr" && back->name == "Français");
+        CHECK(back->entries.size() == 2);
+        if (back->entries.size() == 2) {
+            CHECK(back->entries[0].context == "20001");
+            CHECK(back->entries[0].id == out.entries[0].id);
+            CHECK(back->entries[0].text == "Deux\nlignes");
+            CHECK(back->entries[1].context == "20002" && back->entries[1].text.empty());
+        }
+    }
+
     // The built-in languages: English first, Polish from port/lang/pl.po.
     const std::vector<i18n::LanguageInfo> all = i18n::languages();
     CHECK(!all.empty() && all[0].code == "en");

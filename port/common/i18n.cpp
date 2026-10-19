@@ -98,6 +98,47 @@ std::string header_field(const std::string& header, std::string_view field) {
     return {};
 }
 
+// TEXT as a .po string's inside.
+std::string escaped(std::string_view text) {
+    std::string out;
+    for (const char c : text) {
+        switch (c) {
+            case '"':
+                out += "\\\"";
+                break;
+            case '\\':
+                out += "\\\\";
+                break;
+            case '\n':
+                out += "\\n";
+                break;
+            case '\t':
+                out += "\\t";
+                break;
+            default:
+                out += c;
+        }
+    }
+    return out;
+}
+
+// `keyword "text"`, a text with line breaks continued on a line for each, as gettext's tools write it.
+std::string quoted(std::string_view keyword, std::string_view text) {
+    const auto nl = text.find('\n');
+    if (nl == std::string_view::npos || nl + 1 == text.size()) {
+        return std::format("{} \"{}\"\n", keyword, escaped(text));
+    }
+    std::string out = std::format("{} \"\"\n", keyword);
+    std::size_t at = 0;
+    while (at < text.size()) {
+        const auto cut = text.find('\n', at);
+        const std::size_t end = cut == std::string_view::npos ? text.size() : cut + 1;
+        out += "\"" + escaped(text.substr(at, end - at)) + "\"\n";
+        at = end;
+    }
+    return out;
+}
+
 // The Latin letters with accents (U+00C0..U+017F) as the plain letters the game's fonts have.
 constexpr const char* kPlain[] = {
     "A", "A", "A",  "A",  "A", "A", "AE", "C", "E", "E", "E", "E", "I", "I", "I",  "I",   // U+00C0
@@ -116,19 +157,23 @@ constexpr const char* kPlain[] = {
 
 }  // namespace
 
-std::optional<Catalogue> parse_po(std::string_view text, std::string& why) {
-    // Entries of msgid and msgstr, each string continued by the quoted lines after it. Comments,
-    // msgctxt, and plural forms (the port has none) are passed over.
-    std::map<std::string, std::string> entries;
-    std::string id, str;
+std::optional<PoFile> read_po(std::string_view text, std::string& why) {
+    // Entries of msgctxt, msgid and msgstr, each string continued by the quoted lines after it.
+    // Comments and plural forms (the port has none) are passed over.
+    PoFile po;
+    std::optional<std::string> header;
+    PoEntry entry;
     std::string* into = nullptr;
     bool has_id = false;
     auto finish = [&] {
         if (has_id) {
-            entries.insert_or_assign(id, str);
+            if (entry.id.empty() && entry.context.empty()) {
+                header = entry.text;
+            } else {
+                po.entries.push_back(std::move(entry));
+            }
         }
-        id.clear();
-        str.clear();
+        entry = PoEntry{};
         has_id = false;
         into = nullptr;
     };
@@ -148,22 +193,27 @@ std::optional<Catalogue> parse_po(std::string_view text, std::string& why) {
         if (line.empty() || line.starts_with('#')) {
             continue;
         }
-        if (line.starts_with("msgid ")) {
+        if (line.starts_with("msgctxt ")) {
             finish();
+            into = &entry.context;
+        } else if (line.starts_with("msgid ")) {
+            if (has_id) {
+                finish();
+            }
             has_id = true;
-            into = &id;
+            into = &entry.id;
         } else if (line.starts_with("msgstr ")) {
             if (!has_id) {
                 why = std::format("line {}: msgstr without a msgid", number);
                 return std::nullopt;
             }
-            into = &str;
+            into = &entry.text;
         } else if (line.starts_with('"')) {
             if (into == nullptr) {
-                continue;  // a continuation of something passed over (msgctxt, a plural)
+                continue;  // a continuation of something passed over (a plural)
             }
         } else {
-            into = nullptr;  // msgctxt, msgid_plural, msgstr[n]: not the port's
+            into = nullptr;  // msgid_plural, msgstr[n]: not the port's
             continue;
         }
         if (!unquote(line, *into)) {
@@ -172,28 +222,60 @@ std::optional<Catalogue> parse_po(std::string_view text, std::string& why) {
         }
     }
     finish();
-    const auto header = entries.find("");
-    if (header == entries.end()) {
+    if (!header) {
         why = "no header (the msgid \"\" entry)";
         return std::nullopt;
     }
-    Catalogue c;
-    c.code = header_field(header->second, "Language");
-    c.name = header_field(header->second, "X-Language-Name");
-    if (c.code.empty()) {
+    po.code = header_field(*header, "Language");
+    po.name = header_field(*header, "X-Language-Name");
+    return po;
+}
+
+std::optional<Catalogue> parse_po(std::string_view text, std::string& why) {
+    std::optional<PoFile> po = read_po(text, why);
+    if (!po) {
+        return std::nullopt;
+    }
+    if (po->code.empty()) {
         why = "the header has no Language:";
         return std::nullopt;
     }
-    if (c.name.empty()) {
-        c.name = c.code;
-    }
-    entries.erase(header);
-    for (auto& [english, translated] : entries) {
-        if (!translated.empty()) {
-            c.texts.emplace(english, std::move(translated));
+    Catalogue c;
+    c.code = po->code;
+    c.name = po->name.empty() ? po->code : po->name;
+    for (PoEntry& e : po->entries) {
+        if (!e.text.empty()) {
+            c.texts.insert_or_assign(std::move(e.id), std::move(e.text));
         }
     }
     return c;
+}
+
+std::string write_po(const PoFile& po, std::string_view comment) {
+    std::string out;
+    std::istringstream lines{std::string(comment)};
+    for (std::string line; std::getline(lines, line);) {
+        out += line.empty() ? "#\n" : "# " + line + "\n";
+    }
+    out += "msgid \"\"\nmsgstr \"\"\n\"Content-Type: text/plain; charset=UTF-8\\n\"\n";
+    if (!po.code.empty()) {
+        out += "\"Language: " + po.code + "\\n\"\n";
+    }
+    if (!po.name.empty()) {
+        out += "\"X-Language-Name: " + po.name + "\\n\"\n";
+    }
+    for (const PoEntry& e : po.entries) {
+        out += "\n";
+        if (!e.reference.empty()) {
+            out += "#: " + e.reference + "\n";
+        }
+        if (!e.context.empty()) {
+            out += quoted("msgctxt", e.context);
+        }
+        out += quoted("msgid", e.id);
+        out += quoted("msgstr", e.text);
+    }
+    return out;
 }
 
 std::vector<LanguageInfo> languages() {
@@ -242,7 +324,12 @@ void set_language(std::string_view code) {
 }
 
 std::string from_locales(std::span<const std::string> tags) {
-    const std::vector<LanguageInfo> known = languages();
+    return from_locales(tags, languages());
+}
+
+std::string from_locales(
+    std::span<const std::string> tags, const std::vector<LanguageInfo>& known
+) {
     auto find = [&](std::string_view tag) -> const LanguageInfo* {
         for (const LanguageInfo& l : known) {
             if (normal(l.code) == normal(tag)) {

@@ -131,6 +131,11 @@ msgstr ""
 
 #. The Video options page, in the game's font: about as short as the English. Accented letters are drawn plain (ą as a).
 #: game/common/options_menu.cpp
+msgid "System"
+msgstr ""
+
+#. The Video options page, in the game's font: about as short as the English. Accented letters are drawn plain (ą as a).
+#: game/common/options_menu.cpp
 msgid "Video"
 msgstr ""
 
@@ -187,11 +192,6 @@ msgstr ""
 #. The Video options page, in the game's font: about as short as the English. Accented letters are drawn plain (ą as a).
 #: game/common/settings.cpp
 msgid "Lock with weapons"
-msgstr ""
-
-#. The Video options page, in the game's font: about as short as the English. Accented letters are drawn plain (ą as a).
-#: game/common/settings.cpp
-msgid "System"
 msgstr ""
 
 #. The Video options page, in the game's font: about as short as the English. Accented letters are drawn plain (ą as a).

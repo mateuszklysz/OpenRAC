@@ -153,7 +153,7 @@ msgstr "Trzymaj L2-R2"
 msgid "Lock with weapons"
 msgstr "Stały z bronią"
 
-#: game/common/settings.cpp
+#: game/common/options_menu.cpp
 msgid "System"
 msgstr "Systemowy"
 

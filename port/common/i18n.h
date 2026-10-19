@@ -34,7 +34,28 @@ struct Catalogue {
     std::unordered_map<std::string, std::string> texts;  // msgid -> msgstr, the empty ones left out
 };
 
-// Reads a .po file's text. Nothing, with WHY, for one that is not one or has no Language:.
+// A .po file's entries, as read_po reads and write_po writes them.
+struct PoEntry {
+    std::string context;    // msgctxt, empty for none: the game's texts give their id
+    std::string id;         // msgid: the English
+    std::string text;       // msgstr: the translation; empty for none
+    std::string reference;  // written as a "#:" line: where the text is used
+};
+
+struct PoFile {
+    std::string code;  // the header's Language:, empty in a template (.pot)
+    std::string name;  // the header's X-Language-Name:
+    std::vector<PoEntry> entries;
+};
+
+// Reads a .po (or .pot) file's text. Nothing, with WHY, for one that is not one.
+std::optional<PoFile> read_po(std::string_view text, std::string& why);
+
+// PO as a .po file's text, COMMENT's lines first as "# " comments. UTF-8, as read_po reads it.
+std::string write_po(const PoFile& po, std::string_view comment);
+
+// Reads a .po file's text as a catalogue of the port's words (contexts ignored). Nothing, with
+// WHY, for one that is not one or has no Language:.
 std::optional<Catalogue> parse_po(std::string_view text, std::string& why);
 
 // The languages there are: English first, then each catalogue's, by code.
@@ -54,8 +75,10 @@ std::string language();
 void set_language(std::string_view code);
 
 // The first language there is among BCP 47 tags in order of preference ("pl-PL", "pt_BR", "de"),
-// as the system lists them: the whole tag's, else its language's; "en" when none.
+// as the system lists them: the whole tag's, else its language's; "en" when none. KNOWN: the
+// languages to choose from, languages() when not given.
 std::string from_locales(std::span<const std::string> tags);
+std::string from_locales(std::span<const std::string> tags, const std::vector<LanguageInfo>& known);
 
 // ENGLISH in the language now; ENGLISH itself where the catalogue has nothing for it.
 const char* tr(const char* english);

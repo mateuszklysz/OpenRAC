@@ -137,7 +137,6 @@ const char* name(Aspect aspect);
 const char* name(Hud hud);
 const char* name(VSync vsync);
 const char* name(Strafe strafe);
-std::string language_name(const Settings& settings);
 std::string frame_rate_name(const Settings& settings);
 
 }  // namespace openrac::settings

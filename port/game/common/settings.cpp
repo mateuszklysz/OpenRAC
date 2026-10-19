@@ -372,19 +372,6 @@ const char* name(Strafe strafe) {
     return i18n::tr(names[std::min<int>(static_cast<int>(strafe), 2)]);
 }
 
-// A language in its own words, as language menus write it; "System" in the language now.
-std::string language_name(const Settings& settings) {
-    if (settings.language == "auto") {
-        return i18n::tr("System");
-    }
-    for (const i18n::LanguageInfo& l : i18n::languages()) {
-        if (l.code == settings.language) {
-            return l.name;
-        }
-    }
-    return settings.language;
-}
-
 std::string frame_rate_name(const Settings& settings) {
     switch (settings.frame_rate) {
         case FrameRate::Original:
