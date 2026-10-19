@@ -234,7 +234,7 @@ msgstr ""
 #: all_text
 msgid "21279/02b786fb"
 msgstr ""
-"Dobra robota, znalazłeś mechanika. Poważnie zastanów się nad kupnem "
+"Dobrze, że znalazłeś mechanika. Poważnie zastanów się nad kupnem "
 "[orange]Infobota[default], którego sprzedaje. Poda współrzędne nowej "
 "planety."
 
@@ -443,7 +443,7 @@ msgstr ""
 #: all_text
 msgid "21321/4991358c"
 msgstr ""
-"To zdecydowanie warty zakup. [orange]Grindboots[default] są rzadkie, ale "
+"Zdecydowanie warto je kupić. [orange]Grindboots[default] są rzadkie, ale "
 "bardzo przydatne."
 
 #: all_text
@@ -458,7 +458,7 @@ msgstr "Zadaj cios Drekowi i uruchom sekwencję samozniszczenia okrętu."
 
 #: all_text
 msgid "21324/81e71474"
-msgstr "Poza stacją kosmiczną nie ma powietrza, więc Clank musi badać ją sam."
+msgstr "Poza stacją kosmiczną nie ma powietrza, więc Clank musi ją zbadać sam."
 
 #: all_text
 msgid "21325/7ebc64a9"
@@ -546,9 +546,9 @@ msgstr ""
 #: all_text
 msgid "21342/2fcc039b"
 msgstr ""
-"Ci goście potrzebują kogoś z dobrym celem do obsługi działka za miastem. "
-"Strzelaj celnie, a może pomożesz powstrzymać inwazję. Porozmawiaj z "
-"wodociągowcem na urwisku za miastem."
+"Ci goście potrzebują kogoś, kto dobrze celuje, do obsługi działka za "
+"miastem. Strzelaj celnie, a może pomożesz powstrzymać inwazję. Porozmawiaj "
+"z wodociągowcem na urwisku za miastem."
 
 #: all_text
 msgid "21343/6e6345e9"
@@ -623,14 +623,14 @@ msgstr "Złap tego [orange]Infobota[default]. Ale uważaj, jest szybki!"
 #: all_text
 msgid "21358/861e66d0"
 msgstr ""
-"[orange]Nanotech Premium[default] zwiększy twoje zdrowie. To zdecydowanie "
-"warty zakup."
+"[orange]Nanotech Premium[default] zwiększy twoje zdrowie. Zdecydowanie "
+"warto go kupić."
 
 #: all_text
 msgid "21359/a4574db2"
 msgstr ""
-"To najpotężniejszy dostępny Nanotech. Jest drogi, ale da ci OGROMNY stały "
-"przyrost zdrowia."
+"To najpotężniejszy dostępny Nanotech. Jest drogi, ale na stałe OGROMNIE "
+"zwiększy twoje zdrowie."
 
 #: all_text
 msgid "21360/2e403dd8"
@@ -659,10 +659,9 @@ msgstr "Kup [orange]Nanotech Ultra[default]"
 #: all_text
 msgid "21366/469dcb76"
 msgstr ""
-"Wygląda na to, że [orange]Infobot[default] tej planety trochę wprowadzał w "
-"błąd. Statki Blargów zrzucające toksyczne odpady zmieniły morza w "
-"wylęgarnie mutantów. Wszyscy turyści uciekli, więc to dobry moment na "
-"zwiedzanie."
+"Wygląda na to, że [orange]Infobot[default] tej planety był trochę mylący. "
+"Statki Blargów zrzucające toksyczne odpady zmieniły morza w wylęgarnie "
+"mutantów. Wszyscy turyści uciekli, więc to dobry moment na zwiedzanie."
 
 #: all_text
 msgid "21367/4a414ff0"
@@ -673,21 +672,21 @@ msgstr ""
 #: all_text
 msgid "21368/9ad52425"
 msgstr ""
-"Zanim otworzysz hangar myśliwców, zajrzyj do Robosklepu Boba. Bob może mieć "
+"Zanim otworzysz hangar myśliwca, zajrzyj do Robosklepu Boba. Bob może mieć "
 "coś, co ci pomoże."
 
 #: all_text
 msgid "21369/6e27f25c"
 msgstr ""
 "Teraz, gdy masz [orange]Thruster-Pack[default], możesz otworzyć hangar "
-"odrzutowców i zestrzelić tych Blargów z nieba! Pamiętaj, jeśli ci się uda, "
+"myśliwca i zestrzelić tych Blargów z nieba! Pamiętaj, jeśli ci się uda, "
 "dostaniesz [orange]Maskę O2[default]!"
 
 #: all_text
 msgid "21370/836df665"
 msgstr ""
 "Witaj w kanałach kurortu Jowai! To z pewnością jeden z czystszych systemów "
-"na tej planecie. Może jest tu na dole coś, co Ratchet może wykorzystać."
+"na tej planecie. Może na dole znajdzie się coś, co przyda się Ratchetowi."
 
 #: all_text
 msgid "21371/5188fd30"
@@ -722,9 +721,9 @@ msgstr "Zanieś [orange]Raritanium[default] Wynalazcy"
 #: all_text
 msgid "21378/153badf3"
 msgstr ""
-"Bomba Dreka, niszczyciel planet, zaraz zostanie wyniesiona z planety. "
-"Musisz ją powstrzymać, bo inaczej jakaś nieszczęsna planeta zostanie "
-"rozerwana na strzępy."
+"Bomba Dreka, niszczyciel planet, zaraz opuści planetę. Musisz ją "
+"powstrzymać, bo inaczej jakaś nieszczęsna planeta zostanie rozerwana na "
+"strzępy."
 
 #: all_text
 msgid "21379/a287ee6d"
@@ -918,7 +917,7 @@ msgstr "Znajdź nowy sprzęt"
 
 #: all_text
 msgid "21416/f7734c59"
-msgstr "Przedostań się obok Blargów"
+msgstr "Przedrzyj się przez Blargów"
 
 #: all_text
 msgid "21417/d35d6da0"
@@ -996,7 +995,7 @@ msgstr "Wyścig o [orange]Zoomerator[default]"
 
 #: all_text
 msgid "20134/e5ecb4ec"
-msgstr "Przekup ochroniarza 4000 śrub"
+msgstr "Przekup ochroniarza za 4000 śrub"
 
 #: all_text
 msgid "20135/8d498140"
@@ -1270,7 +1269,7 @@ msgstr "[R1] Następna mapa"
 
 #: all_text
 msgid "20220/1891b89a"
-msgstr "[lstick] [rstick] Śledź/Przybliż"
+msgstr "[lstick] [rstick] Ruch/Zoom"
 
 #: all_text
 msgid "20221/6ded8a49"
@@ -1346,7 +1345,7 @@ msgstr "Salto w tył"
 
 #: all_text
 msgid "20235/dc6e0f62"
-msgstr "Chwyt półki"
+msgstr "Chwyt krawędzi"
 
 #: all_text
 msgid "20236/e1cca0d0"
@@ -1382,7 +1381,7 @@ msgstr ""
 #: all_text
 msgid "20241/3a74a4fa"
 msgstr ""
-"Kucnij [R1] i obracaj się w miejscu [lstick]. Tą techniką możesz obracać "
+"Kucnij [R1] i obracaj się w miejscu [lstick]. W ten sposób możesz obracać "
 "się w miejscu i strzelać."
 
 #: all_text
@@ -1395,15 +1394,15 @@ msgstr ""
 #: all_text
 msgid "20243/31ecdffd"
 msgstr ""
-"Spróbuj salta w bok! Przytrzymaj [R1], by kucnąć, i szarpnij [lstick] w "
-"prawo lub w lewo, wciskając [cross]. Dla stylu strzelaj w trakcie salta!"
+"Spróbuj przewrotu w bok! Przytrzymaj [R1], by kucnąć, i szarpnij [lstick] w "
+"prawo lub w lewo, naciskając [cross]. Dla stylu strzelaj podczas przewrotu!"
 
 #: all_text
 msgid "20244/1b9b8059"
 msgstr ""
-"Ten ruch przydaje się przy wycofywaniu się przed wrogami. Przytrzymaj [R1], "
-"by kucnąć, i szarpnij [lstick] do tyłu, wciskając [cross]. Rzucaj bomby "
-"podczas salt w tył!"
+"Ten ruch świetnie sprawdza się przy wycofywaniu się przed wrogami. "
+"Przytrzymaj [R1], by kucnąć, i szarpnij [lstick] do tyłu, naciskając "
+"[cross]. Spróbuj rzucać bomby, robiąc salta w tył!"
 
 #: all_text
 msgid "20245/9b9b6547"
@@ -1414,8 +1413,8 @@ msgstr ""
 #: all_text
 msgid "20246/64e5cbb2"
 msgstr ""
-"Wisząc na krawędzi, możesz się po niej przesuwać, wychylając [lstick] w "
-"lewo lub w prawo."
+"Wisząc na krawędzi, możesz się po niej przesuwać, ruszając [lstick] w lewo "
+"lub w prawo."
 
 #: all_text
 msgid "20247/101cd199"
@@ -1610,12 +1609,12 @@ msgstr "Opcje dźwięku"
 #: all_text
 msgid "20292/bad56667"
 msgstr ""
-"To [orange]Hoverboard[default] Z3000 Deluxe firmy Gadgetron. Możesz go "
-"używać w wyścigach w całej galaktyce. Hoverboard zakłada się sam, gdy "
-"wejdziesz na Oficjalny Tor Gadgetron. \n\nW wyścigu skacz [cross]. Triki "
-"wykonasz, skacząc i wciskając kombinacje [R1], [R2], [L1] i [L2]. W "
-"powietrzu możesz też kręcić się [lstick]. \n\nZnajdź "
-"[orange]Zoomerator[default] i zamieniaj triki w turbo!"
+"Oto [orange]Hoverboard[default] Z3000 Deluxe produkcji Gadgetronu. Możesz "
+"go używać w wyścigach w całej galaktyce. Hoverboard zakłada się sam, gdy "
+"tylko wejdziesz na Oficjalny HoverTor Gadgetronu. \n\nW wyścigu skaczesz "
+"[cross]. Triki wykonasz, skacząc i naciskając kombinacje [R1], [R2], [L1] i "
+"[L2]. W powietrzu spróbuj też kręcić się [lstick]. \n\nZnajdź "
+"[orange]Zoomerator[default], a zamienisz triki w turbo!"
 
 #: all_text
 msgid "20293/1343cc05"
@@ -1717,7 +1716,7 @@ msgstr "[rstick] przybliża"
 
 #: all_text
 msgid "20311/5aaaa95f"
-msgstr "[lstick] śledzi"
+msgstr "[lstick] przesuwa"
 
 #: all_text
 msgid "20312/806b1aba"
@@ -1988,15 +1987,14 @@ msgstr ""
 #: all_text
 msgid "20355/45c0686d"
 msgstr ""
-"[orange]Trespasser[default] firmy Gadgetron świetnie radzi sobie z "
-"[orange]Invinco-Lockami[default]. Stań na podkładce "
-"[orange]Invinco-Locka[default] i wciśnij [circle], by otworzyć interfejs "
-"[orange]Invinco-Locka[default]. \n\nNa każdym pierścieniu "
-"[orange]Invinco-Locka[default] są lasery. Wychylaj [lstick] w górę i w dół, "
-"by wybrać pierścień; w lewo i w prawo, by go obracać. Celuj laserami w "
-"odbiorniki na zewnętrznym pierścieniu, aż zrobią się zielone. \n\nWszystkie "
-"odbiorniki muszą być zielone, zanim [orange]Invinco-Lock[default] się "
-"otworzy. "
+"[orange]Trespasser[default] Gadgetronu to idealne urządzenie do pokonywania "
+"[orange]Invinco-Locków[default]. Stań na płycie aktywacyjnej "
+"[orange]Invinco-Locka[default] i naciśnij [circle], by otworzyć jego "
+"interfejs. \n\nNa każdym pierścieniu [orange]Invinco-Locka[default] są "
+"lasery. Ruszaj [lstick] w górę i w dół, by wybrać pierścień, a w lewo i w "
+"prawo, by go obracać. Wyceluj lasery w odbiorniki na zewnętrznym "
+"pierścieniu, aby zrobiły się zielone. \n\n[orange]Invinco-Lock[default] "
+"otworzy się dopiero, gdy wszystkie odbiorniki będą zielone."
 
 #: all_text
 msgid "20356/2b6abe9a"
@@ -2031,10 +2029,10 @@ msgid "20359/f413fef2"
 msgstr ""
 "[orange]Magneboots[default] są wciąż w fazie rozwoju w Gadgetronie i na "
 "razie nie są w sprzedaży. Kilka prototypów trafiło do testów beta. Buty "
-"mocno przylegają do specjalnie zjonizowanych [orange]Pasów "
-"magnetycznych[default], dzięki czemu można chodzić po ścianach, a nawet do "
-"góry nogami! \n\nUważaj jednak: [orange]Magneboots[default] nie uchronią "
-"cię przed upadkiem, jeśli zejdziesz z [orange]Pasów magnetycznych[default]!"
+"mocno przylegają do specjalnie zjonizowanych [orange]Magnetopasów[default], "
+"dzięki czemu można chodzić po ścianach, a nawet do góry nogami! \n\nUważaj "
+"jednak: [orange]Magneboots[default] nie uchronią cię przed upadkiem, jeśli "
+"zejdziesz z [orange]Magnetopasów[default]!"
 
 #: all_text
 msgid "20360/b857c902"
@@ -2048,7 +2046,7 @@ msgstr ""
 msgid "20361/2aaa70b5"
 msgstr ""
 "[orange]Sonic Summoner[default] pozwala porozumiewać się z tajemniczymi i "
-"inteligentnymi Piaskowymi Myszami. Mimo niewinnego wyglądu Piaskowe Myszy "
+"inteligentnymi piaskowymi myszami. Mimo niewinnego wyglądu piaskowe myszy "
 "to bardzo skuteczne i agresywne łowczynie.\n\nZałóż [orange]Sonic "
 "Summoner[default] w pobliżu Mysiego Domku, a wyjdzie z niego mysz, by cię "
 "powitać. Jeśli cię polubi, może zaoferować solidne wsparcie taktyczne."
@@ -2075,10 +2073,10 @@ msgstr ""
 "Ulepszenie [orange]Thruster-Pack[default] ma, tak jak "
 "[orange]Heli-Pack[default], [orange]Skok z wybiciem[default], [orange]Długi "
 "skok[default] i [orange]Szybowanie[default]. Do tego "
-"[orange]Thruster-Pack[default] daje specjalny manewr: [orange]Potężne "
-"uderzenie[default]. Naciśnij [R1] w trakcie skoku, by go wykonać. \n\n"
-"[orange]Potężne uderzenie[default] otwiera specjalne zamki i rozbija "
-"przedmioty w otoczeniu."
+"[orange]Thruster-Pack[default] daje specjalny manewr: [orange]Potężny "
+"cios[default]. Naciśnij [R1] w trakcie skoku, by go wykonać. \n\n"
+"[orange]Potężny cios[default] otwiera specjalne zamki i rozbija przedmioty "
+"w otoczeniu."
 
 #: all_text
 msgid "20365/970763c9"
@@ -2660,11 +2658,11 @@ msgstr "Zamień czołg w kurczaka"
 
 #: all_text
 msgid "20483/7ac5047b"
-msgstr "Pokonaj wyzwanie hoverboardowe w 1:35 lub mniej"
+msgstr "Pokonaj wyzwanie hoverboardowe w czasie 1:35 lub krótszym"
 
 #: all_text
 msgid "20484/434838be"
-msgstr "Pokonaj wyzwanie hoverboardowe w 1:36 lub mniej"
+msgstr "Pokonaj wyzwanie hoverboardowe w czasie 1:36 lub krótszym"
 
 #: all_text
 msgid "20485/1af93385"
@@ -2680,7 +2678,7 @@ msgstr "Zniszcz mały myśliwiec z działka"
 
 #: all_text
 msgid "20488/30e8dd72"
-msgstr "Zniszcz wszystkie czołgi Piaskową Myszą"
+msgstr "Zniszcz wszystkie czołgi piaskową myszą"
 
 #: all_text
 msgid "20489/06a5fe36"
@@ -2765,7 +2763,7 @@ msgstr "Postacie mają przerośnięte czaszki"
 
 #: all_text
 msgid "20509/6c65761d"
-msgstr "Wrogowie mają ogromne kopuły"
+msgstr "Wrogowie mają ogromne makówki"
 
 #: all_text
 msgid "20510/8000c022"
@@ -2797,7 +2795,7 @@ msgstr "Ludzie na tych planetach mają przechlapane!"
 
 #: all_text
 msgid "20517/f7bb39bf"
-msgstr "Przepraszam za to."
+msgstr "Przepraszam."
 
 #: all_text
 msgid "20518/03a4ec2a"
@@ -2809,7 +2807,7 @@ msgstr "Kapitan Qwark naprawdę się sprzedał."
 
 #: all_text
 msgid "20520/9047a57f"
-msgstr "Patrz - hydraulik się schylił!"
+msgstr "Patrz - hydraulik się wypiął!"
 
 #: all_text
 msgid "20522/9c32e2c8"
@@ -2837,11 +2835,11 @@ msgstr "Hej, ty jesteś tym gościem z robotem, co?"
 
 #: all_text
 msgid "20528/0c249548"
-msgstr "Dobra, to nie będzie wcale bolało."
+msgstr "Dobra, to ani trochę nie zaboli."
 
 #: all_text
 msgid "20529/f4b1b8d2"
-msgstr "Słuchać, wy grubasy!"
+msgstr "Słuchać, grubasy!"
 
 #: all_text
 msgid "20530/5e401d75"
@@ -2949,7 +2947,7 @@ msgstr "Ratchet dostaje [orange]Nanotech Ultra[default]"
 
 #: all_text
 msgid "20556/fd3f46a8"
-msgstr "Jesteś przyjazny, prawda?"
+msgstr "Jesteście przyjaźni, prawda?"
 
 #: all_text
 msgid "20557/fab3372e"
@@ -3097,7 +3095,7 @@ msgstr "''Nie zgadzam się na to!''"
 
 #: all_text
 msgid "20593/cc48118e"
-msgstr "''Ojej! To jest świetne!''"
+msgstr "''Łał! To jest świetne!''"
 
 #: all_text
 msgid "20594/24b8a684"
@@ -3314,7 +3312,7 @@ msgstr "salta"
 #: all_text
 msgid "20649/b0847c2a"
 msgstr ""
-"Twórcy\n\nInsomniac Games"
+"Stworzone przez\n\nInsomniac Games"
 
 #: all_text
 msgid "20693/3fec7651"
@@ -4107,11 +4105,11 @@ msgstr "W"
 
 #: all_text
 msgid "20944/a4fce146"
-msgstr "GORĄCY BOT"
+msgstr "WILLI"
 
 #: all_text
 msgid "20945/db01dd78"
-msgstr "HOTBOT"
+msgstr "HOTBOTA"
 
 #: all_text
 msgid "20946/4d73bf52"
@@ -4139,7 +4137,7 @@ msgstr "\"\"Zrobię wszystko za kilka śrub\"\" - Qwark"
 
 #: all_text
 msgid "20952/d8370c8b"
-msgstr "SZCZERE ZDJĘCIA W ŚRODKU"
+msgstr "ZDJĘCIA Z UKRYCIA W ŚRODKU"
 
 #: all_text
 msgid "20953/9e0644a4"
@@ -4207,7 +4205,7 @@ msgstr "ZABÓJCZE KOMBOSY"
 
 #: all_text
 msgid "20969/e8e565bd"
-msgstr "RUCHY, OD KTÓRYCH PĘKA KRĘGOSŁUP"
+msgstr "ŁAMIĄCE KOŚCI RUCHY"
 
 #: all_text
 msgid "20970/1a0bbe23"
@@ -4416,7 +4414,7 @@ msgstr "Atakuj"
 
 #: all_text
 msgid "21024/66f5e903"
-msgstr "Twórcy"
+msgstr "Stworzone przez"
 
 #: all_text
 msgid "21025/93c0509c"
@@ -4956,7 +4954,7 @@ msgstr "[triangle] Odwiedź przyczepę Kapitana Qwarka"
 
 #: all_text
 msgid "5021/b31df306"
-msgstr "[triangle] Przekup ochroniarza 4000 śrub"
+msgstr "[triangle] Przekup ochroniarza za 4000 śrub"
 
 #: all_text
 msgid "5022/fa040b3d"
@@ -5678,7 +5676,7 @@ msgstr "Otwórz te drzwi [orange]Trespasserem[default] Gadgetronu."
 
 #: all_text
 msgid "5000/062c3161"
-msgstr "Ścigajmy się! Steruj [lstick], skacz [cross]."
+msgstr "Ścigajmy się! Skręcasz [lstick], skaczesz [cross]."
 
 #: all_text
 msgid "5001/9387b521"
@@ -5848,7 +5846,7 @@ msgstr ""
 msgid "11003/501afdc7"
 msgstr ""
 "Twój [orange]Thruster-Pack[default] ma nową funkcję [orange]Potężnego "
-"uderzenia[default]! Naciśnij [R1] w trakcie skoku i ciesz się nowymi "
+"ciosu[default]! Naciśnij [R1] w trakcie skoku i ciesz się nowymi "
 "niszczycielskimi możliwościami."
 
 #: all_text
@@ -5905,8 +5903,8 @@ msgstr ""
 #: all_text
 msgid "2012/7919f3cd"
 msgstr ""
-"Steruj [orange]Trespasserem[default] za pomocą [lstick]. Góra i dół "
-"wybierają pierścień; lewo i prawo go obracają."
+"[orange]Trespasserem[default] sterujesz [lstick]. Ruch w górę i w dół "
+"wybiera pierścień, w lewo i w prawo go obraca."
 
 #: all_text
 msgid "2013/fbe40b83"
@@ -5928,7 +5926,7 @@ msgstr "Masz mnóstwo śrub. Może wydasz trochę w automacie Gadgetronu?"
 
 #: all_text
 msgid "20002/e57403d0"
-msgstr "Kamerą sterujesz za pomocą [rstick]."
+msgstr "Kamerą sterujesz [rstick]."
 
 #: all_text
 msgid "20003/b2a87b51"
@@ -6108,7 +6106,7 @@ msgstr ""
 msgid "11009/84d2d2d3"
 msgstr ""
 "Z [orange]Thruster-Packiem[default] wciśniesz takie przełączniki "
-"[orange]Potężnym uderzeniem[default]: skocz, a potem naciśnij [R1]."
+"[orange]Potężnym ciosem[default]: skocz, a potem naciśnij [R1]."
 
 #: all_text
 msgid "12003/83b96bb1"
@@ -6119,7 +6117,9 @@ msgstr ""
 
 #: all_text
 msgid "12004/062a6bb9"
-msgstr "Użyj [R2] lub [L2] z [lstick], by unosząc się, poruszać się bokiem."
+msgstr ""
+"Unosząc się, używaj [R2] lub [L2] razem z [lstick], by przesuwać się na "
+"boki."
 
 #: all_text
 msgid "13000/c5e48006"
@@ -6255,9 +6255,9 @@ msgstr ""
 #: all_text
 msgid "18000/2d3d6b73"
 msgstr ""
-"Wciśnij ten przycisk [orange]Potężnym uderzeniem[default], by przerwać "
-"odliczanie! Aby wykonać [orange]Potężne uderzenie[default], skocz i "
-"naciśnij [R1]."
+"Wciśnij ten przycisk [orange]Potężnym ciosem[default], by przerwać "
+"odliczanie! Aby wykonać [orange]Potężny cios[default], skocz i naciśnij "
+"[R1]."
 
 #: all_text
 msgid "11011/91b42289"
@@ -6297,15 +6297,14 @@ msgstr "Ogień z tych działek jest zabójczy. Musisz znaleźć objazd."
 #: all_text
 msgid "18001/3be3ce73"
 msgstr ""
-"Wciśnij ten przycisk resetu [orange]Potężnym uderzeniem[default], zanim "
-"skończy się czas! Aby wykonać [orange]Potężne uderzenie[default], skocz i "
-"naciśnij [R1]."
+"Wciśnij ten przycisk resetu [orange]Potężnym ciosem[default], zanim skończy "
+"się czas! Aby wykonać [orange]Potężny cios[default], skocz i naciśnij [R1]."
 
 #: all_text
 msgid "18002/49bdde32"
 msgstr ""
-"Wciśnij ten przycisk resetu [orange]Potężnym uderzeniem[default], zanim "
-"skończy się czas!"
+"Wciśnij ten przycisk resetu [orange]Potężnym ciosem[default], zanim skończy "
+"się czas!"
 
 #: all_text
 msgid "8006/5b3854ed"
@@ -6332,7 +6331,7 @@ msgstr ""
 msgid "2014/2aaa70b5"
 msgstr ""
 "[orange]Sonic Summoner[default] pozwala porozumiewać się z tajemniczymi i "
-"inteligentnymi Piaskowymi Myszami. Mimo niewinnego wyglądu Piaskowe Myszy "
+"inteligentnymi piaskowymi myszami. Mimo niewinnego wyglądu piaskowe myszy "
 "to bardzo skuteczne i agresywne łowczynie.\n\nZałóż [orange]Sonic "
 "Summoner[default] w pobliżu Mysiego Domku, a wyjdzie z niego mysz, by cię "
 "powitać. Jeśli cię polubi, może zaoferować solidne wsparcie taktyczne."
@@ -7199,7 +7198,7 @@ msgstr "Tymczasem w fabryce na pobliskiej planecie[xAD]"
 
 #: all_text
 msgid "21254/d07b7219"
-msgstr "Zbliżanie się do planety Veldin[xAD]"
+msgstr "W drodze na planetę Veldin[xAD]"
 
 #: all_text
 msgid "21255/f10cf8a8"
@@ -7293,8 +7292,8 @@ msgstr "Najlepszy wynik"
 #: level 00 scene 0
 msgid "-1/b830c3cb"
 msgstr ""
-"Ostatni krok: podłącz Robotyczny System Zapłonu. Dziękujemy za korzystanie "
-"z technologii Help Desk."
+"Ostatni krok: podłącz Robotyczny System Zapłonu. Dziękujemy za skorzystanie "
+"z Pomocy Gadgetronu."
 
 #: level 00 scene 2
 msgid "-1/210fe3e8"
@@ -7391,8 +7390,8 @@ msgstr "[xAD]i nicość, która po nich nastaje."
 #: level 00 scene 5
 msgid "-1/63401688"
 msgstr ""
-"Dołączcie do Najwyższego Przewodniczącego Dreka, gdy wciśnie przycisk, "
-"który kończy jeden świat i zaczyna nowy."
+"Dołączcie do Ostatecznego Najwyższego Prezesa Zarządu Dreka, gdy wciśnie "
+"przycisk, który kończy jeden świat i zaczyna nowy."
 
 #: level 00 scene 5
 msgid "-1/a8f2af0f"
@@ -7406,7 +7405,7 @@ msgstr "Do licha!"
 
 #: level 01 scene 0
 msgid "-1/28f9c3f0"
-msgstr "Patrzcie, hydraulik się wypina."
+msgstr "Patrz, hydraulik się wypiął."
 
 #: level 01 scene 0
 msgid "-1/5ffb868c"
@@ -7414,7 +7413,7 @@ msgstr "Coś ty powiedział?!"
 
 #: level 01 scene 0
 msgid "-1/809f33e3"
-msgstr "Powiedziałem: \"Patrzcie, hydraulik się zjawia!\""
+msgstr "Powiedziałem: \"Patrz, hydraulik się zjawił!\""
 
 #: level 01 scene 0
 msgid "-1/33a3637b"
@@ -7623,7 +7622,7 @@ msgstr "No weź!  "
 #: level 02 scene 0
 msgid "-1/f5ed595a"
 msgstr ""
-"Jeśli rozprawicie się ze wszystkimi Piaskowymi Rekinami, może znajdę dla "
+"Jeśli rozprawicie się ze wszystkimi piaskowymi rekinami, może znajdę dla "
 "was zapasowy hoverboard."
 
 #: level 02 scene 0
@@ -7715,7 +7714,7 @@ msgstr "Super hełm!"
 
 #: level 02 scene 3
 msgid "-1/a9431bb8"
-msgstr "To Sonic Summoner. Służy do przywabiania Piaskowych Myszy."
+msgstr "To Sonic Summoner. Służy do przywabiania piaskowych myszy."
 
 #: level 02 scene 3
 msgid "-1/4891153f"
@@ -7777,7 +7776,7 @@ msgstr "Wersja 7.66."
 msgid "-1/ed07c2cc"
 msgstr ""
 "Nawzajem!  Może jednak zdołam wam pomóc. Co powiecie na ulepszenie "
-"helipacka?"
+"Heli-Packa?"
 
 #: level 03 scene 0
 msgid "-1/60c73fe8"
@@ -7791,7 +7790,7 @@ msgstr ""
 
 #: level 03 scene 1
 msgid "-1/0c249548"
-msgstr "Dobra, to nie będzie wcale bolało."
+msgstr "Dobra, to ani trochę nie zaboli."
 
 #: level 03 scene 1
 msgid "-1/4ce9c716"
@@ -7902,8 +7901,8 @@ msgstr ""
 #: level 03 scene 4
 msgid "-1/7959df73"
 msgstr ""
-"Nie lekceważ Przewodniczącego Dreka[xAD]jest bardzo niebezpieczny. Musimy "
-"znaleźć Kapitana Qwarka"
+"Nie lekceważ Prezesa Dreka[xAD]jest bardzo niebezpieczny. Musimy znaleźć "
+"Kapitana Qwarka"
 
 #: level 03 scene 4
 msgid "-1/3b04dfa9"
@@ -7983,16 +7982,16 @@ msgstr "Och."
 msgid "-1/374aea04"
 msgstr ""
 "Cześć, tu Kapitan Qwark. Uwierzcie mi, nie ma nic gorszego niż patrzeć w "
-"oczy Blargiańskiej Bestii, i to od środka, ze świadomością, że sprzęt nie "
-"działa jak należy."
+"oczy Blargańskiej Snagglebestii, i to od środka, ze świadomością, że sprzęt "
+"nie działa jak należy."
 
 #: level 03 scene 9
 msgid "-1/922d22e3"
 msgstr ""
-"Dlatego ze wszystkimi sprawami elektronicznymi przychodzę do Al's "
-"Roboshack. Al naprawia moje super elektrogadżety, odkąd byłem wielkości "
-"Piaskowej Myszy. Jeśli Al tego nie naprawi, to znaczy, że nie jest zepsute. "
-"Prawda, Al?"
+"Dlatego ze wszystkimi sprawami elektronicznymi przychodzę do Robosklepu "
+"Ala. Al naprawia moje super elektrogadżety, odkąd byłem wielkości piaskowej "
+"myszy. Jeśli Al tego nie naprawi, to znaczy, że nie jest zepsute. Prawda, "
+"Al?"
 
 #: level 03 scene 9
 msgid "-1/a9d0510d"
@@ -8002,7 +8001,7 @@ msgstr "Święta racja, kolego!"
 msgid "-1/80858f8b"
 msgstr ""
 "Więc niezależnie, czy walczysz ze zbrodnią, czy z brudem[xAD]he-he, przyjdź "
-"do Al's Roboshack w Metropolis po każdą naprawę robota. "
+"do Robosklepu Ala w Metropolis po każdą naprawę robota. "
 
 #: level 04 scene 0
 msgid "-1/7468809a"
@@ -8034,7 +8033,7 @@ msgstr "Mam."
 msgid "-1/902ab959"
 msgstr ""
 "Jasne. Musimy znaleźć Qwarka. Ale kiedy go znajdziemy, czy nie byłoby miło "
-"móc mu powiedzieć, gdzie jest Przewodniczący Drek?"
+"móc mu powiedzieć, gdzie jest Prezes Drek?"
 
 #: level 04 scene 1
 msgid "-1/9c05e13f"
@@ -8060,7 +8059,7 @@ msgstr "Ekstra!"
 
 #: level 04 scene 3
 msgid "-1/53e553e8"
-msgstr "Witam, Najwyższy Przewodniczący Dreku."
+msgstr "Witam, Prezesie Zarządu."
 
 #: level 04 scene 3
 msgid "-1/a386b3f6"
@@ -8199,7 +8198,7 @@ msgstr "Żartuję!  Sorry, nie jest na sprzedaż.  I co to w ogóle jest RYNO?"
 
 #: level 05 scene 7
 msgid "-1/087b5e96"
-msgstr "Rozwalę Ye Na Ostro."
+msgstr "Rip Ya a New One. Zrobię ci nową dziurę."
 
 #: level 05 scene 7
 msgid "-1/d5204740"
@@ -8207,7 +8206,7 @@ msgstr "Coś ty mi powiedział?"
 
 #: level 05 scene 7
 msgid "-1/be15b2fc"
-msgstr "R-Y-N-O.  Rozwalę Ye Na Ostro. "
+msgstr "R-Y-N-O.  Rip Ya a New One. Zrobię ci nową dziurę. "
 
 #: level 05 scene 7
 msgid "-1/e48fd8ae"
@@ -8223,7 +8222,7 @@ msgstr ""
 
 #: level 05 scene 7
 msgid "-1/80c38cb7"
-msgstr "Czekaj!  Nie mów - Rozwalisz Ye Na Ostro!"
+msgstr "Czekaj!  Nie mów - zrobisz mi nową dziurę!"
 
 #: level 05 scene 8
 msgid "-1/d384a1b8"
@@ -8376,9 +8375,8 @@ msgstr "Czyli jest pan wynalazcą!"
 #: level 06 scene 0
 msgid "-1/71439907"
 msgstr ""
-"Inżynierem Gadżetów. Tworzę rewolucyjne urządzenia dla Najwyższego "
-"Przewodniczącego Dreka. Na przykład, voilà!  Moje wkrótce opatentowane "
-"GRINDBOOTS."
+"Inżynierem Gadżetów. Tworzę rewolucyjne urządzenia dla Prezesa Zarządu "
+"Dreka. Na przykład, voilà!  Moje wkrótce opatentowane GRINDBOOTS."
 
 #: level 06 scene 0
 msgid "-1/1cce50b4"
@@ -8429,8 +8427,8 @@ msgstr "Czy twoja obecna praca zostawia niesmak?"
 #: level 06 scene 4
 msgid "-1/041199be"
 msgstr ""
-"W takim razie poznaj BTS: Blargiańską Taktyczną Stację Badawczą. Cześć, tu "
-"Najwyższy Przewodniczący Drek, a my w BTS szukamy zmotywowanych osób na te "
+"W takim razie poznaj BTS: Blargańską Taktyczną Stację Badawczą. Cześć, tu "
+"Najwyższy Prezes Zarządu Drek, a my w BTS szukamy zmotywowanych osób na te "
 "ekscytujące stanowiska:"
 
 #: level 06 scene 4
@@ -8528,7 +8526,7 @@ msgstr "Po prostu[xAD]coś tu nie gra. "
 
 #: level 07 scene 1
 msgid "-1/c8dcd9e5"
-msgstr "To jest to! Qwark pomoże nam powstrzymać Przewodniczącego Dreka."
+msgstr "To jest to! Qwark pomoże nam powstrzymać Prezesa Dreka."
 
 #: level 07 scene 1
 msgid "-1/94f92fff"
@@ -8655,8 +8653,8 @@ msgstr "Czy tobie też się to zdarzyło?"
 #: level 08 scene 0
 msgid "-1/9d5bf879"
 msgstr ""
-"Baczność, dezerterzy! Następnym razem, jak spróbujecie zwiać, sam was "
-"zastrzelę!"
+"Baczność, wy dezerterskie robaki! Następnym razem, jak spróbujecie zwiać, "
+"sam was zastrzelę!"
 
 #: level 08 scene 0
 msgid "-1/6013bdcb"
@@ -8799,8 +8797,7 @@ msgstr "Ło! Jeśli kiedyś dopracują to ustrojstwo, muszę sobie takie sprawi�
 
 #: level 08 scene 5
 msgid "-1/dceb18d6"
-msgstr ""
-"Jeśli pracują dla Przewodniczącego Dreka, mogą wiedzieć, gdzie on jest."
+msgstr "Jeśli pracują dla Prezesa Dreka, mogą wiedzieć, gdzie on jest."
 
 #: level 08 scene 5
 msgid "-1/238ce6b4"
@@ -8827,7 +8824,7 @@ msgstr "Hej, znam was dwóch."
 
 #: level 08 scene 6
 msgid "-1/72fa7140"
-msgstr "Patrzcie, hydraulik się zjawia!"
+msgstr "Patrz, hydraulik się zjawił!"
 
 #: level 08 scene 6
 msgid "-1/3ab11b59"
@@ -9096,7 +9093,7 @@ msgstr ""
 msgid "-1/4990656e"
 msgstr ""
 "Spokojnie, spokojnie, widzę, że naprawdę chcecie polatać naszym "
-"odrzutowcem, więc powiem wam tak. Pogadajcie z Bobem w jego Roboshacku. On "
+"odrzutowcem, więc powiem wam tak. Pogadajcie z Bobem w jego Robosklepie. On "
 "zna się na tych zamkach."
 
 #: level 11 scene 2
@@ -9121,7 +9118,7 @@ msgstr "Poznaję tę robotę. Byliście u Ala, nie?"
 
 #: level 11 scene 3
 msgid "-1/8f424136"
-msgstr "No, zamontował helipack."
+msgstr "No, zamontował Heli-Packa."
 
 #: level 11 scene 3
 msgid "-1/84e83944"
@@ -9131,7 +9128,7 @@ msgstr "Toć widzę!"
 msgid "-1/93e0c180"
 msgstr ""
 "Nauczyłem tego mojego głupiego brata wszystkiego, co umie. Słuchajcie, jak "
-"chcecie porządnego sprzętu, to mogę zamontować małemu Thrusterpacka."
+"chcecie porządnego sprzętu, to mogę zamontować małemu Thruster-Packa."
 
 #: level 11 scene 3
 msgid "-1/4dbdbfad"
@@ -9144,8 +9141,8 @@ msgstr "Pomoże nam to przejść przez ten dziwny zamek przy garażu myśliwca?"
 #: level 11 scene 3
 msgid "-1/ced8938e"
 msgstr ""
-"Aa[xAD]znacie te ustrojstwa, co? No pewnie, że pomoże! Ma wbudowane "
-"specjalne uderzenie z wyskoku."
+"Aa[xAD]znacie te ustrojstwa, co? No pewnie, że pomoże! Ma wbudowany "
+"specjalny Potężny cios."
 
 #: level 11 scene 3
 msgid "-1/db2688cc"
@@ -9167,7 +9164,7 @@ msgstr "Proszę bardzo, kolego. Lepszy niż nowy!"
 
 #: level 11 scene 4
 msgid "-1/8db1abf7"
-msgstr "No pewnie[xAD]jestem gość!"
+msgstr "No pewnie[xAD]JA tu rządzę!"
 
 #: level 11 scene 4
 msgid "-1/e4bab73d"
@@ -9377,7 +9374,7 @@ msgstr "Bądź grzeczny! "
 msgid "-1/895a0723"
 msgstr ""
 "Chyba mam dla ciebie coś specjalnego. Co powiesz na ulepszenie do "
-"Hydropacka?"
+"Hydro-Packa?"
 
 #: level 12 scene 3
 msgid "-1/b5ada082"
@@ -9410,7 +9407,7 @@ msgstr "Wpadaj do mnie, kiedy tylko zechcesz!"
 #: level 12 scene 5
 msgid "-1/a2b74b94"
 msgstr ""
-"Witajcie ponownie. Tu Najwyższy Przewodniczący Drek z wieściami o naszych "
+"Witajcie ponownie. Tu Najwyższy Prezes Zarządu Drek z wieściami o naszych "
 "postępach. "
 
 #: level 12 scene 5
@@ -9429,14 +9426,14 @@ msgstr ""
 #: level 12 scene 5
 msgid "-1/7423c4b6"
 msgstr ""
-"Planetbuster Maximus. Urządzenie zdolne rozbić całą planetę na cząstki "
-"subatomowe. Jesteśmy z niego bardzo dumni. Oto jak działa."
+"Niszczyciel planet Maximus. Urządzenie zdolne rozbić całą planetę na "
+"cząstki subatomowe. Jesteśmy z niego bardzo dumni. Oto jak działa."
 
 #: level 12 scene 5
 msgid "-1/5cbec3d9"
 msgstr ""
-"Mocujemy Planetbuster do tego statku, wprowadzamy go na orbitę planety i "
-"puszczamy. Bum! He-he. Naprawdę genialne."
+"Mocujemy niszczyciel planet do tego statku, wprowadzamy go na orbitę "
+"planety i puszczamy. Bum! He-he. Naprawdę genialne."
 
 #: level 12 scene 5
 msgid "-1/25e710e5"
@@ -9712,7 +9709,7 @@ msgstr ""
 #: level 14 scene 7
 msgid "-1/4f45d0df"
 msgstr ""
-"Wydaje się już pewne, że Najwyższy Przewodniczący Drek nie zrezygnuje z "
+"Wydaje się już pewne, że Najwyższy Prezes Zarządu Drek nie zrezygnuje z "
 "niszczenia galaktyki dla własnych samolubnych celów."
 
 #: level 14 scene 7
@@ -9954,8 +9951,7 @@ msgstr ""
 
 #: level 16 scene 2
 msgid "-1/351fd5e2"
-msgstr ""
-"Ej, w końcu poznamy dziewczynę z Help Desku!  Mam nadzieję, że jest ładna."
+msgstr "Ej, w końcu poznamy dziewczynę z Pomocy!  Mam nadzieję, że jest ładna."
 
 #: level 16 scene 2
 msgid "-1/20a5d49c"
