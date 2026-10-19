@@ -161,6 +161,27 @@ static int is_mark(unsigned byte) {
     return rac1_mark_of[byte & 0xFF] != 0;
 }
 
+/* The scrolling text on the vendor's neon panel (Vendor_DrawScrollText): its font has capitals,
+ * digits and punctuation only, and a byte below 0x20 reads past its glyph table, so a translation's
+ * marks are dropped there and its letters shown plain. */
+void func_00239628(gaddr text, int x, int y, float scale) {
+    enum { SIZE = 512 };
+    static gaddr plain = 0;
+    if (plain == 0) {
+        plain = openrac_guest_static(SIZE);
+    }
+    const uint8_t* src = (const uint8_t*)G(text);
+    uint8_t* dst = (uint8_t*)G(plain);
+    int n = 0;
+    for (int i = 0; src[i] != 0 && n < SIZE - 1; ++i) {
+        if (!is_mark(src[i])) {
+            dst[n++] = src[i];
+        }
+    }
+    dst[n] = 0;
+    func_00239628__game(plain, x, y, scale);
+}
+
 /* How far the marks are moved from where draw_mark puts them, in pixels of the unscaled font. */
 enum { ACUTE_DX = 0, STROKE_DX = -1, STROKE_DY = 5, DOT_DY = -9, DOT_DY_CAPITAL = -12, OGONEK_DX = -2, OGONEK_DY = 1 };
 
