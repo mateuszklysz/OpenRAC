@@ -1176,7 +1176,7 @@ msgstr "Szybki wybór"
 
 #: all_text
 msgid "20197/20dfc649"
-msgstr "Rzeczy"
+msgstr "Przedmioty"
 
 #: all_text
 msgid "20198/a8b5f392"
