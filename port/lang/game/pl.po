@@ -1270,7 +1270,7 @@ msgstr "[R1] Następna mapa"
 
 #: all_text
 msgid "20220/1891b89a"
-msgstr "[lstick] [rstick] Ruch/Zoom"
+msgstr "[lstick] [rstick] Śledź/Przybliż"
 
 #: all_text
 msgid "20221/6ded8a49"
@@ -1382,7 +1382,7 @@ msgstr ""
 #: all_text
 msgid "20241/3a74a4fa"
 msgstr ""
-"Kucnij [R1] i obracaj się w miejscu [lstick]. W ten sposób możesz obracać "
+"Kucnij [R1] i obracaj się w miejscu [lstick]. Tą techniką możesz obracać "
 "się w miejscu i strzelać."
 
 #: all_text
@@ -1395,15 +1395,15 @@ msgstr ""
 #: all_text
 msgid "20243/31ecdffd"
 msgstr ""
-"Spróbuj przewrotu w bok! Przytrzymaj [R1], by kucnąć, i szarpnij [lstick] w "
-"prawo lub w lewo, naciskając [cross]. Dla stylu strzelaj podczas przewrotu!"
+"Spróbuj salta w bok! Przytrzymaj [R1], by kucnąć, i szarpnij [lstick] w "
+"prawo lub w lewo, wciskając [cross]. Dla stylu strzelaj w trakcie salta!"
 
 #: all_text
 msgid "20244/1b9b8059"
 msgstr ""
-"Ten ruch świetnie sprawdza się przy wycofywaniu się przed wrogami. "
-"Przytrzymaj [R1], by kucnąć, i szarpnij [lstick] do tyłu, naciskając "
-"[cross]. Spróbuj rzucać bomby, robiąc salta w tył!"
+"Ten ruch przydaje się przy wycofywaniu się przed wrogami. Przytrzymaj [R1], "
+"by kucnąć, i szarpnij [lstick] do tyłu, wciskając [cross]. Rzucaj bomby "
+"podczas salt w tył!"
 
 #: all_text
 msgid "20245/9b9b6547"
@@ -1414,8 +1414,8 @@ msgstr ""
 #: all_text
 msgid "20246/64e5cbb2"
 msgstr ""
-"Wisząc na krawędzi, możesz się po niej przesuwać, ruszając [lstick] w lewo "
-"lub w prawo."
+"Wisząc na krawędzi, możesz się po niej przesuwać, wychylając [lstick] w "
+"lewo lub w prawo."
 
 #: all_text
 msgid "20247/101cd199"
@@ -1610,12 +1610,12 @@ msgstr "Opcje dźwięku"
 #: all_text
 msgid "20292/bad56667"
 msgstr ""
-"Oto [orange]Hoverboard[default] Z3000 Deluxe produkcji Gadgetronu. Możesz "
-"go używać w wyścigach w całej galaktyce. Hoverboard zakłada się sam, gdy "
-"tylko wejdziesz na Oficjalny HoverTor Gadgetronu. \n\nW wyścigu skaczesz "
-"[cross]. Triki wykonasz, skacząc i naciskając kombinacje [R1], [R2], [L1] i "
-"[L2]. W powietrzu spróbuj też kręcić się [lstick]. \n\nZnajdź "
-"[orange]Zoomerator[default], a zamienisz triki w turbo!"
+"To [orange]Hoverboard[default] Z3000 Deluxe firmy Gadgetron. Możesz go "
+"używać w wyścigach w całej galaktyce. Hoverboard zakłada się sam, gdy "
+"wejdziesz na Oficjalny Tor Gadgetron. \n\nW wyścigu skacz [cross]. Triki "
+"wykonasz, skacząc i wciskając kombinacje [R1], [R2], [L1] i [L2]. W "
+"powietrzu możesz też kręcić się [lstick]. \n\nZnajdź "
+"[orange]Zoomerator[default] i zamieniaj triki w turbo!"
 
 #: all_text
 msgid "20293/1343cc05"
@@ -1717,7 +1717,7 @@ msgstr "[rstick] przybliża"
 
 #: all_text
 msgid "20311/5aaaa95f"
-msgstr "[lstick] przesuwa"
+msgstr "[lstick] śledzi"
 
 #: all_text
 msgid "20312/806b1aba"
@@ -1988,14 +1988,15 @@ msgstr ""
 #: all_text
 msgid "20355/45c0686d"
 msgstr ""
-"[orange]Trespasser[default] Gadgetronu to idealne urządzenie do pokonywania "
-"[orange]Invinco-Locków[default]. Stań na płycie aktywacyjnej "
-"[orange]Invinco-Locka[default] i naciśnij [circle], by otworzyć jego "
-"interfejs. \n\nNa każdym pierścieniu [orange]Invinco-Locka[default] są "
-"lasery. Ruszaj [lstick] w górę i w dół, by wybrać pierścień, a w lewo i w "
-"prawo, by go obracać. Wyceluj lasery w odbiorniki na zewnętrznym "
-"pierścieniu, aby zrobiły się zielone. \n\n[orange]Invinco-Lock[default] "
-"otworzy się dopiero, gdy wszystkie odbiorniki będą zielone."
+"[orange]Trespasser[default] firmy Gadgetron świetnie radzi sobie z "
+"[orange]Invinco-Lockami[default]. Stań na podkładce "
+"[orange]Invinco-Locka[default] i wciśnij [circle], by otworzyć interfejs "
+"[orange]Invinco-Locka[default]. \n\nNa każdym pierścieniu "
+"[orange]Invinco-Locka[default] są lasery. Wychylaj [lstick] w górę i w dół, "
+"by wybrać pierścień; w lewo i w prawo, by go obracać. Celuj laserami w "
+"odbiorniki na zewnętrznym pierścieniu, aż zrobią się zielone. \n\nWszystkie "
+"odbiorniki muszą być zielone, zanim [orange]Invinco-Lock[default] się "
+"otworzy. "
 
 #: all_text
 msgid "20356/2b6abe9a"
@@ -5677,7 +5678,7 @@ msgstr "Otwórz te drzwi [orange]Trespasserem[default] Gadgetronu."
 
 #: all_text
 msgid "5000/062c3161"
-msgstr "Ścigajmy się! Skręcasz [lstick], skaczesz [cross]."
+msgstr "Ścigajmy się! Steruj [lstick], skacz [cross]."
 
 #: all_text
 msgid "5001/9387b521"
@@ -5904,8 +5905,8 @@ msgstr ""
 #: all_text
 msgid "2012/7919f3cd"
 msgstr ""
-"[orange]Trespasserem[default] sterujesz [lstick]. Ruch w górę i w dół "
-"wybiera pierścień, w lewo i w prawo go obraca."
+"Steruj [orange]Trespasserem[default] za pomocą [lstick]. Góra i dół "
+"wybierają pierścień; lewo i prawo go obracają."
 
 #: all_text
 msgid "2013/fbe40b83"
@@ -5927,7 +5928,7 @@ msgstr "Masz mnóstwo śrub. Może wydasz trochę w automacie Gadgetronu?"
 
 #: all_text
 msgid "20002/e57403d0"
-msgstr "Kamerą sterujesz [rstick]."
+msgstr "Kamerą sterujesz za pomocą [rstick]."
 
 #: all_text
 msgid "20003/b2a87b51"
@@ -6118,9 +6119,7 @@ msgstr ""
 
 #: all_text
 msgid "12004/062a6bb9"
-msgstr ""
-"Unosząc się, używaj [R2] lub [L2] razem z [lstick], by przesuwać się na "
-"boki."
+msgstr "Użyj [R2] lub [L2] z [lstick], by unosząc się, poruszać się bokiem."
 
 #: all_text
 msgid "13000/c5e48006"
@@ -7290,3 +7289,2865 @@ msgstr "Najlepszy czas"
 #: all_text
 msgid "21276/671ff335"
 msgstr "Najlepszy wynik"
+
+#: level 00 scene 0
+msgid "-1/b830c3cb"
+msgstr ""
+"Ostatni krok: podłącz Robotyczny System Zapłonu. Dziękujemy za korzystanie "
+"z technologii Help Desk."
+
+#: level 00 scene 2
+msgid "-1/210fe3e8"
+msgstr "Ciekawe.  "
+
+#: level 00 scene 2
+msgid "-1/55e415c6"
+msgstr "Całkiem nieźle radzisz sobie z kluczem."
+
+#: level 00 scene 2
+msgid "-1/0454615a"
+msgstr "No pewnie. "
+
+#: level 00 scene 2
+msgid "-1/e5c1cf56"
+msgstr " Zbudowałem nim ten statek."
+
+#: level 00 scene 2
+msgid "-1/7935e21d"
+msgstr "Szukam właśnie kogoś, kto mógłby pomóc ocalić układ słoneczny."
+
+#: level 00 scene 2
+msgid "-1/79848022"
+msgstr "Wiesz może, gdzie mógłbym znaleźć takiego gościa?"
+
+#: level 00 scene 2
+msgid "-1/e71454cb"
+msgstr ""
+"No, co tydzień jest w radiu.  Poza tym[xAD]nie.  Ej, o co chodzi z tym "
+"całym ratowaniem układu słonecznego?"
+
+#: level 00 scene 3
+msgid "-1/4fa5390c"
+msgstr ""
+"Ludzie na tamtych planetach mają przechlapane.  No to powodzenia z "
+"namawianiem Kapitana Qwarka."
+
+#: level 00 scene 3
+msgid "-1/c2201323"
+msgstr ""
+"Właściwie to ty mógłbyś mi pomóc.  Gdybyś zabrał mnie swoim statkiem pod "
+"współrzędne z tego infobota, może zdobyłbym tam więcej informacji."
+
+#: level 00 scene 3
+msgid "-1/65c76693"
+msgstr "Nawet gdybym chciał, nie mogę.   Brakuje mi kluczowej części statku."
+
+#: level 00 scene 3
+msgid "-1/3ca5c123"
+msgstr "Robotycznego Systemu Zapłonu."
+
+#: level 00 scene 3
+msgid "-1/ecbe84d7"
+msgstr "Skąd wiedziałeś?"
+
+#: level 00 scene 3
+msgid "-1/84e1479b"
+msgstr ""
+"Tak się składa, proszę pana, że mam najnowszy Robotyczny System Zapłonu.  "
+"Moje oprogramowanie pozwala mi uruchomić dowolny statek."
+
+#: level 00 scene 3
+msgid "-1/080ccefe"
+msgstr ""
+"No, to rozumiem.  Czyli zabieram cię tam[xAD]gdziekolwiek to jest[xAD]a ty "
+"odpalasz mi statek."
+
+#: level 00 scene 3
+msgid "-1/a16b2059"
+msgstr "To właśnie proponuję."
+
+#: level 00 scene 3
+msgid "-1/ab9d9b47"
+msgstr "Umowa stoi!"
+
+#: level 00 scene 5
+msgid "-1/e9ca5a8d"
+msgstr ""
+"Dziś w Blarg TV wydarzenie, na które wszyscy czekaliście. Całkowita zagłada "
+"całej planety."
+
+#: level 00 scene 5
+msgid "-1/8f013641"
+msgstr "Zobaczcie potęgę[xAD]"
+
+#: level 00 scene 5
+msgid "-1/8607477c"
+msgstr "[xAD]zniszczenie[xAD]"
+
+#: level 00 scene 5
+msgid "-1/7f58b6ae"
+msgstr "[xAD]i nicość, która po nich nastaje."
+
+#: level 00 scene 5
+msgid "-1/63401688"
+msgstr ""
+"Dołączcie do Najwyższego Przewodniczącego Dreka, gdy wciśnie przycisk, "
+"który kończy jeden świat i zaczyna nowy."
+
+#: level 00 scene 5
+msgid "-1/a8f2af0f"
+msgstr ""
+"A potem zostańcie z nami na \"Najzabawniejszych wpadkach superbohaterów "
+"galaktyki\" z Kapitanem Qwarkiem."
+
+#: level 01 scene 0
+msgid "-1/4a76ee15"
+msgstr "Do licha!"
+
+#: level 01 scene 0
+msgid "-1/28f9c3f0"
+msgstr "Patrzcie, hydraulik się wypina."
+
+#: level 01 scene 0
+msgid "-1/5ffb868c"
+msgstr "Coś ty powiedział?!"
+
+#: level 01 scene 0
+msgid "-1/809f33e3"
+msgstr "Powiedziałem: \"Patrzcie, hydraulik się zjawia!\""
+
+#: level 01 scene 0
+msgid "-1/33a3637b"
+msgstr ""
+"Dobra, mądralo, nie powinieneś być na którymś z transportowców "
+"ewakuacyjnych?"
+
+#: level 01 scene 0
+msgid "-1/dbc83671"
+msgstr "Transportowców ewakuacyjnych?"
+
+#: level 01 scene 0
+msgid "-1/b76a79fd"
+msgstr ""
+"Wiadomość z ostatniej chwili: atakują wielkie roboty. Transportowce "
+"zabierają wszystkich bogaczy z tej przeklętej planety."
+
+#: level 01 scene 0
+msgid "-1/a64d4862"
+msgstr "To czemu nie jesteś na żadnym?"
+
+#: level 01 scene 0
+msgid "-1/01ee1ba8"
+msgstr "Nierówności społeczno-ekonomiczne. "
+
+#: level 01 scene 0
+msgid "-1/cddecfe8"
+msgstr "Co?!"
+
+#: level 01 scene 0
+msgid "-1/7b00e2af"
+msgstr "Nie ma dość śrub."
+
+#: level 01 scene 0
+msgid "-1/07badfde"
+msgstr "Ludzie pracy muszą czekać, aż uratuje nas Kapitan Qwark. "
+
+#: level 01 scene 0
+msgid "-1/009788d2"
+msgstr "Masz coś, co jest warte dużo śrub?"
+
+#: level 01 scene 0
+msgid "-1/18201430"
+msgstr ""
+"Mam to - pokazuje dwóch dziwaków, którzy porzucają statek.  Są tam też "
+"współrzędne pustynnej planety. "
+
+#: level 01 scene 0
+msgid "-1/0452e092"
+msgstr "Infobot.  Ratchet, przyda nam się."
+
+#: level 01 scene 1
+msgid "-1/bf67c9bc"
+msgstr "Czy on właśnie zjechał rurą kanalizacyjną?"
+
+#: level 01 scene 2
+msgid "-1/e32618b2"
+msgstr "Widziałeś tego gościa po lewej? To był Skid McMarx. "
+
+#: level 01 scene 2
+msgid "-1/b083d6ce"
+msgstr "Zna Kapitana Qwarka?"
+
+#: level 01 scene 2
+msgid "-1/d4590843"
+msgstr ""
+"Wątpię.  To zawodowy hoverboardzista - ciągle gada, jaki to on nie jest "
+"super."
+
+#: level 01 scene 2
+msgid "-1/9422c926"
+msgstr "Chyba ma kłopoty."
+
+#: level 01 scene 2
+msgid "-1/349553bb"
+msgstr "No ba!  Nigdy nie widziałem go tak przerażonego[xAD]"
+
+#: level 01 scene 3
+msgid "-1/2410b59c"
+msgstr ""
+"Nie róbcie mi krzywdy! Nie róbcie mi krzywdy! Kim jesteście? Najemnikami? "
+"Oprawcami? Zabójcami? Powiem wam wszystko! Macie, weźcie mojego infobota, "
+"nic więcej mi nie zostało!"
+
+#: level 01 scene 3
+msgid "-1/5d6af222"
+msgstr "Proszę pana, nie jesteśmy zabój-"
+
+#: level 01 scene 3
+msgid "-1/7028e1ed"
+msgstr "Czekaj! Zobaczmy, co ma!"
+
+#: level 01 scene 4
+msgid "-1/60495c0c"
+msgstr "Wiesz, co to znaczy?"
+
+#: level 01 scene 4
+msgid "-1/d73bc3ca"
+msgstr "No, Kapitan Qwark naprawdę się sprzedał."
+
+#: level 01 scene 4
+msgid "-1/9bf9583a"
+msgstr ""
+"Nie, to znaczy, że Kapitan Qwark jest na Metropolis!  Moglibyśmy mu "
+"powiedzieć o inwazji[xAD]"
+
+#: level 01 scene 4
+msgid "-1/60b6f741"
+msgstr "Gdybyśmy mieli statek[xAD]"
+
+#: level 01 scene 4
+msgid "-1/f08d3805"
+msgstr "Hę?[xAD]eee, statek? Nie będziecie mnie torturować? "
+
+#: level 01 scene 4
+msgid "-1/6244c921"
+msgstr ""
+"Cóż, jako przewodniczący planety mógłbym wam pożyczyć nasz statek kurierski."
+
+#: level 01 scene 4
+msgid "-1/7c9e8a39"
+msgstr "Super!"
+
+#: level 01 scene 4
+msgid "-1/236ef66c"
+msgstr "Może pan na nas liczyć."
+
+#: level 01 scene 4
+msgid "-1/b859d76e"
+msgstr "Eee[xAD]tak. Dziękujemy[xAD]wasza[xAD]przewodniczącość[xAD]"
+
+#: level 01 scene 5
+msgid "-1/b11f3182"
+msgstr "Uuuf!"
+
+#: level 01 scene 5
+msgid "-1/07928ee3"
+msgstr "Uuuf!"
+
+#: level 01 scene 5
+msgid "-1/88285ec2"
+msgstr "Uhn[xAD] Clank?  Gdzie jesteś?"
+
+#: level 01 scene 5
+msgid "-1/f74486ff"
+msgstr "Hmm tutj hrrr."
+
+#: level 01 scene 5
+msgid "-1/9f705dd0"
+msgstr "Och, przepraszam. "
+
+#: level 01 scene 5
+msgid "-1/98b54f08"
+msgstr "No[xAD] nie wyjdziemy tędy, którędy weszliśmy."
+
+#: level 01 scene 5
+msgid "-1/2e479f6d"
+msgstr "Może zdobędziemy statek od któregoś z mieszkańców."
+
+#: level 01 scene 5
+msgid "-1/4f8280ab"
+msgstr "O ile ktoś jeszcze został."
+
+#: level 02 scene 0
+msgid "-1/b56c882f"
+msgstr "To on.  Skid McMarx! "
+
+#: level 02 scene 0
+msgid "-1/3f4cae2b"
+msgstr "Ten człowiek z infobota."
+
+#: level 02 scene 0
+msgid "-1/9be0056b"
+msgstr ""
+"We własnej osobie, mały. Widzieliście tę epicką bitwę kosmiczną, w której "
+"byłem?"
+
+#: level 02 scene 0
+msgid "-1/27dccc42"
+msgstr "Widzieliśmy, jak krzyczysz o pomoc.   "
+
+#: level 02 scene 0
+msgid "-1/084043a9"
+msgstr ""
+"Eee[xAD] To był taki okrzyk bojowy.  Ja i mój agent wpadliśmy w zasadzkę w "
+"drodze na trening.  "
+
+#: level 02 scene 0
+msgid "-1/93b6d894"
+msgstr "Czy przeżył katastrofę, proszę pana?"
+
+#: level 02 scene 0
+msgid "-1/5223485e"
+msgstr ""
+"Aaa, nic mu nie jest. Ale ja mam mały problem z dotarciem do mojego "
+"statku[xAD]"
+
+#: level 02 scene 0
+msgid "-1/2380f1bc"
+msgstr "[xAD]przez skręconą kostkę. "
+
+#: level 02 scene 0
+msgid "-1/72f94054"
+msgstr "No weź!  "
+
+#: level 02 scene 0
+msgid "-1/f5ed595a"
+msgstr ""
+"Jeśli rozprawicie się ze wszystkimi Piaskowymi Rekinami, może znajdę dla "
+"was zapasowy hoverboard."
+
+#: level 02 scene 0
+msgid "-1/e749651e"
+msgstr ""
+"Chętnie panu pomożemy, panie McMarx, ale Ratchet i ja musimy znaleźć "
+"Kapitana[xAD]"
+
+#: level 02 scene 0
+msgid "-1/891d6aed"
+msgstr ""
+"Ćśś!  Jedną z twoich desek[xAD]?  Hmmm[xAD] Zawsze chciałem porządny "
+"hoverboard[xAD]  No dobra[xAD]"
+
+#: level 02 scene 0
+msgid "-1/99cb7bcf"
+msgstr "[xAD]tylko trzymaj tę nogę w górze. "
+
+#: level 02 scene 1
+msgid "-1/c672e2eb"
+msgstr "Masz, stary.  Łap!"
+
+#: level 02 scene 1
+msgid "-1/ec288d03"
+msgstr "Nowiutki Z-3000!  Tego nawet nie da się kupić[xAD]"
+
+#: level 02 scene 1
+msgid "-1/24d07986"
+msgstr "Dobra, spadam.  Do zobaczenia na wyścigach hoverboardów.  "
+
+#: level 02 scene 2
+msgid "-1/7ffdc17d"
+msgstr "Aaargh[xAD]Zero zasięgu!"
+
+#: level 02 scene 2
+msgid "-1/1ae9746d"
+msgstr "Ten przestój mnie wykończy!!!"
+
+#: level 02 scene 2
+msgid "-1/5bd04923"
+msgstr "Potrzebuje pan pomocy medycznej?"
+
+#: level 02 scene 2
+msgid "-1/d37d2f4b"
+msgstr ""
+"Nie bierz wszystkiego dosłownie, synu. Problem w tym, że utknąłem na tej "
+"zapadłej planecie, a mojej gwiazdy nigdzie nie ma."
+
+#: level 02 scene 2
+msgid "-1/8ad71650"
+msgstr "Ej, widzieliśmy cię w tym infobocie! Jesteś agentem Skida!"
+
+#: level 02 scene 2
+msgid "-1/d7220e32"
+msgstr ""
+"Byłem agentem Skida. Nie widziałem go od katastrofy, a agent bez klienta "
+"jest jak pchła bez psa."
+
+#: level 02 scene 2
+msgid "-1/52d5e8f8"
+msgstr ""
+"Wyglądasz na wysportowanego dzieciaka. Jeśli zdobędziesz nagrodę mistrzostw "
+"w wyścigach hoverboardów w Blackwater City, zrobię z ciebie moją nową "
+"gwiazdę."
+
+#: level 02 scene 2
+msgid "-1/9edccbd6"
+msgstr "Nie mamy czasu na błahostki, proszę pana."
+
+#: level 02 scene 2
+msgid "-1/045fd8d1"
+msgstr "Hmmmm[xAD]Mógłbym być nowym Skidem McMarxem!"
+
+#: level 02 scene 3
+msgid "-1/89a2fab5"
+msgstr "Fantastycznie, masz ją!  Świetna robota, mały! No, muszę lecieć."
+
+#: level 02 scene 3
+msgid "-1/25bf8057"
+msgstr "To[xAD]będziesz moim agentem?"
+
+#: level 02 scene 3
+msgid "-1/960c514b"
+msgstr "No pewnie, mały! A na dobry początek mam[xAD]to"
+
+#: level 02 scene 3
+msgid "-1/a0010214"
+msgstr "Super hełm!"
+
+#: level 02 scene 3
+msgid "-1/a9431bb8"
+msgstr "To Sonic Summoner. Służy do przywabiania Piaskowych Myszy."
+
+#: level 02 scene 3
+msgid "-1/4891153f"
+msgstr ""
+"Właśnie! I jest twój. No, idę dopiąć papiery. Moi ludzie zadzwonią do "
+"twoich ludzi!"
+
+#: level 02 scene 3
+msgid "-1/089a5536"
+msgstr "Masz ludzi?"
+
+#: level 02 scene 4
+msgid "-1/9126ac94"
+msgstr "Tak!"
+
+#: level 03 scene 0
+msgid "-1/83b92524"
+msgstr "Ratchet, to ten człowiek z infobota. Pamiętasz?  Zna Kapitana Qwarka!"
+
+#: level 03 scene 0
+msgid "-1/7f428057"
+msgstr "Hej, ty jesteś tym gościem z robotem, co?"
+
+#: level 03 scene 0
+msgid "-1/a70c1437"
+msgstr ""
+"Nie, właściwie to buduję roboty. Ja sam nie jestem, że tak powiem, "
+"robotem.  Ha-ha.  "
+
+#: level 03 scene 0
+msgid "-1/a72b0956"
+msgstr "Kujon."
+
+#: level 03 scene 0
+msgid "-1/5974c2e2"
+msgstr "Lubię go."
+
+#: level 03 scene 0
+msgid "-1/ee1c80ef"
+msgstr "Skoro to sobie wyjaśniliśmy, co mogę dla was zrobić?"
+
+#: level 03 scene 0
+msgid "-1/5afe4f8d"
+msgstr ""
+"Widzieliśmy twoje ogłoszenie w infobocie.  Byłeś z Kapitanem Qwarkiem.  "
+"Szukamy Kapitana Qwarka. Myśleliśmy, że nam pomożesz."
+
+#: level 03 scene 0
+msgid "-1/1913cd68"
+msgstr ""
+"Godna pochwały logika.  Ale nie widziałem Kapitana Qwarka od nagrania tej "
+"reklamy.  Słuchaj, działasz na standardowej płytce XP-18?"
+
+#: level 03 scene 0
+msgid "-1/ae346efa"
+msgstr "Wersja 7.66."
+
+#: level 03 scene 0
+msgid "-1/ed07c2cc"
+msgstr ""
+"Nawzajem!  Może jednak zdołam wam pomóc. Co powiecie na ulepszenie "
+"helipacka?"
+
+#: level 03 scene 0
+msgid "-1/60c73fe8"
+msgstr "Ulepszenie?"
+
+#: level 03 scene 0
+msgid "-1/b60dd544"
+msgstr ""
+"Jasne.  Skoro to siedem-sześć-sześć, w mig sprawię, że maluch będzie "
+"latał.  Oczywiście za drobną opłatą."
+
+#: level 03 scene 1
+msgid "-1/0c249548"
+msgstr "Dobra, to nie będzie wcale bolało."
+
+#: level 03 scene 1
+msgid "-1/4ce9c716"
+msgstr "Ej, czekaj!"
+
+#: level 03 scene 1
+msgid "-1/79b41966"
+msgstr "Ratchet, czy teraz jestem fajny?"
+
+#: level 03 scene 1
+msgid "-1/18da7a74"
+msgstr "No.  Jesteś gość, Clank."
+
+#: level 03 scene 1
+msgid "-1/846499cd"
+msgstr "Nie ma za co!"
+
+#: level 03 scene 2
+msgid "-1/676673dc"
+msgstr ""
+"Słuchać, grubasy!  To był najżałośniejszy występ, jaki widziałam na tym "
+"torze przeszkód."
+
+#: level 03 scene 2
+msgid "-1/c526a01d"
+msgstr "Jak to?  "
+
+#: level 03 scene 2
+msgid "-1/9419e883"
+msgstr "Ukończyliśmy trasę, proszę pani."
+
+#: level 03 scene 2
+msgid "-1/54021cbc"
+msgstr ""
+"No tak, ale słabo, słabo, SŁABO!  Kiedy ja startowałam, takie tory "
+"pożerałam na śniadanie.   "
+
+#: level 03 scene 2
+msgid "-1/2987cc3c"
+msgstr "Założę się, że nie tylko tory."
+
+#: level 03 scene 2
+msgid "-1/6fd3a956"
+msgstr ""
+"Gdyby to zależało ode mnie, ćwiczylibyście, ćwiczyli i ćwiczyli do końca "
+"dnia.  Ale jakoś udało wam się zaimponować temu głupcowi, Kapitanowi "
+"Qwarkowi."
+
+#: level 03 scene 2
+msgid "-1/d8742841"
+msgstr "Kapitan Qwark o nas wie?"
+
+#: level 03 scene 2
+msgid "-1/1527549b"
+msgstr ""
+"Oczywiście.  A co najgorsze, chce, żebym dała wam nagrodę za ten żałosny "
+"występ."
+
+#: level 03 scene 2
+msgid "-1/c3edaeca"
+msgstr "Super, co to?"
+
+#: level 03 scene 2
+msgid "-1/d8a69d45"
+msgstr ""
+"Mam wam dać Swingshot, żebyście mogli bujać się tam i z powrotem jak małe "
+"owady.  "
+
+#: level 03 scene 2
+msgid "-1/d826e0c2"
+msgstr "Dobra, pokaż!"
+
+#: level 03 scene 2
+msgid "-1/4275796d"
+msgstr ""
+"Nie tak szybko.  Dziś obaj zhańbiliście mój tor przeszkód.  Więc teraz za "
+"to zapłacicie. "
+
+#: level 03 scene 2
+msgid "-1/4ecdd71b"
+msgstr "Ale tę nagrodę dał nam Kapitan.  To niesprawiedliwe. "
+
+#: level 03 scene 2
+msgid "-1/740b5fa5"
+msgstr "Trudno - życie jest niesprawiedliwe."
+
+#: level 03 scene 3
+msgid "-1/f87ae1b2"
+msgstr "Ekstra!  Założę się, że Kapitan Qwark ciągle używa takich rzeczy."
+
+#: level 03 scene 3
+msgid "-1/8a001658"
+msgstr "Ha!  Prawdziwi mężczyźni huśtają się bez takich głupich zabawek."
+
+#: level 03 scene 3
+msgid "-1/5e401d75"
+msgstr "Niedobrze mi się robi na wasz widok."
+
+#: level 03 scene 4
+msgid "-1/150e5440"
+msgstr "Drek niszczy kolejną planetę."
+
+#: level 03 scene 4
+msgid "-1/1a0d65f9"
+msgstr ""
+"No, ale jeśli tak wygląda jego pomoc, to chyba nie mamy się czym martwić."
+
+#: level 03 scene 4
+msgid "-1/7959df73"
+msgstr ""
+"Nie lekceważ Przewodniczącego Dreka[xAD]jest bardzo niebezpieczny. Musimy "
+"znaleźć Kapitana Qwarka"
+
+#: level 03 scene 4
+msgid "-1/3b04dfa9"
+msgstr "Słuchaj, ten porucznik nie wygląda na twardziela. Załatwmy go sami."
+
+#: level 03 scene 4
+msgid "-1/c7dc2139"
+msgstr ""
+"Może ZDOŁAMY przekonać porucznika, żeby powiedział nam, gdzie jest Drek."
+
+#: level 03 scene 4
+msgid "-1/7536322d"
+msgstr "Ha, ha... No, to rozumiem! "
+
+#: level 03 scene 5
+msgid "-1/7c38a49f"
+msgstr ""
+"Witajcie na Torze Sprawności Kapitana Qwarka. Jeśli jesteś dość silny, "
+"szybki i sprytny, by pokonać moje wyzwanie, dostaniesz nagrodę od mojej "
+"głównej trenerki. Po prostu dotrzyj na trzecią wyspę. Powodzenia!"
+
+#: level 03 scene 5
+msgid "-1/51d7c1ff"
+msgstr ""
+"Qwark Enterprises nie odpowiada za skręcenia, złamania, zerwane ścięgna, "
+"urażone ego ani przypadkową śmierć podczas wyzwania."
+
+#: level 03 scene 6
+msgid "-1/83dbc662"
+msgstr ""
+"Właśnie tak, fani fitnessu, dotrzyjcie na trzecią wyspę po nagrodę. I nie "
+"przegapcie w tym tygodniu, jak ja, Kapitan Qwark, osobiście wręczę Główną "
+"Nagrodę mistrzostw hoverboardów w Blackwater City."
+
+#: level 03 scene 7
+msgid "-1/a4458eae"
+msgstr ""
+"Tak, ty też możesz być tak sprawny i przystojny jak twój bohater, Kapitan "
+"Qwark. No, może nie tak przystojny[xAD]he-he. Śmiało, podejmij wyzwanie i "
+"zdobądź nagrodę!"
+
+#: level 03 scene 8
+msgid "-1/6d5301ad"
+msgstr ""
+"Przepraszam, Kapitanie, ale mamy pilniejsze sprawy. Pilnie potrzebujemy "
+"pańskiej pomocy. "
+
+#: level 03 scene 8
+msgid "-1/0199b105"
+msgstr "Tak."
+
+#: level 03 scene 8
+msgid "-1/2e6709c1"
+msgstr "Zauważasz coś dziwnego w Kapitanie Qwarku?"
+
+#: level 03 scene 8
+msgid "-1/11cc41da"
+msgstr "Cóż[xAD]zastanawia mnie to, że zamiast nóg ma sprężynę."
+
+#: level 03 scene 8
+msgid "-1/23f846a5"
+msgstr "A jak myślisz, dlaczego?"
+
+#: level 03 scene 8
+msgid "-1/bc6d7950"
+msgstr "Może to rana odniesiona w walce ze złem?"
+
+#: level 03 scene 8
+msgid "-1/2beca832"
+msgstr "To nie jest prawdziwy Kapitan Qwark, tępaku. To robot."
+
+#: level 03 scene 8
+msgid "-1/f575ff8f"
+msgstr "Och."
+
+#: level 03 scene 9
+msgid "-1/374aea04"
+msgstr ""
+"Cześć, tu Kapitan Qwark. Uwierzcie mi, nie ma nic gorszego niż patrzeć w "
+"oczy Blargiańskiej Bestii, i to od środka, ze świadomością, że sprzęt nie "
+"działa jak należy."
+
+#: level 03 scene 9
+msgid "-1/922d22e3"
+msgstr ""
+"Dlatego ze wszystkimi sprawami elektronicznymi przychodzę do Al's "
+"Roboshack. Al naprawia moje super elektrogadżety, odkąd byłem wielkości "
+"Piaskowej Myszy. Jeśli Al tego nie naprawi, to znaczy, że nie jest zepsute. "
+"Prawda, Al?"
+
+#: level 03 scene 9
+msgid "-1/a9d0510d"
+msgstr "Święta racja, kolego!"
+
+#: level 03 scene 9
+msgid "-1/80858f8b"
+msgstr ""
+"Więc niezależnie, czy walczysz ze zbrodnią, czy z brudem[xAD]he-he, przyjdź "
+"do Al's Roboshack w Metropolis po każdą naprawę robota. "
+
+#: level 04 scene 0
+msgid "-1/7468809a"
+msgstr "Ale mu pokazałeś."
+
+#: level 04 scene 0
+msgid "-1/05217778"
+msgstr "Chyba tak."
+
+#: level 04 scene 1
+msgid "-1/a0193fc4"
+msgstr ""
+"No, to rozumiem. Widziałeś te wszystkie fajne gadżety, które tu robią? "
+"Chodźmy po kilka!"
+
+#: level 04 scene 1
+msgid "-1/da3d8bcc"
+msgstr "Nie. Musimy dalej szukać Kapitana Qwarka"
+
+#: level 04 scene 1
+msgid "-1/3e6fadcf"
+msgstr "Masz całkowitą rację."
+
+#: level 04 scene 1
+msgid "-1/7663db29"
+msgstr "Mam."
+
+#: level 04 scene 1
+msgid "-1/902ab959"
+msgstr ""
+"Jasne. Musimy znaleźć Qwarka. Ale kiedy go znajdziemy, czy nie byłoby miło "
+"móc mu powiedzieć, gdzie jest Przewodniczący Drek?"
+
+#: level 04 scene 1
+msgid "-1/9c05e13f"
+msgstr "Chyba tak."
+
+#: level 04 scene 1
+msgid "-1/f26a1bc4"
+msgstr ""
+"No to lecimy na stację kosmiczną i pogadamy z naukowcami. Pracują dla "
+"Dreka, więc na pewno wiedzą, gdzie jest."
+
+#: level 04 scene 1
+msgid "-1/335a367d"
+msgstr "Nie jestem przekonany do twojej logiki."
+
+#: level 04 scene 1
+msgid "-1/8e7ab084"
+msgstr "Aaa, za dużo myślisz. Chodź, idziemy."
+
+#: level 04 scene 2
+msgid "-1/35f44573"
+msgstr "Ekstra!"
+
+#: level 04 scene 3
+msgid "-1/53e553e8"
+msgstr "Witam, Najwyższy Przewodniczący Dreku."
+
+#: level 04 scene 3
+msgid "-1/a386b3f6"
+msgstr ""
+"Daruj sobie uprzejmości, poruczniku. Moje źródła donoszą, że masz "
+"opóźnienia. Musisz przygotować tę planetę do eksploatacji na potrzeby "
+"naszego nowego świata!"
+
+#: level 04 scene 3
+msgid "-1/8e3e7cf3"
+msgstr "Tak jest[xAD] Jak pan widzi, wszystko idzie zgodnie z planem."
+
+#: level 04 scene 3
+msgid "-1/b0dc0498"
+msgstr ""
+"Liczę na ciebie, poruczniku. A jak może ci powiedzieć twój poprzedni "
+"dowódca, źle znoszę rozczarowania."
+
+#: level 04 scene 3
+msgid "-1/668214fd"
+msgstr "Tak jest. Nie zawiodę."
+
+#: level 05 scene 0
+msgid "-1/942199ae"
+msgstr ""
+"Witajcie na Międzygalaktycznych Zawodach Hoverboardowych Hovercon!  Kapitan "
+"Qwark wręczy zwycięzcy nowiutki Platynowy Zoomerator."
+
+#: level 05 scene 0
+msgid "-1/9bea3353"
+msgstr ""
+"Platynowy Zoomerator!  Może to będzie dowód twoich osiągnięć, którego chce "
+"agent Skida."
+
+#: level 05 scene 0
+msgid "-1/36ad7e41"
+msgstr "Chwila, mówicie o Skidzie McMarxie?!"
+
+#: level 05 scene 0
+msgid "-1/d42a2939"
+msgstr ""
+"No, Skid nie mógł przyjść.  Więc jesteśmy tu, żeby, no wiesz[xAD] go "
+"zastąpić."
+
+#: level 05 scene 0
+msgid "-1/a4ff0681"
+msgstr "No to się okaże.  "
+
+#: level 05 scene 1
+msgid "-1/5ecadbea"
+msgstr "Dobra, hoverchłopcze - może spróbujesz pobić rekord toru?"
+
+#: level 05 scene 2
+msgid "-1/35f29ca3"
+msgstr ""
+"To tylko moja praca - nie wyobrażaj sobie za dużo.  A tak przy okazji, "
+"wygrałeś mnóstwo śrub!"
+
+#: level 05 scene 3
+msgid "-1/47ccd66d"
+msgstr ""
+"Dobra, chłopaki, został jeszcze jeden czas do pobicia.  Chcecie spróbować "
+"pobić Rekord Galaktyki?"
+
+#: level 05 scene 4
+msgid "-1/8c76a635"
+msgstr ""
+"Co mogę powiedzieć?  Skid McMarx to przeszłość.  Jesteście najszybszymi "
+"hoverboardzistami w Galaktyce!  "
+
+#: level 05 scene 5
+msgid "-1/606b1798"
+msgstr ""
+"Hej, hej, hej!  Konferencja prasowa skończona.  Kapitan Qwark nie chce, "
+"żeby kolejni dziennikarze nachodzili go w przyczepie."
+
+#: level 05 scene 5
+msgid "-1/6a768e87"
+msgstr ""
+"Och[xAD]  Widzi pan, mój przyjaciel i ja musimy porozmawiać z Kapitanem w "
+"sprawie bezpieczeństwa galaktyki."
+
+#: level 05 scene 5
+msgid "-1/2f358841"
+msgstr ""
+"Ty i ta twoja chodząca kamera?  Niedobrze mi się robi od was, paparazzi.  "
+"Spadajcie.  "
+
+#: level 05 scene 5
+msgid "-1/58e38be5"
+msgstr "Ale proszę pana, na pewno Kapitan Qwark zrozumie, kiedy tylko[xAD]"
+
+#: level 05 scene 5
+msgid "-1/f8d6730e"
+msgstr ""
+"Nie, nie, daruj sobie.  Wiem, jak to działa.  Przekonujecie mnie, żebym was "
+"wpuścił.  Robicie Kapitanowi zdjęcie w gaciach.  "
+
+#: level 05 scene 5
+msgid "-1/8860e162"
+msgstr " [xAD]w gaciach?"
+
+#: level 05 scene 5
+msgid "-1/5857c9db"
+msgstr "A potem sprzedajecie je Info-Brukowcowi za milion śrub.  "
+
+#: level 05 scene 5
+msgid "-1/93b94051"
+msgstr "Źle pan to zrozumiał[xAD]"
+
+#: level 05 scene 5
+msgid "-1/173572e1"
+msgstr ""
+"A ja tymczasem tkwię tu za sześć śrub na godzinę i muszę wysłuchiwać kazań "
+"tego sknery Qwarka.  "
+
+#: level 05 scene 5
+msgid "-1/ac0a0301"
+msgstr "Więc nie wejdziecie, dopóki nie dostanę działki.  Z góry."
+
+#: level 05 scene 6
+msgid "-1/3827cd9a"
+msgstr "Rozumiecie?  Posmarujesz zawiasy, drzwi się otworzą"
+
+#: level 05 scene 7
+msgid "-1/f6013583"
+msgstr "RYNO za twojego robota - wymienię się."
+
+#: level 05 scene 7
+msgid "-1/e07161d1"
+msgstr "No[xAD] dobra!"
+
+#: level 05 scene 7
+msgid "-1/ab797c1b"
+msgstr "Żartuję!  Sorry, nie jest na sprzedaż.  I co to w ogóle jest RYNO?"
+
+#: level 05 scene 7
+msgid "-1/087b5e96"
+msgstr "Rozwalę Ye Na Ostro."
+
+#: level 05 scene 7
+msgid "-1/d5204740"
+msgstr "Coś ty mi powiedział?"
+
+#: level 05 scene 7
+msgid "-1/be15b2fc"
+msgstr "R-Y-N-O.  Rozwalę Ye Na Ostro. "
+
+#: level 05 scene 7
+msgid "-1/e48fd8ae"
+msgstr ""
+"Przecież to najpotężniejsza wyrzutnia rakiet w galaktyce! Wiem, że jest "
+"warta mnóstwo śrub. Musiał ją ukraść Blargom."
+
+#: level 05 scene 7
+msgid "-1/83b82c50"
+msgstr ""
+"Ukraść?!  Słuchaj, puszko, mówiłem coś, że jest kradziona?  Uważaj, co "
+"mówisz, bo ci[xAD]"
+
+#: level 05 scene 7
+msgid "-1/80c38cb7"
+msgstr "Czekaj!  Nie mów - Rozwalisz Ye Na Ostro!"
+
+#: level 05 scene 8
+msgid "-1/d384a1b8"
+msgstr "Ale to ciężkie!"
+
+#: level 05 scene 8
+msgid "-1/a3fcffcf"
+msgstr "No, spróbuj to nosić w płaszczu przez dwa miesiące."
+
+#: level 05 scene 8
+msgid "-1/5e39cbc3"
+msgstr "Dziękujemy panu.  Na pewno wszystkim opowiemy o pańskich usługach."
+
+#: level 05 scene 8
+msgid "-1/4efdbd93"
+msgstr ""
+"Słuchaj no, mały gnojku.  Jeśli komukolwiek powiesz, co widziałeś albo o "
+"czym gadaliśmy[xAD] "
+
+#: level 05 scene 8
+msgid "-1/b0be15be"
+msgstr "Muszę w ogóle kończyć? "
+
+#: level 05 scene 8
+msgid "-1/3d4f55aa"
+msgstr "Miłego dnia, panowie."
+
+#: level 05 scene 9
+msgid "-1/9603c0a2"
+msgstr ""
+"Cześć wszystkim, tu Kapitan Qwark.  Mam wielką przyjemność przedstawić "
+"tegorocznych Międzygalaktycznych Mistrzów Hovercon.  Brawa dla debiutantów, "
+"Ratcheta i Clanka!"
+
+#: level 05 scene 9
+msgid "-1/acf508f4"
+msgstr "Ej, patrz - to my!"
+
+#: level 05 scene 9
+msgid "-1/b7aff652"
+msgstr ""
+"Dzisiejsi zwycięzcy zabiorą do domu nowiutki, profesjonalny Platynowy "
+"Zoomerator model T-15. Ten napęd do hoverboardu firmy Gadgetron daje więcej "
+"siły nośnej, szybkości i zwrotności niż jakiekolwiek inne urządzenie "
+"antygrawitacyjne na rynku.  "
+
+#: level 05 scene 9
+msgid "-1/baad6454"
+msgstr ""
+"Cóż, kochani, to już cały nasz czas. Pamiętajcie, by dziś wieczorem "
+"nastawić infoboty na Kanał Klasyki Qwarka na odcinek \"Pojedynek nad "
+"Kanionem Śmierci\" z moją skromną osobą w roli głównej.  Dziękuję i życzę "
+"qwarkastycznego dnia."
+
+#: level 05 scene 10
+msgid "-1/f92e8f93"
+msgstr "Kapitanie Qwark?"
+
+#: level 05 scene 10
+msgid "-1/53c40352"
+msgstr "Ktoś ty?!"
+
+#: level 05 scene 10
+msgid "-1/c55293bc"
+msgstr "To my, Ratchet i Clank, Kapitanie.  No wie pan, z[xAD]"
+
+#: level 05 scene 10
+msgid "-1/db37f6ec"
+msgstr "Ach, tak, tak!  Wiem, kim jesteście.  "
+
+#: level 05 scene 10
+msgid "-1/06e53b31"
+msgstr "Naprawdę?  "
+
+#: level 05 scene 10
+msgid "-1/76923875"
+msgstr "Tak, i dzięki Galaktyce, że mnie znaleźliście. "
+
+#: level 05 scene 10
+msgid "-1/1cb43f36"
+msgstr "Co?  "
+
+#: level 05 scene 10
+msgid "-1/61018396"
+msgstr "Ktoś knuje straszny spisek, by zniszczyć nasze planety[xAD]     "
+
+#: level 05 scene 10
+msgid "-1/0148decf"
+msgstr "Ratchet, on wie! "
+
+#: level 05 scene 10
+msgid "-1/30c16c9e"
+msgstr "Super. To możemy już iść pojeździć na hoverboardzie?"
+
+#: level 05 scene 10
+msgid "-1/c7891f5f"
+msgstr ""
+"Przyjaciele, wszyscy jesteśmy w śmiertelnym niebezpieczeństwie i wierzę, że "
+"razem możemy położyć kres temu szaleństwu. "
+
+#: level 05 scene 10
+msgid "-1/a06865b2"
+msgstr "Razem[xAD]?  Chce pan naszej pomocy?"
+
+#: level 05 scene 10
+msgid "-1/fcd25ec9"
+msgstr ""
+"Słuchaj, Ratchet, obserwowałem cię i nigdy nie widziałem nikogo z takim "
+"surowym talentem.  Jesteś prawdziwym bohaterem w zarodku!  "
+
+#: level 05 scene 10
+msgid "-1/5bfe0430"
+msgstr "Serio?  Czyli mógłbym być sławny[xAD]?"
+
+#: level 05 scene 10
+msgid "-1/b3215337"
+msgstr "Och, absolutnie.  O, proszę - weź to."
+
+#: level 05 scene 11
+msgid "-1/07f86395"
+msgstr "Spotkajmy się w[xAD]Spotkajmy się w mojej kwaterze głównej."
+
+#: level 05 scene 11
+msgid "-1/a2f9269f"
+msgstr "Ej - \"Kapitan Ratchet\".  Jak ci się podoba?"
+
+#: level 05 scene 11
+msgid "-1/9bc861dc"
+msgstr "Nie zawiedziemy pana.  Obiecujemy.  "
+
+#: level 06 scene 0
+msgid "-1/87e0087b"
+msgstr ""
+"Uff, myślałem, że tym razem już po mnie. Jakiś nanoprzygłup z genetyki "
+"znowu musiał zostawić otwarte klatki."
+
+#: level 06 scene 0
+msgid "-1/17719e6d"
+msgstr "Możesz już zejść."
+
+#: level 06 scene 0
+msgid "-1/b8af25b8"
+msgstr ""
+"Szczerze mówiąc, Inżynier Gadżetów zasługuje na trochę więcej szacunku."
+
+#: level 06 scene 0
+msgid "-1/7bc1939d"
+msgstr "Czyli jest pan wynalazcą!"
+
+#: level 06 scene 0
+msgid "-1/71439907"
+msgstr ""
+"Inżynierem Gadżetów. Tworzę rewolucyjne urządzenia dla Najwyższego "
+"Przewodniczącego Dreka. Na przykład, voilà!  Moje wkrótce opatentowane "
+"GRINDBOOTS."
+
+#: level 06 scene 0
+msgid "-1/1cce50b4"
+msgstr ""
+"Słuchajcie, muszę się stąd wydostać i znaleźć nową pracę. Może sprzedam wam "
+"te[xAD]po kosztach?"
+
+#: level 06 scene 0
+msgid "-1/4274476b"
+msgstr "Sprzedasz?! Po tym, jak właśnie uratowaliśmy ci tyłek?"
+
+#: level 06 scene 0
+msgid "-1/88d1552f"
+msgstr "Dobra, dobra. Dorzucę też zniżkę pracowniczą."
+
+#: level 06 scene 1
+msgid "-1/63bfaa34"
+msgstr "No to dzięki. Zmywam się, póki mogę."
+
+#: level 06 scene 3
+msgid "-1/fa609c3f"
+msgstr "Wróciłem."
+
+#: level 06 scene 3
+msgid "-1/6cba6c23"
+msgstr "Rzeczywiście."
+
+#: level 06 scene 3
+msgid "-1/3241b1da"
+msgstr "I[xAD]znalazłem[xAD]to!"
+
+#: level 06 scene 3
+msgid "-1/948bb1ce"
+msgstr "Ej, super! To[xAD]to[xAD]Co to jest?"
+
+#: level 06 scene 3
+msgid "-1/1b231139"
+msgstr "Hydrodisplacer."
+
+#: level 06 scene 3
+msgid "-1/fd495181"
+msgstr "Świetnie! Zawsze chciałem coś takiego. Chyba."
+
+#: level 06 scene 4
+msgid "-1/6cc265ab"
+msgstr "Czy twoja obecna praca zostawia niesmak?"
+
+#: level 06 scene 4
+msgid "-1/041199be"
+msgstr ""
+"W takim razie poznaj BTS: Blargiańską Taktyczną Stację Badawczą. Cześć, tu "
+"Najwyższy Przewodniczący Drek, a my w BTS szukamy zmotywowanych osób na te "
+"ekscytujące stanowiska:"
+
+#: level 06 scene 4
+msgid "-1/98f6a139"
+msgstr "Tester Grindbootów, Technik Montażu Głowic[xAD]"
+
+#: level 06 scene 4
+msgid "-1/65a5fdf2"
+msgstr "Hodowca Zmutowanych Zwierząt, Naprawiacz Robotów[xAD]"
+
+#: level 06 scene 4
+msgid "-1/caddc6d4"
+msgstr "Manekin do Testów Suck Cannona i Asystent Administracyjny"
+
+#: level 06 scene 4
+msgid "-1/fe89ad2d"
+msgstr "Zadzwoń do BTS: buduj nasze bronie, a my zbudujemy twoją przyszłość!"
+
+#: level 06 scene 4
+msgid "-1/14d2cf05"
+msgstr "Dziś dzwonię do BTS."
+
+#: level 06 scene 5
+msgid "-1/92dab310"
+msgstr "Widziałeś to?!"
+
+#: level 06 scene 5
+msgid "-1/99ba3c67"
+msgstr "Tak, mam nadzieję, że tej biednej kobiecie nic nie jest!"
+
+#: level 06 scene 5
+msgid "-1/9cb30a75"
+msgstr "Aaa, nic jej nie jest[xAD]chyba.  Mówiłem o wyścigach hoverboardów.  "
+
+#: level 07 scene 0
+msgid "-1/15d8c721"
+msgstr ""
+"Witajcie na moim torze wyzwań. Teraz możecie udowodnić, że jesteście silni "
+"i odważni, jak ja, he-he. Pokonajcie go, a dołączycie do mojej walki ze "
+"złem."
+
+#: level 07 scene 0
+msgid "-1/cee2e0d6"
+msgstr "Nie zrobiliśmy już dość?"
+
+#: level 07 scene 0
+msgid "-1/397c1b74"
+msgstr "Co? Nie słyszę!"
+
+#: level 07 scene 0
+msgid "-1/7de9b16b"
+msgstr "Powiedziałem, czy nie[xAD]zrobiliśmy[xAD]już[xAD]"
+
+#: level 07 scene 0
+msgid "-1/cc556341"
+msgstr "Wybacz, nadal słabo słyszę. Powiesz mi później."
+
+#: level 07 scene 0
+msgid "-1/b4b474c8"
+msgstr "Później?! Możemy już wtedy nie żyć!"
+
+#: level 07 scene 0
+msgid "-1/06a30bf2"
+msgstr "Co?"
+
+#: level 07 scene 0
+msgid "-1/e24e09a3"
+msgstr "Dobra, Clank, ruszajmy."
+
+#: level 07 scene 1
+msgid "-1/4258c5db"
+msgstr "No, no. Wciąż mnie zaskakujecie. "
+
+#: level 07 scene 1
+msgid "-1/90d19ef6"
+msgstr "Wejdźcie do Kręgu Bohaterów, a w końcu dam wam to, na co zasługujecie."
+
+#: level 07 scene 1
+msgid "-1/5b4bfd02"
+msgstr "Ratchet, to nie czas na ostrożność. Osiągnęliśmy nasz cel."
+
+#: level 07 scene 1
+msgid "-1/36e65fcb"
+msgstr "Nie wiem. Coś tu śmierdzi."
+
+#: level 07 scene 1
+msgid "-1/1f1a7eef"
+msgstr ""
+"Posłuchaj swojego metalowego przyjaciela, Ratchet. Twoje przeznaczenie jest "
+"o krok."
+
+#: level 07 scene 1
+msgid "-1/e631a3b7"
+msgstr "Po prostu[xAD]coś tu nie gra. "
+
+#: level 07 scene 1
+msgid "-1/c8dcd9e5"
+msgstr "To jest to! Qwark pomoże nam powstrzymać Przewodniczącego Dreka."
+
+#: level 07 scene 1
+msgid "-1/94f92fff"
+msgstr "Ależ dziękuję, Clank. Bardzo mi pomogłeś."
+
+#: level 07 scene 2
+msgid "-1/4be47417"
+msgstr "Złaź ze mnie, idioto!"
+
+#: level 07 scene 2
+msgid "-1/b65e7d75"
+msgstr "He, he, he. Uwielbiam, kiedy plan się udaje."
+
+#: level 07 scene 2
+msgid "-1/7005ffa3"
+msgstr "Co pan ma na myśli?"
+
+#: level 07 scene 2
+msgid "-1/c2c6d7e5"
+msgstr "A jak myślisz, geniuszu? On nam nie pomoże, on nas zabije."
+
+#: level 07 scene 2
+msgid "-1/0d17e45b"
+msgstr ""
+"Szybko łapiesz. Choć w twojej hipotezie jest jeden błąd: to nie ja was "
+"zabiję."
+
+#: level 07 scene 2
+msgid "-1/86570d68"
+msgstr "Nie?"
+
+#: level 07 scene 2
+msgid "-1/4e4b50bf"
+msgstr "Nie. On."
+
+#: level 07 scene 2
+msgid "-1/a1c093a1"
+msgstr "Ale[xAD][xAD]dlaczego?"
+
+#: level 07 scene 2
+msgid "-1/c122ec62"
+msgstr ""
+"Dlaczego?  To naprawdę nietrudno odgadnąć. Jestem oficjalnym rzecznikiem "
+"nowej planety Dreka. Nie mogę pozwolić, żebyście przeszkodzili mi w "
+"powrocie na szczyt."
+
+#: level 07 scene 2
+msgid "-1/9c01ab7f"
+msgstr "To jeszcze nie koniec, Qwark!"
+
+#: level 07 scene 2
+msgid "-1/61255ac3"
+msgstr "Nie[xAD]"
+
+#: level 07 scene 2
+msgid "-1/070ee8de"
+msgstr "[xAD]ale wkrótce będzie."
+
+#: level 07 scene 3
+msgid "-1/3f2144f4"
+msgstr "Ciekawe, do czego jest ten infobot?"
+
+#: level 07 scene 3
+msgid "-1/f5ebf04c"
+msgstr "Może cię zastąpi! "
+
+#: level 07 scene 4
+msgid "-1/18937023"
+msgstr "To statki Dreka niszczą tę planetę. Musimy pomóc temu komandosowi."
+
+#: level 07 scene 4
+msgid "-1/fa894e19"
+msgstr ""
+"Żartujesz?! Dość tego!  Spadam stąd! Kapitan Qwark pożałuje, że ze mną "
+"zadarł!"
+
+#: level 07 scene 4
+msgid "-1/bcc23327"
+msgstr "Tu już nie chodzi o Kapitana Qwarka. Giną niewinni ludzie. "
+
+#: level 07 scene 4
+msgid "-1/efd41a09"
+msgstr ""
+"Taa, a ja mam dość tych głupich bohaterskich bzdur. Teraz mam własne plany!"
+
+#: level 07 scene 4
+msgid "-1/28385ff4"
+msgstr "Ratchet, to do ciebie niepodobne."
+
+#: level 07 scene 4
+msgid "-1/d928d7ec"
+msgstr ""
+"A co ty o mnie wiesz?! Cały czas tylko szukałeś Qwarka! Nic o mnie nie "
+"wiesz!"
+
+#: level 07 scene 4
+msgid "-1/531b84ff"
+msgstr "Wiem, że postąpisz słusznie."
+
+#: level 07 scene 4
+msgid "-1/8f9cbd70"
+msgstr "Taa, a w tej chwili chcę tylko znaleźć Qwarka! "
+
+#: level 07 scene 4
+msgid "-1/f59c00c1"
+msgstr "Jak się odpala to głupie badziewie!!?"
+
+#: level 07 scene 4
+msgid "-1/8b81a840"
+msgstr "Zapomniałeś? Potrzebujesz robotycznego systemu zapłonu."
+
+#: level 07 scene 4
+msgid "-1/2c5545f4"
+msgstr "Uruchomię statek, jeśli zgodzisz się pomóc temu komandosowi."
+
+#: level 07 scene 4
+msgid "-1/29ce44b1"
+msgstr "Czyli[xAD]szantaż, tak?  Dobra. Zamknij się i odpal statek."
+
+#: level 07 scene 5
+msgid "-1/9dc5be9c"
+msgstr "Czy tobie też się to zdarzyło?"
+
+#: level 08 scene 0
+msgid "-1/9d5bf879"
+msgstr ""
+"Baczność, dezerterzy! Następnym razem, jak spróbujecie zwiać, sam was "
+"zastrzelę!"
+
+#: level 08 scene 0
+msgid "-1/6013bdcb"
+msgstr "Słuchaj, ja tylko chcę[xAD]"
+
+#: level 08 scene 0
+msgid "-1/24f8182e"
+msgstr "Zamknij się, robaku! Widzisz te bombowce?"
+
+#: level 08 scene 0
+msgid "-1/f86241d2"
+msgstr ""
+"Jeśli nie dotrzesz do działek i nie zestrzelisz tych statków, z całej "
+"planety zostaną gruzy! Spotkamy się przy wejściu do miasta."
+
+#: level 08 scene 0
+msgid "-1/718511f0"
+msgstr "Potrzebuje naszej pomocy!"
+
+#: level 08 scene 0
+msgid "-1/df756c65"
+msgstr ""
+"Taa, to może ty mu pomożesz[xAD]wpaść w kolejną pułapkę! "
+"No[xAD]dalej[xAD]idź walczyć ze złem."
+
+#: level 08 scene 0
+msgid "-1/f7601905"
+msgstr "Przynajmniej nie jestem tchórzem!"
+
+#: level 08 scene 0
+msgid "-1/8d319d00"
+msgstr "Nieważne. Jak tylko znajdę Qwarka, sprzedam cię na złom."
+
+#: level 08 scene 1
+msgid "-1/50fafbc2"
+msgstr ""
+"Przeklęte ustrojstwo, ani drgnie. Próbowałem wszystkiego oprócz broni "
+"jądrowej[xAD]hmmm[xAD]nie, nieważne."
+
+#: level 08 scene 1
+msgid "-1/7469dce2"
+msgstr "No, próbowałeś. Na razie."
+
+#: level 08 scene 1
+msgid "-1/867df134"
+msgstr ""
+"Nie tak szybko, żołnierzu. Wejdziesz do tego kompleksu, choćbym miał cię "
+"tam wrzucić."
+
+#: level 08 scene 1
+msgid "-1/12ffb794"
+msgstr ""
+"Aha! Ten szyb wentylacyjny prowadzi na platformę z działkami. Żołnierzu, "
+"znajdź sposób, by przez ten szyb niepostrzeżenie dostać się do kompleksu."
+
+#: level 08 scene 1
+msgid "-1/18584f75"
+msgstr ""
+"Wykazałeś się odwagą, docierając tak daleko, żołnierzu, i za to cię "
+"nagrodzę. "
+
+#: level 08 scene 1
+msgid "-1/5dafe0a2"
+msgstr "Przechwyciłem ten komunikat, może ci się przyda. Weź go."
+
+#: level 08 scene 1
+msgid "-1/cfa3182c"
+msgstr "Idę szukać mojego batalionu. Powodzenia."
+
+#: level 08 scene 2
+msgid "-1/6e5af588"
+msgstr ""
+"Rozumiesz teraz, dlaczego musimy go powstrzymać? Nie spocznie, dopóki nie "
+"zniszczy każdej planety w galaktyce."
+
+#: level 08 scene 2
+msgid "-1/d17c12cc"
+msgstr "Taa, a ja mam ważniejsze sprawy na głowie."
+
+#: level 08 scene 2
+msgid "-1/5d16db3e"
+msgstr "Ważniejsze niż galaktyka?"
+
+#: level 08 scene 2
+msgid "-1/e1ec1d8f"
+msgstr ""
+"No, w każdym razie inne. Słuchaj, ten komandos nie mówił przypadkiem, że "
+"możemy dostać się do tego kompleksu?"
+
+#: level 08 scene 2
+msgid "-1/d44c321d"
+msgstr ""
+"Tak. Przez szyb wentylacyjny. Ale żeby po nim chodzić, będziemy potrzebować "
+"czegoś specjalnego."
+
+#: level 08 scene 2
+msgid "-1/15c5535d"
+msgstr "Dobra, to ruszajmy. Wrócimy tu później."
+
+#: level 08 scene 3
+msgid "-1/29dea906"
+msgstr "Stój. Kim jesteście? Co tu robicie?"
+
+#: level 08 scene 3
+msgid "-1/bbef005e"
+msgstr "Mamy misję ocalenia galaktyki!"
+
+#: level 08 scene 3
+msgid "-1/c3283c89"
+msgstr "Mów za siebie. I opuść ręce, wyglądasz śmiesznie."
+
+#: level 08 scene 3
+msgid "-1/e3426480"
+msgstr ""
+"Właściwie to nie obchodzi mnie, kim jesteście. Muszę się stąd zmyć. "
+"Zaciągnąłem się do armii, żeby zarobić na studia. Nie wiedziałem, że trafię "
+"na wojnę. No i masz."
+
+#: level 08 scene 3
+msgid "-1/e8989fe4"
+msgstr "To szlachetna sprawa, proszę pana."
+
+#: level 08 scene 3
+msgid "-1/2250199d"
+msgstr "Szlachetna, akurat. Chcę tylko wrócić do rodziny. Masz[xAD]"
+
+#: level 08 scene 3
+msgid "-1/1cbec122"
+msgstr ""
+"Wyciągnąłem to z rozwalonego robota. Daj mi parę śrub na bilet autobusowy, "
+"to jest twoje."
+
+#: level 08 scene 4
+msgid "-1/4329cdcf"
+msgstr "Wielkie dzięki. Powodzenia w ratowaniu galaktyki czy czego tam."
+
+#: level 08 scene 5
+msgid "-1/421fbfb7"
+msgstr "Ło! Jeśli kiedyś dopracują to ustrojstwo, muszę sobie takie sprawić."
+
+#: level 08 scene 5
+msgid "-1/dceb18d6"
+msgstr ""
+"Jeśli pracują dla Przewodniczącego Dreka, mogą wiedzieć, gdzie on jest."
+
+#: level 08 scene 5
+msgid "-1/238ce6b4"
+msgstr "Czy ty myślisz tylko o tym?! Drek to, Drek tamto. Mam własne problemy."
+
+#: level 08 scene 5
+msgid "-1/bddcda5e"
+msgstr "Jeśli nie dostrzegasz powagi sytuacji, to faktycznie masz problemy."
+
+#: level 08 scene 5
+msgid "-1/2738edcb"
+msgstr ""
+"Taa, skoro jesteś taki mądry, to czemu dałeś się nabrać na głupi numer "
+"Qwarka?"
+
+#: level 08 scene 5
+msgid "-1/23252a43"
+msgstr ""
+"Ech, nieważne. Obaj musimy dostać się na tę planetę i tylko to się liczy."
+
+#: level 08 scene 6
+msgid "-1/bc7cd139"
+msgstr "Hej, znam was dwóch."
+
+#: level 08 scene 6
+msgid "-1/72fa7140"
+msgstr "Patrzcie, hydraulik się zjawia!"
+
+#: level 08 scene 6
+msgid "-1/3ab11b59"
+msgstr "Bardzo śmieszne."
+
+#: level 08 scene 6
+msgid "-1/54504371"
+msgstr "Co pan tu robi?"
+
+#: level 08 scene 6
+msgid "-1/6e756997"
+msgstr ""
+"Konserwacja, a co innego?  Pomagam naprawiać bezużyteczną obronę "
+"przeciwlotniczą tej planety."
+
+#: level 08 scene 6
+msgid "-1/795b8372"
+msgstr "No, to lepiej niech się pan pospieszy. "
+
+#: level 08 scene 6
+msgid "-1/2ad5b425"
+msgstr ""
+"Działko działa jak trzeba, ty mały głupku.  Problem w miejscowych.  Nie "
+"mają wyszkolonych ludzi, którzy umieliby z niego strzelać."
+
+#: level 08 scene 6
+msgid "-1/9f6167c7"
+msgstr "Całkiem nieźle strzelam."
+
+#: level 08 scene 6
+msgid "-1/c1bd8137"
+msgstr "Ty?!  Nie, mógłbym stracić pracę."
+
+#: level 08 scene 6
+msgid "-1/b3ce4d06"
+msgstr ""
+"No weź!  Po co utrzymywać działko, skoro nikt z niego nie strzela?  Poza "
+"tym Blargowie przegonili cię z poprzedniej planety.  Może im się odpłacimy?"
+
+#: level 08 scene 6
+msgid "-1/08fb4b92"
+msgstr "No dobra, jak chcesz, to śmiało.  Tylko niczego nie zepsuj. "
+
+#: level 08 scene 7
+msgid "-1/4c7799ab"
+msgstr ""
+"No proszę, kto się obudził!  Masz szczęście, że byłem w pobliżu i wywlokłem "
+"twój nieprzytomny tyłek z działka.  Dobra wiadomość: znowu je naprawiłem."
+
+#: level 08 scene 8
+msgid "-1/c767e29d"
+msgstr "No, no, no.  Wygląda na to, że jednak do czegoś się nadaje."
+
+#: level 08 scene 8
+msgid "-1/46afdaf3"
+msgstr "Masz, weź to. "
+
+#: level 08 scene 8
+msgid "-1/df05040d"
+msgstr "Co to jest?"
+
+#: level 08 scene 8
+msgid "-1/6ad1977e"
+msgstr ""
+"Wykrywa śruby pod ziemią.  Mój dziadek zaprojektował go, żeby zbierać "
+"drobne na każdej planecie w galaktyce.  Ale był z niego skąpiec[xAD] No, do "
+"zobaczenia kiedyś. "
+
+#: level 08 scene 9
+msgid "-1/096a9958"
+msgstr ""
+"Jesteśmy przyszpileni! Jesteśmy przyszpileni! Statki ostrzeliwują nas z "
+"powietrza!"
+
+#: level 08 scene 9
+msgid "-1/d905bee8"
+msgstr "TO było trochę za blisko! Potrzebujemy wsparcia[xAD]NATYCHMIAST! "
+
+#: level 08 scene 9
+msgid "-1/0fa6a499"
+msgstr ""
+"Właściwie to ja potrzebuję wsparcia. Cały mój batalion zdezerterował i "
+"zostawił mnie samego na tej wojnie. Jak nie zabije ich wróg, to ja to "
+"zrobię."
+
+#: level 08 scene 9
+msgid "-1/87b154fa"
+msgstr "Długo nie wytrzymam! Proszę o natychmiastowe wsparcie!!! Bez odbioru!"
+
+#: level 10 scene 2
+msgid "-1/82578772"
+msgstr "Uuuf!"
+
+#: level 10 scene 3
+msgid "-1/5298d704"
+msgstr "lepiej, żeby Ratchet tego nie zobaczył."
+
+#: level 10 scene 4
+msgid "-1/4d351117"
+msgstr "Ej, dajesz mi je czy nie?!"
+
+#: level 10 scene 4
+msgid "-1/13a48caf"
+msgstr "Są magnetyczne. Chyba się do nich przykleiłem."
+
+#: level 10 scene 5
+msgid "-1/bb45c15b"
+msgstr "Co ty tam masz?!"
+
+#: level 10 scene 5
+msgid "-1/6067f6f0"
+msgstr "Zębatki.  Opiłki metalu.  Kurz.  "
+
+#: level 10 scene 5
+msgid "-1/8e2a212e"
+msgstr "Wiesz, o co mi chodzi.  Co to jest?"
+
+#: level 10 scene 5
+msgid "-1/727a212b"
+msgstr "Pokażę ci, ale musisz obiecać, że skupisz się na naszej misji."
+
+#: level 10 scene 5
+msgid "-1/a643d464"
+msgstr "Chodzi o Qwarka?!"
+
+#: level 10 scene 6
+msgid "-1/d2e514ef"
+msgstr "Kurort Jowai, Pokitaru!"
+
+#: level 10 scene 6
+msgid "-1/36a60170"
+msgstr "Wiedziałem."
+
+#: level 10 scene 6
+msgid "-1/837cb0c1"
+msgstr "No weź! Wyłącz te kujońskie obwody i trochę się zabaw."
+
+#: level 10 scene 6
+msgid "-1/62fd6335"
+msgstr "Słuchaj, wpadniemy tylko na chwilę, po maskę tlenową."
+
+#: level 10 scene 6
+msgid "-1/3129e7b2"
+msgstr "Może dodatkowy tlen pomoże ci normalnie myśleć."
+
+#: level 10 scene 6
+msgid "-1/bb96c31f"
+msgstr "Taa, a może słona woda zardzewi ci usta na amen!"
+
+#: level 10 scene 6
+msgid "-1/4f9b2c21"
+msgstr "Hmpf!"
+
+#: level 10 scene 7
+msgid "-1/dba0c257"
+msgstr "A teraz ten gość chce wysadzić całą planetę! To już po prostu podłe!"
+
+#: level 10 scene 7
+msgid "-1/9d996e52"
+msgstr "Przecież cały czas ci to mówię!"
+
+#: level 10 scene 7
+msgid "-1/173ae847"
+msgstr ""
+"Słuchaj. Nadal poluję na Qwarka, ale jeśli przy okazji załatwimy też Dreka, "
+"to niech będzie!"
+
+#: level 10 scene 7
+msgid "-1/6b682ce0"
+msgstr "Jednak ci zależy."
+
+#: level 10 scene 7
+msgid "-1/0c40f638"
+msgstr "Nie przeginaj, kolego. "
+
+#: level 10 scene 8
+msgid "-1/76612839"
+msgstr ""
+"Witajcie ponownie, drodzy Blargowie. Mam nadzieję, że ta wiadomość zastaje "
+"was w dobrym zdrowiu. "
+
+#: level 10 scene 8
+msgid "-1/ee48a7ab"
+msgstr "Jak wielu z was wie, na naszej rodzinnej planecie nie da się już żyć."
+
+#: level 11 scene 0
+msgid "-1/b93f61d1"
+msgstr ""
+"Hej, jesteście pierwszymi przyjaznymi twarzami, jakie widzę od tygodni. "
+
+#: level 11 scene 0
+msgid "-1/7377aece"
+msgstr "Jesteście przyjaźni, prawda?"
+
+#: level 11 scene 0
+msgid "-1/2d2c4237"
+msgstr "Dla pana tak. Dla niego nie."
+
+#: level 11 scene 0
+msgid "-1/f520a86a"
+msgstr ""
+"No to, przyjacielu, mam dla was ofertę! Odkąd Blargowie zaczęli zrzucać "
+"toksyczny szlam do naszego oceanu, zwierzęta[xAD]eee[xAD]"
+
+#: level 11 scene 0
+msgid "-1/4bdcd6ee"
+msgstr "Stały się wygłodniałymi mutantami?"
+
+#: level 11 scene 0
+msgid "-1/5b9a5486"
+msgstr ""
+"No, można tak powiedzieć. Wszyscy klienci albo wyjechali, albo zostali "
+"obiadem, więc zamykam interes.  Ale tak się składa, że została mi jedna, "
+"słownie jedna, maska tlenowa. "
+
+#: level 11 scene 0
+msgid "-1/c87bb68c"
+msgstr "Ile?"
+
+#: level 11 scene 0
+msgid "-1/4f4f2652"
+msgstr "Nie jest na sprzedaż."
+
+#: level 11 scene 0
+msgid "-1/4a9af8bb"
+msgstr "Ale mówił pan[xAD]"
+
+#: level 11 scene 0
+msgid "-1/cc09df1f"
+msgstr ""
+"Mówiłem, że mam ofertę! I mam. Pozbądźcie się tych statków Blargów, a maska "
+"jest wasza. Odprowadźcie mnie tylko na drugi koniec kurortu, a będziecie "
+"mogli skorzystać z naszego myśliwca!"
+
+#: level 11 scene 0
+msgid "-1/390aa1ee"
+msgstr "Myśliwca, co[xAD]? Dobra, ale lepiej nie próbuj nas wykiwać."
+
+#: level 11 scene 1
+msgid "-1/27fbd182"
+msgstr "Jesteśmy. To gdzie ten myśliwiec?"
+
+#: level 11 scene 1
+msgid "-1/f8ea3d6d"
+msgstr ""
+"O tam, w zamkniętym garażu. Jeden turysta rozbije odrzutowiec i bach! "
+"Proces!"
+
+#: level 11 scene 1
+msgid "-1/8cb5e02a"
+msgstr "Ten zamek nie przypomina żadnego, jaki widziałem."
+
+#: level 11 scene 1
+msgid "-1/748ad7e9"
+msgstr ""
+"Bardzo trafna uwaga, panie Błyszczący. Ja też nie umiem go otworzyć. Ja nie "
+"ufam turystom, a zarząd nie ufa mnie. Więc mamy mały problem."
+
+#: level 11 scene 1
+msgid "-1/47e10971"
+msgstr ""
+"MY mamy mały problem? Ja chcę tylko maskę, więc jak nie umiesz otworzyć "
+"zamka, to TWÓJ problem! Dawaj maskę!"
+
+#: level 11 scene 1
+msgid "-1/4990656e"
+msgstr ""
+"Spokojnie, spokojnie, widzę, że naprawdę chcecie polatać naszym "
+"odrzutowcem, więc powiem wam tak. Pogadajcie z Bobem w jego Roboshacku. On "
+"zna się na tych zamkach."
+
+#: level 11 scene 2
+msgid "-1/dec41912"
+msgstr "To chyba wystarczy. Proszę bardzo!"
+
+#: level 11 scene 2
+msgid "-1/d6be9cf6"
+msgstr "Najwyższy czas."
+
+#: level 11 scene 3
+msgid "-1/35496eb6"
+msgstr "No, no[xAD]co my tu mamy?!"
+
+#: level 11 scene 3
+msgid "-1/9d3714ac"
+msgstr "Ej, uważaj!"
+
+#: level 11 scene 3
+msgid "-1/4f061e84"
+msgstr "Poznaję tę robotę. Byliście u Ala, nie?"
+
+#: level 11 scene 3
+msgid "-1/8f424136"
+msgstr "No, zamontował helipack."
+
+#: level 11 scene 3
+msgid "-1/84e83944"
+msgstr "Toć widzę!"
+
+#: level 11 scene 3
+msgid "-1/93e0c180"
+msgstr ""
+"Nauczyłem tego mojego głupiego brata wszystkiego, co umie. Słuchajcie, jak "
+"chcecie porządnego sprzętu, to mogę zamontować małemu Thrusterpacka."
+
+#: level 11 scene 3
+msgid "-1/4dbdbfad"
+msgstr "Ooo."
+
+#: level 11 scene 3
+msgid "-1/ee1a545f"
+msgstr "Pomoże nam to przejść przez ten dziwny zamek przy garażu myśliwca?"
+
+#: level 11 scene 3
+msgid "-1/ced8938e"
+msgstr ""
+"Aa[xAD]znacie te ustrojstwa, co? No pewnie, że pomoże! Ma wbudowane "
+"specjalne uderzenie z wyskoku."
+
+#: level 11 scene 3
+msgid "-1/db2688cc"
+msgstr ""
+"Masz szczęście, że potrzebuję tego, żeby dostać się do odrzutowca, bo "
+"inaczej nic byś nie dostał, kolego!"
+
+#: level 11 scene 4
+msgid "-1/a63de57f"
+msgstr "Mam je."
+
+#: level 11 scene 4
+msgid "-1/58ac9f78"
+msgstr "Naprawię cię szybciej, niż ropucha zdąży podskoczyć!"
+
+#: level 11 scene 4
+msgid "-1/d5c0376f"
+msgstr "Proszę bardzo, kolego. Lepszy niż nowy!"
+
+#: level 11 scene 4
+msgid "-1/8db1abf7"
+msgstr "No pewnie[xAD]jestem gość!"
+
+#: level 11 scene 4
+msgid "-1/e4bab73d"
+msgstr "Hmmm[xAD]nieźle."
+
+#: level 11 scene 5
+msgid "-1/d2c6565d"
+msgstr "Hej, co ty tu robisz?"
+
+#: level 11 scene 5
+msgid "-1/d781fe1b"
+msgstr "Poszukuję bardzo nieuchwytnej i tajemniczej substancji!"
+
+#: level 11 scene 5
+msgid "-1/d46a1752"
+msgstr "Eee[xAD]może?"
+
+#: level 11 scene 5
+msgid "-1/db89dcb3"
+msgstr ""
+"Mówi się, że oceany tej planety są doskonałym źródłem tego pierwiastka."
+
+#: level 11 scene 5
+msgid "-1/a322cf84"
+msgstr "Cóż, już nie. Przez te toksyczne odpady nie ma po nim śladu."
+
+#: level 11 scene 5
+msgid "-1/8627128d"
+msgstr "Znajdziesz dla mnie Raritanium."
+
+#: level 11 scene 5
+msgid "-1/bebc5826"
+msgstr "Nie, nie znajdę!"
+
+#: level 11 scene 5
+msgid "-1/526571fe"
+msgstr "Kupa złomu!"
+
+#: level 11 scene 5
+msgid "-1/ffd0ddd2"
+msgstr ""
+"Mój najnowszy wynalazek: Persuader! Miał służyć do kontroli umysłów, ale "
+"jak dotąd dał mi tylko zniżkę u sprzedawców Gadgetronu."
+
+#: level 11 scene 5
+msgid "-1/e46b5704"
+msgstr "Ej, przydałby mi się!"
+
+#: level 11 scene 5
+msgid "-1/f9bc8535"
+msgstr "No[xAD]wymienię go na trochę Raritanium. "
+
+#: level 11 scene 5
+msgid "-1/35242997"
+msgstr "Wydaje mi się, że na planecie Hoven można znaleźć ten pierwiastek."
+
+#: level 11 scene 6
+msgid "-1/c0ad15b8"
+msgstr "Doskonale. Dokładnie tego potrzebuję."
+
+#: level 11 scene 6
+msgid "-1/c7f1bd05"
+msgstr "Przyniesiesz mi więcej Raritanium."
+
+#: level 11 scene 6
+msgid "-1/a3db12bb"
+msgstr "Chyba żartujesz."
+
+#: level 11 scene 6
+msgid "-1/937fb185"
+msgstr "No cóż, próbowałem."
+
+#: level 11 scene 7
+msgid "-1/ceae2b07"
+msgstr ""
+"Miasta są pełne smogu, bagna pełne mułu, a doły smołowe pełne smoły. Ale "
+"tu, w Kurorcie Jowai[xAD]słońce świeci 24 godziny na dobę!"
+
+#: level 11 scene 7
+msgid "-1/9d345edf"
+msgstr ""
+"Goście dostają darmową maskę tlenową do zwiedzania naszych ciepłych wód."
+
+#: level 11 scene 7
+msgid "-1/20f2be12"
+msgstr ""
+"Łagodne morskie stworzenia powitają was w wielkim błękitnym świecie pod "
+"wodą."
+
+#: level 11 scene 7
+msgid "-1/33e37231"
+msgstr ""
+"Eee[xAD]darmowe płetwy pozwolą wam też wziąć udział w pływaniu na czas."
+
+#: level 11 scene 7
+msgid "-1/b8e2f26b"
+msgstr ""
+"Przyjedźcie więc do Kurortu Jowai i zostawcie swój świat i kłopoty za sobą."
+
+#: level 12 scene 0
+msgid "-1/4a869086"
+msgstr "To pewnie statek, który przewiezie bombę"
+
+#: level 12 scene 0
+msgid "-1/8af1ece7"
+msgstr "Tak sądzisz? Świetna robota, detektywie."
+
+#: level 12 scene 1
+msgid "-1/c131c641"
+msgstr "Musimy dostać się do bazy na księżycu i powstrzymać Dreka."
+
+#: level 12 scene 1
+msgid "-1/3adb5716"
+msgstr ""
+"Nie. Musimy dostać się do bazy na księżycu, żeby znaleźć Qwarka! Jeśli jest "
+"tam Drek, Qwark pewnie jest z nim!"
+
+#: level 12 scene 1
+msgid "-1/8a24c4c9"
+msgstr "Ale Drek zniszczy to miasto! Musimy dostać się do bazy!"
+
+#: level 12 scene 1
+msgid "-1/65e00bbf"
+msgstr "Przecież to właśnie powiedziałem!"
+
+#: level 12 scene 1
+msgid "-1/a763377f"
+msgstr "Nie, to ja to powiedziałem!"
+
+#: level 12 scene 1
+msgid "-1/41158beb"
+msgstr "Dobra!"
+
+#: level 12 scene 1
+msgid "-1/8b5180c2"
+msgstr "[xAD]Dobra!"
+
+#: level 12 scene 2
+msgid "-1/ab8d3518"
+msgstr "Ach, do licha!"
+
+#: level 12 scene 2
+msgid "-1/fe03dc9e"
+msgstr "Jakiś problem, proszę pana?"
+
+#: level 12 scene 2
+msgid "-1/9fb23370"
+msgstr "Nie macie przypadkiem jakich zapasowych części?"
+
+#: level 12 scene 2
+msgid "-1/9de773bc"
+msgstr "Proszę się częstować."
+
+#: level 12 scene 2
+msgid "-1/42a2a5cf"
+msgstr "Te przeklęte skały są za twarde! Ciągle łamię wiertło."
+
+#: level 12 scene 2
+msgid "-1/2679ecd1"
+msgstr "Ta \"skała\" to Raritanium!"
+
+#: level 12 scene 2
+msgid "-1/9fd365fd"
+msgstr "Mogę rzucić okiem na to wiertło?"
+
+#: level 12 scene 2
+msgid "-1/1f4890df"
+msgstr "A niech mnie kule biją! Dzięki, kolego."
+
+#: level 12 scene 2
+msgid "-1/fd3bafa4"
+msgstr "Nie ma sprawy. Mogę też zabrać od pana tę skałę."
+
+#: level 12 scene 2
+msgid "-1/9faef77f"
+msgstr "A bierz, proszę."
+
+#: level 12 scene 3
+msgid "-1/13db653f"
+msgstr "Hej, kolego, co słychać?"
+
+#: level 12 scene 3
+msgid "-1/d2f16ee8"
+msgstr "O mój Boże!"
+
+#: level 12 scene 3
+msgid "-1/2706609d"
+msgstr "Czyż nie jesteś małym aniołkiem!"
+
+#: level 12 scene 3
+msgid "-1/94ae7e0c"
+msgstr "Właściwie jestem małym robotem."
+
+#: level 12 scene 3
+msgid "-1/a5bbf9d4"
+msgstr "He, he. I jeszcze zabawny!"
+
+#: level 12 scene 3
+msgid "-1/d54e9981"
+msgstr "No? Ale wygląd to nie wszystko."
+
+#: level 12 scene 3
+msgid "-1/48045479"
+msgstr "Bądź grzeczny! "
+
+#: level 12 scene 3
+msgid "-1/895a0723"
+msgstr ""
+"Chyba mam dla ciebie coś specjalnego. Co powiesz na ulepszenie do "
+"Hydropacka?"
+
+#: level 12 scene 3
+msgid "-1/b5ada082"
+msgstr "Bardzo przydałoby się do pływania pod wodą."
+
+#: level 12 scene 3
+msgid "-1/99488744"
+msgstr "Wszystko jedno! "
+
+#: level 12 scene 4
+msgid "-1/b6def8d5"
+msgstr "Proszę bardzo, złotko. Wyglądasz tak przystojnie."
+
+#: level 12 scene 4
+msgid "-1/77e46f0c"
+msgstr "Dziękuję pani. Pani rzemiosło jest znakomite!"
+
+#: level 12 scene 4
+msgid "-1/8ff62c58"
+msgstr "Jeśli już skończyliście[xAD]"
+
+#: level 12 scene 4
+msgid "-1/18906e5b"
+msgstr "Zazdrosny?"
+
+#: level 12 scene 4
+msgid "-1/a6b4f4b4"
+msgstr "Wpadaj do mnie, kiedy tylko zechcesz!"
+
+#: level 12 scene 5
+msgid "-1/a2b74b94"
+msgstr ""
+"Witajcie ponownie. Tu Najwyższy Przewodniczący Drek z wieściami o naszych "
+"postępach. "
+
+#: level 12 scene 5
+msgid "-1/f7d6d64c"
+msgstr ""
+"Znaleźliśmy idealną orbitę dla naszej planety. Taką, która zapewni "
+"optymalną temperaturę przez cały rok. "
+
+#: level 12 scene 5
+msgid "-1/1a0320e5"
+msgstr ""
+"Niestety tę orbitę zajmuje obecnie inna planeta. I niestety dla jej "
+"nielicznych, nic nieznaczących mieszkańców, musi zostać zniszczona. Dlatego "
+"stworzyliśmy[xAD]to!"
+
+#: level 12 scene 5
+msgid "-1/7423c4b6"
+msgstr ""
+"Planetbuster Maximus. Urządzenie zdolne rozbić całą planetę na cząstki "
+"subatomowe. Jesteśmy z niego bardzo dumni. Oto jak działa."
+
+#: level 12 scene 5
+msgid "-1/5cbec3d9"
+msgstr ""
+"Mocujemy Planetbuster do tego statku, wprowadzamy go na orbitę planety i "
+"puszczamy. Bum! He-he. Naprawdę genialne."
+
+#: level 12 scene 5
+msgid "-1/25e710e5"
+msgstr ""
+"Gdy nasi wykwalifikowani specjaliści nadadzą nowej planecie ostatni szlif, "
+"wszystko będzie gotowe."
+
+#: level 12 scene 5
+msgid "-1/4903a0d6"
+msgstr "Dziękuję[xAD]do widzenia!"
+
+#: level 12 scene 6
+msgid "-1/2d450588"
+msgstr "Spóźniliśmy się! Statek odlatuje."
+
+#: level 12 scene 6
+msgid "-1/2a5757f2"
+msgstr "Czekaj! Tam jest stare działko obronne"
+
+#: level 12 scene 6
+msgid "-1/b31d3aef"
+msgstr "Ej.  Myślisz o tym samym co ja?"
+
+#: level 12 scene 6
+msgid "-1/f2ec0375"
+msgstr "Szczerze wątpię."
+
+#: level 13 scene 0
+msgid "-1/bf3b5ff4"
+msgstr "Nie widziałem statku Dreka. Musieliśmy go przegapić!"
+
+#: level 13 scene 0
+msgid "-1/7b4b6d79"
+msgstr ""
+"Aargh! Kto wie, gdzie jest teraz Qwark! Jeśli mamy złapać tych dwóch, "
+"potrzebujemy szybszego statku."
+
+#: level 13 scene 0
+msgid "-1/ebbb86a3"
+msgstr "Może na tej stacji kosmicznej znajdziemy statek, którego potrzebujemy."
+
+#: level 13 scene 0
+msgid "-1/4ecf0b9d"
+msgstr "No, jesteśmy. Chodźmy się rozejrzeć."
+
+#: level 13 scene 1
+msgid "-1/00314173"
+msgstr "Witaj, \"Kapitanie Ratchet\"!"
+
+#: level 13 scene 1
+msgid "-1/3fa1316a"
+msgstr "A - ha - ha - ha - ha!"
+
+#: level 13 scene 1
+msgid "-1/3b2b3abb"
+msgstr "Chodź tu i mnie złap, bohaterze!"
+
+#: level 13 scene 1
+msgid "-1/a4af63e6"
+msgstr "Może tam zdobędziemy statek."
+
+#: level 13 scene 1
+msgid "-1/42039d6a"
+msgstr "Świetny pomysł! Chodźmy."
+
+#: level 13 scene 2
+msgid "-1/072d1033"
+msgstr "Tak! Z Qwarkiem koniec!"
+
+#: level 13 scene 2
+msgid "-1/2cd22f2f"
+msgstr ""
+"Mimo moich wcześniejszych uwag muszę przyznać, że coraz lepiej pilotujesz."
+
+#: level 13 scene 2
+msgid "-1/cb89b997"
+msgstr "Wiedziałem, że w końcu to przyznasz."
+
+#: level 13 scene 2
+msgid "-1/e032989b"
+msgstr "Ale nie pomogło nam to znaleźć Dreka!"
+
+#: level 13 scene 2
+msgid "-1/a3a71436"
+msgstr ""
+"No weź, Clank, nie możesz[xAD]choć raz[xAD]wyluzować i nacieszyć się małym "
+"sukcesem?"
+
+#: level 13 scene 2
+msgid "-1/c1387d8a"
+msgstr "Ej! Chcesz złapać Dreka? Założę się, że to cacko da radę!"
+
+#: level 13 scene 3
+msgid "-1/daf6a24a"
+msgstr "Yyy[xAD]"
+
+#: level 13 scene 3
+msgid "-1/cf188be2"
+msgstr "Tak, wiem. Też jest gorzej, niż się spodziewałem."
+
+#: level 13 scene 3
+msgid "-1/75055447"
+msgstr "Słuchaj, może miałeś rację. "
+
+#: level 13 scene 3
+msgid "-1/a55721dd"
+msgstr ""
+"To jest dużo większe niż ty czy ja. Byłem naprawdę samolubny, skupiając się "
+"na Qwarku."
+
+#: level 13 scene 3
+msgid "-1/0cfc2a62"
+msgstr "Jeszcze nie jest za późno, by powstrzymać Dreka."
+
+#: level 13 scene 3
+msgid "-1/85d1017b"
+msgstr "No właśnie! Mamy ten nowy statek. Chodźmy po niego."
+
+#: level 13 scene 3
+msgid "-1/02be0434"
+msgstr "No, teraz mówisz do rzeczy."
+
+#: level 14 scene 0
+msgid "-1/f255a1a1"
+msgstr "Clank?! Clank! No dalej, obudź się!"
+
+#: level 14 scene 0
+msgid "-1/8cb4af8e"
+msgstr "Ha. Nie, głuptasie, to ja[xAD]Ratchet."
+
+#: level 14 scene 0
+msgid "-1/faee3da0"
+msgstr "Co[xAD]się stało?"
+
+#: level 14 scene 0
+msgid "-1/9e589762"
+msgstr ""
+"Poraził cię piorun. Rozpętała się tu potężna burza. Tam na zewnątrz nie "
+"będziesz bezpieczny."
+
+#: level 14 scene 0
+msgid "-1/99ba087a"
+msgstr "Zaraz wracam. "
+
+#: level 14 scene 1
+msgid "-1/0321b2f0"
+msgstr "Kapitan Qwark!"
+
+#: level 14 scene 1
+msgid "-1/fc6aacb0"
+msgstr "Dokąd?"
+
+#: level 14 scene 1
+msgid "-1/d11b629c"
+msgstr "Daj spokój, Qwark! Wiem, że to ty."
+
+#: level 14 scene 1
+msgid "-1/53443e2a"
+msgstr "Mam na imię Steve. Miło mi."
+
+#: level 14 scene 1
+msgid "-1/3d8a5b93"
+msgstr ""
+"Słuchaj, \"Steve\". Muszę wiedzieć, gdzie jest Drek, zanim będzie za późno."
+
+#: level 14 scene 1
+msgid "-1/67713c2c"
+msgstr "Powiedziałeś \"za późno\"?"
+
+#: level 14 scene 1
+msgid "-1/bf0967b7"
+msgstr ""
+"Proszę pana. Nigdy nie jest za późno, by nabyć najnowszy z długiej linii "
+"wysokiej jakości produktów Gadgetronu. "
+
+#: level 14 scene 1
+msgid "-1/6b748cc1"
+msgstr "Mam dla pana, tylko dziś, Gadgetron PDA."
+
+#: level 14 scene 1
+msgid "-1/951eb6c4"
+msgstr "Publiczne Demonstrowanie Afektu?"
+
+#: level 14 scene 1
+msgid "-1/88abf1ef"
+msgstr ""
+"Nie, nie. Personalny Dostawca Amunicji. To urządzenie pozwala kupować "
+"amunicję gdziekolwiek i kiedykolwiek zechcesz. "
+
+#: level 14 scene 1
+msgid "-1/2e4de15f"
+msgstr "Taa? A skąd mam wiedzieć, że działa?"
+
+#: level 14 scene 1
+msgid "-1/bebff3da"
+msgstr ""
+"Jakości Gadgetronu zawsze można ufać, albo nie nazywam "
+"się[xAD]eee[xAD]Steve!"
+
+#: level 14 scene 2
+msgid "-1/2674e74c"
+msgstr "Dziękuję i życzę qwarkastycznego dnia!"
+
+#: level 14 scene 2
+msgid "-1/1b2a741c"
+msgstr "Coś ty powiedział?!"
+
+#: level 14 scene 2
+msgid "-1/ef37eeed"
+msgstr "Nic."
+
+#: level 14 scene 3
+msgid "-1/08038194"
+msgstr "Hej! Witaj w moim sklepie! Co ci podać?!"
+
+#: level 14 scene 3
+msgid "-1/4465acf7"
+msgstr "Szukam Dreka"
+
+#: level 14 scene 3
+msgid "-1/3db71ab0"
+msgstr ""
+"Jasne! Mam mnóstwo rzeczy na wyprzedaży! Po bombardowaniu nie ma komu "
+"kupować!"
+
+#: level 14 scene 3
+msgid "-1/d33ccb45"
+msgstr "Wszystko w porządku?"
+
+#: level 14 scene 3
+msgid "-1/84b5fc32"
+msgstr ""
+"Niskie ceny?! No pewnie! Mogę ci dobrze sprzedać zepsuty turborator, "
+"pogięty karbonizator albo[xAD] mam tego infobota."
+
+#: level 14 scene 3
+msgid "-1/dffd48ac"
+msgstr "To bombardowanie było chyba dość głośne, co?"
+
+#: level 14 scene 3
+msgid "-1/e813743c"
+msgstr ""
+"Oho! Ale z ciebie twardy negocjator! Wiesz co, oddam ci tego infobota za "
+"pół ceny!"
+
+#: level 14 scene 4
+msgid "-1/5a3456cb"
+msgstr "No, to by było na tyle!"
+
+#: level 14 scene 4
+msgid "-1/dd035f8a"
+msgstr "Dzięki!"
+
+#: level 14 scene 4
+msgid "-1/c561f6d7"
+msgstr "Przestań marudzić! Dałem ci świetną cenę! No wiesz co!"
+
+#: level 14 scene 5
+msgid "-1/3686c2a7"
+msgstr ""
+"To się nazywa porządna siła ognia! Clank będzie zazdrosny, jak to zobaczy!"
+
+#: level 14 scene 7
+msgid "-1/f039fe86"
+msgstr "Mówi Darla Gratch na żywo z Gorda City."
+
+#: level 14 scene 7
+msgid "-1/b3632bab"
+msgstr ""
+"Ta niegdyś spokojna planeta jest dziś rozdzierana przez niesprowokowany "
+"atak."
+
+#: level 14 scene 7
+msgid "-1/4f45d0df"
+msgstr ""
+"Wydaje się już pewne, że Najwyższy Przewodniczący Drek nie zrezygnuje z "
+"niszczenia galaktyki dla własnych samolubnych celów."
+
+#: level 14 scene 7
+msgid "-1/94412077"
+msgstr ""
+"Wszelka nadzieja wydaje się stracona. Darla Gratch, wiadomości kanału 64."
+
+#: level 15 scene 0
+msgid "-1/9637b0b2"
+msgstr "Hmmm[xAD]to było pi przez nieskończoność czy[xAD]"
+
+#: level 15 scene 0
+msgid "-1/129d40c7"
+msgstr "Hej! Pomóc ci to naprawić?"
+
+#: level 15 scene 0
+msgid "-1/d41f422e"
+msgstr "Właściwie próbuję to zniszczyć. "
+
+#: level 15 scene 0
+msgid "-1/79c19d1d"
+msgstr "Dlaczego?"
+
+#: level 15 scene 0
+msgid "-1/295beb1d"
+msgstr ""
+"Zlecono mi przerobienie mojej powiększarki tak, by tworzyła ogromne, ciężko "
+"uzbrojone mechy."
+
+#: level 15 scene 0
+msgid "-1/dc03732e"
+msgstr "Więc stąd się wzięły te mechy!"
+
+#: level 15 scene 0
+msgid "-1/7f492d01"
+msgstr ""
+"Właśnie! Gdybym wiedział, że stoi za tym Drek, nigdy bym tego nie zrobił."
+
+#: level 15 scene 0
+msgid "-1/40ea0076"
+msgstr "Możemy jakoś pomóc?"
+
+#: level 15 scene 0
+msgid "-1/e81fd033"
+msgstr ""
+"Cóż, jeśli zgłosisz się na ochotnika do powiększenia, może zdołasz "
+"zatrzymać te mechy na tyle długo, żebym zdążył zepsuć maszynę."
+
+#: level 15 scene 0
+msgid "-1/9325bc4f"
+msgstr "A potem zmienisz mnie z powrotem?"
+
+#: level 15 scene 0
+msgid "-1/e69a549e"
+msgstr "Eee[xAD]nigdy tego nie próbowałem, ale[xAD]teoretycznie[xAD]tak."
+
+#: level 15 scene 1
+msgid "-1/9cb14486"
+msgstr "Dobra robota. A teraz wejdź do maszyny i zobaczymy, co się stanie."
+
+#: level 15 scene 1
+msgid "-1/8c926c8a"
+msgstr "Miło cię znowu widzieć[xAD]chyba."
+
+#: level 15 scene 1
+msgid "-1/51b0a594"
+msgstr ""
+"Przekalibrowałem sterowanie tak, by reagowało tylko na twój układ obwodów."
+
+#: level 15 scene 1
+msgid "-1/928b9443"
+msgstr "Aaach[xAD]Doskonale!"
+
+#: level 15 scene 1
+msgid "-1/38e7f9da"
+msgstr "Nie wiem, jak wam dziękować. Może to się przyda!"
+
+#: level 15 scene 2
+msgid "-1/05444d5e"
+msgstr "Jak zdobędę to coś, przejdę obok tych robotów-strażników!"
+
+#: level 15 scene 2
+msgid "-1/9f8d7a54"
+msgstr "Robotów nie tak łatwo oszukać."
+
+#: level 15 scene 2
+msgid "-1/9be2db56"
+msgstr "Aaa! Co to jest?!"
+
+#: level 15 scene 2
+msgid "-1/ac485337"
+msgstr "Aha."
+
+#: level 15 scene 3
+msgid "-1/086b6abc"
+msgstr "To powinno wystarczyć!"
+
+#: level 15 scene 3
+msgid "-1/6d84eb36"
+msgstr "Mamo?"
+
+#: level 15 scene 3
+msgid "-1/693da5b6"
+msgstr "Och, rany."
+
+#: level 15 scene 3
+msgid "-1/11f77daa"
+msgstr "Starałem się, mamo."
+
+#: level 15 scene 3
+msgid "-1/816b426d"
+msgstr "Wiem."
+
+#: level 15 scene 3
+msgid "-1/e4f16273"
+msgstr "Ej, patrz, siostra!"
+
+#: level 15 scene 4
+msgid "-1/8e29d987"
+msgstr "Czy ty[xAD]dobrze[xAD]się czujesz!"
+
+#: level 15 scene 4
+msgid "-1/2f1b407d"
+msgstr "On[xAD]za[xAD]to[xAD]zapłaci."
+
+#: level 15 scene 4
+msgid "-1/a2e35f4b"
+msgstr "Słucham?"
+
+#: level 15 scene 4
+msgid "-1/d6237832"
+msgstr ""
+"Nie powinienem tak długo tego nie dostrzegać. Drek przekona się, co się "
+"dzieje, gdy ktoś zadziera z moim domem."
+
+#: level 15 scene 4
+msgid "-1/6b6f785d"
+msgstr "Z czego się cieszysz?"
+
+#: level 15 scene 4
+msgid "-1/5d96f2d5"
+msgstr "To jest ten Ratchet, o którym zawsze wiedziałem, że tam jest."
+
+#: level 15 scene 4
+msgid "-1/392a4adc"
+msgstr ""
+"Dobra, jeśli mamy to zrobić, musimy dostać się na statek Dreka, wtedy "
+"dowiemy się, gdzie ustawił ten laser!"
+
+#: level 15 scene 4
+msgid "-1/67ec0108"
+msgstr "Postaram się, żebyś była ze mnie dumna, mamo."
+
+#: level 15 scene 5
+msgid "-1/7a08ddf5"
+msgstr "O tak!"
+
+#: level 16 scene 0
+msgid "-1/a1ccec52"
+msgstr ""
+"Przepraszam pana, zastanawiałem się, czy nie martwi pana "
+"ta[xAD]eee[xAD]inwazja?"
+
+#: level 16 scene 0
+msgid "-1/6aff19e9"
+msgstr ""
+"Synu, nasza obrona to najlepsze, co można kupić za pieniądze. Nie zaprzątaj "
+"sobie tym głowy."
+
+#: level 16 scene 0
+msgid "-1/09fa64e2"
+msgstr "Jeździłeś kiedyś na hoverboardzie?"
+
+#: level 16 scene 0
+msgid "-1/7c1b3d74"
+msgstr "No, raz czy dwa."
+
+#: level 16 scene 0
+msgid "-1/cf7326e1"
+msgstr ""
+"Szukam modnej młodej gwiazdy, która będzie reklamować moją najnowszą linię "
+"desek. Kogoś, na kogo dzieciaki mogą się wzorować."
+
+#: level 16 scene 0
+msgid "-1/3b651718"
+msgstr "To ja[xAD]jestem twoim człowiekiem!"
+
+#: level 16 scene 0
+msgid "-1/2726c5b9"
+msgstr "Jeśli pokonasz moje testowe roboty w wyścigu... praca jest twoja!"
+
+#: level 16 scene 1
+msgid "-1/f05fe72e"
+msgstr ""
+"To było świetne! Teraz potrzebuję tylko, żebyś powiedział parę słów o "
+"naszych nowych deskach!"
+
+#: level 16 scene 1
+msgid "-1/4fd587f1"
+msgstr "Co? Teraz?!"
+
+#: level 16 scene 1
+msgid "-1/5e60d2b1"
+msgstr "Oczywiście! Popatrz w tę kamerę i powiedz, co ci przyjdzie do głowy."
+
+#: level 16 scene 1
+msgid "-1/4e99f12e"
+msgstr "Kręcimy!"
+
+#: level 16 scene 1
+msgid "-1/3049c244"
+msgstr ""
+"Eee[xAD]cześć? Tu Ratchet dla[xAD]eee[xAD]hoverboardów Gadgetronu. A "
+"jeśli[xAD]yyy[xAD]"
+
+#: level 16 scene 1
+msgid "-1/51a6be41"
+msgstr ""
+"Siema, ziomki. Po najświeższe deski w galaktyce sięgnijcie po nowy XZ88 od "
+"Gadgetronu. Jest tak gorący, że aż cool."
+
+#: level 16 scene 1
+msgid "-1/d5bdfe5f"
+msgstr "Chyba wybrałem złego gościa."
+
+#: level 16 scene 1
+msgid "-1/a4caeb20"
+msgstr "To było[xAD]eee[xAD]coś."
+
+#: level 16 scene 1
+msgid "-1/cfdb272d"
+msgstr "Ej, tak sobie myślę, czy teraz dostanę zniżkę na gadżety?"
+
+#: level 16 scene 1
+msgid "-1/d166375c"
+msgstr ""
+"Eee[xAD]zniżka pracownicza przysługuje dopiero po 2 latach w firmie. Ale "
+"mogę ci dać to."
+
+#: level 16 scene 2
+msgid "-1/351fd5e2"
+msgstr ""
+"Ej, w końcu poznamy dziewczynę z Help Desku!  Mam nadzieję, że jest ładna."
+
+#: level 16 scene 2
+msgid "-1/20a5d49c"
+msgstr "A jakie to ma znaczenie?"
+
+#: level 16 scene 2
+msgid "-1/ebfe971b"
+msgstr "Oooo rany!?"
+
+#: level 16 scene 2
+msgid "-1/5a1a5151"
+msgstr "Eee[xAD]Często tu bywasz?"
+
+#: level 16 scene 2
+msgid "-1/7e18ddc1"
+msgstr "Właściwie to tu pracuję, więc bywam tu cały czas."
+
+#: level 16 scene 2
+msgid "-1/e3f9b018"
+msgstr "A, no tak. He-he. "
+
+#: level 16 scene 2
+msgid "-1/59fd7d83"
+msgstr ""
+"Śledzę twoje postępy, proszę[xAD]ćśś[xAD]weź to. To Map-o-matic. Bardzo ci "
+"się przyda."
+
+#: level 16 scene 2
+msgid "-1/9ed2215e"
+msgstr "To[xAD]eee[xAD]do zobaczenia."
+
+#: level 16 scene 2
+msgid "-1/f8a9c9cb"
+msgstr "Pa, słodziaku."
+
+#: level 16 scene 2
+msgid "-1/c75a3505"
+msgstr "Chyba mnie lubi!"
+
+#: level 17 scene 1
+msgid "-1/f9c47bf3"
+msgstr "Tak jest!"
+
+#: level 17 scene 3
+msgid "-1/4cd66266"
+msgstr "Czas zacząć twoje nowe zadanie."
+
+#: level 17 scene 3
+msgid "-1/9cb18ee7"
+msgstr ""
+"Ach! Sesja zdjęciowa przy pańskim lśniącym nowym promie. Świetny pomysł!"
+
+#: level 17 scene 3
+msgid "-1/07894d0b"
+msgstr "Naprawdę jesteś idiotą!"
+
+#: level 17 scene 3
+msgid "-1/fcdc1c3c"
+msgstr ""
+"Masz polecieć tym promem do bazy na księżycu i urządzić zasadzkę na tych "
+"dwóch łobuzów, kiedy tam dotrą."
+
+#: level 17 scene 3
+msgid "-1/57f97b3b"
+msgstr "A, tak[xAD]kim oni byli?"
+
+#: level 17 scene 3
+msgid "-1/468434da"
+msgstr "Aaargh! Ci dwaj!"
+
+#: level 17 scene 3
+msgid "-1/f2fd5104"
+msgstr "Ach, oczywiście! Jest tylko[xAD]jeden[xAD]problem. Jestem[xAD]"
+
+#: level 17 scene 3
+msgid "-1/babe2680"
+msgstr ""
+"[xAD]za bardzo wypalony do walki na ziemi? Prawda. Dlatego pożyczę ci mój "
+"myśliwiec. Latać chyba jeszcze umiesz?"
+
+#: level 17 scene 3
+msgid "-1/57ec3d6e"
+msgstr ""
+"Postanowione. Myśliwiec dostaniesz na księżycu. Jeśli to zawalisz, kontrakt "
+"reklamowy przepada!"
+
+#: level 17 scene 3
+msgid "-1/84bb2efe"
+msgstr "Ale to by mnie zrujnowało! Nie zrobi pan tego!"
+
+#: level 17 scene 3
+msgid "-1/4c00445f"
+msgstr "Przekonaj się!"
+
+#: level 18 scene 0
+msgid "-1/fc25524f"
+msgstr "Hej, co do[xAD]?"
+
+#: level 18 scene 0
+msgid "-1/30ce0a6e"
+msgstr ""
+"He-he-he. Imbecyle. Po wszystkim, przez co przeszliście, zginiecie "
+"dokładnie tam, gdzie zaczęliście. To takie[xAD]poetyckie."
+
+#: level 18 scene 0
+msgid "-1/fdda4825"
+msgstr "To jest to, Clank! Bierzmy go!"
+
+#: level 18 scene 1
+msgid "-1/2586bd6b"
+msgstr ""
+"Hmmmm[xAD]Może jednak byłbyś mi przydatny. Szkoda, że wybrałeś złą stronę."
+
+#: level 18 scene 2
+msgid "-1/21f261db"
+msgstr ""
+"Więc doszło do tego. Gdy nadepnę na ten włącznik, rozpocznie się "
+"odliczanie, a jego koniec oznacza zagładę waszego żałosnego świata."
+
+#: level 18 scene 2
+msgid "-1/b9482200"
+msgstr "Musi być inny sposób, by dać dom twojemu ludowi!"
+
+#: level 18 scene 2
+msgid "-1/02a2683d"
+msgstr ""
+"Myślisz, że o to tu chodzi? A jak myślisz, kto zanieczyścił nasz poprzedni "
+"świat? Ja. Tu chodzi o jedno i tylko o jedno. O kasę[xAD]i to dużo kasy.  "
+"Widzisz, dostałem zapłatę za każdy centymetr kwadratowy mojego nowego "
+"świata. Gdy wprowadzą się mieszkańcy, zacznę zanieczyszczać i ten świat, a "
+"potem wszystko zacznie się od nowa. Ach, genialne!"
+
+#: level 18 scene 2
+msgid "-1/93b7a0e7"
+msgstr "Ty[xAD]ty[xAD]podły mały[xAD]"
+
+#: level 18 scene 2
+msgid "-1/babfe142"
+msgstr "Daruj sobie, Clank, musimy zatrzymać ten licznik!"
+
+#: level 18 scene 3
+msgid "-1/94157c39"
+msgstr "Co jest?"
+
+#: level 18 scene 3
+msgid "-1/6e9957ea"
+msgstr "Wiesz, tym razem myślę o tym samym co ty!"
+
+#: level 18 scene 4
+msgid "-1/5bb116b4"
+msgstr "To nie wróży nic dobrego."
+
+#: level 18 scene 4
+msgid "-1/240f6a6a"
+msgstr "Uff, było blisko."
+
+#: level 18 scene 4
+msgid "-1/dcebd53c"
+msgstr "Eee, Clank[xAD]możesz[xAD]he-he[xAD]już nas wciągnąć!"
+
+#: level 18 scene 4
+msgid "-1/9a7403bc"
+msgstr "Serwomechanizmy w moim ramieniu chyba są zepsute."
+
+#: level 18 scene 4
+msgid "-1/1d0124e1"
+msgstr "Zepsute[xAD]w sensie[xAD]że spadniemy i zginiemy?"
+
+#: level 18 scene 4
+msgid "-1/19352d6a"
+msgstr "Eee[xAD]tak."
+
+#: level 18 scene 5
+msgid "-1/7948fc93"
+msgstr "Było blisko. Dzięki."
+
+#: level 18 scene 5
+msgid "-1/6e5d047e"
+msgstr "Moje ramię jest chyba poważnie uszkodzone."
+
+#: level 18 scene 5
+msgid "-1/09325056"
+msgstr "Aa, nic ci nie będzie"
+
+#: level 18 scene 5
+msgid "-1/186e6a28"
+msgstr "Ej, puszko!"
+
+#: level 18 scene 5
+msgid "-1/e3fc94df"
+msgstr "A ty dokąd się wybierasz?"
+
+#: level 18 scene 5
+msgid "-1/170d3b91"
+msgstr "Musimy[xAD]eee[xAD]jeszcze naprawić to ramię."
