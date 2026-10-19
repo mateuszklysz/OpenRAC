@@ -25,8 +25,9 @@ void use(const std::string& code, const std::vector<char32_t>& letters);
 bool has_font(const std::string& code);
 
 // UTF8 (a translation as its file writes it) drawn into a texture of the port's in CODE's font
-// file, or the port's Latin one: on one line, or two when it is long, fitted into MAX_WIDTH x
-// MAX_HEIGHT of the game's pixels. False when it cannot be drawn (no window yet).
+// file, or the port's Latin one, as the captions' slides are: black over the whole MAX_WIDTH x
+// MAX_HEIGHT of the game's pixels, the letters (one line, or two when it is long) left clear.
+// False when it cannot be drawn (no window yet).
 bool picture(const std::string& utf8, const std::string& code, float max_width, float max_height,
              openrac_game_picture& out);
 

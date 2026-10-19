@@ -54,38 +54,6 @@ bool square(char32_t c) {
            || (c >= 0xF900 && c < 0xFB00) || (c >= 0xFF00 && c < 0xFF61);
 }
 
-// White (the chip's 0x80) where COVERAGE (w x h, 0..255) is, dark around it, as the game's fonts
-// are drawn, into IMAGE at (X, Y).
-void put_edged(renderer::Rgba8Image& image, int x, int y, const std::vector<unsigned char>& coverage, int w,
-               int h) {
-    const auto fill = [&](int px, int py) -> float {
-        return px < 0 || py < 0 || px >= w || py >= h
-                   ? 0.0f
-                   : static_cast<float>(coverage[static_cast<std::size_t>(py * w + px)]) / 255.0f;
-    };
-    for (int py = -kEdge; py < h + kEdge; ++py) {
-        for (int px = -kEdge; px < w + kEdge; ++px) {
-            const int ix = x + px, iy = y + py;
-            if (ix < 0 || iy < 0 || ix >= image.width || iy >= image.height) {
-                continue;
-            }
-            const float f = fill(px, py);
-            float edge = 0.0f;
-            for (int dy = -kEdge; dy <= kEdge; ++dy) {
-                for (int dx = -kEdge; dx <= kEdge; ++dx) {
-                    if (dx * dx + dy * dy <= kEdge * kEdge + 1) {
-                        edge = std::max(edge, fill(px + dx, py + dy));
-                    }
-                }
-            }
-            const float a = std::max(f, edge * 0.85f);
-            const float white = a > 0.0f ? 128.0f * f / a : 0.0f;
-            const auto c = static_cast<std::uint32_t>(std::lround(white));
-            image.set_texel(ix, iy, c | c << 8 | c << 16 | static_cast<std::uint32_t>(std::lround(a * 255.0f)) << 24);
-        }
-    }
-}
-
 // The characters of a translation as its file writes it, as they are shown: a button or colour
 // in brackets left out, [xAD] (the game's ellipsis) as one, "[[" as '['.
 std::u32string shown_letters(const std::string& utf8) {
@@ -137,7 +105,7 @@ bool picture(const std::string& utf8, const std::string& code, float max_width, 
     if (stbtt_InitFont(&font, data, stbtt_GetFontOffsetForIndex(data, 0)) == 0) {
         return false;
     }
-    constexpr float em = 48.0f;
+    constexpr float em = 32.0f;
     const float scale = stbtt_ScaleForMappingEmToPixels(&font, em);
     const std::u32string text = shown_letters(utf8);
     const auto width_of = [&](std::size_t from, std::size_t to) {
@@ -149,13 +117,13 @@ bool picture(const std::string& utf8, const std::string& code, float max_width, 
         }
         return w;
     };
-    // One line, or two split at the space (or newline) nearest the middle when it is more than 18
-    // ems long.
+    // One line, or two split at the space (or newline) nearest the middle when one line would be
+    // wider than the slide.
     std::vector<std::pair<std::size_t, std::size_t>> lines;
     std::size_t split = std::u32string::npos;
     const float whole = width_of(0, text.size());
     for (std::size_t i = 0; i < text.size(); ++i) {
-        if (text[i] == U'\n' || (whole > 18.0f * em && text[i] == U' '
+        if (text[i] == U'\n' || (whole * 18.0f / em > max_width - 24.0f && text[i] == U' '
                                   && (split == std::u32string::npos
                                       || std::abs(2.0f * width_of(0, i) - whole)
                                              < std::abs(2.0f * width_of(0, split) - whole)))) {
@@ -178,8 +146,14 @@ bool picture(const std::string& utf8, const std::string& code, float max_width, 
     for (const auto& [from, to] : lines) {
         widest = std::max(widest, width_of(from, to));
     }
-    const int w = static_cast<int>(std::ceil(widest)) + 2 * kPad;
-    const int h = static_cast<int>(std::ceil(line_height * static_cast<float>(lines.size()))) + 2 * kPad;
+    // The letters as high as the slides' own (18 pixels to the em on one line, 15 on two),
+    // smaller when that is too wide or too high for the slide less a margin.
+    const float text_w = widest, text_h = line_height * static_cast<float>(lines.size());
+    float k = (lines.size() == 1 ? 18.0f : 15.0f) / em;
+    k = std::min({k, (max_width - 24.0f) / text_w, (max_height - 4.0f) / text_h});
+    // The whole slide, black, with the letters left clear: drawn over the game's band, as its
+    // slides are, they show the band through them.
+    const int w = static_cast<int>(std::ceil(max_width / k)), h = static_cast<int>(std::ceil(max_height / k));
     int tw = 1, th = 1;
     while (tw < w) {
         tw *= 2;
@@ -188,23 +162,40 @@ bool picture(const std::string& utf8, const std::string& code, float max_width, 
         th *= 2;
     }
     renderer::Rgba8Image image(tw, th);
+    for (int y = 0; y < th; ++y) {
+        for (int x = 0; x < tw; ++x) {
+            image.set_texel(x, y, 0xFF000000u);
+        }
+    }
+    const float left = (static_cast<float>(w) - text_w) / 2.0f, top = (static_cast<float>(h) - text_h) / 2.0f;
     for (std::size_t l = 0; l < lines.size(); ++l) {
         const float line_width = width_of(lines[l].first, lines[l].second);
-        float x = static_cast<float>(kPad) + (widest - line_width) / 2.0f;
-        const float baseline = static_cast<float>(kPad) + line_height * static_cast<float>(l)
-                               + static_cast<float>(ascent) * scale;
+        float x = left + (widest - line_width) / 2.0f;
+        const float baseline = top + line_height * static_cast<float>(l) + static_cast<float>(ascent) * scale;
         for (std::size_t i = lines[l].first; i < lines[l].second; ++i) {
             const int c = static_cast<int>(text[i]);
             int advance = 0, bearing = 0;
             stbtt_GetCodepointHMetrics(&font, c, &advance, &bearing);
             int x0 = 0, y0 = 0, x1 = 0, y1 = 0;
-            stbtt_GetCodepointBitmapBox(&font, c, scale, scale, &x0, &y0, &x1, &y1);
+            const float shift = x - std::floor(x);
+            stbtt_GetCodepointBitmapBoxSubpixel(&font, c, scale, scale, shift, 0.0f, &x0, &y0, &x1, &y1);
             const int gw = x1 - x0, gh = y1 - y0;
             if (gw > 0 && gh > 0) {
                 std::vector<unsigned char> coverage(static_cast<std::size_t>(gw * gh));
-                stbtt_MakeCodepointBitmap(&font, coverage.data(), gw, gh, gw, scale, scale, c);
-                put_edged(image, static_cast<int>(std::lround(x)) + x0, static_cast<int>(std::lround(baseline)) + y0,
-                          coverage, gw, gh);
+                stbtt_MakeCodepointBitmapSubpixel(&font, coverage.data(), gw, gh, gw, scale, scale, shift, 0.0f, c);
+                const int ox = static_cast<int>(std::floor(x)) + x0;
+                const int oy = static_cast<int>(std::lround(baseline)) + y0;
+                for (int py = 0; py < gh; ++py) {
+                    for (int px = 0; px < gw; ++px) {
+                        const int ix = ox + px, iy = oy + py;
+                        if (ix < 0 || iy < 0 || ix >= tw || iy >= th) {
+                            continue;
+                        }
+                        const std::uint32_t clear = coverage[static_cast<std::size_t>(py * gw + px)];
+                        const std::uint32_t was = image.texel(ix, iy) >> 24;
+                        image.set_texel(ix, iy, std::min(was, 255u - clear) << 24);
+                    }
+                }
             }
             x += static_cast<float>(advance) * scale;
         }
@@ -213,17 +204,13 @@ bool picture(const std::string& utf8, const std::string& code, float max_width, 
     if (!place_texture(key, image, "text picture")) {
         return false;
     }
-    // The letters as high as the game's captions (24 pixels to the em on one line, 20 on two),
-    // smaller when that is too wide or too high.
-    float k = (lines.size() == 1 ? 24.0f : 20.0f) / em;
-    k = std::min({k, max_width / static_cast<float>(w), max_height / static_cast<float>(h)});
     out.key = key;
     out.log2_width = static_cast<std::uint32_t>(std::log2(tw));
     out.log2_height = static_cast<std::uint32_t>(std::log2(th));
     out.u1 = static_cast<float>(w);
     out.v1 = static_cast<float>(h);
-    out.width = static_cast<float>(w) * k;
-    out.height = static_cast<float>(h) * k;
+    out.width = max_width;
+    out.height = max_height;
     return true;
 }
 

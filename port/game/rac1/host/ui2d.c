@@ -576,9 +576,10 @@ void func_00232B90(int language, int first, int second, gaddr shared, gaddr firs
     g_slides[1].tex = GREF(uint64_t, second_out), g_slides[1].slide = second;
 }
 
-/* In a language the port translates into, a caption picture is replaced by its text, drawn by the
- * port in its own font (the game's is not in the GS while the slides show: their loop pages no
- * effect textures in): on one line, or two when it is long. True when it was. */
+/* In a language the port translates into, a caption picture is replaced by the port's own of its
+ * text (the game's font is not in the GS while the slides show: their loop pages no effect
+ * textures in). As the game's, it is black with the letters clear, over the band drawn before it,
+ * which shows through them. True when it was. */
 static int loading_slide(int x, int y, int w, int h, unsigned long long rgba, unsigned long long tex) {
     if (w != 0x200 || h != 0x40 || tex == 0) {
         return 0;
@@ -594,18 +595,17 @@ static int loading_slide(int x, int y, int w, int h, unsigned long long rgba, un
         return 0;
     }
     openrac_game_picture p;
-    if (!openrac_game_text_picture(21251 + slide, 488.0f, 60.0f, &p)) {
+    if (!openrac_game_text_picture(21251 + slide, (float)w, (float)h, &p)) {
         return 0; /* the game's own words: its picture says them */
     }
-    const float cx = (float)x + (float)w / 2.0f, cy = (float)y + (float)h / 2.0f;
-    const float x0 = cx - p.width / 2.0f, y0 = cy - p.height / 2.0f;
+    const float x0 = (float)x, y0 = (float)y;
     openrac_game_ui_rect q;
     memset(&q, 0, sizeof(q));
     const float ofx = (float)SCREEN_OFX, ofy = (float)SCREEN_OFY;
     rect(&q, (int)(x0 * 16.0f + ofx) - 8, (int)(y0 * 16.0f + ofy) - 8, (int)((x0 + p.width) * 16.0f + ofx) - 8,
          (int)((y0 + p.height) * 16.0f + ofy) - 8, 0, 0, (int)(p.u1 * 16.0f), (int)(p.v1 * 16.0f));
     q.z = 0xFFFFF0u;
-    q.rgba = (uint32_t)(rgba & 0xFF000000ull) | 0x808080u;
+    q.rgba = (uint32_t)rgba;
     /* TCC, MODULATE; TW and TH the picture's, for the texel coordinates. */
     q.tex0 = (1ull << 34) | ((unsigned long long)p.log2_width << 26) | ((unsigned long long)p.log2_height << 30);
     q.key = p.key;

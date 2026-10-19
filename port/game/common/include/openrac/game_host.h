@@ -327,8 +327,8 @@ typedef struct openrac_game_glyph {
 int openrac_game_foreign_glyph(int index, openrac_game_glyph* out);
 
 /* A text drawn by the port into a texture of its own (openrac_game_ui_rect's key, log2 sizes for
- * TEX0's TW and TH): its texels (0, 0) .. (u1, v1), white with a dark edge, and how big to draw them
- * in the game's pixels, on one or two lines as high and no wider than asked. */
+ * TEX0's TW and TH): its texels (0, 0) .. (u1, v1), black with the letters left clear (on one or
+ * two lines), and how big to draw them in the game's pixels. */
 typedef struct openrac_game_picture {
     uint32_t key;
     uint32_t log2_width, log2_height;
@@ -336,9 +336,10 @@ typedef struct openrac_game_picture {
     float width, height;
 } openrac_game_picture;
 
-/* The translation of text ID in the language in use as such a picture, at most MAX_WIDTH x
- * MAX_HEIGHT pixels: 1 with OUT filled, 0 when the language has no words for it. The captions
- * before the story movies, which are pictures in the game. */
+/* The translation of text ID in the language in use as such a picture of MAX_WIDTH x MAX_HEIGHT
+ * pixels: 1 with OUT filled, 0 when the language has no words for it. The captions before the
+ * story movies, which are pictures in the game: drawn over their band, the band shows through
+ * the letters. */
 int openrac_game_text_picture(int id, float max_width, float max_height, openrac_game_picture* out);
 
 /* How many digits a foreign letter's number has in the language in use; 0: it has none. */
