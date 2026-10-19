@@ -392,6 +392,19 @@ static struct {
 } g_slides[2];
 
 void func_00232B90(int language, int first, int second, gaddr shared, gaddr first_out, gaddr second_out) {
+    /* The slides are uploaded from the texture cursor (D_0015EF74), which the last frame's paging
+     * left where the effect textures go: over the font, which the slides' loop does not page in
+     * again. When their text is printed instead, they go past the font. */
+    if (openrac_game_text_by_id(21251 + first) != 0) {
+        const unsigned long long font = (unsigned long long)func_001F4868(1);
+        const unsigned tbp = (unsigned)(font & 0x3FFF);
+        const unsigned w = 1u << ((font >> 26) & 0xF), h = 1u << ((font >> 30) & 0xF);
+        const int past = (int)(((tbp << 8) + w * h * 4u + 0xFFu) & ~0xFFu);
+        int* cursor = &GREF(int, OPENRAC_DATA(RAC1_ADDR(0x0015EF74u)));
+        if (*cursor < past && past + 0x40000 < 0x400000) {
+            *cursor = past;
+        }
+    }
     func_00232B90__game(language, first, second, shared, first_out, second_out);
     g_slides[0].tex = GREF(uint64_t, first_out), g_slides[0].slide = first;
     g_slides[1].tex = GREF(uint64_t, second_out), g_slides[1].slide = second;

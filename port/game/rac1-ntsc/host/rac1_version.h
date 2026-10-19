@@ -56,6 +56,8 @@
 #define RAC1_ADDR_0x001997FCu 0x001996FCu
 /* The language the game's menu chose (its texts' slot), as the title's draw (FUN_001eb410) reads it. */
 #define RAC1_ADDR_0x0015EE88u 0x0015ED88u
+/* The GS texture cursor (gs_texture_allocation_cursor). */
+#define RAC1_ADDR_0x0015EF74u 0x0015EE74u
 
 /* Where this version's decompilation declares a function otherwise: the type in its prototypes. */
 /* ParseBin's result, the loaded level's entry. */
