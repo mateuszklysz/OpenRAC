@@ -2683,18 +2683,31 @@ bool place_texture(std::uint32_t key, const renderer::Rgba8Image& image, const s
     return true;
 }
 
-bool keep_texture(std::uint32_t key, std::uint64_t tex0) {
+std::uint32_t t8_texture(std::span<const std::uint8_t> indices, std::span<const std::uint8_t> palette, int width,
+                         int height) {
+    constexpr std::uint32_t kKey = 0x43000;  // past the foreign letters' and the captions' (glyphs.cpp)
     if (!g || !g->renderer) {
-        return false;
+        return 0;
     }
-    renderer::TexturePool& pool = g->renderer->textures();
-    const renderer::TextureHandle h = pool.resolve(renderer::gs::Tex0::decode(tex0), renderer::gs::Texa{0, false, 0x80});
-    if (h == pool.placeholder()) {
-        return false;
+    static std::unordered_map<std::uint64_t, std::uint32_t> placed;
+    static const renderer::Renderer* placed_for = nullptr;
+    if (placed_for != g->renderer.get()) {
+        placed.clear();
+        placed_for = g->renderer.get();
     }
-    const renderer::TextureHandle copy = pool.add(pool.image(h), pool.alpha_scale(h), "kept texture", false, true);
-    pool.place(key, copy);
-    return true;
+    const std::uint64_t id = renderer::hash_bytes(indices.data(), indices.size())
+                             ^ (renderer::hash_bytes(palette.data(), palette.size()) * 0x9E3779B97F4A7C15ull);
+    if (const auto found = placed.find(id); found != placed.end()) {
+        return found->second;
+    }
+    const std::vector<std::uint32_t> colours = renderer::clut_csm1(palette, 0x00, 16, 256, {0, false, 0x80});
+    renderer::Rgba8Image image = renderer::convert_t8(indices, width, height, colours, renderer::AlphaScale::Gs);
+    const renderer::TextureHandle h = g->renderer->textures().add(std::move(image), renderer::AlphaScale::Gs,
+                                                                   "effect texture", false, true);
+    const std::uint32_t key = kKey + static_cast<std::uint32_t>(placed.size() & 0xFFF);
+    g->renderer->textures().place(key, h);
+    placed.emplace(id, key);
+    return key;
 }
 
 int ui_quad(const openrac_game_ui_rect& quad) {

@@ -47,9 +47,10 @@ int ui_quad(const openrac_game_ui_rect& quad);
 // (openrac_game_ui_rect.key), drawn filtered. False when there is no window yet.
 bool place_texture(std::uint32_t key, const renderer::Rgba8Image& image, const std::string& name);
 
-// What the GS holds now for the texture TEX0 (as the frame last drawn left it), copied to KEY as
-// such a texture: kept when the game puts something else there. False when it holds nothing.
-bool keep_texture(std::uint32_t key, std::uint64_t tex0);
+// A PSMT8 texture of the game's (WIDTH x HEIGHT indices and a 16 x 16 CSM1 palette of PSMCT32, as
+// it uploads them) decoded once and placed at a key of the port's: the key, 0 without a window.
+std::uint32_t t8_texture(std::span<const std::uint8_t> indices, std::span<const std::uint8_t> palette, int width,
+                         int height);
 
 // How far the HUD's side-anchored elements go out past the game's picture, in its 512ths of that
 // picture's width (openrac_game_hud_side): the player's "HUD: Edges" in a wider picture, else 0.

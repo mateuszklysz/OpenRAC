@@ -972,14 +972,21 @@ int openrac_game_foreign_glyph(int index, openrac_game_glyph* out) {
     return 0;
 }
 
-uint32_t openrac_game_keep_texture(uint64_t tex0) {
+uint32_t openrac_game_t8_texture(gaddr pixels, gaddr clut, int log2_width, int log2_height) {
 #ifdef OPENRAC_FRONTEND
-    if (g_window) {
-        constexpr std::uint32_t kKept = 0x42000;  // past the foreign letters' (glyphs.cpp)
-        return frontend::keep_texture(kKept, tex0) ? kKept : 0;
+    if (g_window && log2_width >= 0 && log2_width <= 10 && log2_height >= 0 && log2_height <= 10) {
+        const std::size_t n = std::size_t{1} << (log2_width + log2_height);
+        const std::uint8_t* base = openrac_guest_base;
+        if (pixels == 0 || clut == 0 || pixels + n > GUEST_RAM_SIZE || clut + 1024 > GUEST_RAM_SIZE) {
+            return 0;
+        }
+        return frontend::t8_texture({base + pixels, n}, {base + clut, 1024}, 1 << log2_width, 1 << log2_height);
     }
 #endif
-    (void)tex0;
+    (void)pixels;
+    (void)clut;
+    (void)log2_width;
+    (void)log2_height;
     return 0;
 }
 

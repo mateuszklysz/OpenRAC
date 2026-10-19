@@ -326,11 +326,11 @@ typedef struct openrac_game_glyph {
 /* The letter numbered INDEX among the language's: 1 with OUT filled, 0 when there is none. */
 int openrac_game_foreign_glyph(int index, openrac_game_glyph* out);
 
-/* What the GS holds now for the texture TEX0 (as the last frame drawn left it), kept as a texture
- * of the port's when the game puts something else there: its key (openrac_game_ui_rect.key), 0
- * when it holds nothing. One such texture at a time, each call replacing the last. The game's font
- * for the captions before the story movies, whose slides are uploaded over it. */
-uint32_t openrac_game_keep_texture(uint64_t tex0);
+/* A PSMT8 texture of the game's as it uploads it (1 << LOG2_WIDTH x 1 << LOG2_HEIGHT indices at
+ * PIXELS, a 16 x 16 CSM1 palette of PSMCT32 at CLUT, in game memory) as a texture of the port's: its
+ * key (openrac_game_ui_rect.key), 0 without a window. The game's font for the captions before the
+ * story movies, whose slides are uploaded over it in the GS. */
+uint32_t openrac_game_t8_texture(gaddr pixels, gaddr clut, int log2_width, int log2_height);
 
 /* The key of an opaque black texture of the port's (4 x 4), 0 without a window. */
 uint32_t openrac_game_black_texture(void);

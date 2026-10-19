@@ -57,6 +57,10 @@
 /* The language the game's menu chose (its texts' slot), as the title's draw (FUN_001eb410) reads it. */
 #define RAC1_ADDR_0x0015EE88u 0x0015ED88u
 
+/* The effect textures' definitions, and the base of their texels and palettes. */
+#define RAC1_ADDR_0x0018D540u 0x0018D440u
+#define RAC1_ADDR_0x0015F560u 0x0015F460u
+
 /* Where this version's decompilation declares a function otherwise: the type in its prototypes. */
 /* ParseBin's result, the loaded level's entry. */
 #define RAC1_TYPE_func_0012DA38_result long long

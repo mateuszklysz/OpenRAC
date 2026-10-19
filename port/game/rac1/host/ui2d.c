@@ -50,8 +50,9 @@ static int skipped(const char* name) {
     return list != NULL && strstr(list, name) != NULL;
 }
 
-/* The game's font kept for the captions before the story movies (their slides are uploaded over
- * it): its base pointer, and the port's texture holding it while they are drawn (0: none). */
+/* The game's font for the captions before the story movies (their slides are uploaded over it in
+ * the GS): its base pointer as the last frame paged it in, and a texture of the port's decoded from
+ * its pixels in game memory, used while a caption is drawn (0: none). */
 static unsigned g_kept_font_tbp;
 static uint32_t g_kept_font_key;
 static int g_drawing_caption;
@@ -598,13 +599,17 @@ static struct {
 
 void func_00232B90(int language, int first, int second, gaddr shared, gaddr first_out, gaddr second_out) {
     /* The slides are uploaded where the effect textures were paged in, over the font, and their
-     * loop pages nothing in again: when their text is printed instead, the font as the last frame
-     * left it is kept first. */
+     * loop pages nothing in again: when their text is printed instead, its glyphs draw from the
+     * font's own pixels (effect texture 1: its definition at D_0018D540 + 16, its texels and
+     * palette at offsets in quadwords from the effect textures' base, D_0015F560). */
     g_kept_font_key = 0;
     if (openrac_game_text_by_id(21251 + first) != 0) {
-        const unsigned long long font = (unsigned long long)func_001F4868(1);
-        g_kept_font_tbp = (unsigned)(font & 0x3FFF);
-        g_kept_font_key = openrac_game_keep_texture(font);
+        const gaddr def = OPENRAC_DATA(RAC1_ADDR(0x0018D540u)) + 16u;
+        const gaddr base = (gaddr)GREF(int32_t, OPENRAC_DATA(RAC1_ADDR(0x0015F560u)));
+        const gaddr pixels = base + (gaddr)GREF(uint16_t, def + 8) * 16u;
+        const gaddr clut = base + (gaddr)GREF(uint16_t, def + 10) * 16u;
+        g_kept_font_tbp = (unsigned)((unsigned long long)func_001F4868(1) & 0x3FFF);
+        g_kept_font_key = openrac_game_t8_texture(pixels, clut, GREF(int16_t, def + 12), GREF(int16_t, def + 14));
     }
     func_00232B90__game(language, first, second, shared, first_out, second_out);
     g_slides[0].tex = GREF(uint64_t, first_out), g_slides[0].slide = first;
