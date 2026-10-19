@@ -94,6 +94,7 @@ int main() {
         == "Press [cross] to [orange]jump[default]\nnow"
     );
     CHECK(game_text_to_utf8("caf\x8c [x]") == "café [[x]");
+    CHECK(game_text_to_utf8("\x18\x19") == "[rstick][lstick]");  // the camera's, then walking's
     CHECK(game_text_to_utf8("\x8d\x9c\xa7\x7f\xb0") == "èóü[x7F][xB0]");
 
     // Every byte but NUL comes back from its UTF-8.

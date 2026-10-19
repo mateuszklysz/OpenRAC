@@ -32,8 +32,10 @@ constexpr std::pair<u8, std::string_view> kNamed[] = {
     {0x15, "R1"},
     {0x16, "L2"},
     {0x17, "R2"},
-    {0x18, "lstick"},
-    {0x19, "rstick"},
+    // The help texts name 0x18 for the camera and 0x19 for walking and steering: the right stick,
+    // then the left (ReRAC's notes have them the other way round).
+    {0x18, "rstick"},
+    {0x19, "lstick"},
 };
 
 constexpr u8 kNewLine = 0x01;
