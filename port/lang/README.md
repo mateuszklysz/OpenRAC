@@ -11,13 +11,15 @@ file a language, edited with any text editor or a PO editor such as
   disc lacks is built into the port from [game/](game), which holds only the
   translation (below, [The game's texts](#the-games-texts)).
 - **The port's own words**: the rows and values of the Video options page it
-  adds to the game's menus, and the message boxes a player may see when the
+  adds to the game's menus, the names of its languages, and the message boxes a player may see when the
   game cannot start. These files are in this folder and built into the
   program.
 
-Both follow the Language row of the Video options page (the settings'
-`language`): `System` picks the system's language when there is a translation
-for it.
+Both follow the language chosen on the game's own Options → Language page,
+where the port adds its languages after the disc's (the settings'
+`language`; `auto` picks the system's language when there is a translation
+for it). [TRANSLATING.md](TRANSLATING.md) has the rules for writing a
+translation of the game.
 
 ## The game's texts
 
@@ -36,7 +38,7 @@ OpenRAC (docs/policy/SOURCING.md). To translate the game into another
 language, copy `game.pot` to `<code>.po` in the same folder (`pl.po`), add the
 `Language:` and `X-Language-Name:` lines to its header as
 [Translating](#translating) shows, and fill in each `msgstr`. Choose the language on the
-Language row and the game shows your words; a text left empty stays English.
+game's Language page and the game shows your words; a text left empty stays English.
 Editing `fr.po` changes the French the same way. Delete `game.pot` and the
 port writes the files again at its next start (your own `<code>.po` stays).
 
@@ -79,10 +81,11 @@ In a game text:
   itself is written `[[`.
 - A new line is `\n`. Help boxes wrap their lines themselves.
 - The game's fonts have the vowels with an accent (á à â ä, é è ê ë and so
-  on); any other letter is drawn plain: ą as a, ł as l, ż as z. Write them
-  normally anyway: a later port may draw them.
-- The game itself is left in English underneath: its own Language page set
-  to another language shows that language from the disc instead.
+  on). The port draws Polish letters (ą ć ę ł ń ó ś ź ż) from the plain letter
+  and a mark; other letters are drawn plain. Write them normally.
+- The game itself runs in English underneath while one of the port's
+  languages is chosen; choosing a disc language on the same page shows that
+  language from the disc instead.
 
 ## The port's own words
 
@@ -100,7 +103,7 @@ here is built into the program.
    ([ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes),
    with a region when it matters: `de`, `pt_BR`).
 2. In its header, after the `Content-Type` line, add the language's code and
-   its name in its own words, the way the Language row shows it:
+   its name in its own words, the way the Language page lists it:
 
    ```po
    msgid ""
@@ -129,8 +132,8 @@ Put the `.po` file in a `lang` folder beside the port's settings file:
 `settings/lang/` in the launcher's install folder (`~/OpenRAC` unless you
 chose another), or beside the file `--settings` names; the log's first lines
 say which. The port reads every `.po` there at start, in place
-of a built-in one of the same language. Then choose it on the Language row of
-the Video options page, or set `language = <code>` in the settings file.
+of a built-in one of the same language. Then choose it on the game's
+Options → Language page, or set `language = <code>` in the settings file.
 `auto` (System) picks the system's language when there is a translation for
 it. The log says which language the port uses and which files it read.
 
