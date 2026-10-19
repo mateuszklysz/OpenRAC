@@ -58,7 +58,9 @@
 
 #ifdef OPENRAC_FRONTEND
 #include "debug_overlay.h"
+#include "common/i18n.h"
 #include "frontend.h"
+#include "options_menu.h"
 #include "settings.h"
 #include "openrac/sound_engine.h"
 #include "platform/audio.h"
@@ -1211,6 +1213,11 @@ int main(int argc, char** argv) {
         std::string why;
         settings::load(g_options.settings);
         log::header("settings  " + settings::summary(), false);
+        // The port's words in the player's language: port/lang's translations, and any .po file in
+        // a lang folder beside the settings, for a translator to try one without building.
+        i18n::load_folder(g_options.settings.parent_path() / "lang");
+        frontend::options_menu::apply_language();
+        log::info("the port's words in {}", i18n::language());
         if (settings::get().verbose_log && log::level() > log::Level::Verbose) {
             log::set_level(log::Level::Verbose);
             log::info("the settings ask for the detailed log (verbose_log = 1)");

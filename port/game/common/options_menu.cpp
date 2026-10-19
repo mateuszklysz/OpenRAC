@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 
+#include "common/i18n.h"
 #include "common/log.h"
 #include "openrac/game_host.h"
 #include "openrac/guest.h"
@@ -42,12 +43,15 @@ enum Row {
     kMuteUnfocused,
     kSkipCutscenes,
     kStrafe,
+    kLanguage,
     kRows
 };
+using i18n::N_;
 constexpr const char* kLabels[kRows] = {
-    "Display mode", "Monitor",   "Resolution", "Picture",       "HUD",           "Render scale", "Anti-aliasing",
-    "Texture filter", "VSync",   "Frame rate", "Frame cap",     "Frame counter", "Mute in background",
-    "Skip cutscenes", "Strafe (experimental)",
+    N_("Display mode"),   N_("Monitor"),    N_("Resolution"),    N_("Picture"),
+    N_("HUD"),            N_("Render scale"), N_("Anti-aliasing"), N_("Texture filter"),
+    N_("VSync"),          N_("Frame rate"), N_("Frame cap"),     N_("Frame counter"),
+    N_("Mute in background"), N_("Skip cutscenes"), N_("Strafe (experimental)"), N_("Language"),
 };
 
 // The value after `current` in a list (before it, for by = -1), around the ends; the first when
@@ -86,11 +90,11 @@ std::string value_of(int row) {
             return settings::name(s.display_mode);
         case kMonitor: {
             if (s.monitor == 0) {
-                return "Window's own";
+                return i18n::tr("Window's own");
             }
             const auto all = platform::displays();
             if (static_cast<std::size_t>(s.monitor) > all.size()) {
-                return std::format("{} (not connected)", s.monitor);
+                return std::vformat(i18n::tr("{} (not connected)"), std::make_format_args(s.monitor));
             }
             const platform::DisplayInfo& d = all[static_cast<std::size_t>(s.monitor - 1)];
             return std::format("{}: {}x{} {:.0f} Hz", s.monitor, d.width, d.height, d.refresh_rate);
@@ -99,10 +103,10 @@ std::string value_of(int row) {
             // Only the fullscreen display mode changes the display's own.
             return s.fullscreen_width > 0 && s.fullscreen_height > 0
                        ? std::format("{}x{}", s.fullscreen_width, s.fullscreen_height)
-                       : std::string("Desktop");
+                       : std::string(i18n::tr("Desktop"));
         case kAspect:
             return s.aspect == settings::Aspect::Custom
-                       ? std::format("Custom {}:{}", s.aspect_custom_x, s.aspect_custom_y)
+                       ? std::vformat(i18n::tr("Custom {}:{}"), std::make_format_args(s.aspect_custom_x, s.aspect_custom_y))
                        : std::string(settings::name(s.aspect));
         case kHud:
             return settings::name(s.hud);
@@ -111,23 +115,26 @@ std::string value_of(int row) {
             return s.render_scale % 100 == 0 ? std::format("{}x", s.render_scale / 100)
                                              : std::format("{:.2f}x", static_cast<float>(s.render_scale) / 100.0f);
         case kMsaa:
-            return s.msaa > 1 ? std::format("{}x", s.msaa) : std::string("Off");
+            return s.msaa > 1 ? std::format("{}x", s.msaa) : std::string(i18n::tr("Off"));
         case kAnisotropy:
-            return s.anisotropy > 1 ? std::format("Anisotropic {}x", s.anisotropy) : std::string("Trilinear");
+            return s.anisotropy > 1 ? std::vformat(i18n::tr("Anisotropic {}x"), std::make_format_args(s.anisotropy))
+                                  : std::string(i18n::tr("Trilinear"));
         case kVSync:
             return settings::name(s.vsync);
         case kFrameRate:
             return settings::frame_rate_name(s);
         case kFrameCap:
-            return s.frame_rate == settings::FrameRate::Capped ? std::to_string(s.frame_cap) : std::string("Off");
+            return s.frame_rate == settings::FrameRate::Capped ? std::to_string(s.frame_cap) : std::string(i18n::tr("Off"));
         case kShowFps:
-            return s.show_fps ? "On" : "Off";
+            return s.show_fps ? i18n::tr("On") : i18n::tr("Off");
         case kMuteUnfocused:
-            return s.mute_unfocused ? "On" : "Off";
+            return s.mute_unfocused ? i18n::tr("On") : i18n::tr("Off");
         case kSkipCutscenes:
-            return s.skip_cutscenes ? "Start" : "Off";
+            return s.skip_cutscenes ? i18n::tr("Start") : i18n::tr("Off");
         case kStrafe:
             return settings::name(s.strafe);
+        case kLanguage:
+            return settings::language_name(s);
         default:
             return {};
     }
@@ -235,6 +242,19 @@ void step_value(int row, int by) {
         case kStrafe:
             s.strafe = stepped_enum(s.strafe, by);
             break;
+        case kLanguage: {
+            // The system's, then each language there is a translation for (English first).
+            std::vector<std::string> codes{"auto"};
+            for (const i18n::LanguageInfo& l : i18n::languages()) {
+                codes.push_back(l.code);
+            }
+            const auto at = std::find(codes.begin(), codes.end(), s.language);
+            const int count = static_cast<int>(codes.size());
+            const int index = at == codes.end() ? 0 : static_cast<int>(at - codes.begin());
+            s.language = codes[static_cast<std::size_t>((index + by + count) % count)];
+            apply_language();
+            break;
+        }
         default:
             break;
     }
@@ -299,9 +319,10 @@ struct Native {
 };
 Native n;
 
+// In the game's font, which has no Polish letters (common/i18n.h).
 void put_text(gaddr at, const std::string& text) {
     char* p = static_cast<char*>(G(at));
-    std::snprintf(p, kTextBytes, "%s", text.c_str());
+    std::snprintf(p, kTextBytes, "%s", i18n::game_font(text).c_str());
 }
 
 void build() {
@@ -399,7 +420,7 @@ bool update(const openrac_front_end& fe) {
         ++cursor;
     }
     for (int i = 0; i < kShown; ++i) {
-        put_text(n.labels + kTextBytes * static_cast<gaddr>(i), kLabels[n.top + i]);
+        put_text(n.labels + kTextBytes * static_cast<gaddr>(i), i18n::tr(kLabels[n.top + i]));
         put_text(n.values + kTextBytes * static_cast<gaddr>(i), value_of(n.top + i));
     }
     if (changed) {
@@ -412,6 +433,17 @@ bool update(const openrac_front_end& fe) {
 constexpr int kTextVideo = kTextFirst + 2 * kShown;
 constexpr int kPauseTexts = 3;
 gaddr pause_texts = 0;
+
+// The pause menu's Video item, its title and its hint, in the language now: put again each frame
+// the Options page or the Video page is shown, since the Language row changes it.
+void put_pause_texts() {
+    if (pause_texts == 0) {
+        pause_texts = openrac_guest_static(kTextBytes * kPauseTexts);
+    }
+    put_text(pause_texts, i18n::tr("Video"));
+    put_text(pause_texts + kTextBytes, i18n::tr("Video Options"));
+    put_text(pause_texts + 2 * kTextBytes, i18n::tr("Change the display, picture and frame rate"));
+}
 // The pause menu's Video page's rows: kPauseRows labels, then as many values.
 constexpr int kPauseRows = 5;
 constexpr int kPauseRowText = kTextVideo + kPauseTexts;
@@ -535,12 +567,7 @@ void make(gaddr items) {
     if (page::pause_rows_text == 0) {
         page::pause_rows_text = openrac_guest_static(page::kTextBytes * 2 * kShownHere);
     }
-    if (page::pause_texts == 0) {
-        page::pause_texts = openrac_guest_static(page::kTextBytes * page::kPauseTexts);
-        page::put_text(page::pause_texts, "Video");
-        page::put_text(page::pause_texts + page::kTextBytes, "Video Options");
-        page::put_text(page::pause_texts + 2 * page::kTextBytes, "Change the display, picture and frame rate");
-    }
+    page::put_pause_texts();
     for (gaddr at = 0x40; at < 0x7C; at += 4) {  // the focus and the screens: our list for Camera's
         if (GREF(std::uint32_t, m.page + at) == camera_list) {
             GREF(std::uint32_t, m.page + at) = m.list;
@@ -622,6 +649,9 @@ bool update(gaddr page_menu, gaddr pad) {
     if (shown == 0) {
         return false;
     }
+    if (page::pause_texts != 0) {
+        page::put_pause_texts();
+    }
     if (shown != m.page || m.page == 0) {
         // The Options page (pause_options.h): its list's items are the game's with Camera in them.
         // Another page's focus may be no list at all: the item grids keep floats where a list keeps
@@ -670,7 +700,7 @@ bool update(gaddr page_menu, gaddr pad) {
         ++cursor;
     }
     for (int i = 0; i < kShownHere; ++i) {
-        page::put_text(page::pause_rows_text + page::kTextBytes * static_cast<gaddr>(i), kLabels[m.top + i]);
+        page::put_text(page::pause_rows_text + page::kTextBytes * static_cast<gaddr>(i), i18n::tr(kLabels[m.top + i]));
         page::put_text(page::pause_rows_text + page::kTextBytes * static_cast<gaddr>(kShownHere + i), value_of(m.top + i));
     }
     if (changed) {
@@ -688,6 +718,11 @@ const openrac_front_end* front_end() {
 }
 
 }  // namespace
+
+void apply_language() {
+    const std::string& chosen = settings::get().language;
+    i18n::set_language(chosen == "auto" ? i18n::from_locales(platform::preferred_languages()) : chosen);
+}
 
 bool update(int loaded_overlay) {
     const openrac_front_end* fe = front_end();

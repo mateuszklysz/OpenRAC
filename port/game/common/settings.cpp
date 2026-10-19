@@ -5,12 +5,14 @@
 
 #include <algorithm>
 #include <atomic>
+#include <cctype>
 #include <cstdio>
 #include <cstring>
 #include <format>
 #include <fstream>
 #include <system_error>
 
+#include "common/i18n.h"
 #include "common/log.h"
 
 namespace openrac::settings {
@@ -218,6 +220,14 @@ void load(const std::filesystem::path& file) {
             has_strafe = has_strafe || known;
         } else if (key == "lock_strafe") {
             known = parse_bool(value, old_lock_strafe);
+        } else if (key == "language") {
+            // A code (letters, '-' and '_'); one the port has no translation for shows English.
+            known = !value.empty() && std::all_of(value.begin(), value.end(), [](unsigned char c) {
+                return std::isalnum(c) || c == '-' || c == '_';
+            });
+            if (known) {
+                s.language = value;
+            }
         } else if (key == "volume") {
             known = parse_int(value, 0, 100, s.volume);
         } else if (key == "verbose_log") {
@@ -288,6 +298,7 @@ void save() {
         << "mute_unfocused = " << (s.mute_unfocused ? 1 : 0) << "\n"
         << "skip_cutscenes = " << (s.skip_cutscenes ? 1 : 0) << "\n"
         << "strafe = " << kStrafe[static_cast<int>(s.strafe)] << "\n"
+        << "language = " << s.language << "\n"
         << "volume = " << s.volume << "\n";
     if (s.verbose_log) {
         out << "verbose_log = 1\n";
@@ -334,44 +345,59 @@ float aspect_ratio(const Settings& settings, int window_width, int window_height
     return 4.0f / 3.0f;
 }
 
+using i18n::N_;
+
 const char* name(DisplayMode mode) {
-    constexpr const char* names[] = {"Window", "Borderless", "Fullscreen"};
-    return names[std::min<int>(static_cast<int>(mode), 2)];
+    constexpr const char* names[] = {N_("Window"), N_("Borderless"), N_("Fullscreen")};
+    return i18n::tr(names[std::min<int>(static_cast<int>(mode), 2)]);
 }
 
 const char* name(Aspect aspect) {
-    constexpr const char* names[] = {"4:3", "16:10", "16:9", "21:9", "32:9", "Window", "Custom"};
-    return names[std::min<int>(static_cast<int>(aspect), 6)];
+    constexpr const char* names[] = {"4:3", "16:10", "16:9", "21:9", "32:9", N_("Window"), N_("Custom")};
+    return i18n::tr(names[std::min<int>(static_cast<int>(aspect), 6)]);
 }
 
 const char* name(Hud hud) {
-    constexpr const char* names[] = {"Centre", "Edges"};
-    return names[std::min<int>(static_cast<int>(hud), 1)];
+    constexpr const char* names[] = {N_("Centre"), N_("Edges")};
+    return i18n::tr(names[std::min<int>(static_cast<int>(hud), 1)]);
 }
 
 const char* name(VSync vsync) {
-    constexpr const char* names[] = {"Off", "On", "Adaptive"};
-    return names[std::min<int>(static_cast<int>(vsync), 2)];
+    constexpr const char* names[] = {N_("Off"), N_("On"), N_("Adaptive")};
+    return i18n::tr(names[std::min<int>(static_cast<int>(vsync), 2)]);
 }
 
 const char* name(Strafe strafe) {
-    constexpr const char* names[] = {"Off", "Hold L2-R2", "Lock with weapons"};
-    return names[std::min<int>(static_cast<int>(strafe), 2)];
+    constexpr const char* names[] = {N_("Off"), N_("Hold L2-R2"), N_("Lock with weapons")};
+    return i18n::tr(names[std::min<int>(static_cast<int>(strafe), 2)]);
+}
+
+// A language in its own words, as language menus write it; "System" in the language now.
+std::string language_name(const Settings& settings) {
+    if (settings.language == "auto") {
+        return i18n::tr("System");
+    }
+    for (const i18n::LanguageInfo& l : i18n::languages()) {
+        if (l.code == settings.language) {
+            return l.name;
+        }
+    }
+    return settings.language;
 }
 
 std::string frame_rate_name(const Settings& settings) {
     switch (settings.frame_rate) {
         case FrameRate::Original:
-            return "Original";
+            return i18n::tr("Original");
         case FrameRate::Capped:
             return std::to_string(settings.frame_cap);
         case FrameRate::Unlimited:
-            return "Unlimited";
+            return i18n::tr("Unlimited");
         case FrameRate::Display:
         case FrameRate::Count:
             break;
     }
-    return "Display";
+    return i18n::tr("Display");
 }
 
 }  // namespace openrac::settings

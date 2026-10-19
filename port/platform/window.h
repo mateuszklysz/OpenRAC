@@ -92,6 +92,9 @@ struct DisplayInfo {
     float refresh_rate = 0.0f;
 };
 
+// The system's preferred languages, most preferred first, as BCP 47 tags ("pl-PL", "en").
+std::vector<std::string> preferred_languages();
+
 // The displays connected now, in SDL's order (the first is the primary one). Needs a Platform.
 std::vector<DisplayInfo> displays();
 

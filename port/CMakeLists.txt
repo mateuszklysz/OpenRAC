@@ -56,6 +56,7 @@ add_custom_target(openrac_build_info
   VERBATIM)
 add_library(openrac_common STATIC
   common/crash.cpp
+  common/i18n.cpp
   common/log.cpp
   common/process.cpp
   common/stats.cpp
@@ -63,6 +64,8 @@ add_library(openrac_common STATIC
   "${OPENRAC_BUILD_INFO}"
 )
 add_dependencies(openrac_common openrac_build_info)
+include(Lang)
+openrac_embed_translations(openrac_common)
 target_include_directories(openrac_common PUBLIC .)
 if(UNIX AND NOT APPLE)
   target_link_libraries(openrac_common PUBLIC ${CMAKE_DL_LIBS})  # dladdr, for the crash report
@@ -73,6 +76,16 @@ add_executable(log_test tests/log_test.cpp)
 target_link_libraries(log_test PRIVATE openrac_common)
 openrac_warnings(log_test)
 add_test(NAME log COMMAND log_test)
+
+add_executable(i18n_test tests/i18n_test.cpp)
+target_link_libraries(i18n_test PRIVATE openrac_common)
+openrac_warnings(i18n_test)
+add_test(NAME i18n COMMAND i18n_test)
+# The template lists every text the code marks with tr() or N_() (port/lang/README.md).
+find_package(Python3 COMPONENTS Interpreter)
+if(Python3_FOUND)
+  add_test(NAME i18n_template COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/i18n_template.py" --check)
+endif()
 
 add_executable(pause_options_test tests/pause_options_test.cpp)
 target_include_directories(pause_options_test PRIVATE .)

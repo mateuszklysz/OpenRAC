@@ -92,6 +92,10 @@ struct Settings {
     bool mute_unfocused = false;  // silence while another window has the keyboard
     bool skip_cutscenes = true;   // Start skips an in-game cutscene (without the game's L1 L2 R1 R2 hold)
     Strafe strafe = Strafe::Off;  // the file's `strafe`; an old file's `lock_strafe = 1` is Lock
+    // The language of the port's own words (common/i18n.h): "auto", the system's preferred one
+    // the port has a translation for, or a translation's code ("en", "pl"). The game's texts follow
+    // the game's own Language page.
+    std::string language = "auto";
     int volume = 100;  // of everything the port plays, 0 (nothing at all) to 100 (as mixed)
     bool verbose_log = false;  // the detailed log (as OPENRAC_LOG=verbose): level loads, pad changes, callers
 };
@@ -127,12 +131,13 @@ inline constexpr int kRenderScales[] = {50, 75, 100, 125, 150, 200};
 inline constexpr int kSampleCounts[] = {1, 2, 4, 8, 16};
 inline constexpr int kAnisotropies[] = {1, 2, 4, 8, 16};
 
-// What the options page shows for a value.
+// What the options page shows for a value, in the language of the port's words (common/i18n.h).
 const char* name(DisplayMode mode);
 const char* name(Aspect aspect);
 const char* name(Hud hud);
 const char* name(VSync vsync);
 const char* name(Strafe strafe);
+std::string language_name(const Settings& settings);
 std::string frame_rate_name(const Settings& settings);
 
 }  // namespace openrac::settings

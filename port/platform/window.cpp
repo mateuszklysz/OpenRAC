@@ -14,6 +14,7 @@
 
 #include <SDL3/SDL.h>
 
+#include "common/i18n.h"
 #include "common/log.h"
 
 namespace openrac::platform {
@@ -21,6 +22,17 @@ namespace {
 
 constexpr int kGlMajor = 4;
 constexpr int kGlMinor = 1;
+
+// The message boxes a player may see, in English for the log and translated for the box
+// (common/i18n.h).
+constexpr const char* kNoOpenGl =
+    i18n::N_("OpenGL {}.{} (core profile) is not available: {}. OpenRAC draws with OpenGL {}.{}; update the "
+             "graphics driver, or check that the graphics card supports it.");
+constexpr const char* kSoftwareGl =
+    i18n::N_("OpenGL is being drawn on the CPU by a software rasteriser ({}), not by a graphics card: the game "
+             "would run at a few frames a second. Install or update the graphics driver; on a machine with two "
+             "graphics cards, check that the program is allowed the fast one. (OPENRAC_SOFTWARE_GL=1 in the "
+             "environment runs it anyway.)");
 
 // Read a GL string without the renderer's loader: the platform layer only
 // needs it for the log.
@@ -196,6 +208,21 @@ bool is_software_renderer(const std::string& renderer, const std::string& vendor
     return false;
 }
 
+std::vector<std::string> preferred_languages() {
+    std::vector<std::string> tags;
+    int count = 0;
+    SDL_Locale** locales = SDL_GetPreferredLocales(&count);
+    for (int i = 0; locales != nullptr && i < count; ++i) {
+        std::string tag = locales[i]->language != nullptr ? locales[i]->language : "";
+        if (locales[i]->country != nullptr) {
+            tag += std::string("-") + locales[i]->country;
+        }
+        tags.push_back(std::move(tag));
+    }
+    SDL_free(locales);
+    return tags;
+}
+
 std::vector<DisplayInfo> displays() {
     std::vector<DisplayInfo> list;
     int count = 0;
@@ -348,17 +375,13 @@ std::unique_ptr<Window> Window::open(const WindowConfig& config, std::string& er
     // Without OpenGL 4.1 there is no game to show: say so in a message box
     // too, since a player starting from the launcher sees no console.
     auto no_opengl = [&](SDL_Window* parent) {
-        error = std::format(
-            "OpenGL {}.{} (core profile) is not available: {}. OpenRAC draws with OpenGL {}.{}; "
-            "update the graphics driver, or check that the graphics card supports it.",
-            kGlMajor,
-            kGlMinor,
-            SDL_GetError(),
-            kGlMajor,
-            kGlMinor
-        );
+        const std::string why = SDL_GetError();
+        error = std::vformat(kNoOpenGl, std::make_format_args(kGlMajor, kGlMinor, why, kGlMajor, kGlMinor));
         if (!config.hidden) {
-            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "OpenRAC", error.c_str(), parent);
+            // The log keeps the English; the player reads their own language.
+            const std::string shown =
+                std::vformat(i18n::tr(kNoOpenGl), std::make_format_args(kGlMajor, kGlMinor, why, kGlMajor, kGlMinor));
+            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "OpenRAC", shown.c_str(), parent);
         }
     };
 
@@ -427,18 +450,14 @@ std::unique_ptr<Window> Window::open(const WindowConfig& config, std::string& er
                   red, depth, stencil, samples, doublebuffer != 0 ? "double buffered" : "single buffered");
     }
     if (window->m_software) {
-        const std::string what = std::format(
-            "OpenGL is being drawn on the CPU by a software rasteriser ({}), not by a graphics card: the game "
-            "would run at a few frames a second. Install or update the graphics driver; on a machine with two "
-            "graphics cards, check that the program is allowed the fast one. (OPENRAC_SOFTWARE_GL=1 in the "
-            "environment runs it anyway.)",
-            window->m_gl_renderer
-        );
+        const std::string what = std::vformat(kSoftwareGl, std::make_format_args(window->m_gl_renderer));
         if (config.software == SoftwareRenderer::Refuse) {
             error = what;
             log::error("{}", what);
             if (!config.hidden) {
-                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "OpenRAC", what.c_str(), window->m_window);
+                const std::string shown =
+                    std::vformat(i18n::tr(kSoftwareGl), std::make_format_args(window->m_gl_renderer));
+                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "OpenRAC", shown.c_str(), window->m_window);
             }
             return nullptr;
         }

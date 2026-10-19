@@ -39,7 +39,8 @@ decompilation and is remembered by the build folder.
 | [platform/](platform) | the window, input as the console's pad, audio output, timing (SDL3) |
 | [renderer/](renderer) | the renderer: per-subsystem renderers in OpenGOAL's manner, the direct renderer for the 2D path, texture conversion (OpenGL 4.1) |
 | [viewer/](viewer) | `openrac-viewer`: a level, extracted from the player's disc by the editor, drawn natively with a free camera |
-| [common/](common) | the log |
+| [common/](common) | the log, the language of the port's own words |
+| [lang/](lang/README.md) | the translations of the port's own words, one `.po` file a language (Polski so far): no code to edit |
 | [tests/](tests) | the runtime's tests |
 
 ## How a game is built

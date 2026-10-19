@@ -17,6 +17,10 @@ namespace openrac::frontend::options_menu {
 // already; the window applies it at once: none needs the game started again).
 bool update(int loaded_overlay);
 
+// Sets the language of the port's words (common/i18n.h) from the settings' `language`; Auto: the
+// system's preferred languages. Once the settings are read, and again when the Language row changes.
+void apply_language();
+
 // The items the Options list is given in place of the game's own (with the Video page's added), or 0
 // while it has the game's.
 std::uint32_t options_items();

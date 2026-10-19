@@ -1,0 +1,194 @@
+# Polish translation of the port's own words (port/lang/README.md).
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: pl\n"
+"X-Language-Name: Polski\n"
+
+#: game/common/options_menu.cpp
+msgid "Display mode"
+msgstr "Tryb ekranu"
+
+#: game/common/options_menu.cpp
+msgid "Monitor"
+msgstr "Monitor"
+
+#: game/common/options_menu.cpp
+msgid "Resolution"
+msgstr "Rozdzielczość"
+
+#: game/common/options_menu.cpp
+msgid "Picture"
+msgstr "Obraz"
+
+#: game/common/options_menu.cpp
+msgid "HUD"
+msgstr "HUD"
+
+#: game/common/options_menu.cpp
+msgid "Render scale"
+msgstr "Skala renderu"
+
+#: game/common/options_menu.cpp
+msgid "Anti-aliasing"
+msgstr "Antyaliasing"
+
+#: game/common/options_menu.cpp
+msgid "Texture filter"
+msgstr "Filtr tekstur"
+
+#: game/common/options_menu.cpp
+msgid "VSync"
+msgstr "VSync"
+
+#: game/common/options_menu.cpp
+msgid "Frame rate"
+msgstr "Liczba klatek"
+
+#: game/common/options_menu.cpp
+msgid "Frame cap"
+msgstr "Limit klatek"
+
+#: game/common/options_menu.cpp
+msgid "Frame counter"
+msgstr "Licznik klatek"
+
+#: game/common/options_menu.cpp
+msgid "Mute in background"
+msgstr "Wycisz w tle"
+
+#: game/common/options_menu.cpp
+msgid "Skip cutscenes"
+msgstr "Pomijanie scenek"
+
+#: game/common/options_menu.cpp
+msgid "Strafe (experimental)"
+msgstr "Strafe (eksperym.)"
+
+#: game/common/options_menu.cpp
+msgid "Language"
+msgstr "Język"
+
+#: game/common/options_menu.cpp
+msgid "Window's own"
+msgstr "Monitor okna"
+
+#: game/common/options_menu.cpp
+msgid "{} (not connected)"
+msgstr "{} (odłączony)"
+
+#: game/common/options_menu.cpp
+msgid "Desktop"
+msgstr "Pulpit"
+
+#: game/common/options_menu.cpp
+msgid "Custom {}:{}"
+msgstr "Własne {}:{}"
+
+#: game/common/options_menu.cpp game/common/settings.cpp
+msgid "Off"
+msgstr "Wył."
+
+#: game/common/options_menu.cpp
+msgid "Anisotropic {}x"
+msgstr "Anizotropowy {}x"
+
+#: game/common/options_menu.cpp
+msgid "Trilinear"
+msgstr "Trójliniowy"
+
+#: game/common/options_menu.cpp game/common/settings.cpp
+msgid "On"
+msgstr "Wł."
+
+#: game/common/options_menu.cpp
+msgid "Start"
+msgstr "Start"
+
+#: game/common/options_menu.cpp
+msgid "Video"
+msgstr "Grafika"
+
+#: game/common/options_menu.cpp
+msgid "Video Options"
+msgstr "Opcje grafiki"
+
+#: game/common/options_menu.cpp
+msgid "Change the display, picture and frame rate"
+msgstr "Zmień ekran, obraz i liczbę klatek"
+
+#: game/common/settings.cpp
+msgid "Window"
+msgstr "Okno"
+
+#: game/common/settings.cpp
+msgid "Borderless"
+msgstr "Bez ramki"
+
+#: game/common/settings.cpp
+msgid "Fullscreen"
+msgstr "Pełny ekran"
+
+#: game/common/settings.cpp
+msgid "Custom"
+msgstr "Własne"
+
+#: game/common/settings.cpp
+msgid "Centre"
+msgstr "Środek"
+
+#: game/common/settings.cpp
+msgid "Edges"
+msgstr "Krawędzie"
+
+#: game/common/settings.cpp
+msgid "Adaptive"
+msgstr "Adaptacyjny"
+
+#: game/common/settings.cpp
+msgid "Hold L2-R2"
+msgstr "Trzymaj L2-R2"
+
+#: game/common/settings.cpp
+msgid "Lock with weapons"
+msgstr "Stały z bronią"
+
+#: game/common/settings.cpp
+msgid "System"
+msgstr "Systemowy"
+
+#: game/common/settings.cpp
+msgid "Original"
+msgstr "Oryginalna"
+
+#: game/common/settings.cpp
+msgid "Unlimited"
+msgstr "Bez limitu"
+
+#: game/common/settings.cpp
+msgid "Display"
+msgstr "Jak ekran"
+
+#: platform/window.cpp
+msgid ""
+"OpenGL {}.{} (core profile) is not available: {}. OpenRAC draws with OpenGL "
+"{}.{}; update the graphics driver, or check that the graphics card supports "
+"it."
+msgstr ""
+"OpenGL {}.{} (core profile) jest niedostępny: {}. OpenRAC rysuje przez "
+"OpenGL {}.{}; zaktualizuj sterownik karty graficznej albo sprawdź, czy "
+"karta go obsługuje."
+
+#: platform/window.cpp
+msgid ""
+"OpenGL is being drawn on the CPU by a software rasteriser ({}), not by a "
+"graphics card: the game would run at a few frames a second. Install or "
+"update the graphics driver; on a machine with two graphics cards, check "
+"that the program is allowed the fast one. (OPENRAC_SOFTWARE_GL=1 in the "
+"environment runs it anyway.)"
+msgstr ""
+"OpenGL jest rysowany przez procesor programowym rasteryzatorem ({}), a nie "
+"przez kartę graficzną: gra działałaby z prędkością kilku klatek na sekundę. "
+"Zainstaluj lub zaktualizuj sterownik karty graficznej; na komputerze z "
+"dwiema kartami graficznymi sprawdź, czy program może używać tej szybszej. "
+"(OPENRAC_SOFTWARE_GL=1 w środowisku i tak go uruchamia.)"
