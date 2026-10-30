@@ -109,6 +109,15 @@ constexpr std::array<Entry, kOptCount> kEntries = {{
     {Opt::ShaderFloat16, "shader-float16",
      "audited local FP16 arithmetic on enabled Vulkan devices; shader interfaces remain FP32",
      true, Tolerance{1.0, 2}},
+    {Opt::ShadowDepthOnly, "shadow-depth-only",
+     "the shadow atlas and its caches are float depth alone, without a colour or stencil attachment",
+     true, Tolerance{}},
+    {Opt::FsrReactiveR8, "fsr-reactive-r8",
+     "FSR's reactive mask is a one-channel R8 image instead of RGBA8, a quarter of its bytes",
+     true, Tolerance{}},
+    {Opt::MsaaPassResolve, "msaa-pass-resolve",
+     "a blit resolving a whole multisampled colour is the pass's resolve attachment, not a copy reading the samples back",
+     true, Tolerance{}},
 }};
 // clang-format on
 
