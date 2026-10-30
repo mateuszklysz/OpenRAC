@@ -37,6 +37,9 @@ struct TemporalFrame {
     float motion_blur_strength = 0.5f;
     bool camera_motion_blur = false;  // Real-time cutscenes use the original FSR motion.
     renderer::MotionBlurSettings blur_settings;
+    // AgX's source (same size and format as display): a blurred picture is drawn there instead,
+    // sparing AgX its copy of display (agx-direct-source). Null keeps display.
+    renderer::FrameBuffer* final_colour = nullptr;
 };
 
 // Owns SDK histories and intermediate targets; only the render thread calls it.
@@ -60,6 +63,9 @@ public:
     [[nodiscard]] bool begin(
         TemporalFrame frame, renderer::TemporalQuality quality, float sharpness, std::string& error
     );
+    // Whether this frame's picture went to TemporalFrame::final_colour; display's colour then
+    // holds nothing of it.
+    bool wrote_final_colour() const;
     // Invalidates history on loading, a skipped world, or an explicit camera cut.
     void reset();
     // Frees GPU resources while the context is current, retaining compiled shader sources.

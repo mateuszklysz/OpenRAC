@@ -1698,6 +1698,12 @@ entries below is `/mnt/project-files/docs/perf/enhanced-android-perf.md` in the 
   the pass stored them and a separate resolve read them back.
 - **`fsr-reactive-r8`.** The upscaler's reactive mask is one R8 channel instead of RGBA8; the
   upscaler reads only its red channel.
+- **`agx-direct-source`.** With AgX on, the motion blur's gather over the upscaler's output
+  draws every pixel straight into AgX's source image, so AgX no longer copies the whole picture
+  before tone-mapping it; the picture's old colour is then let go (glInvalidateFramebuffer).
+  The gather and AgX also let go what they overwrite whole: the gather's target colour and depth
+  are not read in, nor its depth written out, and AgX's target colour is not read in. On Novalis
+  at 1920x1080 (temporal Performance) a frame moves about 33 MB less, frames byte-identical.
 - **Arm ASR.** On a tile-based GPU the temporal module upscales with Arm Accuracy Super
   Resolution (`port/enhanced/asr/README.md`), whose fragment passes suit these GPUs better than
   FSR 3.1's compute passes. `OPENRAC_TEMPORAL_UPSCALER=asr` or `fsr3` chooses either one on any

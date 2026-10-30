@@ -10,7 +10,11 @@ namespace openrac::enhanced {
 class AgxPreview {
 public:
     ~AgxPreview();
-    void apply(renderer::FrameBuffer& output, float exposure);
+    // The image AgX reads, sized for `output`; a pass that draws the whole picture into it lets
+    // apply() skip its copy. Null when AgX cannot run.
+    renderer::FrameBuffer* source(const renderer::FrameBuffer& output);
+    // Tone-maps `output` in place; `source_filled`: source() already holds the picture.
+    void apply(renderer::FrameBuffer& output, float exposure, bool source_filled = false);
     void release();
 
 private:

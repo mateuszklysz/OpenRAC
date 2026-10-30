@@ -218,7 +218,20 @@ void MotionBlur::gather(const Passes& passes, int source) {
     glUniform2f(resolve.uniform("jitter"), jitter[0], jitter[1]);
     glBindFramebuffer(GL_FRAMEBUFFER, display.framebuffer);
     glViewport(0, 0, display.width, display.height);
+
+    // Over the upscaler's own output every pixel is written and the target's depth is cleared
+    // or replaced before it is read again: a tiled GPU need not read either in, nor write depth out.
+    const bool whole = reconstructed_colour != 0 && glInvalidateFramebuffer != nullptr;
+    const GLenum everything[] = {GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT, GL_STENCIL_ATTACHMENT};
+    if (whole) {
+        glInvalidateFramebuffer(GL_FRAMEBUFFER, 3, everything);
+    }
+
     glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    if (whole) {
+        glInvalidateFramebuffer(GL_FRAMEBUFFER, 2, everything + 1);
+    }
 }
 
 }  // namespace openrac::enhanced::fsr3_detail

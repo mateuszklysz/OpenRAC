@@ -118,6 +118,9 @@ constexpr std::array<Entry, kOptCount> kEntries = {{
     {Opt::MsaaPassResolve, "msaa-pass-resolve",
      "a blit resolving a whole multisampled colour is the pass's resolve attachment, not a copy reading the samples back",
      true, Tolerance{}},
+    {Opt::AgxDirectSource, "agx-direct-source",
+     "the motion blur's gather draws straight into AgX's source image instead of the picture AgX then copies",
+     true, Tolerance{}},
 }};
 // clang-format on
 

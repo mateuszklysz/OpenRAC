@@ -24,6 +24,10 @@ bool Fsr3::begin(TemporalFrame, renderer::TemporalQuality, float, std::string&) 
     return false;
 }
 
+bool Fsr3::wrote_final_colour() const {
+    return false;
+}
+
 void Fsr3::reset() {}
 
 void Fsr3::release() {}

@@ -55,6 +55,9 @@ struct Fsr3::State {
     renderer::Mat4 inverse_raster{};            // Current clip-to-world transform.
     scene::MotionView view;                     // Camera matrices and motion target size.
     renderer::RenderTarget display;             // Final target restored before HUD drawing.
+    // A later pass's source (AgX's), drawn in display's place; null draws into display.
+    renderer::FrameBuffer* final_colour = nullptr;
+    bool final_written = false;  // This frame's picture went to final_colour, not to display.
     scene::LevelScene* scene = nullptr;         // Frontend-owned scene, borrowed through render().
     renderer::TexturePool* textures = nullptr;  // Renderer-owned pool, same borrow duration.
 

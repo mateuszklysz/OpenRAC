@@ -251,9 +251,15 @@ void Fsr3::State::resolve(renderer::RenderTarget& target) {
         failed = true;
     }
 
+    // A blur over the upscaler's own output writes every pixel: AgX's source can take them all.
+    renderer::RenderTarget blurred_into = display;
+    if (blur_output && final_colour != nullptr) {
+        blurred_into.framebuffer = final_colour->id();
+    }
+
     if (resolved && delta) {
         const bool blurred = blur.apply(
-            {display,
+            {blurred_into,
              {world.width(), world.height()},
              motion.texture(),
              world.depth_texture(),
@@ -268,6 +274,15 @@ void Fsr3::State::resolve(renderer::RenderTarget& target) {
              blur_settings,
              blur_output}
         );
+        final_written = blurred && blurred_into.framebuffer != display.framebuffer;
+
+        // The picture is in final_colour: what display's colour holds is never shown.
+        if (final_written && glInvalidateFramebuffer != nullptr) {
+            const GLenum colour = GL_COLOR_ATTACHMENT0;
+            glBindFramebuffer(GL_FRAMEBUFFER, display.framebuffer);
+            glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, &colour);
+        }
+
         // Resource failures still present the complete reconstructed world and HUD.
         if (!blurred && blur_output) {
             blur.present_reconstruction(display);
