@@ -156,6 +156,7 @@ enum class Var : std::uint16_t {
     SunReceiverCullOff,
     SunShadows,
     SunTimingDetail,
+    TemporalUpscaler,
     TileBased,
     TimeScale,
     Trace,
