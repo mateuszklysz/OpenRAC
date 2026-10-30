@@ -990,6 +990,7 @@ struct Context {
     VkPhysicalDeviceProperties properties{};
     std::uint32_t timestamp_bits = 0;
     VkPhysicalDeviceFeatures features{};
+    bool subgroup_extended_types = false;  // Subgroup operations on 16-bit values, enabled.
     bool shader_float16 = false;  // Actually enabled arithmetic, not 16-bit storage support.
     bool tile_based = false;      // tile_based(): the vendor's guess or OPENRAC_TILE_BASED.
     bool split_pass_timing = false;  // set_split_pass_timing(): timed sections end their pass.
