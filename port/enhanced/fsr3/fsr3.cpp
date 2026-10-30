@@ -286,10 +286,6 @@ bool Fsr3::begin(
         fsr3_detail::render_extent({frame.display.width(), frame.display.height()}, quality);
 
     state.scene = &frame.scene;
-    state.final_written = false;
-    state.final_colour = renderer::render_opt::enabled(renderer::render_opt::Opt::AgxDirectSource)
-                             ? frame.final_colour
-                             : nullptr;
     // A failed setup cannot install callbacks or leave a jittered native fallback.
     if (!state.configure(frame.display, size, error)
         || !state.prepare_camera(frame, sharpness, error)) {
@@ -299,10 +295,6 @@ bool Fsr3::begin(
 
     state.attach_frame(frame, size);
     return true;
-}
-
-bool Fsr3::wrote_final_colour() const {
-    return m_state->final_written;
 }
 
 void Fsr3::reset() {

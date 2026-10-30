@@ -336,11 +336,6 @@ bool draw_world(SceneFrame& frame) {
         target.resolves_itself = owner.frame.resolves_itself();
         target.wide_2d = picture_scale < 1.0f && graphics.hud == settings::Hud::Edges;
 
-        const bool agx = graphics.agx_preview && graphics.enhanced_graphics
-                         && enhanced_graphics_available() && scene.has_camera && !input.keep_colour
-                         && (scene.draws & 0x1Fu) != 0;
-        bool temporal_active = false;
-
         // Loading/menu snapshots bypass history; active world frames resolve before the final HUD bucket.
         if (temporal_wanted && !input.keep_colour) {
             std::string temporal_error;
@@ -354,13 +349,11 @@ bool draw_world(SceneFrame& frame) {
                 graphics.motion_blur,
                 graphics.motion_blur_strength,
                 scene.cutscene,
-                graphics.motion_blur_settings,
-                agx ? owner.agx.source(owner.frame) : nullptr
+                graphics.motion_blur_settings
             };
             const bool active = owner.temporal->begin(
                 temporal, graphics.temporal_quality, graphics.temporal_sharpness, temporal_error
             );
-            temporal_active = active;
 
             // The temporal module reports recoverable setup failures without throwing.
             if (!active && !temporal_error.empty()) {
@@ -368,15 +361,13 @@ bool draw_world(SceneFrame& frame) {
             }
         }
 
-        if (agx) {
+        if (graphics.agx_preview && graphics.enhanced_graphics && enhanced_graphics_available()
+            && scene.has_camera && !input.keep_colour && (scene.draws & 0x1Fu) != 0) {
             auto before_hud = std::move(input.before_hud);
             input.before_hud = [&owner,
-                                temporal_active,
                                 exposure = graphics.adjusted_agx_exposure(),
                                 before_hud = std::move(before_hud)] {
-                // This frame's motion blur may have drawn the picture into AgX's source already.
-                const bool filled = temporal_active && owner.temporal->wrote_final_colour();
-                owner.agx.apply(owner.frame, exposure, filled);
+                owner.agx.apply(owner.frame, exposure);
                 if (before_hud) {
                     before_hud();
                 }

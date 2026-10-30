@@ -24,10 +24,10 @@ void AgxPreview::release() {
     m_failed = false;
 }
 
-renderer::FrameBuffer* AgxPreview::source(const renderer::FrameBuffer& output) {
+void AgxPreview::apply(renderer::FrameBuffer& output, float exposure) {
     if (m_failed || !enhanced_rendering_available() || output.width() <= 0
         || output.height() <= 0) {
-        return nullptr;
+        return;
     }
     std::string error;
     if ((!m_shader.id()
@@ -37,20 +37,11 @@ renderer::FrameBuffer* AgxPreview::source(const renderer::FrameBuffer& output) {
             && !m_copy.create(output.width(), output.height(), error))) {
         log::error("AgX disabled: {}", error);
         m_failed = true;
-        return nullptr;
-    }
-    return &m_copy;
-}
-
-void AgxPreview::apply(renderer::FrameBuffer& output, float exposure, bool source_filled) {
-    if (source(output) == nullptr) {
         return;
     }
     const stats::Scope timing("AgX", stats::kGpu);
     // A separate source avoids attachment feedback, including multisampled world targets.
-    if (!source_filled) {
-        output.blit_to(m_copy.id(), output.width(), output.height());
-    }
+    output.blit_to(m_copy.id(), output.width(), output.height());
     if (!m_vao) {
         glGenVertexArrays(1, &m_vao);
     }
@@ -68,13 +59,6 @@ void AgxPreview::apply(renderer::FrameBuffer& output, float exposure, bool sourc
     glUniform1f(m_shader.uniform("exposure_ev"), std::clamp(exposure, -4.8f, 4.8f));
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_copy.colour_texture());
-
-    // Every pixel of the colour is drawn again: a tiled GPU need not read the old one in.
-    if (glInvalidateFramebuffer != nullptr) {
-        const GLenum colour = GL_COLOR_ATTACHMENT0;
-        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, &colour);
-    }
-
     glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);
     glDepthMask(GL_TRUE);

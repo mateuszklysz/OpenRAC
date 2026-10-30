@@ -61,7 +61,6 @@ enum class Opt : std::uint8_t {
     ShadowDepthOnly,  // shadow-depth-only: the shadow maps hold depth alone, no colour or stencil
     FsrReactiveR8,    // fsr-reactive-r8: the upscaler's reactive mask is one R8 channel
     MsaaPassResolve,  // msaa-pass-resolve: a multisampled colour resolved by its own pass
-    AgxDirectSource,  // agx-direct-source: motion blur writes AgX's input, no copy of the picture
     // motion-blur-adaptive-samples: two blur samples a pixel of trail, not always the most
     MotionBlurAdaptiveSamples,
 };

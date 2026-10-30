@@ -1698,12 +1698,6 @@ entries below is `/mnt/project-files/docs/perf/enhanced-android-perf.md` in the 
   the pass stored them and a separate resolve read them back.
 - **`fsr-reactive-r8`.** The upscaler's reactive mask is one R8 channel instead of RGBA8; the
   upscaler reads only its red channel.
-- **`agx-direct-source`.** With AgX on, the motion blur's gather over the upscaler's output
-  draws every pixel straight into AgX's source image, so AgX no longer copies the whole picture
-  before tone-mapping it; the picture's old colour is then let go (glInvalidateFramebuffer).
-  The gather and AgX also let go what they overwrite whole: the gather's target colour and depth
-  are not read in, nor its depth written out, and AgX's target colour is not read in. On Novalis
-  at 1920x1080 (temporal Performance) a frame moves about 33 MB less, frames byte-identical.
 - **`motion-blur-adaptive-samples`.** The blur's gather takes two samples a display pixel of
   each trail's length (at least 8) instead of always `motion_blur_samples` (two thirds of it
   along the receiver's own trail): a short trail no longer samples the same texels many times.
