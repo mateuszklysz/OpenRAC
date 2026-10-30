@@ -1679,3 +1679,35 @@ attachment, so GTAO's colour composite (the path of a level without an active pr
 it directly; before, it blitted depth and stencil into a copy of its own. Radeon 610M, level 03 at
 1920x1080, Enhanced on, `openrac_render_bench --level`: `GTAO depth copy` 0.96 ms gone, the
 picture 32.58 against 31.22 ms. Frames identical in `render_equivalence_vulkan`.
+
+## Tile-based GPUs
+
+Phone GPUs (Arm Mali, Qualcomm Adreno, Apple, Imagination) bin each pass's geometry and keep its
+attachments in tile memory; what they pay for is vertex binning and the bytes a pass loads from
+and stores to memory, not the pixels it shades. `vkgl::tile_based()` says whether the device is
+one: the vendor ID decides, and `OPENRAC_TILE_BASED=1` or `0` overrides it, so a desktop GPU can
+run the same paths. The capture report's `gpu passes` line records it. The analysis behind the
+entries below is `/mnt/project-files/docs/perf/enhanced-android-perf.md` in the project files.
+
+- **Scrolling static shadows by default.** On a tile-based GPU the four sun cascades keep their
+  static casters in the toroidal caches of "Scrolling static shadows" above, so a frame redraws
+  only the strips the camera uncovered and the dynamic casters, instead of binning every
+  caster of every cascade again. `OPENRAC_SCROLLING_SHADOWS_OFF` keeps the ordinary atlas there
+  for comparison; elsewhere `OPENRAC_SCROLLING_SHADOWS` still opts in.
+- **`shadow-depth-only`.** The shadow atlas, the static shadow cache and the scrolling caches
+  are a float depth image alone. Before, each also had an RGBA8 colour and a stencil attachment
+  that nothing read, which a tile-based GPU cleared and stored every frame.
+- **`msaa-pass-resolve`.** A blit that resolves a whole multisampled colour image into a
+  single-sampled one of the same size and format, while the multisampled image's pass is still
+  open, becomes that pass's resolve attachment. The samples never leave tile memory; before,
+  the pass stored them and a separate resolve read them back.
+- **`fsr-reactive-r8`.** The upscaler's reactive mask is one R8 channel instead of RGBA8; the
+  upscaler reads only its red channel.
+- **Pass timing.** Timestamps written inside an open render pass on a tile-based GPU measure
+  the binning, not the shading, so the capture's per-pass GPU column reads about zero there.
+  **Time GPU passes** (Developer tools, or `OPENRAC_GPU_PASS_TIMING`) ends the pass around each
+  GPU timer: every timed section's time is then its own, at the cost of extra loads and stores,
+  so only the per-pass split is meaningful in such a recording, not the frame time.
+
+The three registry entries are lossless: `render_equivalence_vulkan --opt <name>` compares
+frames with each one on and off with no tolerance.
