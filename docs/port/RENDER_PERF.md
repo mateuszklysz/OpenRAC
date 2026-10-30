@@ -1704,6 +1704,12 @@ entries below is `/mnt/project-files/docs/perf/enhanced-android-perf.md` in the 
   The gather and AgX also let go what they overwrite whole: the gather's target colour and depth
   are not read in, nor its depth written out, and AgX's target colour is not read in. On Novalis
   at 1920x1080 (temporal Performance) a frame moves about 33 MB less, frames byte-identical.
+- **`motion-blur-adaptive-samples`.** The blur's gather takes two samples a display pixel of
+  each trail's length (at least 8) instead of always `motion_blur_samples` (two thirds of it
+  along the receiver's own trail): a short trail no longer samples the same texels many times.
+  Not byte-identical: on Novalis while turning, up to about 20% of pixels differ, under 0.2% by
+  more than 4 of 255 and none by more than 32; the trails look the same. The player chose this
+  trade for 120 fps on phones.
 - **Arm ASR.** On a tile-based GPU the temporal module upscales with Arm Accuracy Super
   Resolution (`port/enhanced/asr/README.md`), whose fragment passes suit these GPUs better than
   FSR 3.1's compute passes. `OPENRAC_TEMPORAL_UPSCALER=asr` or `fsr3` chooses either one on any

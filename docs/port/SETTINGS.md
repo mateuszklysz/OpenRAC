@@ -515,7 +515,9 @@ Motion Blur tuning is saved with the graphics settings:
 | `motion_blur_depth_tolerance` | 0.001ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“0.05 | 0.009 |
 | `motion_blur_cutscene_multiplier` | 0ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“2 | 1 |
 
-Longer trails and more samples increase GPU cost. Minimum motion suppresses tiny
+Longer trails and more samples increase GPU cost. The sample count is a ceiling: a trail
+takes two samples a display pixel of its length, at least 8 (`motion-blur-adaptive-samples`
+in docs/port/RENDER_PERF.md). Minimum motion suppresses tiny
 movements; trail spread controls JFA's sideways reach; depth tolerance controls
 colour gathering across depth differences. A zero cutscene multiplier disables
 cutscene blur. Reset blur tuning restores these defaults and strength 0.5 while

@@ -121,6 +121,9 @@ constexpr std::array<Entry, kOptCount> kEntries = {{
     {Opt::AgxDirectSource, "agx-direct-source",
      "the motion blur's gather draws straight into AgX's source image instead of the picture AgX then copies",
      true, Tolerance{}},
+    {Opt::MotionBlurAdaptiveSamples, "motion-blur-adaptive-samples",
+     "the blur's gather takes two samples a display pixel of trail (at least 8), at most its sample count",
+     true, Tolerance{0.25, 32}},
 }};
 // clang-format on
 

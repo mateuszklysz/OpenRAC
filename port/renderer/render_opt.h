@@ -62,10 +62,13 @@ enum class Opt : std::uint8_t {
     FsrReactiveR8,    // fsr-reactive-r8: the upscaler's reactive mask is one R8 channel
     MsaaPassResolve,  // msaa-pass-resolve: a multisampled colour resolved by its own pass
     AgxDirectSource,  // agx-direct-source: motion blur writes AgX's input, no copy of the picture
+    // motion-blur-adaptive-samples: two blur samples a pixel of trail, not always the most
+    MotionBlurAdaptiveSamples,
 };
 
-// The number of entries: AgxDirectSource is the last enumerator of Opt.
-inline constexpr std::size_t kOptCount = static_cast<std::size_t>(Opt::AgxDirectSource) + 1;
+// The number of entries: MotionBlurAdaptiveSamples is the last enumerator of Opt.
+inline constexpr std::size_t kOptCount =
+    static_cast<std::size_t>(Opt::MotionBlurAdaptiveSamples) + 1;
 
 // How far the frames an optimisation draws may differ from its reference path's. The default,
 // zero, is byte-identical frames; anything else is a tolerance the maintainers accepted, named in
