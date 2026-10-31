@@ -157,8 +157,8 @@ public:
     }
 
     // The settings sweep's experiments (debug/capture.cpp): the blended passes of every layer
-    // (static translucent texels, the mobys' translucent pass) left out, or drawn without probe
-    // light.
+    // (static translucent texels, the mobys' translucent pass) left out, drawn without probe
+    // light, or drawn with the full (not the cheaper) probe light.
     void set_sweep_translucent(bool off, bool unlit, bool full) {
         m_sweep_translucent_off = off;
         m_sweep_translucent_unlit = unlit;
