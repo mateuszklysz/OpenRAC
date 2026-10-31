@@ -133,6 +133,9 @@ constexpr std::array<Entry, kOptCount> kEntries = {{
     {Opt::ShadowCacheSettled, "shadow-cache-settled",
      "a sun cascade whose key changed in the last frame too draws its static casters into the atlas, not the cache",
      true, Tolerance{}},
+    {Opt::AttachmentUntouched, "attachment-untouched",
+     "a colour or depth attachment no draw or clear of a pass touches is neither loaded nor stored (load/store op none)",
+     true, Tolerance{}},
 }};
 // clang-format on
 

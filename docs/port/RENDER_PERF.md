@@ -1734,6 +1734,11 @@ entries below is `/mnt/project-files/docs/perf/enhanced-android-perf.md` in the 
   cleared without loading, as with the cache off. Byte-identical (`shadow_cache_bypassed`
   counts the cascades drawn directly). It matters only with `shadow-static-cache` on, which is
   off by default.
+- **`attachment-untouched`.** A deferred Vulkan pass whose draws and clears never touch an
+  attachment (no colour write, no depth or stencil test, no clear) gives it the load and store
+  operation NONE (`VK_EXT_load_store_op_none` or `VK_KHR_load_store_op_none`): the attachment
+  is neither read in nor written back, and keeps what it held. Before, such a pass loaded and
+  stored it anyway, for example the display depth in the copy to the screen. Byte-identical.
 - **Arm ASR.** On a Qualcomm (Snapdragon) GPU the temporal module upscales with Arm Accuracy Super
   Resolution (`port/enhanced/asr/README.md`), whose fragment passes suit these GPUs better than
   FSR 3.1's compute passes. `OPENRAC_TEMPORAL_UPSCALER=asr` or `fsr3` chooses either one on any
