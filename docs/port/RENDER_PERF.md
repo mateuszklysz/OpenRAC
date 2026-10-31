@@ -1757,6 +1757,12 @@ entries below is `/mnt/project-files/docs/perf/enhanced-android-perf.md` in the 
   the display under the copying blur gather are let go (`glInvalidateFramebuffer`) before the
   draw, so the pass does not load them. Byte-identical; the equivalence test's poison mode
   checks that nothing reads what was let go.
+- **`effects-unlit`.** The blended mobys' pass (explosion domes, fireballs, smoke) runs a
+  variant of the mesh shader with its pass and `probe_effect` fixed, so the whole probe-lit path
+  compiles away. A bomb's dome close to the camera covers the screen several times over, and the
+  large uber-shader made that pass cost up to 9-12 ms on an Adreno 830. On Novalis with the bomb
+  glove the frames are byte-identical (those effects take no probe light) and the pass costs
+  15% less on average, 27% less at its worst, under lavapipe.
 - **Arm ASR.** On a Qualcomm (Snapdragon) GPU the temporal module upscales with Arm Accuracy Super
   Resolution (`port/enhanced/asr/README.md`), whose fragment passes suit these GPUs better than
   FSR 3.1's compute passes. `OPENRAC_TEMPORAL_UPSCALER=asr` or `fsr3` chooses either one on any

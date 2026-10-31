@@ -72,10 +72,11 @@ enum class Opt : std::uint8_t {
     PassRenderArea,       // pass-render-area: a pass loads and stores only the rectangle it touched
     ShadowCascadePasses,  // shadow-cascade-passes: each atlas rectangle cleared and drawn on its own
     OverwriteDiscard,     // overwrite-discard: a target a full-screen pass overwrites is not loaded
+    EffectsUnlit,         // effects-unlit: the blended mobys drawn by a shader with no probe light
 };
 
-// The number of entries: OverwriteDiscard is the last enumerator of Opt.
-inline constexpr std::size_t kOptCount = static_cast<std::size_t>(Opt::OverwriteDiscard) + 1;
+// The number of entries: EffectsUnlit is the last enumerator of Opt.
+inline constexpr std::size_t kOptCount = static_cast<std::size_t>(Opt::EffectsUnlit) + 1;
 
 // How far the frames an optimisation draws may differ from its reference path's. The default,
 // zero, is byte-identical frames; anything else is a tolerance the maintainers accepted, named in

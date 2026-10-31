@@ -145,6 +145,9 @@ constexpr std::array<Entry, kOptCount> kEntries = {{
     {Opt::OverwriteDiscard, "overwrite-discard",
      "the temporal and blur targets a full-screen draw overwrites whole are let go before it, so not loaded",
      true, Tolerance{}},
+    {Opt::EffectsUnlit, "effects-unlit",
+     "the blended mobys (explosions, smoke) drawn by a small shader without probe light, as the added ones already are",
+     true, Tolerance{1.0, 255}},
 }};
 // clang-format on
 

@@ -519,6 +519,8 @@ private:
     renderer::Shader m_mesh;
     renderer::Shader m_early_mesh, m_early_solid;
     renderer::Shader m_colour_opaque, m_early_colour_opaque, m_static_translucent;
+    // The blended mobys' pass (explosions, smoke) with no probe light compiled in (effects-unlit).
+    renderer::Shader m_effects_unlit;
     // Static solid, static alpha-tested, then opaque mobys (optional skinning).
     std::array<renderer::Shader, 3> m_colour_specialised, m_early_colour_specialised;
     // mesh.frag's opaque path alone, without discard (the static layers' opaque pass; draw_layer).
