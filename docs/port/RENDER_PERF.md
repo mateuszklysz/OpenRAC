@@ -1708,6 +1708,8 @@ entries below is `/mnt/project-files/docs/perf/enhanced-android-perf.md` in the 
   Quality ones (the context is made again when the entry changes). Not byte-identical: on
   Novalis about 85% of pixels differ, 7-12% by more than 4 of 255 and 0.05% by more than 32
   (single texels on thin edges, at most 167); side by side the frames look the same.
+  Off by default: on an Adreno 830 (Odin 3) the upscaler took 1.84 ms with it against 1.67 ms
+  with Quality, so it bought nothing for its picture change.
 - **`motion-blur-quarter-flood`.** The blur's jump flood runs over 2x2 blocks of render pixels,
   a quarter of the texels and one jump fewer. The first flood takes every pixel of a block as a
   source, so a thin object's exact coordinate is still carried; each block floods for its
@@ -1730,7 +1732,8 @@ entries below is `/mnt/project-files/docs/perf/enhanced-android-perf.md` in the 
   key changed in the last frame too draws all its casters into the atlas itself, and is cached
   once its key holds for two frames; when no cascade takes anything from the cache the atlas is
   cleared without loading, as with the cache off. Byte-identical (`shadow_cache_bypassed`
-  counts the cascades drawn directly).
+  counts the cascades drawn directly). It matters only with `shadow-static-cache` on, which is
+  off by default.
 - **Arm ASR.** On a Qualcomm (Snapdragon) GPU the temporal module upscales with Arm Accuracy Super
   Resolution (`port/enhanced/asr/README.md`), whose fragment passes suit these GPUs better than
   FSR 3.1's compute passes. `OPENRAC_TEMPORAL_UPSCALER=asr` or `fsr3` chooses either one on any

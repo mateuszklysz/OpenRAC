@@ -26,7 +26,7 @@ built against OpenRAC's volk loader: `asr_compat.h`, force-included, brings `vol
 
 ## Quality
 
-ASR runs its Balanced shader preset (`asr-balanced-shaders` in docs/port/RENDER_PERF.md;
-`OPENRAC_RENDER_OPT_OFF=asr-balanced-shaders` brings back Quality) at the same render scale,
-jitter sequence, sharpening and reactive mask as FSR 3.1. It is FSR 2 based, so its image differs from FSR 3.1's in detail; set
+ASR runs its Quality shader preset (Balanced, `asr-balanced-shaders` in docs/port/RENDER_PERF.md,
+measured no cheaper on an Adreno 830 and is off) at the same render scale, jitter sequence,
+sharpening and reactive mask as FSR 3.1. It is FSR 2 based, so its image differs from FSR 3.1's in detail; set
 `OPENRAC_TEMPORAL_UPSCALER=fsr3` to compare on the same device.
