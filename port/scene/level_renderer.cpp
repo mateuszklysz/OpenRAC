@@ -216,6 +216,9 @@ bool LevelScene::upload(
         // The effects pass alone, its probe light left out: the whole lit path compiles away,
         // so a fireball that covers the screen several times runs a small shader.
         std::string effects_unlit(fragment);
+        // Its chrome and environment samplers are dead with metal_pass fixed at 0: leave them out.
+        effects_unlit
+            .insert(effects_unlit.find('\n') + 1, "#define OPENRAC_COLOUR_SPECIALISED 1\n");
         for (const auto* name : {"metal_pass", "glow_pass", "translucent_pass"}) {
             effects_unlit = fixed_int(std::move(effects_unlit), name, 0);
         }
