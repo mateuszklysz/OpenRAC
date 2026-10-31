@@ -13,6 +13,8 @@ uniform vec2 display_size;
 uniform int jump_pixels;
 uniform float min_motion;
 uniform float side_spread;
+// Render pixels along each side of one seed texel: 1, or 2 for a flood over a quarter of them.
+uniform int seed_scale;
 layout(location=0) out uint chosen_seed;
 const uint invalid_seed = 0xffffffffu;
 #ifdef FAST_FLOOD
@@ -25,6 +27,10 @@ uint seed_at(ivec2 pixel) {
 #else
     return texelFetch(seed_texture, pixel, 0).r;
 #endif
+}
+// The render-pixel position a seed texel stands for: its block's centre.
+vec2 receiver_at(ivec2 pixel) {
+    return vec2(pixel * seed_scale) + 0.5 * float(seed_scale - 1);
 }
 const ivec2 neighbours[8] = ivec2[8](
     ivec2(-1,0), ivec2(1,0), ivec2(0,-1), ivec2(0,1),
@@ -56,8 +62,13 @@ void consider(uint packed, vec2 receiver, inout float best_depth, inout float be
     float velocity_space_distance = dot(sample_velocity, uv_offset) / speed2;
     float absolute_velocity_space_distance = abs(velocity_space_distance - 0.5);
     float side_offset = abs(dot(vec2(uv_offset.y, -uv_offset.x), sample_velocity)) / speed2;
+    // A block's receiver is its centre: a source reaching any of its pixels, up to half a block's
+    // diagonal from the centre, is kept for the gather to test pixel by pixel (none for 1x1).
+    float block_reach = float(seed_scale - 1) * 0.7072
+        * max(display_size.x / float(size.x), display_size.y / float(size.y)) / sqrt(speed2);
     // User-controlled side allowance (upstream default 0.5); gather checks actual coverage.
-    if (absolute_velocity_space_distance > 0.5001 || side_offset > side_spread + 1.0 / sqrt(speed2)) return;
+    if (absolute_velocity_space_distance > 0.5001 + block_reach
+        || side_offset > side_spread + 1.0 / sqrt(speed2) + block_reach) return;
     // Reversed depth makes a foreground source win over background regardless of speed.
     if (motion.z > best_depth
         || (motion.z == best_depth && absolute_velocity_space_distance < best_fitness)) {
@@ -66,15 +77,27 @@ void consider(uint packed, vec2 receiver, inout float best_depth, inout float be
         best_fitness = absolute_velocity_space_distance;
     }
 }
+// Considers the sources of seed texel `at`: the first flood's implicit ones are every render
+// pixel of its block, in row order; later floods' are the one seed it holds.
+void consider_seeds(ivec2 at, vec2 receiver, inout float best_depth, inout float best_fitness) {
+#ifdef INITIALIZE_SEEDS
+    for (int y = 0; y < seed_scale; ++y)
+        for (int x = 0; x < seed_scale; ++x)
+            consider(seed_at(at * seed_scale + ivec2(x, y)), receiver, best_depth, best_fitness);
+#else
+    consider(seed_at(at), receiver, best_depth, best_fitness);
+#endif
+}
 #if defined(FAST_FLOOD) && defined(INITIALIZE_SEEDS)
-void consider_at(ivec2 at, ivec2 pixel, ivec2 size, inout float best_depth, inout float best_fitness) {
+void consider_at(ivec2 at, ivec2 size, vec2 receiver, inout float best_depth, inout float best_fitness) {
     if (any(lessThan(at, ivec2(0))) || any(greaterThanEqual(at, size))) return;
-    consider(seed_at(at), vec2(pixel), best_depth, best_fitness);
+    consider_seeds(at, receiver, best_depth, best_fitness);
 }
 #endif
 void main() {
     ivec2 pixel = ivec2(gl_FragCoord.xy);
     ivec2 size = textureSize(seed_texture, 0);
+    vec2 receiver = receiver_at(pixel);
     chosen_seed = invalid_seed;
 #ifdef FAST_FLOOD
     last_seed = invalid_seed;
@@ -82,20 +105,20 @@ void main() {
     float best_depth = -1.0, best_fitness = 1e20;
     // Preserve a candidate across iterations, including isolated thin features at the image edge.
 #ifndef FAST_FLOOD
-    consider(seed_at(pixel), vec2(pixel), best_depth, best_fitness);
+    consider_seeds(pixel, receiver, best_depth, best_fitness);
 #endif
 #ifdef FAST_FLOOD
 #ifdef INITIALIZE_SEEDS
     // Initial sources are implicit coordinates, so there are no seed reads to prefetch.
-    consider(seed_at(pixel), vec2(pixel), best_depth, best_fitness);
-    consider_at(pixel + ivec2(-1,0) * jump_pixels, pixel, size, best_depth, best_fitness);
-    consider_at(pixel + ivec2(1,0) * jump_pixels, pixel, size, best_depth, best_fitness);
-    consider_at(pixel + ivec2(0,-1) * jump_pixels, pixel, size, best_depth, best_fitness);
-    consider_at(pixel + ivec2(0,1) * jump_pixels, pixel, size, best_depth, best_fitness);
-    consider_at(pixel + ivec2(-1,1) * jump_pixels, pixel, size, best_depth, best_fitness);
-    consider_at(pixel + ivec2(1,-1) * jump_pixels, pixel, size, best_depth, best_fitness);
-    consider_at(pixel + ivec2(1,1) * jump_pixels, pixel, size, best_depth, best_fitness);
-    consider_at(pixel + ivec2(-1,-1) * jump_pixels, pixel, size, best_depth, best_fitness);
+    consider_seeds(pixel, receiver, best_depth, best_fitness);
+    consider_at(pixel + ivec2(-1,0) * jump_pixels, size, receiver, best_depth, best_fitness);
+    consider_at(pixel + ivec2(1,0) * jump_pixels, size, receiver, best_depth, best_fitness);
+    consider_at(pixel + ivec2(0,-1) * jump_pixels, size, receiver, best_depth, best_fitness);
+    consider_at(pixel + ivec2(0,1) * jump_pixels, size, receiver, best_depth, best_fitness);
+    consider_at(pixel + ivec2(-1,1) * jump_pixels, size, receiver, best_depth, best_fitness);
+    consider_at(pixel + ivec2(1,-1) * jump_pixels, size, receiver, best_depth, best_fitness);
+    consider_at(pixel + ivec2(1,1) * jump_pixels, size, receiver, best_depth, best_fitness);
+    consider_at(pixel + ivec2(-1,-1) * jump_pixels, size, receiver, best_depth, best_fitness);
 #else
     // Issue independent source-coordinate reads before the dependent velocity lookups.
     // This preserves candidate order while hiding texture latency between neighbours.
@@ -130,21 +153,21 @@ void main() {
         if (pixel.x >= jump_pixels && pixel.y >= jump_pixels)
             lower_left = seed_at(pixel + ivec2(-jump_pixels,-jump_pixels));
     }
-    consider(centre_seed, vec2(pixel), best_depth, best_fitness);
-    consider(left, vec2(pixel), best_depth, best_fitness);
-    consider(right, vec2(pixel), best_depth, best_fitness);
-    consider(down, vec2(pixel), best_depth, best_fitness);
-    consider(up, vec2(pixel), best_depth, best_fitness);
-    consider(upper_left, vec2(pixel), best_depth, best_fitness);
-    consider(lower_right, vec2(pixel), best_depth, best_fitness);
-    consider(upper_right, vec2(pixel), best_depth, best_fitness);
-    consider(lower_left, vec2(pixel), best_depth, best_fitness);
+    consider(centre_seed, receiver, best_depth, best_fitness);
+    consider(left, receiver, best_depth, best_fitness);
+    consider(right, receiver, best_depth, best_fitness);
+    consider(down, receiver, best_depth, best_fitness);
+    consider(up, receiver, best_depth, best_fitness);
+    consider(upper_left, receiver, best_depth, best_fitness);
+    consider(lower_right, receiver, best_depth, best_fitness);
+    consider(upper_right, receiver, best_depth, best_fitness);
+    consider(lower_left, receiver, best_depth, best_fitness);
 #endif
 #else
     for (int i = 0; i < 8; ++i) {
         ivec2 at = pixel + neighbours[i] * jump_pixels;
         if (any(lessThan(at, ivec2(0))) || any(greaterThanEqual(at, size))) continue;
-        consider(seed_at(at), vec2(pixel), best_depth, best_fitness);
+        consider_seeds(at, receiver, best_depth, best_fitness);
     }
 #endif
 }

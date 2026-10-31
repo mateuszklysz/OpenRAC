@@ -63,11 +63,15 @@ enum class Opt : std::uint8_t {
     MsaaPassResolve,  // msaa-pass-resolve: a multisampled colour resolved by its own pass
     // motion-blur-adaptive-samples: two blur samples a pixel of trail, not always the most
     MotionBlurAdaptiveSamples,
+    AsrBalancedShaders,  // asr-balanced-shaders: Arm ASR's Balanced shaders, not its Quality ones
+    // motion-blur-quarter-flood: the blur's jump flood over 2x2 blocks of render pixels
+    MotionBlurQuarterFlood,
+    ShadowFarAlternate,  // shadow-far-alternate: the far sun cascades drawn every other frame
+    ShadowCacheSettled,  // shadow-cache-settled: a cascade cached only once its key holds
 };
 
-// The number of entries: MotionBlurAdaptiveSamples is the last enumerator of Opt.
-inline constexpr std::size_t kOptCount =
-    static_cast<std::size_t>(Opt::MotionBlurAdaptiveSamples) + 1;
+// The number of entries: ShadowCacheSettled is the last enumerator of Opt.
+inline constexpr std::size_t kOptCount = static_cast<std::size_t>(Opt::ShadowCacheSettled) + 1;
 
 // How far the frames an optimisation draws may differ from its reference path's. The default,
 // zero, is byte-identical frames; anything else is a tolerance the maintainers accepted, named in

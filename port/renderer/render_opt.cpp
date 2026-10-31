@@ -121,6 +121,18 @@ constexpr std::array<Entry, kOptCount> kEntries = {{
     {Opt::MotionBlurAdaptiveSamples, "motion-blur-adaptive-samples",
      "the blur's gather takes two samples a display pixel of trail (at least 8), at most its sample count",
      true, Tolerance{0.25, 32}},
+    {Opt::AsrBalancedShaders, "asr-balanced-shaders",
+     "Arm ASR runs its Balanced shader permutations, cheaper than Quality's, at a little sharpness",
+     true, Tolerance{1.0, 192}},
+    {Opt::MotionBlurQuarterFlood, "motion-blur-quarter-flood",
+     "the blur's jump flood runs over 2x2 blocks of render pixels, a quarter of its texels, seeds still exact",
+     true, Tolerance{0.25, 255}},
+    {Opt::ShadowFarAlternate, "shadow-far-alternate",
+     "the sun's cascades 1 to 3 are drawn every other frame, 1 and the far two in turn, while their receivers fit",
+     true, Tolerance{0.25, 255}},
+    {Opt::ShadowCacheSettled, "shadow-cache-settled",
+     "a sun cascade whose key changed in the last frame too draws its static casters into the atlas, not the cache",
+     true, Tolerance{}},
 }};
 // clang-format on
 

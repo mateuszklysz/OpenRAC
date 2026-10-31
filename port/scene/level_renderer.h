@@ -259,10 +259,10 @@ public:
 private:
     // One consecutive run of compatible motion instances, preserving draw order.
     struct MotionBatch {
-        std::uint32_t model = 0;  // Shared geometry and material runs.
-        unsigned group = 0;       // Current moby geometry VAO.
-        int first = 0;            // First nine-texel pose record.
-        int count = 0;            // Instances submitted together.
+        std::uint32_t model = 0;       // Shared geometry and material runs.
+        unsigned group = 0;            // Current moby geometry VAO.
+        int first = 0;                 // First nine-texel pose record.
+        int count = 0;                 // Instances submitted together.
         bool floats_on_water = false;  // Shared deformation selection for this batch.
     };
 
@@ -352,9 +352,17 @@ private:
         DynamicAlpha,  // Mobys and all static coverage that can require alpha testing.
     };
     // Draws the sun cascades whose static casters changed into the static shadow cache, copies
-    // the cache into the atlas and draws the dynamic casters over it; returns the cascades it drew
-    // into the cache (shadow-static-cache, docs/port/RENDER_PERF.md, R-18).
-    unsigned draw_cached_cascades(renderer::RenderState& state);
+    // the cache into the atlas but for the `kept` cascades' rectangles and draws the dynamic
+    // casters over it; returns the cascades it drew into the cache (shadow-static-cache,
+    // docs/port/RENDER_PERF.md, R-18).
+    // `direct` gets the cascades it leaves to the atlas to draw whole (shadow-cache-settled).
+    unsigned draw_cached_cascades(renderer::RenderState& state, unsigned kept, unsigned& direct);
+    // Clears the atlas to 0, all but the `kept` cascades' rectangles, which hold the last frame's
+    // depth; `discard` lets go of its colour and stencil when the whole of it is cleared.
+    void clear_shadow_atlas(unsigned kept, bool discard);
+    // Keeps the far cascades the last frame drew in place of this frame's when this frame's
+    // receivers fit inside them (shadow-far-alternate); sets m_kept_cascades.
+    void keep_far_cascades(bool level_bounds);
     // Binds `framebuffer`, the atlas or the cache, for depth-only shadow drawing over all of it.
     void begin_shadow_target(unsigned framebuffer);
     void report_sun_culling() const;
@@ -530,6 +538,8 @@ private:
     // cascade's rectangle was drawn for (shadow-static-cache, R-18).
     std::unique_ptr<renderer::FrameBuffer> m_static_shadow;
     std::array<StaticShadowKey, kSunCascades> m_static_keys{};
+    // Each cascade's key in the last frame: a cascade is cached once its key holds for two.
+    std::array<StaticShadowKey, kSunCascades> m_last_static_keys{};
     // Bumped whenever the static layers' instances change (an upload, set_instances of one).
     std::uint64_t m_static_generation = 1;
 
@@ -564,6 +574,19 @@ private:
     std::array<std::unique_ptr<renderer::FrameBuffer>, kSunCascades> m_sun_maps;
     SunCascades m_sun_cascades;
     bool m_sun_enabled = false, m_sun_ready = false;
+
+    // shadow-far-alternate: the far cascades as last drawn, and what they were drawn for. A frame
+    // after one that drew them keeps them (m_kept_cascades) while its receivers fit inside them.
+    struct DrawnCascades {
+        SunCascades cascades;
+        unsigned fresh = 0;  // The cascades the last frame drew, one bit each.
+        bool separate_hero = false;
+        std::uint64_t generation = 0;
+        int atlas_size = 0;
+    };
+
+    DrawnCascades m_drawn_cascades;
+    unsigned m_kept_cascades = 0;  // The cascades this frame keeps from the last, one bit each.
 };
 
 // One layer of a LevelScene, as a bucket of the renderer.

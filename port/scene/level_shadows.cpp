@@ -6,6 +6,7 @@
 #include <cstring>
 #include <iterator>
 #include <stdexcept>
+#include <utility>
 
 #include "common/log.h"
 #include "common/stats.h"
@@ -212,6 +213,9 @@ void LevelScene::prepare_sun_shadow(
 ) {
     m_sun_ready = false;
     m_scroll_requested = false;
+    m_kept_cascades = 0;
+    // What the last frame drew; a frame that draws none leaves nothing to keep.
+    const unsigned fresh = std::exchange(m_drawn_cascades.fresh, 0u);
     for (auto& scroll : m_scroll_shadows) {
         scroll.active = false;
     }
@@ -237,8 +241,17 @@ void LevelScene::prepare_sun_shadow(
     }
     try {
         direction = m_lighting->sunlight_direction(direction);
-        m_sun_cascades =
-            sun_cascades(input.camera, direction, low, high, 256, input.shadow_quality);
+        m_sun_cascades = sun_cascades(
+            input.camera,
+            direction,
+            low,
+            high,
+            256,
+            input.shadow_quality,
+            renderer::render_opt::enabled(renderer::render_opt::Opt::ShadowFarAlternate)
+                ? kFarCascadeSlack
+                : 0.f
+        );
 #if defined(OPENRAC_VULKAN)
         static const bool& scrolling = stats::probe(
             "OPENRAC_SCROLLING_SHADOWS", "Experimental toroidal static caches for the sun cascades"
@@ -254,6 +267,8 @@ void LevelScene::prepare_sun_shadow(
         }
         return;
     }  // invalid/transitional camera: leave surfaces lit
+    m_drawn_cascades.fresh = fresh;
+    keep_far_cascades(low[0] <= high[0]);
     for (unsigned i = 0; i < kSunCascades; ++i) {
         glActiveTexture(GL_TEXTURE0 + 7 + i);
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -269,8 +284,15 @@ void LevelScene::prepare_sun_shadow(
                     m_shadow_layout.rects[i][2], m_shadow_layout.rects[i][2], error, 1, true
                 )) {
                 log::warn("sun shadow target unavailable: {}", error);
+                m_drawn_cascades.fresh = 0;
                 return;
             }
+
+            // A kept cascade's map still holds what the last frame drew.
+            if (m_kept_cascades & (1u << i)) {
+                continue;
+            }
+
             draw_shadow_map(
                 m_sun_maps[i]->id(),
                 m_shadow_layout.rects[i][2],
@@ -286,6 +308,59 @@ void LevelScene::prepare_sun_shadow(
     if (!m_shadow_atlas_active) {
         report_sun_culling();
     }
+}
+
+void LevelScene::keep_far_cascades(bool level_bounds) {
+    auto& drawn = m_drawn_cascades;
+    const int atlas_size = m_shadow_atlas_active ? m_shadow_layout.size : -m_shadow_layout.size;
+
+    // Only a cascade the last frame drew is kept (1, or 2 and 3, in turn), never two frames
+    // running, and only while what it was drawn for is the same: the static layers, the hero's
+    // map, the shadow layout. Without the level's bounds a cascade's depth range follows the
+    // camera, and the scrolling caches draw cascades in strips.
+    if (renderer::render_opt::enabled(renderer::render_opt::Opt::ShadowFarAlternate) && level_bounds
+        && !m_scroll_requested && drawn.generation == m_static_generation
+        && drawn.separate_hero == m_hero_ready && drawn.atlas_size == atlas_size) {
+        // Every receiver of this frame's slice inside the drawn cascade's footprint: the drawn
+        // cascade covers it, casters and filter margin included.
+        const auto fits = [&](unsigned i) {
+            return (drawn.fresh & (1u << i)) != 0
+                   && receivers_inside(
+                       m_sun_cascades.corners[i],
+                       drawn.cascades.casters[i],
+                       drawn.cascades.matrices[i]
+                   );
+        };
+
+        for (unsigned i = 2; i < kSunCascades; ++i) {
+            if (fits(i)) {
+                m_kept_cascades |= 1u << i;
+            }
+        }
+
+        // Cascade 1 in the frames that draw the far two, so that every frame draws about as much.
+        if (m_kept_cascades == 0 && fits(1)) {
+            m_kept_cascades = 1u << 1;
+        }
+    }
+
+    // A kept cascade is sampled with the matrix it was drawn with; the others are drawn now.
+    for (unsigned i = 0; i < kSunCascades; ++i) {
+        if (m_kept_cascades & (1u << i)) {
+            m_sun_cascades.matrices[i] = drawn.cascades.matrices[i];
+            m_sun_cascades.casters[i] = drawn.cascades.casters[i];
+            m_sun_cascades.corners[i] = drawn.cascades.corners[i];
+        } else {
+            drawn.cascades.matrices[i] = m_sun_cascades.matrices[i];
+            drawn.cascades.casters[i] = m_sun_cascades.casters[i];
+            drawn.cascades.corners[i] = m_sun_cascades.corners[i];
+        }
+    }
+
+    drawn.fresh = m_scroll_requested ? 0u : ((1u << kSunCascades) - 1) & ~m_kept_cascades;
+    drawn.separate_hero = m_hero_ready;
+    drawn.generation = m_static_generation;
+    drawn.atlas_size = atlas_size;
 }
 
 void LevelScene::report_sun_culling() const {

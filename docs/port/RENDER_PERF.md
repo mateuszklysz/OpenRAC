@@ -1704,6 +1704,33 @@ entries below is `/mnt/project-files/docs/perf/enhanced-android-perf.md` in the 
   Not byte-identical: on Novalis while turning, up to about 20% of pixels differ, under 0.2% by
   more than 4 of 255 and none by more than 32; the trails look the same. The player chose this
   trade for 120 fps on phones.
+- **`asr-balanced-shaders`.** Arm ASR runs its Balanced shader permutations instead of its
+  Quality ones (the context is made again when the entry changes). Not byte-identical: on
+  Novalis about 85% of pixels differ, 7-12% by more than 4 of 255 and 0.05% by more than 32
+  (single texels on thin edges, at most 167); side by side the frames look the same.
+- **`motion-blur-quarter-flood`.** The blur's jump flood runs over 2x2 blocks of render pixels,
+  a quarter of the texels and one jump fewer. The first flood takes every pixel of a block as a
+  source, so a thin object's exact coordinate is still carried; each block floods for its
+  centre, with half a block's diagonal of extra reach, and the gather keeps testing each display
+  pixel against the source's real trail. Not byte-identical: on Novalis while turning up to 16%
+  of pixels differ, under 0.7% by more than 4 and 0.02% by more than 32 (trail ends move by up
+  to a render pixel).
+- **`shadow-far-alternate`.** The sun's cascades 1 to 3 are drawn every other frame, cascade 1
+  in the frames that draw 2 and 3 not, so that each frame draws about as much. A frame after
+  one that drew a cascade keeps it, with the matrix it was drawn with, while all of its
+  receivers for that cascade lie inside the drawn cascade's caster volume and square by the
+  filter's margin; those caster volumes reach 1/16 of their radius further so that a moving
+  camera still fits (`kFarCascadeSlack`). A kept cascade is neither cleared nor drawn again,
+  and the static cache copies every other rectangle on its own. What changes: a moving object's
+  shadow in cascades 1 to 3 lags one frame. On Novalis while turning under 0.2% of pixels
+  differ by more than 4 (`shadow_far_kept` counts the kept cascades).
+- **`shadow-cache-settled`.** The static shadow cache's key follows the camera, so while the
+  camera moves every cascade misses every frame, and the cache only added work: the static
+  casters drawn into it, the whole atlas copied out of it, then the mobys. Now a cascade whose
+  key changed in the last frame too draws all its casters into the atlas itself, and is cached
+  once its key holds for two frames; when no cascade takes anything from the cache the atlas is
+  cleared without loading, as with the cache off. Byte-identical (`shadow_cache_bypassed`
+  counts the cascades drawn directly).
 - **Arm ASR.** On a Qualcomm (Snapdragon) GPU the temporal module upscales with Arm Accuracy Super
   Resolution (`port/enhanced/asr/README.md`), whose fragment passes suit these GPUs better than
   FSR 3.1's compute passes. `OPENRAC_TEMPORAL_UPSCALER=asr` or `fsr3` chooses either one on any

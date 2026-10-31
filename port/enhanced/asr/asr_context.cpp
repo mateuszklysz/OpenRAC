@@ -13,6 +13,7 @@
 #include "common/env.h"
 #include "common/log.h"
 #include "renderer/gl.h"
+#include "renderer/render_opt.h"
 #include "renderer/vulkan/vkgl.h"
 
 #include <host/backends/vk/ffxm_vk.h>
@@ -92,12 +93,14 @@ struct AsrContext::State {
     std::array<int, 2> render_size{};   // Active render extent.
     std::array<int, 2> display_size{};  // Active display extent.
     bool live = false;                  // Whether the library context needs destruction.
+    bool balanced = false;              // Whether it runs the Balanced shaders, not Quality's.
 
     bool create(const vkgl::NativeDevice& device, std::string& error) {
         arm::VkDeviceContext native{device.device, device.physical, device.device_proc};
         scratch.resize(arm::ffxmGetScratchMemorySizeVK(device.physical, 1));
         arm::FfxmFsr2ContextDescription description{};
-        description.qualityMode = arm::FFXM_FSR2_SHADER_QUALITY_MODE_QUALITY;
+        description.qualityMode = balanced ? arm::FFXM_FSR2_SHADER_QUALITY_MODE_BALANCED
+                                           : arm::FFXM_FSR2_SHADER_QUALITY_MODE_QUALITY;
         description.flags = arm::FFXM_FSR2_ENABLE_DEPTH_INVERTED;
         description.maxRenderSize =
             {static_cast<unsigned>(render_size[0]), static_cast<unsigned>(render_size[1])};
@@ -196,21 +199,25 @@ bool AsrContext::configure(
         return false;
     }
 
+    const bool balanced =
+        renderer::render_opt::enabled(renderer::render_opt::Opt::AsrBalancedShaders);
+
     if (m_state->live && m_state->render_size == render_size
-        && m_state->display_size == display_size) {
+        && m_state->display_size == display_size && m_state->balanced == balanced) {
         return true;
     }
 
     release();
     m_state->render_size = render_size;
     m_state->display_size = display_size;
+    m_state->balanced = balanced;
 
     if (!m_state->create(device, error)) {
         release();
         return false;
     }
 
-    log::info("Arm ASR temporal upscaling: quality shaders, FP16");
+    log::info("Arm ASR temporal upscaling: {} shaders, FP16", balanced ? "balanced" : "quality");
     return true;
 }
 

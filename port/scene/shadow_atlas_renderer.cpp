@@ -2,6 +2,7 @@
 // Copyright (c) 2026 the OpenRAC contributors
 
 #include <algorithm>
+#include <bit>
 #include <cmath>
 #include <cstring>
 #include <iterator>
@@ -84,7 +85,15 @@ void LevelScene::draw_shadow_atlas(renderer::RenderState& state) {
     const bool cache =
         !scrolling && m_sun_ready
         && renderer::render_opt::enabled(renderer::render_opt::Opt::ShadowStaticCache);
+    // Kept far cascades (shadow-far-alternate) are neither cleared nor drawn again.
+    const unsigned kept = m_sun_ready ? m_kept_cascades : 0;
     unsigned rerendered = m_sun_ready ? kSunCascades : 0;
+    unsigned last_cascade = 0;
+    for (unsigned i = 0; i < kSunCascades; ++i) {
+        if (!(kept & (1u << i))) {
+            last_cascade = i;
+        }
+    }
 
     // Nothing samples the atlas's colour or reads its stencil: neither is loaded or written back
     // (shadow-atlas-discard; the depth is cleared with the stencil so it is not loaded either).
@@ -94,27 +103,26 @@ void LevelScene::draw_shadow_atlas(renderer::RenderState& state) {
     const GLenum unread[] = {GL_COLOR_ATTACHMENT0, GL_STENCIL_ATTACHMENT};
 
     // The static casters come from the cache, the atlas holding its copy; otherwise it is cleared.
+    // Cascades the cache leaves to the atlas (`direct`) draw all their casters there.
+    unsigned direct = 0;
     if (cache) {
-        rerendered = draw_cached_cascades(state);
+        rerendered = draw_cached_cascades(state, kept, direct);
     } else {
         release_target(m_static_shadow);
         m_static_keys = {};
-        begin_shadow_target(m_shadow_atlas->id());
-        glClearDepth(0);
-
-        // The colour let go before the pass, the stencil cleared with the depth: nothing loaded.
-        if (discard) {
-            glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, unread);
-            glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        } else {
-            glClear(GL_DEPTH_BUFFER_BIT);
-        }
+        clear_shadow_atlas(kept, discard);
     }
 
     vkgl::indexed_viewports(m_shadow_layout.rects);
     if (m_sun_ready) {
         for (unsigned i = 0; i < 4; ++i) {
-            auto casters = cache ? ShadowCasters::Dynamic : ShadowCasters::All;
+            // Still holds what the last frame drew for the same matrix.
+            if (kept & (1u << i)) {
+                continue;
+            }
+
+            auto casters =
+                cache && !(direct & (1u << i)) ? ShadowCasters::Dynamic : ShadowCasters::All;
             if (scrolling & (1u << i)) {
                 casters = ShadowCasters::DynamicAlpha;
             }
@@ -127,7 +135,7 @@ void LevelScene::draw_shadow_atlas(renderer::RenderState& state) {
                 state,
                 i,
                 static_cast<int>(i),
-                i == 3 && !m_hero_ready,
+                i == last_cascade && !m_hero_ready,
                 casters
             );
         }
@@ -165,17 +173,56 @@ void LevelScene::draw_shadow_atlas(renderer::RenderState& state) {
         "vk_shadow_triangles", static_cast<double>(state.stats.triangles - triangles_before)
     );
     stats::gauge("shadow_static_rerenders", static_cast<double>(rerendered));
+    stats::gauge("shadow_far_kept", static_cast<double>(std::popcount(kept)));
+    stats::gauge("shadow_cache_bypassed", static_cast<double>(std::popcount(direct)));
 #else
     (void)state;
 #endif
 }
 
-unsigned LevelScene::draw_cached_cascades(renderer::RenderState& state) {
+void LevelScene::clear_shadow_atlas(unsigned kept, bool discard) {
+    begin_shadow_target(m_shadow_atlas->id());
+    glClearDepth(0);
+
+    // Some rectangles keep their depth: the others are cleared one by one, the atlas loaded.
+    if (kept) {
+        glEnable(GL_SCISSOR_TEST);
+
+        for (unsigned i = 0; i < m_shadow_layout.rects.size(); ++i) {
+            if (kept & (1u << i)) {
+                continue;
+            }
+
+            const auto& rect = m_shadow_layout.rects[i];
+            glScissor(rect[0], rect[1], rect[2], rect[3]);
+            glClear(GL_DEPTH_BUFFER_BIT);
+        }
+
+        glDisable(GL_SCISSOR_TEST);
+        return;
+    }
+
+    // The colour let go before the pass, the stencil cleared with the depth: nothing loaded.
+    if (discard) {
+        const GLenum unread[] = {GL_COLOR_ATTACHMENT0, GL_STENCIL_ATTACHMENT};
+        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, unread);
+        glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    } else {
+        glClear(GL_DEPTH_BUFFER_BIT);
+    }
+}
+
+unsigned LevelScene::draw_cached_cascades(
+    renderer::RenderState& state, unsigned kept, unsigned& direct
+) {
 #if defined(OPENRAC_VULKAN)
     std::array<StaticShadowKey, kSunCascades> keys{};
     std::array<bool, kSunCascades> missed{};
     unsigned misses = 0;
     unsigned last = 0;
+    const bool settled_only =
+        renderer::render_opt::enabled(renderer::render_opt::Opt::ShadowCacheSettled);
+    const unsigned all = (1u << kSunCascades) - 1;
 
     // A fresh cache holds nothing: every cascade is drawn into it.
     if (!m_static_shadow || !m_static_shadow->id()) {
@@ -191,13 +238,31 @@ unsigned LevelScene::draw_cached_cascades(renderer::RenderState& state) {
         keys[i].plane_count = volume.plane_count;
         keys[i].separate_hero = m_hero_ready;
         keys[i].generation = m_static_generation;
-        missed[i] = !same_static_key(keys[i], m_static_keys[i]);
+        missed[i] = !(kept & (1u << i)) && !same_static_key(keys[i], m_static_keys[i]);
+
+        // A key that changed since the last frame too would be drawn into the cache only to be
+        // copied once: the atlas draws its static casters itself (shadow-cache-settled).
+        if (missed[i] && settled_only && !same_static_key(keys[i], m_last_static_keys[i])) {
+            missed[i] = false;
+            direct |= 1u << i;
+        }
 
         // A changed key draws again; the last one drawn flushes the buckets.
         if (missed[i]) {
             ++misses;
             last = i;
         }
+    }
+    m_last_static_keys = keys;
+
+    // Nothing comes from the cache: the atlas is cleared as without it, its last copy not loaded.
+    if ((kept | direct) == all) {
+        clear_shadow_atlas(
+            kept,
+            glInvalidateFramebuffer != nullptr
+                && renderer::render_opt::enabled(renderer::render_opt::Opt::ShadowAtlasDiscard)
+        );
+        return 0;
     }
 
     // A cascade changed: its rectangle of the cache is cleared and its static casters drawn.
@@ -213,9 +278,8 @@ unsigned LevelScene::draw_cached_cascades(renderer::RenderState& state) {
             if (!create_shadow_target(*m_static_shadow, m_shadow_layout.size, error)) {
                 log::warn("static shadow cache unavailable: {}", error);
                 release_target(m_static_shadow);
-                begin_shadow_target(m_shadow_atlas->id());
-                glClearDepth(0);
-                glClear(GL_DEPTH_BUFFER_BIT);
+                clear_shadow_atlas(kept, false);
+                direct = all & ~kept;
                 return kSunCascades;
             }
         }
@@ -278,19 +342,63 @@ unsigned LevelScene::draw_cached_cascades(renderer::RenderState& state) {
     // copy: vkCmdCopyImage of the depth aspect).
     glBindFramebuffer(GL_READ_FRAMEBUFFER, m_static_shadow->id());
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_shadow_atlas->id());
-    glBlitFramebuffer(
-        0,
-        0,
-        m_shadow_layout.size,
-        m_shadow_layout.size,
-        0,
-        0,
-        m_shadow_layout.size,
-        m_shadow_layout.size,
-        GL_DEPTH_BUFFER_BIT,
-        GL_NEAREST
-    );
+
+    // All of it in one copy, or every rectangle neither kept nor drawn directly on its own; the
+    // hero's and the direct ones are cleared.
+    if (!(kept | direct)) {
+        glBlitFramebuffer(
+            0,
+            0,
+            m_shadow_layout.size,
+            m_shadow_layout.size,
+            0,
+            0,
+            m_shadow_layout.size,
+            m_shadow_layout.size,
+            GL_DEPTH_BUFFER_BIT,
+            GL_NEAREST
+        );
+    }
+
+    for (unsigned i = 0; (kept | direct) && i < kSunCascades; ++i) {
+        if ((kept | direct) & (1u << i)) {
+            continue;
+        }
+
+        const auto& r = m_shadow_layout.rects[i];
+        glBlitFramebuffer(
+            r[0],
+            r[1],
+            r[0] + r[2],
+            r[1] + r[3],
+            r[0],
+            r[1],
+            r[0] + r[2],
+            r[1] + r[3],
+            GL_DEPTH_BUFFER_BIT,
+            GL_NEAREST
+        );
+    }
+
     begin_shadow_target(m_shadow_atlas->id());
+
+    if (kept | direct) {
+        glClearDepth(0);
+        glEnable(GL_SCISSOR_TEST);
+
+        for (unsigned i = 0; i < m_shadow_layout.rects.size(); ++i) {
+            if ((kept & (1u << i)) || (i < kSunCascades && !(direct & (1u << i)))) {
+                continue;
+            }
+
+            const auto& r = m_shadow_layout.rects[i];
+            glScissor(r[0], r[1], r[2], r[3]);
+            glClear(GL_DEPTH_BUFFER_BIT);
+        }
+
+        glDisable(GL_SCISSOR_TEST);
+    }
+
     return misses;
 #else
     (void)state;

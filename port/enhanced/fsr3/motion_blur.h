@@ -55,6 +55,7 @@ private:
         float intensity;
         int max_radius, samples;
         float min_motion;
+        int seed_scale;  // Render pixels along each side of one seed texel.
     };
 
     // Preserves display colour only when the upscaler did not write our input directly.
@@ -65,7 +66,14 @@ private:
     int jump_flood(const Passes& passes);
     // Resolves moving samples and, for direct reconstruction, copies stationary pixels too.
     void gather(const Passes& passes, int source);
-    bool prepare(int width, int height, int render_width, int render_height, std::string& error);
+    bool prepare(
+        int width,
+        int height,
+        int render_width,
+        int render_height,
+        int seed_scale,
+        std::string& error
+    );
     bool prepare_colour(int width, int height, std::string& error);
     FrameTarget m_velocity, m_colour;
     std::array<int, 2> m_colour_size{};
@@ -74,7 +82,7 @@ private:
     renderer::Shader m_extract, m_first_jump, m_jump, m_resolve, m_copy_resolve;
     renderer::Shader m_fast_first_jump, m_fast_jump;
     unsigned m_vao = 0;
-    std::array<int, 4> m_size{};
+    std::array<int, 5> m_size{};
     bool m_failed = false;
 };
 }  // namespace openrac::enhanced::fsr3_detail

@@ -58,7 +58,8 @@ bool MotionBlur::apply(const BlurFrame& frame) {
         intensity,
         std::clamp(frame.tuning.max_radius, 1, 128),
         std::clamp(frame.tuning.samples, 8, 64),
-        std::clamp(frame.tuning.min_motion, .1f, 4.f)
+        std::clamp(frame.tuning.min_motion, .1f, 4.f),
+        renderer::render_opt::enabled(renderer::render_opt::Opt::MotionBlurQuarterFlood) ? 2 : 1
     };
     const stats::Scope timing(
         frame.camera_relative ? "Camera motion blur" : "Target-relative motion blur", stats::kGpu
@@ -67,7 +68,8 @@ bool MotionBlur::apply(const BlurFrame& frame) {
     const auto [rw, rh] = frame.render_size;
     std::string error;
     // Never record passes against incomplete or invalid render targets.
-    if (rw <= 0 || rh <= 0 || !prepare(display.width, display.height, rw, rh, error)) {
+    if (rw <= 0 || rh <= 0
+        || !prepare(display.width, display.height, rw, rh, passes.seed_scale, error)) {
         log::warn("Motion blur disabled: {}", error);
         m_failed = true;
         glBindFramebuffer(GL_FRAMEBUFFER, display.framebuffer);
@@ -154,10 +156,12 @@ int MotionBlur::jump_flood(const Passes& passes) {
     // follow its velocity footprint, and propagate through eight neighbours at shrinking jumps.
     // Full render-resolution seeds preserve thin objects before any dilation can discard them.
     // Each R32UI packs two exact 16-bit coordinates; the initial flood generates them implicitly.
+    // A quarter flood's seed texels each stand for a 2x2 block, whose centre is the receiver.
+    const int scale = passes.seed_scale;
     int source = 0;
     const int radius = std::max(
-        int(std::ceil(float(max_radius) * float(rw) / float(display.width))),
-        int(std::ceil(float(max_radius) * float(rh) / float(display.height)))
+        int(std::ceil(float(max_radius) * float(rw) / float(display.width * scale))),
+        int(std::ceil(float(max_radius) * float(rh) / float(display.height * scale)))
     );
     int jump = 1;
     while (jump < radius) {
@@ -174,7 +178,9 @@ int MotionBlur::jump_flood(const Passes& passes) {
         glUniform1f(program->uniform("min_motion"), min_motion);
         glUniform1f(program->uniform("side_spread"), std::clamp(tuning.spread, 0.f, 1.f));
         glUniform2f(program->uniform("display_size"), float(display.width), float(display.height));
+        glUniform1i(program->uniform("seed_scale"), scale);
     }
+    glViewport(0, 0, (rw + scale - 1) / scale, (rh + scale - 1) / scale);
     int pass_count = 0;
     for (; jump >= 1; jump /= 2) {
         const stats::Scope flood("Motion blur jump flood", stats::kGpu);
@@ -213,6 +219,7 @@ void MotionBlur::gather(const Passes& passes, int source) {
         resolve.uniform("adaptive_samples"),
         renderer::render_opt::enabled(renderer::render_opt::Opt::MotionBlurAdaptiveSamples) ? 1 : 0
     );
+    glUniform1i(resolve.uniform("seed_scale"), passes.seed_scale);
     glUniform1f(resolve.uniform("min_motion"), min_motion);
     glUniform1f(
         resolve.uniform("depth_tolerance"), std::clamp(tuning.depth_tolerance, .001f, .05f)

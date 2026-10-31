@@ -10,7 +10,9 @@
 namespace openrac::enhanced::fsr3_detail {
 using namespace openrac::gl;
 
-bool MotionBlur::prepare(int width, int height, int rw, int rh, std::string& error) {
+bool MotionBlur::prepare(
+    int width, int height, int rw, int rh, int seed_scale, std::string& error
+) {
     if (!prepare_colour(width, height, error)) {
         return false;
     }
@@ -46,14 +48,15 @@ bool MotionBlur::prepare(int width, int height, int rw, int rh, std::string& err
             return false;
         }
     }
-    if (m_size != std::array{width, height, rw, rh}) {
+    if (m_size != std::array{width, height, rw, rh, seed_scale}) {
         m_size = {};
+        const int sw = (rw + seed_scale - 1) / seed_scale, sh = (rh + seed_scale - 1) / seed_scale;
         if (!m_velocity.create(rw, rh, 0x881A, 0, error)
-            || !m_seeds[0].create(rw, rh, 0x8236, 0, error)
-            || !m_seeds[1].create(rw, rh, 0x8236, 0, error)) {
+            || !m_seeds[0].create(sw, sh, 0x8236, 0, error)
+            || !m_seeds[1].create(sw, sh, 0x8236, 0, error)) {
             return false;
         }
-        m_size = {width, height, rw, rh};
+        m_size = {width, height, rw, rh, seed_scale};
     }
     if (!m_vao) {
         glGenVertexArrays(1, &m_vao);
