@@ -132,12 +132,10 @@ pub fn settings() -> Vec<SettingSpec> {
         "Lighting quality",
         "choice",
         (if cfg!(target_os = "android") { "low" } else { "high" }).into(),
-        "Low lights faster on phones: simpler bounce light and shadows, and a cheaper upscaler.",
+        "Low lights faster on phones: simpler shadows and a cheaper upscaler.",
     );
-    lighting.choices = vec![
-        Choice { value: "low".into(), name: "Low".into() },
-        Choice { value: "high".into(), name: "High".into() },
-    ];
+    lighting.choices =
+        vec![Choice { value: "low".into(), name: "Low".into() }, Choice { value: "high".into(), name: "High".into() }];
     vec![
         lighting,
         shadows,

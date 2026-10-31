@@ -25,7 +25,7 @@ export const mockEnhanced: EnhancedView = {
           { value: "low", name: "Low" },
           { value: "high", name: "High" },
         ],
-        description: "Low lights faster on phones: simpler bounce light and shadows, and a cheaper upscaler.",
+        description: "Low lights faster on phones: simpler shadows and a cheaper upscaler.",
       },
       {
         key: "shadow_quality",
