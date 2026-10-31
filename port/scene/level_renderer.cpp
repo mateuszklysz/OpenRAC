@@ -203,7 +203,10 @@ bool LevelScene::upload(
         if (!m_static_translucent
                  .build("static translucent colour", static_vertex, static_fast, error)
             || !m_static_translucent_full.build(
-                "static translucent colour, full probe light", static_vertex, static_translucent, error
+                "static translucent colour, full probe light",
+                static_vertex,
+                static_translucent,
+                error
             )) {
             return false;
         }
