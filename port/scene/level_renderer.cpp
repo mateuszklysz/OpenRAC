@@ -212,21 +212,6 @@ bool LevelScene::upload(
             )) {
             return false;
         }
-
-        // The effects pass alone, its probe light left out: the whole lit path compiles away,
-        // so a fireball that covers the screen several times runs a small shader.
-        std::string effects_unlit(fragment);
-        // Its chrome and environment samplers are dead with metal_pass fixed at 0: leave them out.
-        effects_unlit
-            .insert(effects_unlit.find('\n') + 1, "#define OPENRAC_COLOUR_SPECIALISED 1\n");
-        for (const auto* name : {"metal_pass", "glow_pass", "translucent_pass"}) {
-            effects_unlit = fixed_int(std::move(effects_unlit), name, 0);
-        }
-        effects_unlit = fixed_int(std::move(effects_unlit), "effect_pass", 1);
-        effects_unlit = fixed_int(std::move(effects_unlit), "probe_effect", 1);
-        if (!m_effects_unlit.build("unlit effects", mesh_vertex, effects_unlit, error)) {
-            return false;
-        }
     }
 #endif
     const std::string depth_source = deformation_vertex(shaders::mesh_depth_vert);
@@ -611,7 +596,6 @@ void LevelScene::release() {
     m_mesh.release();
     m_static_translucent.release();
     m_static_translucent_full.release();
-    m_effects_unlit.release();
     m_colour_opaque.release();
     m_early_colour_opaque.release();
     for (auto& shader : m_colour_specialised) {
@@ -1143,10 +1127,6 @@ void LevelScene::draw_layer(
             );
             selected = fast_off || m_sweep_translucent_full ? &m_static_translucent_full
                                                             : &m_static_translucent;
-        } else if (mobys && pass == 3 && m_effects_unlit.id()
-                   && renderer::render_opt::enabled(renderer::render_opt::Opt::EffectsUnlit)) {
-            // The blended mobys keep the game's own colours (effects-unlit).
-            selected = &m_effects_unlit;
         } else if (batch_shader && !specialisation_off) {
             // Opaque variants specialise alpha handling for each geometry kind.
             selected = &specialised[variant];
