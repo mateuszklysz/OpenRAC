@@ -85,4 +85,8 @@ private:
     std::array<int, 5> m_size{};
     bool m_failed = false;
 };
+
+// Lets go of the bound framebuffer's colour, which the next draw overwrites whole, so that a
+// tiled GPU does not load it first (overwrite-discard).
+void let_go_colour();
 }  // namespace openrac::enhanced::fsr3_detail

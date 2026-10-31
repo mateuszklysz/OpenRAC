@@ -587,6 +587,9 @@ private:
 
     DrawnCascades m_drawn_cascades;
     unsigned m_kept_cascades = 0;  // The cascades this frame keeps from the last, one bit each.
+    // The whole atlas was cleared since it was made and only its rectangles drawn since, so the
+    // space between them holds 0 (shadow-cascade-passes then clears the rectangles alone).
+    bool m_atlas_gaps_clear = false;
 };
 
 // One layer of a LevelScene, as a bucket of the renderer.

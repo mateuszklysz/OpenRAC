@@ -50,9 +50,12 @@ bool LevelScene::make_shadow_atlas(std::string& error) {
     if (!m_shadow_atlas) {
         m_shadow_atlas = std::make_unique<renderer::FrameBuffer>();
     }
-    if (!m_shadow_atlas->id()
-        && !create_shadow_target(*m_shadow_atlas, m_shadow_layout.size, error)) {
-        return false;
+    if (!m_shadow_atlas->id()) {
+        // A new atlas holds nothing yet, between its rectangles too.
+        m_atlas_gaps_clear = false;
+        if (!create_shadow_target(*m_shadow_atlas, m_shadow_layout.size, error)) {
+            return false;
+        }
     }
     // The reference targets are recreated on demand if the user switches
     // paths; retaining both sets would waste shadow-map storage every frame.
@@ -104,17 +107,70 @@ void LevelScene::draw_shadow_atlas(renderer::RenderState& state) {
 
     // The static casters come from the cache, the atlas holding its copy; otherwise it is cleared.
     // Cascades the cache leaves to the atlas (`direct`) draw all their casters there.
+    // Each rectangle in a pass of its own, which loads nothing and stores that rectangle alone,
+    // once the space between them holds 0 (shadow-cascade-passes): a kept cascade costs nothing.
+    const bool alone =
+        !cache && !scrolling && m_sun_ready && m_atlas_gaps_clear
+        && renderer::render_opt::enabled(renderer::render_opt::Opt::ShadowCascadePasses);
     unsigned direct = 0;
     if (cache) {
         rerendered = draw_cached_cascades(state, kept, direct);
-    } else {
+        m_atlas_gaps_clear = false;
+    } else if (!alone) {
         release_target(m_static_shadow);
         m_static_keys = {};
         clear_shadow_atlas(kept, discard);
+        m_atlas_gaps_clear = m_atlas_gaps_clear || !kept;
+    } else {
+        release_target(m_static_shadow);
+        m_static_keys = {};
     }
 
-    vkgl::indexed_viewports(m_shadow_layout.rects);
-    if (m_sun_ready) {
+    // Opens a pass for the rectangle `view` alone and clears it: every indexed viewport is that
+    // rectangle, so the pass's area is that rectangle, which the draws into `view` keep to.
+    const auto begin_alone = [&](unsigned view) {
+        vkgl::end_pass();
+        const auto& rect = m_shadow_layout.rects[view];
+        std::array<std::array<int, 4>, 5> only;
+        only.fill(rect);
+        vkgl::indexed_viewports(only);
+        begin_shadow_target(m_shadow_atlas->id());
+        glEnable(GL_SCISSOR_TEST);
+        glScissor(rect[0], rect[1], rect[2], rect[3]);
+        glClearDepth(0);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        glDisable(GL_SCISSOR_TEST);
+    };
+
+    // Each cascade the frame draws, then the hero's rectangle, drawn or only cleared.
+    if (alone) {
+        for (unsigned i = 0; i < kSunCascades; ++i) {
+            // Still holds what the last frame drew for the same matrix.
+            if (kept & (1u << i)) {
+                continue;
+            }
+
+            begin_alone(i);
+            draw_shadow_map(
+                m_shadow_atlas->id(),
+                m_shadow_layout.rects[i][2],
+                m_sun_cascades.matrices[i],
+                false,
+                m_hero_ready,
+                state,
+                i,
+                static_cast<int>(i),
+                true,
+                ShadowCasters::All
+            );
+        }
+
+        begin_alone(4);
+    } else {
+        vkgl::indexed_viewports(m_shadow_layout.rects);
+    }
+
+    if (m_sun_ready && !alone) {
         for (unsigned i = 0; i < 4; ++i) {
             // Still holds what the last frame drew for the same matrix.
             if (kept & (1u << i)) {

@@ -183,6 +183,13 @@ void indexed_viewports(std::span<const std::array<int, 4>> rectangles) {
     g->bound_pipeline = VK_NULL_HANDLE;
 }
 
+void end_pass() {
+    // No context: no pass is open.
+    if (active()) {
+        end_rendering(PassEnd::Other);
+    }
+}
+
 renderer::GpuInstanceBatch gpu_instances(
     unsigned source,
     std::span<const renderer::GpuCullBounds> bounds,

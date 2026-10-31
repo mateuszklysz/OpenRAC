@@ -115,6 +115,9 @@ bool gpu_materials_active();
 // shader. Empty rectangles restore the ordinary single-viewport path.
 bool indexed_viewports_supported(unsigned count);
 void indexed_viewports(std::span<const std::array<int, 4>> rectangles);
+// Ends the open pass, so that the next draw or clear begins another one, with a render area of
+// its own (shadow-cascade-passes).
+void end_pass();
 renderer::GpuInstanceBatch gpu_instances(
     unsigned instance_buffer,
     std::span<const renderer::GpuCullBounds> bounds,
