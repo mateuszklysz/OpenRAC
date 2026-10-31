@@ -310,4 +310,16 @@ void reset() {
     registry().reset();
 }
 
+namespace {
+std::atomic<bool> g_low_lighting{false};
+}
+
+void set_low_lighting(bool low) {
+    g_low_lighting.store(low, std::memory_order_relaxed);
+}
+
+bool low_lighting() {
+    return g_low_lighting.load(std::memory_order_relaxed);
+}
+
 }  // namespace openrac::renderer::render_opt

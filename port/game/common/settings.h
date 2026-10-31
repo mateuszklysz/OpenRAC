@@ -109,6 +109,13 @@ struct Settings {
     bool environment_probe_debug =
         false;  // Baked reflection capture positions and influence boxes.
     float probe_gi_multiplier = 1.0f;
+    // Lighting quality Low: cheaper probe light and upscaler shaders, for phones (the default
+    // there). Saved as lighting_quality = high | low.
+#ifdef __ANDROID__
+    bool lighting_low = true;
+#else
+    bool lighting_low = false;
+#endif
     // The settings sweep's experiments alone (debug/capture.cpp); never saved.
     bool sweep_probe_lighting_off = false;
     bool sweep_translucent_off = false;

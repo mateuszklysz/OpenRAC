@@ -19,6 +19,8 @@ namespace openrac::lighting {
 // The scene's mesh fragment shader `source` (viewer/shaders/mesh.frag) with the probe lighting's
 // GLSL put in, and its early-lit variant; unchanged where enhanced rendering is unavailable.
 std::string probe_mesh_fragment(std::string source);
+// The mesh vertex shader with the probe sampler put in, for light sampled at each vertex.
+std::string probe_mesh_vertex(std::string source);
 std::string probe_early_fragment(std::string source);
 std::string probe_shader_source(std::string source);
 

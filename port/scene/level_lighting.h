@@ -41,6 +41,9 @@ public:
     // Enhanced surface history uses the already submitted hero pose and joint palette.
     virtual std::string mesh_vertex(std::string source) const { return source; }
 
+    // The mesh vertex shader that samples probe light at each vertex (OPENRAC_PROBE_VERTEX).
+    virtual std::string probe_vertex(std::string source) const { return source; }
+
     virtual void prepare_wetness(
         const renderer::FrameInput&, unsigned, const std::optional<Instance>&
     ) {}

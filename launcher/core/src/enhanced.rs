@@ -126,7 +126,20 @@ pub fn settings() -> Vec<SettingSpec> {
         Choice { value: "balanced".into(), name: "Balanced".into() },
         Choice { value: "performance".into(), name: "Performance".into() },
     ];
+    // Low is the phones' default (settings.h): the game reads the same when the key is missing.
+    let mut lighting = spec(
+        "lighting_quality",
+        "Lighting quality",
+        "choice",
+        (if cfg!(target_os = "android") { "low" } else { "high" }).into(),
+        "Low lights faster on phones: simpler bounce light and shadows, and a cheaper upscaler.",
+    );
+    lighting.choices = vec![
+        Choice { value: "low".into(), name: "Low".into() },
+        Choice { value: "high".into(), name: "High".into() },
+    ];
     vec![
+        lighting,
         shadows,
         spec("gtao", "Ambient occlusion", "bool", true.into(), "Soft shade in corners and under objects."),
         quality,

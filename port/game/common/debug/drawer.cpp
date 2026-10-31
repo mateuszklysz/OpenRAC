@@ -379,6 +379,15 @@ void drawer_enhanced() {
                 changed = true;
             }
         }
+        if (const int by = drawer_choice(
+                "Lighting quality",
+                set.lighting_low ? "Low (phones)" : "High",
+                !set.lighting_low,
+                set.lighting_low
+            )) {
+            set.lighting_low = by < 0;
+            changed = true;
+        }
         if (drawer_switch("Gameplay rim light", set.rim_light)) {
             set.rim_light = !set.rim_light;
             changed = true;

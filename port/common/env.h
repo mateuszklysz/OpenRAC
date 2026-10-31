@@ -118,6 +118,7 @@ enum class Var : std::uint16_t {
     ProbeBacklight,
     ProbeComputeOff,
     ProbeDense,
+    ProbeFastOff,
     ProbeGi,
     ProbeRays,
     ProbeRegions,

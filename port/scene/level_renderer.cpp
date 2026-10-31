@@ -97,6 +97,19 @@ bool LevelScene::upload(
     m_early_capable = m_lighting && m_lighting->early_supported();
     std::string solid(fragment);
     solid.insert(solid.find('\n') + 1, "#define OPENRAC_SOLID 1\n");
+    // The blended passes' probe light, sampled at the vertices (OPENRAC_PROBE_FAST): blended
+    // layers stack many times over on screen, and per pixel it was the costliest part of Enhanced
+    // on phones' GPUs.
+    const bool vertex_lit = m_lighting && gl::enhanced_rendering_available();
+    if (vertex_lit) {
+        std::string blended(fragment);
+        blended.insert(blended.find('\n') + 1, "#define OPENRAC_PROBE_FAST 1\n");
+        if (!m_moby_translucent.build(
+                "moby translucent", m_lighting->probe_vertex(mesh_vertex), blended, error
+            )) {
+            return false;
+        }
+    }
     if (!m_mesh.build("mesh", mesh_vertex, fragment, error)
         || !m_solid.build("mesh (solid)", mesh_vertex, solid, error)
         || !m_sky.build("sky", shaders::sky_vert, shaders::sky_frag, error)) {
@@ -199,9 +212,13 @@ bool LevelScene::upload(
         // The default blended static pass reads cheaper probe light and shadows (Enhanced is
         // allowed to be lossy); the full one stays as the reference.
         std::string static_fast(static_translucent);
-        static_fast.insert(static_fast.find('\n') + 1, "#define OPENRAC_PROBE_FAST 1\n");
+        if (vertex_lit) {
+            static_fast.insert(static_fast.find('\n') + 1, "#define OPENRAC_PROBE_FAST 1\n");
+        }
+        const std::string fast_vertex =
+            vertex_lit ? m_lighting->probe_vertex(static_vertex) : static_vertex;
         if (!m_static_translucent
-                 .build("static translucent colour", static_vertex, static_fast, error)
+                 .build("static translucent colour", fast_vertex, static_fast, error)
             || !m_static_translucent_full.build(
                 "static translucent colour, full probe light",
                 static_vertex,
@@ -602,6 +619,7 @@ void LevelScene::release() {
         m_lights = 0;
     }
     m_mesh.release();
+    m_moby_translucent.release();
     m_static_translucent.release();
     m_static_translucent_full.release();
     m_effects_unlit.release();
@@ -1070,6 +1088,9 @@ void LevelScene::draw_layer(
         const auto& specialised = early ? m_early_colour_specialised : m_colour_specialised;
         const bool static_translucent = !state.depth_prepass && !mobys && pass == 2
                                         && m_static_translucent.id() && !specialisation_off;
+        static const bool& fast_off = stats::probe(
+            "OPENRAC_PROBE_FAST_OFF", "Reference: full probe light on the blended passes"
+        );
         const renderer::Shader* selected = &m_mesh;
         // Both depth variants retain identical positions and alpha coverage.
         if (state.depth_prepass) {
@@ -1081,9 +1102,6 @@ void LevelScene::draw_layer(
             }
         } else if (static_translucent) {
             // Static blended packets omit moby-only vertex work.
-            static const bool& fast_off = stats::probe(
-                "OPENRAC_PROBE_FAST_OFF", "Reference: full probe light on blended static passes"
-            );
             selected = fast_off || m_sweep_translucent_full ? &m_static_translucent_full
                                                             : &m_static_translucent;
         } else if (mobys && pass == 3 && m_effects_unlit.id()
@@ -1099,6 +1117,10 @@ void LevelScene::draw_layer(
         } else if (early) {
             // Opaque colour consumes the cached compute lighting.
             selected = solid ? &m_early_solid : &m_early_mesh;
+        } else if (mobys && pass == 2 && m_moby_translucent.id() && !fast_off
+                   && !m_sweep_translucent_full) {
+            // The blended mobys: probe light from their vertices.
+            selected = &m_moby_translucent;
         } else {
             // Blended surfaces and unsupported early passes retain fragment lighting.
             selected = solid ? &m_solid : &m_mesh;

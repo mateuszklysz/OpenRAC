@@ -32,6 +32,7 @@ class SceneLighting final : public scene::LevelLighting {
 public:
     std::string mesh_fragment(std::string source) const override;
     std::string mesh_vertex(std::string source) const override;
+    std::string probe_vertex(std::string source) const override;
     void prepare_wetness(
         const renderer::FrameInput& input,
         unsigned palette,

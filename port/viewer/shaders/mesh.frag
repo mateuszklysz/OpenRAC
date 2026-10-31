@@ -146,6 +146,9 @@ vec3 wet_coat(vec3 linear_colour, vec3 n, vec3 toward_camera, float visibility) 
 vec3 wet_coat(vec3 linear_colour,vec3 n,vec3 toward_camera,float visibility) {return linear_colour;}
 #endif
 
+#ifdef OPENRAC_PROBE_FAST
+in vec4 v_probe_vertex;
+#endif
 vec3 probe_surface(vec4 texel, vec3 original) {
     if (probe_receiver == 0 || v_glow != 0 || probe_effect != 0 || metal_pass != 0
         || (probe_receiver == 2 && v_probe_selector.w > 1.5)) {
@@ -209,6 +212,10 @@ vec3 probe_surface(vec4 texel, vec3 original) {
 #ifdef OPENRAC_EARLY_LIGHTING
     indirect = cached_lighting.rgb;
     bool covered = cached_coverage;
+#elif defined(OPENRAC_PROBE_FAST)
+    // Blended static passes: probe light sampled at the vertices (Enhanced, lossy).
+    indirect = v_probe_vertex.rgb;
+    bool covered = v_probe_vertex.a > 0.5;
 #else
     bool covered = sample_probe_irradiance(v_world_position, n, surface_bias, indirect);
 #endif

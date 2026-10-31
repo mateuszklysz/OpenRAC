@@ -1376,6 +1376,10 @@ void write_set(
 
     // The uniform blocks.
     for (std::size_t i = 0; i < c.blocks.size(); ++i) {
+        // A block the program declares and never reads has no binding.
+        if (c.blocks[i].binding < 0) {
+            continue;
+        }
         buffer_infos.push_back({blocks[i].buffer, blocks[i].offset, blocks[i].size});
         write(c.blocks[i].binding, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER).pBufferInfo =
             &buffer_infos.back();
@@ -1494,6 +1498,10 @@ VkDescriptorSet descriptors_reference(Program& p, std::span<const Sampled> sampl
             .pBufferInfo = &buffer_infos.back();
     }
     for (std::size_t i = 0; i < c.blocks.size(); ++i) {
+        // A block the program declares and never reads has no binding.
+        if (c.blocks[i].binding < 0) {
+            continue;
+        }
         buffer_infos.push_back({blocks[i].buffer, blocks[i].offset, blocks[i].size});
         write(c.blocks[i].binding, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER).pBufferInfo =
             &buffer_infos.back();

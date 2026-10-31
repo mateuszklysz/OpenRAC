@@ -27,11 +27,16 @@ uniform float probe_dense_weight[3];
 uniform int probe_gpu_selection;
 uniform int probe_region_count;
 uniform vec2 probe_tile_extent;
+// Per-pixel volume choice. A vertex, and a blended pass lit at its vertices, never choose: the
+// resources stay undeclared there, or the shader holds unused ones with clashing bindings.
+#if !defined(OPENRAC_PROBE_VERTEX) && !defined(OPENRAC_PROBE_FAST)
+#define OPENRAC_PROBE_REGIONS 1
 uniform usamplerBuffer probe_region_masks;
 
 layout(std140) uniform ProbeRegions {
     vec4 probe_regions[3072];
 };
+#endif
 
 uniform int probe_mode;      // 0 original, 1 combined, 2 indirect, 3 direct, 4 coverage
 uniform int probe_receiver;  // 0 unchanged, 1 terrain, 2 moby
@@ -206,6 +211,7 @@ bool sample_probe_grid(
     return true;
 }
 
+#ifdef OPENRAC_PROBE_REGIONS
 uint probe_candidate_word(ivec2 pixel, int word) {
     if (probe_gpu_selection == 2 || any(lessThan(pixel, ivec2(0)))
         || any(greaterThanEqual(pixel, ivec2(probe_tile_extent)))) {
@@ -262,15 +268,22 @@ ivec3 probe_choose_regions(vec3 p) {
     }
     return best;
 }
+#endif
 
 bool sample_probe_irradiance(vec3 p, vec3 n, vec3 surface_bias, out vec3 irradiance) {
     vec3 locals = vec3(0.0);
     float total = 0.0;
     float confidence = 0.0;
     ivec3 chosen = ivec3(-1);
-    if (probe_gpu_selection != 0) {
+#ifndef OPENRAC_PROBE_REGIONS
+    // A vertex has no pixel tile: it reads the volumes the CPU chose around the camera.
+    const bool gpu_selection = false;
+#else
+    const bool gpu_selection = probe_gpu_selection != 0;
+    if (gpu_selection) {
         chosen = probe_choose_regions(p);
     }
+#endif
 #ifdef OPENRAC_PROBE_FAST
     // Blended surfaces read only the best volume (Enhanced, lossy).
     const int slots = 1;
@@ -279,7 +292,7 @@ bool sample_probe_irradiance(vec3 p, vec3 n, vec3 surface_bias, out vec3 irradia
 #endif
     for (int slot = 0; slot < slots; ++slot) {
         int id = chosen[slot];
-        if (probe_gpu_selection != 0 && id < 0) {
+        if (gpu_selection && id < 0) {
             continue;
         }
         vec3 origin = probe_dense_origin[slot];
@@ -288,7 +301,8 @@ bool sample_probe_irradiance(vec3 p, vec3 n, vec3 surface_bias, out vec3 irradia
         vec2 frame = probe_dense_frame[slot];
         vec3 dimensions = probe_dense_dimensions[slot];
         int offset = probe_dense_offset[slot];
-        if (probe_gpu_selection != 0) {
+#ifdef OPENRAC_PROBE_REGIONS
+        if (gpu_selection) {
             origin = probe_regions[id * 3].xyz;
             weight = 1.0;
             spacing = probe_regions[id * 3 + 1].xyz;
@@ -296,6 +310,7 @@ bool sample_probe_irradiance(vec3 p, vec3 n, vec3 surface_bias, out vec3 irradia
             offset = int(probe_regions[id * 3].w);
             frame = vec2(probe_regions[id*3+1].w,probe_regions[id*3+2].w);
         }
+#endif
         if (weight <= 0.0) {
             continue;
         }
@@ -361,6 +376,8 @@ vec3 probe_unit(vec3 v) {
 
 // Interpolate comparison results, never raw depths: a nearest-depth PCF
 // kernel otherwise jumps a whole texel when the receiver moves slightly.
+// A vertex samples probe light only: shadows and direct light stay per pixel.
+#ifndef OPENRAC_PROBE_VERTEX
 float shadow_bilinear_rect(sampler2D map, ivec4 rect, vec3 position, float bias, vec2 slope) {
     ivec2 size = rect.zw;
     vec2 pixel = position.xy * vec2(size) - 0.5;
@@ -449,8 +466,8 @@ float shadow_pcf_unique_rect(sampler2D map, ivec4 rect, vec3 position, float bia
 }
 
 float shadow_pcf_kernel_rect(sampler2D map, ivec4 rect, vec3 position, float bias, vec2 slope, bool tent) {
-#if defined(OPENRAC_PROBE_FAST)
-    // Blended surfaces: four taps instead of the wide kernel (Enhanced, lossy).
+#if defined(OPENRAC_PROBE_FAST) || defined(OPENRAC_CHEAP_SHADOWS)
+    // Blended surfaces and lighting quality Low: four taps, not the wide kernel (lossy).
     return shadow_bilinear_rect(map, rect, position, bias, slope);
 #elif defined(OPENRAC_SHADOW_FILTER_REFERENCE)
     return shadow_pcf_reference_rect(map, rect, position, bias, slope, tent);
@@ -565,7 +582,7 @@ float sun_shadow_visibility(vec3 p, vec3 n, vec3 plane_normal) {
     float start = cascade == 0 ? sun_shadow_near : sun_shadow_ends[cascade - 1];
     float blend =
         smoothstep(mix(start, sun_shadow_ends[cascade], 0.9), sun_shadow_ends[cascade], distance);
-#ifdef OPENRAC_PROBE_FAST
+#if defined(OPENRAC_PROBE_FAST) || defined(OPENRAC_CHEAP_SHADOWS)
     blend = 0.0;
 #endif
     float next =
@@ -615,6 +632,8 @@ vec3 probe_direct(vec3 p, vec3 n, vec4 selector, float visibility) {
 }
 
 // Keep the display transfer curves FP32: chained half powers amplify byte-level banding.
+#endif  // OPENRAC_PROBE_VERTEX
+
 vec3 probe_linear(vec3 c) {
     c = max(c, vec3(0.0));
     return mix(pow((c + 0.055) / 1.055, vec3(2.4)), c / 12.92, lessThanEqual(c, vec3(0.04045)));

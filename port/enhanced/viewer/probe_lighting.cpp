@@ -107,6 +107,15 @@ std::string probe_mesh_fragment(std::string source) {
     return probe_shader_source(std::move(source));
 }
 
+std::string probe_mesh_vertex(std::string source) {
+    if (!enhanced_rendering_available()) {
+        return source;
+    }
+    source.insert(source.find('\n') + 1, shaders::probes_glsl);
+    source.insert(source.find('\n') + 1, "#define OPENRAC_PROBE_VERTEX 1\n");
+    return source;
+}
+
 std::string probe_early_fragment(std::string source) {
     if (!enhanced_rendering_available()) {
         return probe_mesh_fragment(std::move(source));

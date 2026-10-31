@@ -23,6 +23,7 @@ void Settings::reset_enhanced() {
     enhanced_shadows = defaults.enhanced_shadows;
     shadow_quality = defaults.shadow_quality;
     rim_light = defaults.rim_light;
+    lighting_low = defaults.lighting_low;
     rim_shadow_lift = defaults.rim_shadow_lift;
     rim_lift_exponent = defaults.rim_lift_exponent;
     rim_lift_max_gain = defaults.rim_lift_max_gain;
@@ -285,6 +286,11 @@ void load(const std::filesystem::path& file) {
             known = parse(value, renderer::kShadowQualityKeys, s.shadow_quality);
         } else if (key == "enhanced_shadows") {
             known = parse_bool(value, s.enhanced_shadows);
+        } else if (key == "lighting_quality") {
+            known = value == "high" || value == "low";
+            if (known) {
+                s.lighting_low = value == "low";
+            }
         } else if (key == "rim_light") {
             known = parse_bool(value, s.rim_light);
         } else if (key == "rim_shadow_lift") {
@@ -513,6 +519,7 @@ void save() {
         << "shadow_quality = " << renderer::kShadowQualityKeys[static_cast<int>(s.shadow_quality)]
         << "\n"
         << "enhanced_shadows = " << (s.enhanced_shadows ? 1 : 0) << "\n"
+        << "lighting_quality = " << (s.lighting_low ? "low" : "high") << "\n"
         << "rim_light = " << (s.rim_light ? 1 : 0) << "\n"
         << "rim_shadow_lift = " << (s.rim_shadow_lift ? 1 : 0) << "\n"
         << "rim_lift_exponent = " << s.rim_lift_exponent << "\n"

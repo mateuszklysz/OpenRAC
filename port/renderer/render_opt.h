@@ -140,4 +140,9 @@ void set(Opt opt, bool on);
 // For the tests and the benchmark, between frames.
 void reset();
 
+// Lighting quality Low (the graphics setting, for phones): the early probe light reads one volume
+// with cheap shadows and Arm ASR runs its Performance shaders. Set by the frontend each frame.
+void set_low_lighting(bool low);
+[[nodiscard]] bool low_lighting();
+
 }  // namespace openrac::renderer::render_opt

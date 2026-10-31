@@ -32,6 +32,10 @@ std::string SceneLighting::mesh_vertex(std::string source) const {
     return enhanced::WaterFloat::vertex_source(wetness_shader(std::move(source)));
 }
 
+std::string SceneLighting::probe_vertex(std::string source) const {
+    return probe_mesh_vertex(std::move(source));
+}
+
 std::string SceneLighting::mesh_fragment(std::string source) const {
     return wetness_shader(probe_mesh_fragment(std::move(source)));
 }

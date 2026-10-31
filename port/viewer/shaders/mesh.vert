@@ -39,15 +39,22 @@ uniform int skinning;
 uniform sampler2D palette_texture;
 uniform sampler2D light_texture;
 // The level's 16 directional sets: colour A (w = back factor), direction A, colour B, direction B.
+#ifndef OPENRAC_PROBE_VERTEX  // probes.glsl declares these
 uniform vec4 light_sets[64];
+#endif
 // The metal ("shine") pass (MobyProc's metal packets): texture coordinates from the view-space
 // normal, a sphere map of the level's chrome or glass picture, the vertex colour 0x70 and the
 // alpha the moby's distance gives (ReRAC moby_skinning_lighting.md 6 and 9).
 uniform int metal_pass;
+#ifndef OPENRAC_PROBE_VERTEX
 uniform int probe_mode;
 uniform int probe_receiver;
 uniform int sun_shadow_enabled;
 uniform int hero_shadow_enabled;
+#else
+// Probe light at each vertex (RGB irradiance, A 1 where probes cover it), for blended passes.
+out vec4 v_probe_vertex;
+#endif
 
 #ifdef OPENRAC_HERO_WETNESS
 layout(std430,binding=9) readonly buffer HeroWetness { float hero_wetness[]; };
@@ -200,4 +207,20 @@ void main() {
         v_lit = 1;
         v_glow = 0;
     }
+#ifdef OPENRAC_PROBE_VERTEX
+    v_probe_vertex = vec4(0.0);
+    if (probe_mode != 0 && probe_receiver != 0 && dot(v_normal, v_normal) > 1e-12) {
+        vec3 camera = -transpose(mat3(view)) * view[3].xyz;
+        vec3 toward_camera = camera - v_world_position;
+        vec3 n = probe_unit(v_normal);
+        // Two-sided like the fragment's shading normal: light the side the camera sees.
+        n = dot(n, toward_camera) < 0.0 ? -n : n;
+        vec3 irradiance;
+        if (sample_probe_irradiance(
+                v_world_position, n, probe_surface_bias(n, toward_camera), irradiance
+            )) {
+            v_probe_vertex = vec4(irradiance, 1.0);
+        }
+    }
+#endif
 }

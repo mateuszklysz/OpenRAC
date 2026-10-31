@@ -63,6 +63,7 @@ The legacy `probe_lighting` key is accepted but ignored and is omitted when savi
 | Main directional light override | `sun_direction_override` | `0` (default), `1` | Advanced in Graphics > Enhanced Settings. Overrides primary direct light and its shadows; baked bounce lighting retains its baked direction. Off restores the verified profile or authored direction |
 | Light azimuth | `sun_azimuth` | `-180` to `180` degrees (default `0`) | Source direction around world Z: 0 is +X, 90 is +Y |
 | Light elevation | `sun_elevation` | `-90` to `90` degrees (default `45`) | Source height above the horizon; 90 shines straight downward |
+| Lighting quality | `lighting_quality` | `high`, `low` (default `low` on Android, `high` elsewhere) | Low, for phones: four-tap shadows with one cascade at a time in the probe lighting, and Arm ASR's Performance shaders |
 | Gameplay rim light | `rim_light` | `0`, `1` (default `1`) | GI-coloured edge light on essential gameplay objects; requires enhanced probe lighting |
 | Rim shadow lift | `rim_shadow_lift` | `0`, `1` (default `1`) | Lifts the rim in dim surroundings without changing GI itself |
 | Rim lift exponent | `rim_lift_exponent` | `0.01` to `1.0` (default `0.09`) | Lower values brighten dim GI; `1` leaves the rim unchanged |

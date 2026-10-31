@@ -16,6 +16,18 @@ export const mockEnhanced: EnhancedView = {
     blocked: "",
     settings: [
       {
+        key: "lighting_quality",
+        name: "Lighting quality",
+        type: "choice",
+        default: "high",
+        value: "high",
+        choices: [
+          { value: "low", name: "Low" },
+          { value: "high", name: "High" },
+        ],
+        description: "Low lights faster on phones: simpler bounce light and shadows, and a cheaper upscaler.",
+      },
+      {
         key: "shadow_quality",
         name: "Shadow quality",
         type: "choice",

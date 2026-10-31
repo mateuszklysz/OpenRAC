@@ -27,6 +27,7 @@
 #include "openrac/game_host.h"
 #include "renderer/direct.h"
 #include "renderer/gl.h"
+#include "renderer/render_opt.h"
 #include "scene/moby_pose.h"
 
 namespace openrac::frontend {
@@ -157,6 +158,7 @@ void set_lighting(SceneFrame& frame) {
     owner.scene.set_probe_lighting(
         enhanced && !graphics.sweep_probe_lighting_off, graphics.probe_gi_multiplier
     );
+    renderer::render_opt::set_low_lighting(enhanced && graphics.lighting_low);
     owner.scene.set_sweep_translucent(
         graphics.sweep_translucent_off,
         graphics.sweep_translucent_unlit,
