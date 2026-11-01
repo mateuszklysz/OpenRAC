@@ -89,6 +89,7 @@ if(OPENRAC_VULKAN)
     renderer/vulkan/native_compute.cpp
     renderer/vulkan/depth_combine.cpp
     renderer/vulkan/colour_transform.cpp
+    renderer/vulkan/hdr_output.cpp
     renderer/vulkan/native_shader_compiler.cpp
     renderer/vulkan/pipeline_cache_file.cpp
     renderer/vulkan/shader_compiler.cpp
@@ -107,6 +108,10 @@ if(OPENRAC_VULKAN)
   endif()
   target_link_libraries(openrac_renderer_vulkan
     PUBLIC openrac_common openrac_sdl3 openrac_vulkan PRIVATE openrac_glslang)
+  # HDR output's encode pass (renderer/vulkan/hdr_output.cpp).
+  openrac_embed_shaders(openrac_renderer_vulkan vkgl openrac::vkgl
+    "${CMAKE_CURRENT_SOURCE_DIR}/renderer/vulkan/shaders/hdr_encode.comp"
+  )
   # The pipeline cache file is named after the code that makes the pipelines, so a build whose
   # pipelines changed starts a fresh cache: MoltenVK has handed a newer build pipelines an older
   # build saved (the tests' pictures came out black), although the cache's header matched.

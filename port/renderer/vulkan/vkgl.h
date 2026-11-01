@@ -36,6 +36,7 @@
 #include <vector>
 
 #include "renderer/gpu_draw.h"
+#include "renderer/hdr.h"
 
 struct SDL_Window;
 
@@ -58,6 +59,10 @@ struct Config {
     bool present_id = true;
     bool present_wait = true;
     bool fifo_latest_ready = true;
+    // HDR output may be asked for (set_hdr): the instance is given VK_EXT_swapchain_colorspace
+    // and the device VK_EXT_hdr_metadata where offered. Off (the player's `hdr = off` at start),
+    // the instance, the device and the swapchain are made as they always were.
+    bool hdr_colour_spaces = false;
 
     // An outside maker of the instance and the device, which then shares them (a mod's OpenXR
     // session, openrac_mod.h's openrac_vulkan_setup): each function stands in for the backend's
@@ -321,6 +326,37 @@ bool swap_shows_at_once();
 // fewer finished frames wait to be shown. Off: one more image than the surface needs (at least
 // three) and two frames in flight.
 void set_low_latency(bool on);
+
+// HDR output (renderer/hdr.h): the screen is sent `wanted` at `levels` from the next present on,
+// where the surface offers it (the swapchain made again when it changes); else, and always for
+// Output::Sdr, the picture's bytes as before. Needs Config::hdr_colour_spaces for any HDR.
+struct HdrRequest {
+    renderer::hdr::Output wanted = renderer::hdr::Output::Sdr;
+    renderer::hdr::Levels levels;
+
+    bool operator==(const HdrRequest& other) const {
+        return wanted == other.wanted && levels.paper_white == other.levels.paper_white
+               && levels.peak == other.levels.peak;
+    }
+};
+
+void set_hdr(const HdrRequest& request);
+
+// What the screen is sent now (SDR before the first present), and whether the surface offers an
+// HDR colour space at all (false without Config::hdr_colour_spaces).
+renderer::hdr::Output hdr_output();
+bool hdr_offered();
+
+// For the tests: the encode pass run on the default framebuffer into a stand-in of an HDR screen
+// (`output`'s format, `width` by `height`), read back as stored: one 32-bit word a texel for
+// Output::Hdr10 (A2B10G10R10) and four half floats for Output::ScRgb. False without a context.
+bool test_hdr_encode(
+    renderer::hdr::Output output,
+    const renderer::hdr::Levels& levels,
+    int width,
+    int height,
+    std::vector<std::uint8_t>& out
+);
 
 // With low-latency frames, called by the window's thread before a frame begins, before it reads
 // the time it is drawn for and the input: sleeps until the frame, begun then, would be queued just

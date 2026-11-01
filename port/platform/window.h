@@ -19,6 +19,8 @@
 #include <string>
 #include <vector>
 
+#include "renderer/hdr.h"
+
 struct SDL_Window;
 struct SDL_GLContextState;
 
@@ -151,6 +153,8 @@ struct WindowConfig {
     bool debug_context = false;
     int msaa_samples = 0;
     GlApi gl_api = default_gl_api();
+    // HDR output may be asked for later (set_hdr); off, a Vulkan window is made as it always was.
+    bool hdr = false;
 };
 
 // The context's function loader, in SDL_GL_GetProcAddress's shape: what
@@ -192,6 +196,14 @@ public:
     // Low-latency frames (the player's setting): fewer finished frames wait to be shown. Vulkan:
     // vkgl::set_low_latency. OpenGL: each swap waits for the graphics card to finish (glFinish).
     void set_low_latency(bool on);
+
+    // HDR output (renderer/hdr.h): what the system says of the window's display (unknown on
+    // Android and X11, where SDL cannot tell), and the screen asked to show `wanted` at `levels`.
+    // Vulkan only (and WindowConfig::hdr); OpenGL always shows SDR. hdr_output: what it shows.
+    renderer::hdr::Display hdr_display() const;
+    void set_hdr(renderer::hdr::Output wanted, const renderer::hdr::Levels& levels);
+    renderer::hdr::Output hdr_output() const;
+    bool hdr_offered() const;
 
     // Low-latency frames, before a frame begins and reads its time and the input: Vulkan sleeps
     // until the frame would be queued just as the GPU is free for it, never past `limit`, and

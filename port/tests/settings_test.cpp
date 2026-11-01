@@ -56,6 +56,30 @@ void test_lily_momentum(const std::filesystem::path& file) {
     }
 }
 
+// HDR output: off with no key (the picture as always), its three modes and levels round-trip, and
+// values out of range keep the defaults.
+void test_hdr_settings(const std::filesystem::path& file) {
+    using namespace openrac;
+    std::ofstream(file) << "vsync = on\n";
+    settings::load(file);
+    CHECK(settings::get().hdr == renderer::hdr::Mode::Off);
+    CHECK(settings::get().hdr_paper_white == 0 && settings::get().hdr_peak == 0);
+    for (std::size_t n = 0; n < std::size(renderer::hdr::kModeKeys); ++n) {
+        std::ofstream(file) << "hdr = " << renderer::hdr::kModeKeys[n]
+                            << "\nhdr_paper_white = 250\nhdr_peak = 1400\n";
+        settings::load(file);
+        CHECK(settings::get().hdr == static_cast<renderer::hdr::Mode>(n));
+        settings::save();
+        settings::load(file);
+        CHECK(settings::get().hdr == static_cast<renderer::hdr::Mode>(n));
+        CHECK(settings::get().hdr_paper_white == 250 && settings::get().hdr_peak == 1400);
+    }
+    std::ofstream(file) << "hdr = bright\nhdr_paper_white = 5000\nhdr_peak = -1\n";
+    settings::load(file);
+    CHECK(settings::get().hdr == renderer::hdr::Mode::Off);
+    CHECK(settings::get().hdr_paper_white == 0 && settings::get().hdr_peak == 0);
+}
+
 void test_reset_enhanced() {
     using namespace openrac;
     settings::Settings s;
@@ -391,6 +415,7 @@ int main() {
     CHECK(settings::get().temporal_quality == renderer::TemporalQuality::Quality);
     test_temporal_settings(file);
     test_lily_momentum(file);
+    test_hdr_settings(file);
     test_reset_enhanced();
     test_agx_preview(file);
     test_motion_blur_tuning(file);

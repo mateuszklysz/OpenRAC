@@ -328,6 +328,39 @@ void drawer_note(const char* line) {
 // receiver biases, GTAO's directions and steps, materials, water) are the debug overlay's and the
 // desktop's Enhanced Settings window's. When the game cannot have it, the card says why and what
 // to do instead of leaving the player to guess.
+// HDR output (renderer/hdr.h, docs/port/HDR.md): off, auto or on, and the game's white in nits
+// while it is not off. From off it counts from the next start (frontend's apply_hdr says so).
+void drawer_hdr() {
+    namespace hdr = renderer::hdr;
+    settings::Settings& graphics = settings::get();
+    bool changed = false;
+    const int mode = static_cast<int>(graphics.hdr);
+    if (const int by = drawer_choice("HDR", hdr::kModeNames[mode])) {
+        graphics.hdr = static_cast<hdr::Mode>((mode + by + 3) % 3);
+        changed = true;
+    }
+    if (graphics.hdr != hdr::Mode::Off) {
+        // 0 is the system's SDR white.
+        constexpr int kWhites[] = {0, 80, 100, 120, 160, 203, 250, 300, 400, 500};
+        constexpr int kLast = static_cast<int>(std::size(kWhites)) - 1;
+        int at = 0;
+        while (at < kLast && kWhites[at] < graphics.hdr_paper_white) {
+            ++at;
+        }
+        const std::string value = graphics.hdr_paper_white == 0
+                                      ? std::string("System")
+                                      : std::format("{} nits", graphics.hdr_paper_white);
+        if (const int by = drawer_choice("HDR paper white", value, at > 0, at < kLast)) {
+            graphics.hdr_paper_white = kWhites[std::clamp(at + by, 0, kLast)];
+            changed = true;
+        }
+    }
+    if (changed) {
+        settings::save();
+        s.settings_changed = true;
+    }
+}
+
 void drawer_enhanced() {
 #if defined(OPENRAC_ENHANCED_RENDERING) && OPENRAC_ENHANCED_RENDERING
     auto& set = settings::get();
@@ -619,6 +652,7 @@ void drawer(const Shown& shown) {
         setting_row(options_menu::kSceneryDetail);
         setting_row(options_menu::kFrameRate);
         setting_row(options_menu::kVSync);
+        drawer_hdr();
         if (const int by = drawer_choice(
                 "Frame counter", settings::name(settings::get().show_fps), true, true
             )) {

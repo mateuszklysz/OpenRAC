@@ -45,6 +45,9 @@ void window_event(const SDL_Event& event) {
         case SDL_EVENT_WINDOW_ENTER_FULLSCREEN:
         case SDL_EVENT_WINDOW_LEAVE_FULLSCREEN:
             pacing.interval_stale = true;
+            if (event.type == SDL_EVENT_WINDOW_DISPLAY_CHANGED) {
+                apply_hdr();
+            }
             break;
         case SDL_EVENT_WINDOW_RESIZED:
             // Remembered in memory; written with the next setting saved and when the window closes.
@@ -56,6 +59,10 @@ void window_event(const SDL_Event& event) {
         case SDL_EVENT_WINDOW_FOCUS_LOST:
         case SDL_EVENT_WINDOW_FOCUS_GAINED:
             g->muted = event.type == SDL_EVENT_WINDOW_FOCUS_LOST;
+            break;
+        // The display's HDR turned on or off, or another display: HDR output follows (auto).
+        case SDL_EVENT_WINDOW_HDR_STATE_CHANGED:
+            apply_hdr();
             break;
         default:
             break;
@@ -112,6 +119,33 @@ void apply_settings() {
         pacing.last_swap = {};
     }
     g->window->set_low_latency(s.low_latency_frames);
+    apply_hdr();
+}
+
+void apply_hdr() {
+    namespace hdr = renderer::hdr;
+    const settings::Settings& s = settings::get();
+    const hdr::Display display = g->window->hdr_display();
+    // macOS's EDR is linear (scRGB); HDR10 elsewhere, where it costs half the bandwidth.
+#if defined(__APPLE__)
+    constexpr bool prefer_scrgb = true;
+#else
+    constexpr bool prefer_scrgb = false;
+#endif
+    const hdr::Output wanted = hdr::wanted_output(s.hdr, display, prefer_scrgb);
+    const hdr::Levels levels = hdr::resolve_levels(s.hdr_paper_white, s.hdr_peak, display);
+    // Said once: HDR asked for where it cannot be had.
+    static bool said = false;
+    if (s.hdr != hdr::Mode::Off && !said) {
+        if (g->window->gl_api() != platform::GlApi::Vulkan) {
+            log::info("HDR output needs the Vulkan renderer; the picture stays SDR");
+            said = true;
+        } else if (!g->hdr_at_start) {
+            log::info("HDR output was off at start; it takes effect at the next start");
+            said = true;
+        }
+    }
+    g->window->set_hdr(wanted, levels);
 }
 
 // The window's own keys: F11 and Alt+Return change between fullscreen and the window, F9 and F10

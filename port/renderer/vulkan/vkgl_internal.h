@@ -1000,6 +1000,23 @@ struct Context {
         bool failed = false;
     } colour_transform;
 
+    // HDR output (hdr_output.cpp): what the frontend asked, what the swapchain was made for, the
+    // extensions that allow it, and the encode pass with its views of the swapchain's images.
+    struct Hdr {
+        HdrRequest asked;
+        renderer::hdr::Output shown = renderer::hdr::Output::Sdr;
+        renderer::hdr::Output made_for = renderer::hdr::Output::Sdr;  // the asked of the swapchain
+        bool offered = false;
+        bool colour_spaces = false;  // VK_EXT_swapchain_colorspace on the instance
+        bool metadata = false;       // VK_EXT_hdr_metadata on the device
+        VkDescriptorSetLayout descriptors = VK_NULL_HANDLE;
+        VkPipelineLayout layout = VK_NULL_HANDLE;
+        VkPipeline pipeline = VK_NULL_HANDLE;
+        renderer::hdr::Output pipeline_for = renderer::hdr::Output::Sdr;
+        bool failed = false;
+        std::vector<VkImageView> views;  // per swapchain image, while HDR is shown
+    } hdr;
+
     Measures measures;
     SubmissionCounters submission, reported_submission;
     SubmissionCounters published;  // The render counters as the last frame's gauges left them.
@@ -1146,6 +1163,23 @@ extern Context* g;
 // Releases the optional depth-composition pipeline after device idle at context teardown.
 void release_depth_combine();
 void release_colour_transform();
+
+// ---- hdr_output.cpp ----
+
+// The surface format for the swapchain, HDR when asked and the surface allows it; sets
+// g->hdr.offered and made_for.
+VkSurfaceFormatKHR choose_hdr_format(
+    std::span<const VkSurfaceFormatKHR> formats, const VkSurfaceCapabilitiesKHR& caps
+);
+// After a swapchain was made with `format`: the encode pass's views and the screen's metadata.
+void hdr_swapchain_made(const VkSurfaceFormatKHR& format);
+// The views let go (before the swapchain they view goes), and everything at close.
+void release_hdr_views();
+void release_hdr();
+// Records the encode of the default framebuffer into swapchain image `index` (UNDEFINED to
+// PRESENT_SRC). False when it cannot, the image then left in TRANSFER_DST for the SDR copy the
+// caller makes instead.
+bool hdr_encode_into(VkCommandBuffer cmd, std::uint32_t index);
 
 // Records `error` for glGetError, unless an earlier one is still waiting to be read.
 inline void fail(GLenum error) {

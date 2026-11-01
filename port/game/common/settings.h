@@ -19,6 +19,7 @@
 #include <string_view>
 
 #include "renderer/gtao_settings.h"
+#include "renderer/hdr.h"
 #include "renderer/motion_blur_settings.h"
 #include "renderer/shadow_settings.h"
 #include "renderer/temporal_settings.h"
@@ -151,6 +152,13 @@ struct Settings {
     int anisotropy_samples(bool enhanced) const {
         return anisotropy ? anisotropy : enhanced ? 4 : 1;
     }
+
+    // HDR output (renderer/hdr.h, docs/port/HDR.md), off by default: the picture goes to the screen
+    // as it always did. On or auto (with the Vulkan renderer), the same picture is shown on an HDR
+    // screen with the game's white at paper white. From off, it takes effect at the next start.
+    renderer::hdr::Mode hdr = renderer::hdr::Mode::Off;
+    int hdr_paper_white = 0;  // nits of the game's white; 0: the system's SDR white, else 203
+    int hdr_peak = 0;         // nits the screen is told it may show; 0: the display's, else 1000
 
     VSync vsync = VSync::On;
     FrameRate frame_rate = FrameRate::Display;

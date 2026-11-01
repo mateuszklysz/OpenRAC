@@ -481,6 +481,7 @@ bool Window::open_vulkan(const WindowConfig& config, std::string& error) {
          g_vulkan_setup.physical_device,
          g_vulkan_setup.create_device};
     vk.validation = config.debug_context;
+    vk.hdr_colour_spaces = config.hdr;
     if (!vkgl::open(vk, error)) {
         SDL_DestroyWindow(m_window);
         m_window = nullptr;
@@ -832,6 +833,67 @@ bool Window::swap_shows_at_once() const {
 #else
     return true;
 #endif
+}
+
+renderer::hdr::Display Window::hdr_display() const {
+    renderer::hdr::Display display;
+    if (m_window == nullptr) {
+        return display;
+    }
+    // SDL says it on Windows, macOS and Wayland; elsewhere (X11, Android) it has nothing to say.
+#if defined(_WIN32) || defined(__APPLE__)
+    display.known = true;
+#elif defined(__ANDROID__)
+    display.known = false;
+#else
+    const char* driver = SDL_GetCurrentVideoDriver();
+    display.known = driver != nullptr && std::strcmp(driver, "wayland") == 0;
+#endif
+    if (!display.known) {
+        return display;
+    }
+    const SDL_PropertiesID props = SDL_GetWindowProperties(m_window);
+    display.hdr_enabled = SDL_GetBooleanProperty(props, SDL_PROP_WINDOW_HDR_ENABLED_BOOLEAN, false);
+    const float headroom = SDL_GetFloatProperty(props, SDL_PROP_WINDOW_HDR_HEADROOM_FLOAT, 1.0f);
+    // The white level is in scRGB's units (80 nits) on Windows; macOS's EDR puts the system's
+    // white at 1.0, which scRGB's 80 nits then is; Wayland's headroom is over BT.2408's 203 nits.
+#if defined(_WIN32) || defined(__APPLE__)
+    const float white = SDL_GetFloatProperty(props, SDL_PROP_WINDOW_SDR_WHITE_LEVEL_FLOAT, 1.0f);
+    display.sdr_white_nits = white * renderer::hdr::kScRgbUnitNits;
+    display.peak_nits = display.sdr_white_nits * headroom;
+#else
+    display.peak_nits = renderer::hdr::kReferenceWhiteNits * headroom;
+#endif
+    return display;
+}
+
+void Window::set_hdr(
+    [[maybe_unused]] renderer::hdr::Output wanted,
+    [[maybe_unused]] const renderer::hdr::Levels& levels
+) {
+#if defined(OPENRAC_VULKAN)
+    if (m_vulkan) {
+        vkgl::set_hdr({wanted, levels});
+    }
+#endif
+}
+
+renderer::hdr::Output Window::hdr_output() const {
+#if defined(OPENRAC_VULKAN)
+    if (m_vulkan) {
+        return vkgl::hdr_output();
+    }
+#endif
+    return renderer::hdr::Output::Sdr;
+}
+
+bool Window::hdr_offered() const {
+#if defined(OPENRAC_VULKAN)
+    if (m_vulkan) {
+        return vkgl::hdr_offered();
+    }
+#endif
+    return false;
 }
 
 void Window::set_low_latency(bool on) {

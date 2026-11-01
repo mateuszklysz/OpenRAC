@@ -381,6 +381,9 @@ bool open(const std::string& game_id, const std::filesystem::path& levels, std::
     // OPENRAC_HIDDEN=1: the window is made and drawn as always but never shown, for scripted runs
     // that should not open windows on the player's screen (several can run at once).
     config.hidden = env::flag(env::Var::Hidden);
+    // HDR output may be turned on later only when it was not off at start (renderer/hdr.h).
+    config.hdr = chosen.hdr != renderer::hdr::Mode::Off;
+    g->hdr_at_start = config.hdr;
     g->window = platform::Window::open(config, error);
     if (!g->window) {
         return false;
@@ -390,6 +393,7 @@ bool open(const std::string& game_id, const std::filesystem::path& levels, std::
     g->swap_asked = wanted_swap();
     g->swap = g->window->set_swap_interval(g->swap_asked);
     g->window->set_low_latency(settings::get().low_latency_frames);
+    apply_hdr();
     g->display_mode = chosen.display_mode;
     g->monitor = chosen.monitor;
     g->fullscreen_width = chosen.fullscreen_width;
