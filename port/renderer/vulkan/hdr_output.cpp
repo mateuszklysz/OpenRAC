@@ -28,17 +28,9 @@ struct EncodeConstants {
     std::int32_t same_size;
 };
 
-struct StorageQuery {
-    VkImageUsageFlags usage;
-};
-
-// Whether the encode pass can write a swapchain image of `format`: the surface lets its images be
-// storage images, and the device stores to that format.
-bool can_store(void* user, VkFormat format) {
-    const auto* query = static_cast<const StorageQuery*>(user);
-    if ((query->usage & VK_IMAGE_USAGE_STORAGE_BIT) == 0) {
-        return false;
-    }
+// Whether the encode pass can write `format`: the device stores to it. Where the surface's images
+// cannot be storage images, the pass writes an image of the same format and that is copied 1:1.
+bool can_store(void*, VkFormat format) {
     VkFormatProperties props{};
     vkGetPhysicalDeviceFormatProperties(g->physical, format, &props);
     return (props.optimalTilingFeatures & VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT) != 0;
@@ -137,7 +129,9 @@ bool make_pipeline(Output output) {
 // only HDR frames take it, so the transfer-only form of swapchain_barrier is not needed here.
 void screen_barrier(VkCommandBuffer cmd, VkImage image, VkImageLayout from, VkImageLayout to) {
     VkImageMemoryBarrier b{VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER};
-    b.srcAccessMask = from == VK_IMAGE_LAYOUT_UNDEFINED ? 0 : VK_ACCESS_SHADER_WRITE_BIT;
+    b.srcAccessMask = from == VK_IMAGE_LAYOUT_UNDEFINED
+                          ? 0
+                          : VK_ACCESS_SHADER_WRITE_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
     b.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT | VK_ACCESS_MEMORY_WRITE_BIT;
     b.oldLayout = from;
     b.newLayout = to;
@@ -252,8 +246,8 @@ VkSurfaceFormatKHR choose_hdr_format(
     auto& hdr = g->hdr;
     hdr.offered = hdr.colour_spaces && offers_hdr(formats);
     const Output wanted = hdr.colour_spaces ? hdr.asked.wanted : Output::Sdr;
-    StorageQuery query{caps.supportedUsageFlags};
-    const SurfaceChoice choice = choose_surface_format(formats, wanted, can_store, &query);
+    const SurfaceChoice choice = choose_surface_format(formats, wanted, can_store, nullptr);
+    hdr.direct = (caps.supportedUsageFlags & VK_IMAGE_USAGE_STORAGE_BIT) != 0;
     hdr.made_for = hdr.asked.wanted;
     hdr.shown = choice.output;
     if (wanted != Output::Sdr && choice.output == Output::Sdr) {
@@ -269,6 +263,8 @@ void release_hdr_views() {
         vkDestroyImageView(g->device, v, nullptr);
     }
     g->hdr.views.clear();
+    // Only ever let go with the device idle (a swapchain made again, the context closed).
+    g->hdr.staging.reset();
 }
 
 void hdr_swapchain_made(const VkSurfaceFormatKHR& format) {
@@ -277,7 +273,27 @@ void hdr_swapchain_made(const VkSurfaceFormatKHR& format) {
     if (hdr.shown == Output::Sdr) {
         return;
     }
-    for (VkImage image : g->swapchain_images) {
+    // Images that cannot be stored to: the pass writes one of its own, copied into each.
+    if (!hdr.direct) {
+        const Format staging{
+            format.format, VK_IMAGE_ASPECT_COLOR_BIT, hdr.shown == Output::Hdr10 ? 4 : 8
+        };
+        hdr.staging = make_image(
+            staging,
+            static_cast<int>(g->swapchain_extent.width),
+            static_cast<int>(g->swapchain_extent.height),
+            1,
+            VK_SAMPLE_COUNT_1_BIT,
+            VK_IMAGE_USAGE_STORAGE_BIT
+        );
+        if (!hdr.staging) {
+            hdr.shown = Output::Sdr;
+            return;
+        }
+    }
+    // A view of each swapchain image for the pass's writes, when they can be storage images.
+    const std::vector<VkImage> none;
+    for (VkImage image : hdr.direct ? g->swapchain_images : none) {
         VkImageViewCreateInfo info{VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO};
         info.image = image;
         info.viewType = VK_IMAGE_VIEW_TYPE_2D;
@@ -293,10 +309,11 @@ void hdr_swapchain_made(const VkSurfaceFormatKHR& format) {
     }
     set_metadata();
     log::info(
-        "vulkan: HDR output {} at {:.0f} nits paper white (peak {:.0f})",
+        "vulkan: HDR output {} at {:.0f} nits paper white (peak {:.0f}){}",
         renderer::hdr::name(hdr.shown),
         hdr.asked.levels.paper_white,
-        hdr.asked.levels.peak
+        hdr.asked.levels.peak,
+        hdr.direct ? "" : ", through a copy"
     );
 }
 
@@ -309,20 +326,57 @@ void release_hdr() {
 bool hdr_encode_into(VkCommandBuffer cmd, std::uint32_t index) {
     auto& hdr = g->hdr;
     const VkImage screen = g->swapchain_images[index];
-    // No view of it (none made): left ready for the SDR copy the caller makes instead.
-    if (hdr.shown == Output::Sdr || index >= hdr.views.size()) {
+    const VkExtent2D extent = g->swapchain_extent;
+    const bool ready = hdr.direct ? index < hdr.views.size() : static_cast<bool>(hdr.staging);
+    // Nothing to write into: left ready for the SDR copy the caller makes instead.
+    if (hdr.shown == Output::Sdr || !ready) {
         screen_barrier(
             cmd, screen, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
         );
         return false;
     }
-    screen_barrier(cmd, screen, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
-    if (!encode(cmd, hdr.views[index], g->swapchain_extent, hdr.shown, hdr.asked.levels)) {
-        // Nothing written: back to TRANSFER_DST for the SDR copy the caller makes instead.
-        screen_barrier(cmd, screen, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+    if (hdr.direct) {
+        screen_barrier(cmd, screen, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
+        if (!encode(cmd, hdr.views[index], extent, hdr.shown, hdr.asked.levels)) {
+            // Nothing written: back to TRANSFER_DST for the SDR copy the caller makes instead.
+            screen_barrier(
+                cmd, screen, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
+            );
+            return false;
+        }
+        screen_barrier(cmd, screen, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+        return true;
+    }
+    // Through the pass's own image, then one copy of the same format and size.
+    Image& staging = *hdr.staging;
+    screen_barrier(cmd, staging.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
+    screen_barrier(cmd, screen, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+    if (!encode(cmd, sample_view(staging, 0, 0), extent, hdr.shown, hdr.asked.levels)) {
+        staging.layout = VK_IMAGE_LAYOUT_GENERAL;
         return false;
     }
-    screen_barrier(cmd, screen, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+    screen_barrier(
+        cmd, staging.image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL
+    );
+    staging.layout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+    VkImageCopy copy{};
+    copy.srcSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1};
+    copy.dstSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1};
+    copy.extent = {extent.width, extent.height, 1};
+    vkCmdCopyImage(
+        cmd,
+        staging.image,
+        VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+        screen,
+        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+        1,
+        &copy
+    );
+    count_command(Command::Copy);
+    count_copy(extent.width, extent.height);
+    screen_barrier(
+        cmd, screen, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+    );
     return true;
 }
 

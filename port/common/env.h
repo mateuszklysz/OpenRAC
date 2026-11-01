@@ -95,6 +95,7 @@ enum class Var : std::uint16_t {
     GpuMaterialsOff,
     GpuPassTiming,
     Guard,
+    Hdr,
     HeroShadow,
     Hidden,
     HidePasses,

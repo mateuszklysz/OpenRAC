@@ -161,9 +161,7 @@ public class GameActivity extends SDLActivity {
      * the swap's wait) is 60 for good. The game's own frame cap paces it below the display's rate.
      */
     private void preferFastestRefresh() {
-        @SuppressWarnings("deprecation")
-        Display display = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ? getDisplay()
-                                                                          : getWindowManager().getDefaultDisplay();
+        Display display = gameDisplay();
         if (display == null) {
             return;
         }
@@ -181,6 +179,53 @@ public class GameActivity extends SDLActivity {
         getWindow().setAttributes(attributes);
         Log.i(TAG, "display mode " + fastest.getPhysicalWidth() + "x" + fastest.getPhysicalHeight() + " at "
                 + fastest.getRefreshRate() + " Hz");
+    }
+
+    /** The display the game is on (the default one before Android 11). */
+    @SuppressWarnings("deprecation")
+    private Display gameDisplay() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ? getDisplay() : getWindowManager().getDefaultDisplay();
+    }
+
+    /**
+     * HDR output (docs/port/HDR.md), asked by the game's thread (port/android/display_hdr.cpp):
+     * {1 when the display shows HDR10, else 0; its peak in nits, 0 unknown; the SDR white in nits,
+     * 0 unknown}. SDL does not say this on Android.
+     */
+    public static float[] displayHdr() {
+        float[] none = new float[] {0.0f, 0.0f, 0.0f};
+        if (!(mSingleton instanceof GameActivity)) {
+            return none;
+        }
+        Display display = ((GameActivity) mSingleton).gameDisplay();
+        if (display == null || !display.isHdr()) {
+            return none;
+        }
+        Display.HdrCapabilities caps = display.getHdrCapabilities();
+        boolean hdr10 = false;
+        if (caps != null) {
+            for (int type : caps.getSupportedHdrTypes()) {
+                hdr10 |= type == Display.HdrCapabilities.HDR_TYPE_HDR10
+                        || type == Display.HdrCapabilities.HDR_TYPE_HDR10_PLUS;
+            }
+        }
+        float peak = caps != null ? caps.getDesiredMaxLuminance() : 0.0f;
+        return new float[] {hdr10 ? 1.0f : 0.0f, peak > 0.0f ? peak : 0.0f, 0.0f};
+    }
+
+    /**
+     * While the game sends HDR, its window asks for the display's HDR headroom (Android 14 and
+     * later), so the system does not hold it at SDR brightness; off again with SDR.
+     */
+    public static void windowHdr(final boolean on) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE || !(mSingleton instanceof GameActivity)) {
+            return;
+        }
+        final GameActivity activity = (GameActivity) mSingleton;
+        activity.uiThread.post(() -> {
+            activity.getWindow().setColorMode(on ? ActivityInfo.COLOR_MODE_HDR : ActivityInfo.COLOR_MODE_DEFAULT);
+            Log.i(TAG, "window colour mode " + (on ? "HDR" : "default"));
+        });
     }
 
     @Override

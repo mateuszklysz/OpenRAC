@@ -222,6 +222,10 @@ void save();
 // Sets the volume (held to 0..100). output_gain() is it as a factor, for the sound's own thread;
 // set_muted(true) holds the factor at 0 whatever the volume is (the window lost the keyboard).
 void set_volume(int volume);
+
+// HDR output's mode by its file name ("off", "auto", "on"), as the launcher's OPENRAC_HDR asks for
+// it over the file's: false, with nothing changed, for another word.
+bool set_hdr_mode(std::string_view name);
 void set_muted(bool muted);
 float output_gain();
 

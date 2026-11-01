@@ -76,7 +76,9 @@ openrac_add_test(controls SOURCES tests/controls_test.cpp game/common/controls_s
 openrac_add_test(input_ports SOURCES tests/input_ports_test.cpp INCLUDES . LIBS openrac_platform)
 # Android: the player's own GPU driver package (platform/gpu_driver.h, cmake/Android.cmake).
 if(ANDROID)
-  target_sources(openrac_platform PRIVATE android/gpu_driver.cpp)
+  target_sources(openrac_platform PRIVATE android/gpu_driver.cpp
+    # What the display says of HDR, through GameActivity (platform/display_hdr.h).
+    android/display_hdr.cpp)
   if(TARGET adrenotools)
     target_link_libraries(openrac_platform PRIVATE adrenotools)
     target_compile_definitions(openrac_platform PRIVATE OPENRAC_ADRENOTOOLS=1)

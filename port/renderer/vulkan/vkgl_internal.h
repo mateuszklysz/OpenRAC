@@ -1015,6 +1015,9 @@ struct Context {
         renderer::hdr::Output pipeline_for = renderer::hdr::Output::Sdr;
         bool failed = false;
         std::vector<VkImageView> views;  // per swapchain image, while HDR is shown
+        // The swapchain's images can be storage images (else the pass writes `staging`, copied).
+        bool direct = true;
+        ImagePtr staging;
     } hdr;
 
     Measures measures;

@@ -197,8 +197,8 @@ public:
     // vkgl::set_low_latency. OpenGL: each swap waits for the graphics card to finish (glFinish).
     void set_low_latency(bool on);
 
-    // HDR output (renderer/hdr.h): what the system says of the window's display (unknown on
-    // Android and X11, where SDL cannot tell), and the screen asked to show `wanted` at `levels`.
+    // HDR output (renderer/hdr.h): what the system says of the window's display (SDL; on Android
+    // the activity, platform/display_hdr.h; unknown on X11), and the screen asked to show `wanted` at `levels`.
     // Vulkan only (and WindowConfig::hdr); OpenGL always shows SDR. hdr_output: what it shows.
     renderer::hdr::Display hdr_display() const;
     void set_hdr(renderer::hdr::Output wanted, const renderer::hdr::Levels& levels);
@@ -253,6 +253,7 @@ private:
     SDL_GLContextState* m_context = nullptr;
     bool m_vulkan = false;
     bool m_low_latency = false;
+    bool m_hdr_window = false;        // Android: the window's colour mode asked for HDR
     void (*m_gl_finish)() = nullptr;  // OpenGL's glFinish, for m_low_latency
     bool m_vulkan_library = false;  // macOS: the Vulkan library this window had SDL load
     DisplayMode m_mode = DisplayMode::Windowed;

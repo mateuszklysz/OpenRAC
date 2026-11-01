@@ -654,6 +654,16 @@ void save() {
     }
 }
 
+bool set_hdr_mode(std::string_view name) {
+    for (std::size_t i = 0; i < std::size(renderer::hdr::kModeKeys); ++i) {
+        if (name == renderer::hdr::kModeKeys[i]) {
+            g_settings.hdr = static_cast<renderer::hdr::Mode>(i);
+            return true;
+        }
+    }
+    return false;
+}
+
 void set_volume(int volume) {
     g_settings.volume = std::clamp(volume, 0, 100);
     g_gain = gain_now();

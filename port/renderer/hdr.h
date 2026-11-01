@@ -19,7 +19,7 @@ namespace openrac::renderer::hdr {
 enum class Mode {
     Off,   // SDR, as always (the default)
     Auto,  // HDR when the system says the window's display shows HDR, else SDR
-    On,    // HDR whenever the screen offers it, also where the system cannot say (Android, X11)
+    On,    // HDR whenever the screen offers it, also where the system cannot say (X11)
     Count,
 };
 
@@ -31,8 +31,8 @@ enum class Output {
     Count,
 };
 
-// What the system says of the window's display (SDL's window properties). `known` is false where
-// SDL cannot tell (Android, X11): Mode::Auto then stays SDR.
+// What the system says of the window's display (SDL's window properties; Android's activity).
+// `known` is false where nothing can tell (X11): Mode::Auto then stays SDR.
 struct Display {
     bool known = false;
     bool hdr_enabled = false;

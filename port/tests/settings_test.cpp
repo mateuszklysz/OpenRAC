@@ -74,6 +74,9 @@ void test_hdr_settings(const std::filesystem::path& file) {
         CHECK(settings::get().hdr == static_cast<renderer::hdr::Mode>(n));
         CHECK(settings::get().hdr_paper_white == 250 && settings::get().hdr_peak == 1400);
     }
+    // The launcher's word over the file's, and another word changes nothing.
+    CHECK(settings::set_hdr_mode("auto") && settings::get().hdr == renderer::hdr::Mode::Auto);
+    CHECK(!settings::set_hdr_mode("bright") && settings::get().hdr == renderer::hdr::Mode::Auto);
     std::ofstream(file) << "hdr = bright\nhdr_paper_white = 5000\nhdr_peak = -1\n";
     settings::load(file);
     CHECK(settings::get().hdr == renderer::hdr::Mode::Off);

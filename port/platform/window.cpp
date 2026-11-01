@@ -19,6 +19,7 @@
 
 #include "common/env.h"
 #include "common/log.h"
+#include "platform/display_hdr.h"
 #include "platform/gpu_driver.h"
 #if defined(OPENRAC_VULKAN)
 #include <SDL3/SDL_vulkan.h>
@@ -840,11 +841,14 @@ renderer::hdr::Display Window::hdr_display() const {
     if (m_window == nullptr) {
         return display;
     }
-    // SDL says it on Windows, macOS and Wayland; elsewhere (X11, Android) it has nothing to say.
+    // SDL says it on Windows, macOS and Wayland; Android is asked through its activity; X11 has
+    // nothing to say.
 #if defined(_WIN32) || defined(__APPLE__)
     display.known = true;
 #elif defined(__ANDROID__)
-    display.known = false;
+    // Asked of the activity instead (platform/display_hdr.h).
+    android_display_hdr(display);
+    return display;
 #else
     const char* driver = SDL_GetCurrentVideoDriver();
     display.known = driver != nullptr && std::strcmp(driver, "wayland") == 0;
@@ -874,6 +878,14 @@ void Window::set_hdr(
 #if defined(OPENRAC_VULKAN)
     if (m_vulkan) {
         vkgl::set_hdr({wanted, levels});
+#if defined(__ANDROID__)
+        // The window's colour mode follows what is asked, once a change.
+        const bool hdr = wanted != renderer::hdr::Output::Sdr;
+        if (hdr != m_hdr_window) {
+            m_hdr_window = hdr;
+            android_window_hdr(hdr);
+        }
+#endif
     }
 #endif
 }

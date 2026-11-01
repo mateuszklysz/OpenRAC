@@ -574,6 +574,10 @@ impl Action {
         {
             env.push(("OPENRAC_GL_API".to_string(), "vulkan".to_string()));
         }
+        // Settings, "HDR": the launcher's choice over the game's own for this start.
+        if self.kind == Kind::Play && matches!(ctx.config.hdr.as_str(), "off" | "auto" | "on") {
+            env.push(("OPENRAC_HDR".to_string(), ctx.config.hdr.clone()));
+        }
         // The Mods tab's Enhanced graphics (enhanced.rs): with `enhanced_rendering = 1` in the
         // version's settings file the game draws with Vulkan, the one renderer that has it, and
         // takes the probe bakes made from the player's levels. Off, nothing is added. On Android
@@ -933,6 +937,15 @@ mod tests {
         );
         let unnamed = Config { multiplayer_name: "no spaces".into(), ..installed.clone() };
         assert!(!play.plan(&ctx(&unnamed)).unwrap().env.iter().any(|(k, _)| k == "OPENRAC_PLAYER_NAME"));
+        // Settings, "HDR": nothing by default (the game's own), else the launcher's word.
+        assert!(!plan.env.iter().any(|(k, _)| k == "OPENRAC_HDR"));
+        let modes = ["off", "auto", "on"].map(|mode| Config { hdr: mode.into(), ..installed.clone() });
+        for hdr in &modes {
+            let plan = play.plan(&ctx(hdr)).unwrap();
+            assert!(plan.env.contains(&("OPENRAC_HDR".to_string(), hdr.hdr.clone())), "{:?}", plan.env);
+        }
+        let odd = Config { hdr: "bright".into(), ..installed.clone() };
+        assert!(!play.plan(&ctx(&odd)).unwrap().env.iter().any(|(k, _)| k == "OPENRAC_HDR"));
         // Settings, "Renderer": Vulkan on the desktops; OpenGL, the default, sets nothing.
         assert!(!plan.env.iter().any(|(k, _)| k == "OPENRAC_GL_API"));
         let vulkan = Config { renderer: "vulkan".into(), ..installed.clone() };

@@ -275,7 +275,8 @@ bool make_swapchain() {
     info.imageColorSpace = format.colorSpace;
     info.imageExtent = extent;
     info.imageArrayLayers = 1;
-    info.imageUsage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | (hdr ? VK_IMAGE_USAGE_STORAGE_BIT : 0u);
+    info.imageUsage =
+        VK_IMAGE_USAGE_TRANSFER_DST_BIT | (hdr && g->hdr.direct ? VK_IMAGE_USAGE_STORAGE_BIT : 0u);
     info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
     // The system turns the picture to the screen's way up (no pre-rotation of our own).
     info.preTransform = (caps.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR) != 0
