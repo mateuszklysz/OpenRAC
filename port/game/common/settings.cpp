@@ -389,8 +389,6 @@ void load(const std::filesystem::path& file) {
             known = parse_int(value, 0, renderer::hdr::kPaperWhiteMax, s.hdr_paper_white);
         } else if (key == "hdr_peak") {
             known = parse_int(value, 0, renderer::hdr::kPeakMax, s.hdr_peak);
-        } else if (key == "hdr_highlights") {
-            known = parse_int(value, 0, renderer::hdr::kHighlightsMax, s.hdr_highlights);
         } else if (key == "vsync") {
             known = parse(value, kVSync, s.vsync);
             has_vsync = has_vsync || known;
@@ -607,7 +605,6 @@ void save() {
         << "hdr = " << renderer::hdr::kModeKeys[static_cast<int>(s.hdr)] << "\n"
         << "hdr_paper_white = " << s.hdr_paper_white << "\n"
         << "hdr_peak = " << s.hdr_peak << "\n"
-        << "hdr_highlights = " << s.hdr_highlights << "\n"
         << "vsync = " << kVSync[static_cast<int>(s.vsync)] << "\n"
         << "frame_rate = " << frame_rate_value(s) << "\n"
         << "show_fps = " << static_cast<int>(s.show_fps) << "\n"

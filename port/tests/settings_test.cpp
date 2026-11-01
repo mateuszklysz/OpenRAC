@@ -64,28 +64,23 @@ void test_hdr_settings(const std::filesystem::path& file) {
     settings::load(file);
     CHECK(settings::get().hdr == renderer::hdr::Mode::Off);
     CHECK(settings::get().hdr_paper_white == 0 && settings::get().hdr_peak == 0);
-    CHECK(settings::get().hdr_highlights == renderer::hdr::kDefaultHighlights);
     for (std::size_t n = 0; n < std::size(renderer::hdr::kModeKeys); ++n) {
         std::ofstream(file) << "hdr = " << renderer::hdr::kModeKeys[n]
-                            << "\nhdr_paper_white = 250\nhdr_peak = 1400\nhdr_highlights = 70\n";
+                            << "\nhdr_paper_white = 250\nhdr_peak = 1400\n";
         settings::load(file);
         CHECK(settings::get().hdr == static_cast<renderer::hdr::Mode>(n));
         settings::save();
         settings::load(file);
         CHECK(settings::get().hdr == static_cast<renderer::hdr::Mode>(n));
         CHECK(settings::get().hdr_paper_white == 250 && settings::get().hdr_peak == 1400);
-        CHECK(settings::get().hdr_highlights == 70);
     }
     // The launcher's word over the file's, and another word changes nothing.
     CHECK(settings::set_hdr_mode("auto") && settings::get().hdr == renderer::hdr::Mode::Auto);
     CHECK(!settings::set_hdr_mode("bright") && settings::get().hdr == renderer::hdr::Mode::Auto);
-    std::ofstream(
-        file
-    ) << "hdr = bright\nhdr_paper_white = 5000\nhdr_peak = -1\nhdr_highlights = 101\n";
+    std::ofstream(file) << "hdr = bright\nhdr_paper_white = 5000\nhdr_peak = -1\n";
     settings::load(file);
     CHECK(settings::get().hdr == renderer::hdr::Mode::Off);
     CHECK(settings::get().hdr_paper_white == 0 && settings::get().hdr_peak == 0);
-    CHECK(settings::get().hdr_highlights == renderer::hdr::kDefaultHighlights);
 }
 
 void test_reset_enhanced() {

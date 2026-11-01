@@ -280,14 +280,34 @@ Image* read_image() {
     return target_of(g->state.read_framebuffer).colour;
 }
 
+// A half float's value (IEEE 754 binary16).
+static float half_to_float(std::uint16_t h) {
+    const int exponent = (h >> 10) & 0x1F;
+    const int mantissa = h & 0x3FF;
+    const float sign = (h & 0x8000) != 0 ? -1.0f : 1.0f;
+    if (exponent == 0) {
+        return sign * std::ldexp(static_cast<float>(mantissa), -24);
+    }
+    if (exponent == 31) {
+        return mantissa != 0 ? NAN : sign * INFINITY;
+    }
+    return sign * std::ldexp(1.0f + static_cast<float>(mantissa) / 1024.0f, exponent - 15);
+}
+
 void VKGL
 read_pixels(GLint x, GLint y, GLsizei w, GLsizei h, GLenum format, GLenum type, void* pixels) {
     Image* image = read_image();
-    if (image == nullptr || w <= 0 || h <= 0 || format != GL_RGBA || type != GL_UNSIGNED_BYTE
+    // A float frame (an HDR one) is read as bytes, clamped as an 8-bit one's would be, or as
+    // floats (GL_FLOAT).
+    const bool half = image != nullptr && image->format == VK_FORMAT_R16G16B16A16_SFLOAT;
+    if (image == nullptr || w <= 0 || h <= 0 || format != GL_RGBA
+        || (type != GL_UNSIGNED_BYTE && !(half && type == GL_FLOAT))
         || image->samples != VK_SAMPLE_COUNT_1_BIT) {
         fail(kGlInvalidEnum);
         return;
     }
+    const std::size_t texel = half ? 8 : 4;                   // in the image
+    const std::size_t out_texel = type == GL_FLOAT ? 16 : 4;  // in `pixels`
     const int x0 = std::clamp(x, 0, image->width), y0 = std::clamp(y, 0, image->height);
     const int x1 = std::clamp(x + w, x0, image->width), y1 = std::clamp(y + h, y0, image->height);
     if (x1 <= x0 || y1 <= y0) {
@@ -295,7 +315,7 @@ read_pixels(GLint x, GLint y, GLsizei w, GLsizei h, GLenum format, GLenum type, 
     }
     const int cw = x1 - x0, ch = y1 - y0;
     VkBufferCreateInfo info{VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO};
-    info.size = static_cast<VkDeviceSize>(cw) * static_cast<VkDeviceSize>(ch) * 4;
+    info.size = static_cast<VkDeviceSize>(cw) * static_cast<VkDeviceSize>(ch) * texel;
     info.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT;
     VmaAllocationCreateInfo alloc{};
     alloc.usage = VMA_MEMORY_USAGE_AUTO;
@@ -323,16 +343,28 @@ read_pixels(GLint x, GLint y, GLsizei w, GLsizei h, GLenum format, GLenum type, 
     vmaInvalidateAllocation(g->allocator, allocation, 0, VK_WHOLE_SIZE);
     // Rows come as GL gives them, from the bottom: the same rows (vkgl.h, "Rows").
     const int align = std::max(g->state.pack_alignment, 1);
-    const std::size_t pitch = (static_cast<std::size_t>(w) * 4 + align - 1) / align * align;
+    const std::size_t pitch = (static_cast<std::size_t>(w) * out_texel + align - 1) / align * align;
     const auto* src = static_cast<const std::uint8_t*>(got.pMappedData);
     auto* dst = static_cast<std::uint8_t*>(pixels);
     for (int row = 0; row < ch; ++row) {
-        std::memcpy(
-            dst + pitch * static_cast<std::size_t>(row + (y0 - y))
-                + static_cast<std::size_t>(x0 - x) * 4,
-            src + static_cast<std::size_t>(row) * static_cast<std::size_t>(cw) * 4,
-            static_cast<std::size_t>(cw) * 4
-        );
+        std::uint8_t* to = dst + pitch * static_cast<std::size_t>(row + (y0 - y))
+                           + static_cast<std::size_t>(x0 - x) * out_texel;
+        const std::uint8_t* from = src + static_cast<std::size_t>(row) * cw * texel;
+        if (!half) {
+            std::memcpy(to, from, static_cast<std::size_t>(cw) * 4);
+            continue;
+        }
+        for (std::size_t n = 0; n < static_cast<std::size_t>(cw) * 4; ++n) {
+            std::uint16_t bits = 0;
+            std::memcpy(&bits, from + n * 2, 2);
+            const float value = half_to_float(bits);
+            if (type == GL_FLOAT) {
+                std::memcpy(to + n * 4, &value, 4);
+            } else {
+                to[n] =
+                    static_cast<std::uint8_t>(std::lround(std::clamp(value, 0.0f, 1.0f) * 255.0f));
+            }
+        }
     }
     vmaDestroyBuffer(g->allocator, buffer, allocation);
 }
@@ -970,6 +1002,84 @@ VkShaderModule module_of(const std::vector<std::uint32_t>& code) {
     return module;
 }
 
+void separate_draw_uniform(Program& p, const std::string& vertex, const std::string& fragment);
+
+namespace {
+
+// Whether two links of a program give its stages the same resources at the same places, so that
+// one's fragment module can stand in for the other's in the same pipeline layout.
+bool same_layout(const Program& a, const Program& b) {
+    const CompiledProgram& x = a.compiled;
+    const CompiledProgram& y = b.compiled;
+    const auto same_uniform = [](const ProgramUniform& u, const ProgramUniform& v) {
+        return u.name == v.name && u.gl_type == v.gl_type && u.offset == v.offset
+               && u.array_size == v.array_size && u.array_stride == v.array_stride
+               && u.sampler == v.sampler && u.binding == v.binding && u.kind == v.kind;
+    };
+    const auto same_block = [](const ProgramBlock& u, const ProgramBlock& v) {
+        return u.name == v.name && u.binding == v.binding && u.size == v.size;
+    };
+    return a.gpu_materials == b.gpu_materials && a.draw_uniform_offset == b.draw_uniform_offset
+           && x.default_binding == y.default_binding && x.default_size == y.default_size
+           && std::equal(
+               x.uniforms.begin(),
+               x.uniforms.end(),
+               y.uniforms.begin(),
+               y.uniforms.end(),
+               same_uniform
+           )
+           && std::equal(
+               x.blocks.begin(), x.blocks.end(), y.blocks.begin(), y.blocks.end(), same_block
+           )
+           && std::equal(
+               x.storage.begin(), x.storage.end(), y.storage.begin(), y.storage.end(), same_block
+           );
+}
+
+}  // namespace
+
+}  // namespace
+
+// Outside the file's own namespace: vkgl_pipelines.cpp asks for it (vkgl_internal.h).
+VkShaderModule clamped_fragment(Program& p) {
+    if (p.clamped_tried) {
+        return p.fragment_clamped;
+    }
+    p.clamped_tried = true;
+    static const std::regex output(
+        R"(layout\s*\(\s*location\s*=\s*0\s*\)\s*out\s+vec4\s+([A-Za-z_][A-Za-z_0-9]*)\s*;)"
+    );
+    static const std::regex entry(R"(\bvoid\s+main\s*\(\s*(void)?\s*\))");
+    std::smatch match;
+    if (p.fragment_source.empty() || !std::regex_search(p.fragment_source, match, output)
+        || !std::regex_search(p.fragment_source, entry)) {
+        log::warn("vulkan: a program's colour cannot be clamped (no colour output found)");
+        return VK_NULL_HANDLE;
+    }
+    // The program's own main runs first, then its colour is clamped.
+    const std::string colour = match[1];
+    std::string fs = std::regex_replace(p.fragment_source, entry, "void openrac_unclamped_main()");
+    fs += "\nvoid main() {\n    openrac_unclamped_main();\n    " + colour + " = clamp(" + colour
+          + ", 0.0, 1.0);\n}\n";
+    // Linked as link_program links it, so that its resources land where the program's are.
+    Program variant;
+    std::string error;
+    if (!compile_program(p.vertex_source, fs, variant.compiled, error)
+        || !material_program(variant, p.vertex_source, fs)) {
+        log::warn("vulkan: a program's colour cannot be clamped: {}", error);
+        return VK_NULL_HANDLE;
+    }
+    separate_draw_uniform(variant, p.vertex_source, fs);
+    if (!same_layout(variant, p)) {
+        log::warn("vulkan: a program's clamped colour stage has another layout; drawn unclamped");
+        return VK_NULL_HANDLE;
+    }
+    p.fragment_clamped = module_of(variant.compiled.fragment);
+    return p.fragment_clamped;
+}
+
+namespace {
+
 // An explicit source marker opts one scalar int into the ordinary graphics draw's push constant.
 // No shader arithmetic changes; unmarked, compute and native material programs keep their layouts.
 void separate_draw_uniform(Program& p, const std::string& vertex, const std::string& fragment) {
@@ -1040,6 +1150,10 @@ void VKGL link_program(GLuint name) {
     p->serial = ++g->program_serial;
     if (!compile_program(vs, fs, p->compiled, p->log, cs)) {
         return;
+    }
+    if (cs.empty()) {
+        p->vertex_source = vs;
+        p->fragment_source = fs;
     }
     if (!material_program(*p, vs, fs)) {
         return;
@@ -2031,12 +2145,14 @@ void release_program(Program& p) {
     p.last_pipeline_key.clear();
     defer([vertex = p.vertex,
            fragment = p.fragment,
+           clamped = p.fragment_clamped,
            compute = p.compute,
            pipeline = p.compute_pipeline,
            set_layout = p.set_layout,
            layout = p.layout] {
         vkDestroyShaderModule(g->device, vertex, nullptr);
         vkDestroyShaderModule(g->device, fragment, nullptr);
+        vkDestroyShaderModule(g->device, clamped, nullptr);
         vkDestroyShaderModule(g->device, compute, nullptr);
         vkDestroyPipeline(g->device, pipeline, nullptr);
         vkDestroyPipelineLayout(g->device, layout, nullptr);
@@ -2049,6 +2165,8 @@ void release_program(Program& p) {
         defer([pipeline] { vkDestroyPipeline(g->device, pipeline, nullptr); });
     });
     p.vertex = p.fragment = VK_NULL_HANDLE;
+    p.fragment_clamped = VK_NULL_HANDLE;
+    p.clamped_tried = false;
     p.compute = VK_NULL_HANDLE;
     p.compute_pipeline = VK_NULL_HANDLE;
     p.set_layout = VK_NULL_HANDLE;

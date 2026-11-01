@@ -336,7 +336,7 @@ struct HdrRequest {
 
     bool operator==(const HdrRequest& other) const {
         return wanted == other.wanted && levels.paper_white == other.levels.paper_white
-               && levels.peak == other.levels.peak && levels.highlights == other.levels.highlights;
+               && levels.peak == other.levels.peak;
     }
 };
 
@@ -346,6 +346,17 @@ void set_hdr(const HdrRequest& request);
 // HDR colour space at all (false without Config::hdr_colour_spaces).
 renderer::hdr::Output hdr_output();
 bool hdr_offered();
+
+// HDR output's frame (docs/port/HDR.md): true while the screen is sent HDR. The renderer then
+// draws its frame in half floats (RGBA16F) with clamp_colour_writes, so that what the game's
+// blending adds up (glows, explosions, lasers) may go above white instead of stopping at it, and
+// the default framebuffer is RGBA16F too. False in SDR: 8-bit frames, as always.
+bool hdr_frame();
+
+// Draws into `framebuffer`'s colour image are given each fragment's colour clamped to 0..1 (the
+// stage made again with a clamp at its end), as an 8-bit target clamps what it is given before
+// blending: in a float frame only blending's sums go above 1. Until the image is made again.
+void clamp_colour_writes(unsigned framebuffer);
 
 // For the tests: the encode pass run on the default framebuffer into a stand-in of an HDR screen
 // (`output`'s format, `width` by `height`), read back as stored: one 32-bit word a texel for

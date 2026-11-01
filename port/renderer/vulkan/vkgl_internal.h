@@ -324,6 +324,9 @@ struct Image {
     // The aspects whose contents glInvalidateFramebuffer let go and nothing wrote since: the next
     // pass on the image does not load them (attachment-discard, docs/port/RENDER_PERF.md "R-06").
     VkImageAspectFlags discarded = 0;
+    // Draws into it are given each fragment's colour clamped to 0..1, as an 8-bit target clamps
+    // it (vkgl.h, clamp_colour_writes): a float frame that stands in for the 8-bit one.
+    bool clamp_writes = false;
     VkImageView attachment = VK_NULL_HANDLE;
     std::vector<std::pair<std::uint32_t, VkImageView>>
         views;  // (base | top << 16) -> view for sampling
@@ -571,6 +574,11 @@ struct Program {
     unsigned material_start = 0;
     VkShaderModule vertex = VK_NULL_HANDLE;
     VkShaderModule fragment = VK_NULL_HANDLE;
+    // The fragment stage with its colour clamped to 0..1 (Image::clamp_writes), made the first
+    // time a draw needs it from the sources kept here; null when it could not be made.
+    std::string vertex_source, fragment_source;
+    VkShaderModule fragment_clamped = VK_NULL_HANDLE;
+    bool clamped_tried = false;
     VkShaderModule compute = VK_NULL_HANDLE;
     VkPipeline compute_pipeline = VK_NULL_HANDLE;
     VkDescriptorSetLayout set_layout = VK_NULL_HANDLE;
@@ -787,7 +795,7 @@ struct PipelineKey {
     std::uint32_t inputs;
     std::uint32_t viewports;
     std::uint32_t dynamic_fixed;  // 1: `fixed` is dynamic state of the pipeline (R-11).
-    std::uint32_t unused;         // Zero; keeps the key a whole number of 8-byte words.
+    std::uint32_t clamp_colour;   // 1: the fragment stage clamps its colour (Image::clamp_writes).
     Input input[kAttributes];
 };
 
@@ -1603,6 +1611,12 @@ bool material_enabled();
 // matrix and material uniforms); true, with nothing done, for any other program. False when
 // the preparation fails.
 bool material_program(Program& p, const std::string& vertex, const std::string& fragment);
+
+// Program `p`'s fragment stage with its colour output (location 0) clamped to 0..1 as it ends, as
+// an 8-bit target clamps what it is given (Image::clamp_writes): made from the program's sources
+// the first time, the same way link_program makes the stage; null where it cannot be (then the
+// draw uses the stage as it is).
+VkShaderModule clamped_fragment(Program& p);
 
 // Empties frame slot `f`'s material pages for a new recording.
 void material_reset(Frame& f);

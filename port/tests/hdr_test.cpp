@@ -73,64 +73,49 @@ void test_gamma_and_gamut() {
     CHECK(near(hdr::pq_decode(red[2]), 1.64f, 0.05f));
 }
 
+// Light above white rolls off towards the peak: the SDR range untouched, the slope 1 at white,
+// never past the peak, the hue kept; and a frame value above 1 goes on along the 2.2 curve.
+void test_roll_off() {
+    const hdr::Levels levels{200.0f, 1000.0f};
+    const hdr::Rgb sdr{1.0f, 0.5f, 0.25f};
+    CHECK(hdr::roll_off_above_white(sdr, levels) == sdr);
+    const hdr::Rgb just = hdr::roll_off_above_white({1.01f, 0.0f, 0.0f}, levels);
+    CHECK(near(just[0], 1.01f, 1e-4f));
+    const hdr::Rgb far = hdr::roll_off_above_white({1000.0f, 500.0f, 0.0f}, levels);
+    CHECK(near(far[0], 5.0f, 1e-3f) && near(far[1] / far[0], 0.5f, 1e-5f));
+    float last = 1.0f;
+    for (float m = 1.0f; m < 50.0f; m += 0.25f) {
+        const float out = hdr::roll_off_above_white({m, m, m}, levels)[0];
+        CHECK(out >= last && out <= 5.0f);
+        last = out;
+    }
+    // No headroom: above white is held at white.
+    const hdr::Rgb flat = hdr::roll_off_above_white({2.0f, 1.0f, 0.5f}, {400.0f, 400.0f});
+    CHECK(near(flat[0], 1.0f, 1e-6f) && near(flat[1], 0.5f, 1e-6f));
+    // The frame's 1.5 is 1.5^2.2 of white before the roll-off; below 0 is black.
+    CHECK(near(hdr::sdr_to_linear(1.5f), std::pow(1.5f, 2.2f), 1e-5f));
+    CHECK(hdr::sdr_to_linear(-0.25f) == 0.0f);
+    const hdr::Rgb bright = hdr::encode({1.5f, 1.5f, 1.5f}, Output::ScRgb, levels);
+    const float nits = bright[0] * hdr::kScRgbUnitNits;
+    CHECK(nits > 200.0f && nits < 1000.0f);
+}
+
 void test_levels() {
     const hdr::Display unknown;
-    hdr::Levels l = hdr::resolve_levels(0, 0, 0, unknown);
+    hdr::Levels l = hdr::resolve_levels(0, 0, unknown);
     CHECK(l.paper_white == hdr::kReferenceWhiteNits && l.peak == hdr::kDefaultPeakNits);
     // The system's SDR white and peak where the display says them.
     const hdr::Display windows{true, true, 240.0f, 800.0f};
-    l = hdr::resolve_levels(0, 0, 0, windows);
+    l = hdr::resolve_levels(0, 0, windows);
     CHECK(l.paper_white == 240.0f && l.peak == 800.0f);
     // The player's own numbers, clamped to the settings' ranges.
-    l = hdr::resolve_levels(5000, 50000, 0, windows);
+    l = hdr::resolve_levels(5000, 50000, windows);
     CHECK(l.paper_white == hdr::kPaperWhiteMax && l.peak == hdr::kPeakMax);
-    l = hdr::resolve_levels(10, 10, 0, windows);
+    l = hdr::resolve_levels(10, 10, windows);
     CHECK(l.paper_white == hdr::kPaperWhiteMin && l.peak == hdr::kPeakMin);
     // A peak below paper white is raised to it.
-    l = hdr::resolve_levels(600, 400, 0, windows);
+    l = hdr::resolve_levels(600, 400, windows);
     CHECK(l.peak == 600.0f);
-    // Highlights as a fraction, clamped.
-    CHECK(hdr::resolve_levels(0, 0, 50, unknown).highlights == 0.5f);
-    CHECK(hdr::resolve_levels(0, 0, 400, unknown).highlights == 1.0f);
-    CHECK(hdr::resolve_levels(0, 0, -5, unknown).highlights == 0.0f);
-}
-
-// Highlights: nothing below the knee changes, the game's white goes to paper white + the asked
-// share of the headroom, the curve only rises, and hues keep their ratios.
-void test_highlights() {
-    const hdr::Levels flat{200.0f, 1000.0f, 0.0f};
-    const hdr::Levels half{200.0f, 1000.0f, 0.5f};
-    const hdr::Levels full{200.0f, 1000.0f, 1.0f};
-    CHECK(near(hdr::highlight_boost(half), 2.0f, 1e-5f));
-    CHECK(near(hdr::max_content_nits(half), 600.0f, 1e-3f));
-    CHECK(near(hdr::max_content_nits(full), 1000.0f, 1e-3f));
-    CHECK(near(hdr::max_content_nits(flat), 200.0f, 1e-3f));
-    // Peak at paper white: no headroom, nothing lifted.
-    CHECK(hdr::highlight_boost({400.0f, 400.0f, 1.0f}) == 0.0f);
-    const hdr::Rgb white{1.0f, 1.0f, 1.0f};
-    for (float c : hdr::encode(white, Output::ScRgb, half)) {
-        CHECK(near(c * hdr::kScRgbUnitNits, 600.0f, 1e-2f));
-    }
-    for (float c : hdr::encode(white, Output::Hdr10, full)) {
-        CHECK(near(hdr::pq_decode(c), 1000.0f, 1.0f));
-    }
-    // Below the knee (linear 0.5, about byte 0.73) the picture is as with no highlights.
-    const hdr::Rgb mid{0.6f, 0.6f, 0.6f};
-    CHECK(hdr::encode(mid, Output::ScRgb, full) == hdr::encode(mid, Output::ScRgb, flat));
-    float last = 0.0f;
-    for (int i = 0; i <= 255; ++i) {
-        const float v = static_cast<float>(i) / 255.0f;
-        const float out = hdr::encode({v, v, v}, Output::ScRgb, half)[0];
-        CHECK(out >= last);
-        last = out;
-    }
-    const hdr::Rgb warm{1.0f, 0.9f, 0.6f};
-    const hdr::Rgb a = hdr::encode(warm, Output::ScRgb, flat);
-    const hdr::Rgb b = hdr::encode(warm, Output::ScRgb, half);
-    CHECK(
-        b[0] > a[0] && near(b[1] / b[0], a[1] / a[0], 1e-5f)
-        && near(b[2] / b[0], a[2] / a[0], 1e-5f)
-    );
 }
 
 void test_wanted_output() {
@@ -153,8 +138,8 @@ int main() {
     test_white_at_paper_white();
     test_sdr_is_untouched();
     test_gamma_and_gamut();
+    test_roll_off();
     test_levels();
-    test_highlights();
     test_wanted_output();
     return openrac::test::result();
 }

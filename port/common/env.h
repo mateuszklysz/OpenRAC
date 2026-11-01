@@ -96,6 +96,7 @@ enum class Var : std::uint16_t {
     GpuPassTiming,
     Guard,
     Hdr,
+    HdrFrame,
     HeroShadow,
     Hidden,
     HidePasses,

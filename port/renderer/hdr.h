@@ -57,40 +57,19 @@ inline constexpr int kPeakMax = 10000;
 // monitor's real response; the piecewise sRGB curve would lift the game's dark scenes).
 inline constexpr float kSdrGamma = 2.2f;
 
-// Highlights (`hdr_highlights`, percent): how far the picture's brightest parts are lifted above
-// paper white towards the peak. 0 keeps the picture exactly as in SDR.
-inline constexpr int kHighlightsMax = 100;
-inline constexpr int kDefaultHighlights = 50;
-// Linear light (1.0 = the game's white) below which nothing is lifted: the game's mid tones and
-// dark scenes stay as they are, only what is near white (lamps, explosions, sky) gets brighter.
-inline constexpr float kHighlightKnee = 0.5f;
-
-// The HDR picture's brightness: the game's white at `paper_white` nits, its highlights lifted by
-// `highlights` (0..1) of the way to `peak`; `peak` also goes into the screen's metadata.
+// The HDR picture's brightness: the game's white at `paper_white` nits; what the frame holds above
+// white (blending's sums in the HDR frame, vkgl.h hdr_frame) rolls off towards `peak`, which also
+// goes into the screen's metadata.
 struct Levels {
     float paper_white = kReferenceWhiteNits;
     float peak = kDefaultPeakNits;
-    float highlights = 0.0f;
 };
-
-// How much brighter than paper white the game's white is shown, less one (0: not lifted).
-inline float highlight_boost(const Levels& levels) {
-    const float headroom = std::max(levels.peak / levels.paper_white - 1.0f, 0.0f);
-    return std::clamp(levels.highlights, 0.0f, 1.0f) * headroom;
-}
-
-// The brightest the picture gets, in nits (the screen's MaxCLL).
-inline float max_content_nits(const Levels& levels) {
-    return levels.paper_white * (1.0f + highlight_boost(levels));
-}
 
 // The levels for the player's settings (`paper_white`, `peak`: nits, 0 for the system's) on
 // `display`. The system's SDR white is what the player set for SDR content in the system's own
 // settings (Windows' "SDR content brightness"), so the game looks like the desktop around it.
-inline Levels resolve_levels(int paper_white, int peak, int highlights, const Display& display) {
+inline Levels resolve_levels(int paper_white, int peak, const Display& display) {
     Levels levels;
-    levels.highlights =
-        static_cast<float>(std::clamp(highlights, 0, kHighlightsMax)) / kHighlightsMax;
     if (paper_white > 0) {
         levels.paper_white =
             static_cast<float>(std::clamp(paper_white, kPaperWhiteMin, kPaperWhiteMax));
@@ -156,21 +135,26 @@ inline constexpr std::array<Rgb, 3> kBt709ToBt2020 = {{
     {0.016391439f, 0.088013308f, 0.895595253f},
 }};
 
-// A channel of the picture (0..1, as stored) to linear light, 1.0 being the game's white.
+// A channel of the picture (0..1 as in SDR; above 1 where the HDR frame's blending added up past
+// white) to linear light, 1.0 being the game's white. The 2.2 curve goes on above 1, as RenoDX's
+// gamma correction does; below 0 (a subtraction in a float frame) is black.
 inline float sdr_to_linear(float value) {
-    return std::pow(std::clamp(value, 0.0f, 1.0f), kSdrGamma);
+    return std::pow(std::max(value, 0.0f), kSdrGamma);
 }
 
-// Lifts a pixel's linear light (1.0 = the game's white) above the knee by `boost` at most (the
-// game's white comes out at 1 + boost). The colour's luminance is lifted along a curve that
-// starts flat at the knee, and all three channels are scaled alike, so hues stay as they are.
-inline Rgb lift_highlights(const Rgb& linear, float boost) {
-    const float luma = 0.2126f * linear[0] + 0.7152f * linear[1] + 0.0722f * linear[2];
-    if (boost <= 0.0f || luma <= kHighlightKnee) {
+// Light above the game's white (linear, 1.0 = paper white) rolled off towards the peak: a pixel
+// whose brightest channel is at or below 1 is left as it is (the SDR picture is unchanged);
+// above, that channel goes along 1 + h (1 - e^(-(m - 1) / h)), h being the headroom over paper
+// white, which leaves 1 with a slope of 1 and never passes the peak. All three channels are
+// scaled alike, so the colour's hue stays.
+inline Rgb roll_off_above_white(const Rgb& linear, const Levels& levels) {
+    const float m = std::max({linear[0], linear[1], linear[2]});
+    if (m <= 1.0f) {
         return linear;
     }
-    const float t = (std::min(luma, 1.0f) - kHighlightKnee) / (1.0f - kHighlightKnee);
-    const float scale = (luma + boost * t * t) / luma;
+    const float h = std::max(levels.peak / levels.paper_white - 1.0f, 0.0f);
+    const float to = h > 0.0f ? 1.0f + h * (1.0f - std::exp(-(m - 1.0f) / h)) : 1.0f;
+    const float scale = to / m;
     return {linear[0] * scale, linear[1] * scale, linear[2] * scale};
 }
 
@@ -180,9 +164,8 @@ inline Rgb encode(const Rgb& rgb, Output output, const Levels& levels) {
     if (output == Output::Sdr) {
         return rgb;
     }
-    const Rgb linear = lift_highlights(
-        {sdr_to_linear(rgb[0]), sdr_to_linear(rgb[1]), sdr_to_linear(rgb[2])},
-        highlight_boost(levels)
+    const Rgb linear = roll_off_above_white(
+        {sdr_to_linear(rgb[0]), sdr_to_linear(rgb[1]), sdr_to_linear(rgb[2])}, levels
     );
     Rgb out{};
     if (output == Output::ScRgb) {

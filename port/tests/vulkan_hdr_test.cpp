@@ -17,8 +17,10 @@
 #include <string>
 #include <vector>
 
+#include "renderer/framebuffer.h"
 #include "renderer/gl.h"
 #include "renderer/hdr.h"
+#include "renderer/shader.h"
 #include "renderer/vulkan/vkgl.h"
 #include "tests/check.h"
 #include "tests/renderer_gl_context.h"
@@ -139,6 +141,117 @@ void test_scaled() {
     CHECK(std::fabs(hdr::pq_decode(red) - 203.0f) < 2.0f);
 }
 
+// One full-screen triangle of `colour` into `target`, blended ONE, ONE when `add`.
+void fill(
+    const openrac::renderer::FrameBuffer& target,
+    const openrac::renderer::Shader& shader,
+    const std::array<float, 4>& colour,
+    bool add
+) {
+    glBindFramebuffer(GL_FRAMEBUFFER, target.id());
+    glViewport(0, 0, target.width(), target.height());
+    shader.use();
+    glUniform4f(shader.uniform("colour"), colour[0], colour[1], colour[2], colour[3]);
+    if (add) {
+        glEnable(GL_BLEND);
+        glBlendFuncSeparate(GL_ONE, GL_ONE, GL_ONE, GL_ONE);
+    } else {
+        glDisable(GL_BLEND);
+    }
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDisable(GL_BLEND);
+}
+
+// The first pixel of `target`, as floats.
+std::array<float, 4> first_pixel(const openrac::renderer::FrameBuffer& target) {
+    std::vector<float> pixels(static_cast<std::size_t>(target.width() * target.height() * 4));
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, target.id());
+    glReadPixels(0, 0, target.width(), target.height(), GL_RGBA, GL_FLOAT, pixels.data());
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+    return {pixels[0], pixels[1], pixels[2], pixels[3]};
+}
+
+bool near4(const std::array<float, 4>& got, const std::array<float, 4>& want) {
+    for (int c = 0; c < 4; ++c) {
+        if (std::fabs(got[c] - want[c]) > 2e-3f) {
+            std::fprintf(
+                stderr,
+                "got %f %f %f %f, want %f %f %f %f\n",
+                got[0],
+                got[1],
+                got[2],
+                got[3],
+                want[0],
+                want[1],
+                want[2],
+                want[3]
+            );
+            return false;
+        }
+    }
+    return true;
+}
+
+// The HDR frame (vkgl.h, hdr_frame): in half floats with clamp_colour_writes, a draw's own colour
+// is clamped to 0..1 as an 8-bit frame clamps it, and only blending's sums go above 1. Without the
+// clamp a float target keeps what it is given; an 8-bit one stops at 1.
+void test_float_frame() {
+    std::string error;
+    openrac::renderer::Shader shader;
+    CHECK(shader.build(
+        "hdr frame fixture",
+        "#version 410 core\n"
+        "void main() {\n"
+        "    vec2 p = vec2((gl_VertexID << 1) & 2, gl_VertexID & 2);\n"
+        "    gl_Position = vec4(p * 2.0 - 1.0, 0, 1);\n"
+        "}\n",
+        "#version 410 core\n"
+        "uniform vec4 colour;\n"
+        "layout(location = 0) out vec4 result;\n"
+        "void main() {\n"
+        "    if (colour.a < 0.0) {\n"
+        "        discard;\n"
+        "    }\n"
+        "    result = colour;\n"
+        "}\n",
+        error
+    ));
+    unsigned vao = 0;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    openrac::renderer::FrameBuffer frame;
+    CHECK(frame.create(4, 4, error, 1, false, true) && frame.float_colour());
+    openrac::vkgl::clamp_colour_writes(frame.id());
+    // A colour past both ends, written as it is: clamped.
+    fill(frame, shader, {2.0f, 0.5f, -1.0f, 3.0f}, false);
+    CHECK(near4(first_pixel(frame), {1.0f, 0.5f, 0.0f, 1.0f}));
+    // Two adds of 0.75: 1.5, above white.
+    fill(frame, shader, {0.0f, 0.0f, 0.0f, 0.0f}, false);
+    fill(frame, shader, {0.75f, 0.75f, 0.25f, 0.5f}, true);
+    fill(frame, shader, {0.75f, 2.0f, 0.25f, 0.5f}, true);
+    CHECK(near4(first_pixel(frame), {1.5f, 1.75f, 0.5f, 1.0f}));
+    // Its bytes stop at white, as an 8-bit frame's do.
+    const std::vector<std::uint8_t> bytes = frame.read_rgba();
+    CHECK(bytes.size() == 64 && bytes[0] == 255 && bytes[1] == 255 && bytes[2] == 128);
+
+    // A float target without the clamp: what it is given.
+    openrac::renderer::FrameBuffer plain;
+    CHECK(plain.create(4, 4, error, 1, false, true));
+    fill(plain, shader, {2.0f, 0.5f, 0.25f, 1.0f}, false);
+    CHECK(near4(first_pixel(plain), {2.0f, 0.5f, 0.25f, 1.0f}));
+
+    // An 8-bit target: the adds stop at 1.
+    openrac::renderer::FrameBuffer sdr;
+    CHECK(sdr.create(4, 4, error));
+    fill(sdr, shader, {0.0f, 0.0f, 0.0f, 0.0f}, false);
+    fill(sdr, shader, {0.75f, 0.75f, 0.25f, 0.5f}, true);
+    fill(sdr, shader, {0.75f, 0.75f, 0.25f, 0.5f}, true);
+    const std::vector<std::uint8_t> sdr_bytes = sdr.read_rgba();
+    CHECK(sdr_bytes.size() == 64 && sdr_bytes[0] == 255 && sdr_bytes[2] == 128);
+    glDeleteVertexArrays(1, &vao);
+}
+
 }  // namespace
 
 int main() {
@@ -158,10 +271,8 @@ int main() {
     test_encode(window, hdr::Output::Hdr10, {480.0f, 1500.0f});
     test_encode(window, hdr::Output::ScRgb, {203.0f, 1000.0f});
     test_encode(window, hdr::Output::ScRgb, {80.0f, 400.0f});
-    // Highlights lifted above paper white, the same on the GPU.
-    test_encode(window, hdr::Output::Hdr10, {203.0f, 1000.0f, 0.5f});
-    test_encode(window, hdr::Output::ScRgb, {160.0f, 1200.0f, 1.0f});
     test_scaled();
+    test_float_frame();
     // Without an HDR request the screen is sent SDR, and a hidden window has no HDR to offer.
     CHECK(openrac::vkgl::hdr_output() == hdr::Output::Sdr);
     CHECK(openrac::vkgl::submission_counters().validation_errors == 0);

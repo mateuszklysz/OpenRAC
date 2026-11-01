@@ -6,6 +6,7 @@
 // framebuffer's picture into it at the player's paper white (shaders/hdr_encode.comp). With HDR
 // not asked for, nothing here runs: the swapchain is chosen and the picture copied as before.
 
+#include <algorithm>
 #include <array>
 #include <cstring>
 
@@ -26,8 +27,7 @@ struct EncodeConstants {
     float paper_white;
     float sdr_gamma;
     std::int32_t same_size;
-    float boost;
-    float knee;
+    float headroom;
 };
 
 // Whether the encode pass can write `format`: the device stores to it. Where the surface's images
@@ -204,8 +204,7 @@ bool encode(
                 && colour.height == static_cast<int>(extent.height)
             ? 1
             : 0,
-        renderer::hdr::highlight_boost(levels),
-        renderer::hdr::kHighlightKnee,
+        std::max(levels.peak / levels.paper_white - 1.0f, 0.0f),
     };
     vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, g->hdr.pipeline);
     vkCmdBindDescriptorSets(
@@ -223,8 +222,9 @@ bool encode(
     return true;
 }
 
-// The screen's metadata: BT.2020 primaries, the display's peak, and content that never comes
-// above paper white with its highlights (MaxCLL), so that a television need not tone-map it down.
+// The screen's metadata: BT.2020 primaries, the display's peak, content up to the peak (MaxCLL:
+// the frame's light above white rolls off towards it) and a frame average at paper white, so that
+// a television need not tone-map it down.
 void set_metadata() {
     auto& hdr = g->hdr;
     if (!hdr.metadata || vkSetHdrMetadataEXT == nullptr || hdr.shown == Output::Sdr) {
@@ -237,7 +237,7 @@ void set_metadata() {
     m.whitePoint = {0.3127f, 0.3290f};
     m.maxLuminance = hdr.asked.levels.peak;
     m.minLuminance = 0.0f;
-    m.maxContentLightLevel = renderer::hdr::max_content_nits(hdr.asked.levels);
+    m.maxContentLightLevel = hdr.asked.levels.peak;
     m.maxFrameAverageLightLevel = hdr.asked.levels.paper_white;
     vkSetHdrMetadataEXT(g->device, 1, &g->swapchain, &m);
 }
@@ -313,11 +313,10 @@ void hdr_swapchain_made(const VkSurfaceFormatKHR& format) {
     }
     set_metadata();
     log::info(
-        "vulkan: HDR output {} at {:.0f} nits paper white (peak {:.0f}, highlights up to {:.0f}){}",
+        "vulkan: HDR output {} at {:.0f} nits paper white (peak {:.0f}){}",
         renderer::hdr::name(hdr.shown),
         hdr.asked.levels.paper_white,
         hdr.asked.levels.peak,
-        renderer::hdr::max_content_nits(hdr.asked.levels),
         hdr.direct ? "" : ", through a copy"
     );
 }
@@ -414,6 +413,21 @@ renderer::hdr::Output hdr_output() {
 bool hdr_offered() {
     using namespace detail;
     return active() && g->hdr.offered;
+}
+
+bool hdr_frame() {
+    using namespace detail;
+    return active() && g->hdr.shown != renderer::hdr::Output::Sdr;
+}
+
+void clamp_colour_writes(unsigned framebuffer) {
+    using namespace detail;
+    if (!active() || framebuffer == 0) {
+        return;
+    }
+    if (Image* colour = target_of(framebuffer).colour) {
+        colour->clamp_writes = true;
+    }
 }
 
 bool test_hdr_encode(

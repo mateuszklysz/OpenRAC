@@ -180,8 +180,15 @@ void run_deferred(Frame& f) {
 }
 
 bool make_default_framebuffer(int width, int height) {
-    g->default_colour =
-        default_image({VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT, 4}, width, height);
+    // In half floats while HDR is shown (vkgl.h, hdr_frame), so the frame's light above white
+    // reaches the encode pass; 8-bit otherwise, as always.
+    g->default_colour = default_image(
+        g->hdr.shown != renderer::hdr::Output::Sdr
+            ? Format{VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_ASPECT_COLOR_BIT, 8}
+            : Format{VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT, 4},
+        width,
+        height
+    );
     g->default_depth = default_image(
         {g->depth_format,
          VK_IMAGE_ASPECT_DEPTH_BIT
