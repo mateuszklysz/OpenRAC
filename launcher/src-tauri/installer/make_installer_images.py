@@ -1,7 +1,7 @@
 """Build the Windows installers' pictures from the launcher's icon.
 
-The look follows DualTouch's installer: a flat dark background with the app's
-icon tile in the middle, a soft shadow under it. Only pictures: the installers'
+The look follows DualTouch's installer: the app's icon tile, with a soft
+shadow, on the launcher's dark colour beside Windows' light pages. Only pictures: the installers'
 pages, paths and steps are Tauri's own and stay as they are.
 
     python3 make_installer_images.py    # needs Pillow
@@ -21,7 +21,7 @@ HERE = pathlib.Path(__file__).resolve().parent
 ICON = HERE.parent / "icons" / "icon.png"
 
 # The launcher window's own background (tauri.conf.json backgroundColor), so the
-# installer looks like the program it installs. installer-hooks.nsh uses the same.
+# installer looks like the program it installs.
 DARK = (0x18, 0x18, 0x20)
 LIGHT = (0xFF, 0xFF, 0xFF)
 
@@ -56,7 +56,8 @@ def main() -> None:
     place(sidebar, 112, (82, 150))
     save(sidebar, "nsis-sidebar.bmp")
 
-    header = Image.new("RGBA", (150, 57), DARK + (255,))
+    header = Image.new("RGBA", (150, 57), LIGHT + (255,))
+    ImageDraw.Draw(header).rectangle((150 - 64, 0, 149, 56), fill=DARK + (255,))
     place(header, 42, (150 - 32, 28))
     save(header, "nsis-header.bmp")
 
