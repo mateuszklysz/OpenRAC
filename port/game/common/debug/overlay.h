@@ -276,8 +276,8 @@ extern const ImVec4 kGreen;
 extern const ImVec4 kDim;
 extern const ImVec4 kYellow;
 
-// Returns `v`, a length in the overlay's units, in pixels: `v` on a desktop's screen, more on a
-// dense one (s.ui_scale).
+// Returns `v`, a length in the overlay's units, in pixels: `v` on a 1080p screen, more on a
+// dense or large one (s.ui_scale).
 float dp(float v);
 
 // Says whether the `size` bytes at `address` (a game address, its segment bits ignored) are all in
