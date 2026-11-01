@@ -297,6 +297,8 @@ struct State {
     // The window was opened for HDR output (the settings' `hdr` was not off): only then can it
     // be turned on (apply_hdr).
     bool hdr_at_start = false;
+    // What the window's display said of HDR when apply_hdr last asked (for hdr_status).
+    renderer::hdr::Display hdr_display;
     // The tick's own frame was left undrawn this many ticks in a row (frame(): the game is late).
     int skipped = 0;
     // The producer retains the latest captured scene for interpolation; jobs share its immutable storage.

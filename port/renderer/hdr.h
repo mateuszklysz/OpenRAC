@@ -38,6 +38,14 @@ struct Display {
     bool hdr_enabled = false;
     float sdr_white_nits = 0.0f;  // the system's SDR content brightness; 0 when unknown
     float peak_nits = 0.0f;       // the brightest the display shows; 0 when unknown
+    // HDR is relative to the system's SDR white (Android's HDR/SDR headroom; macOS's EDR): white
+    // is scRGB's 1.0 (sdr_white_nits 80) and follows the system's brightness, so the player's
+    // paper white does not apply. Linear extended sRGB is the format then.
+    bool relative = false;
+    // For the settings' status line: the display shows HDR10, and the most headroom it gives over
+    // SDR white (0 unknown).
+    bool hdr10 = false;
+    float headroom = 0.0f;
 };
 
 // Nits of the SDR white an HDR picture of SDR content is usually given (ITU-R BT.2408), and of
@@ -70,6 +78,17 @@ struct Levels {
 // settings (Windows' "SDR content brightness"), so the game looks like the desktop around it.
 inline Levels resolve_levels(int paper_white, int peak, const Display& display) {
     Levels levels;
+    if (display.relative && display.sdr_white_nits > 0.0f) {
+        // White is the system's; the player's peak may only ask for less headroom.
+        levels.paper_white = display.sdr_white_nits;
+        levels.peak = display.peak_nits > 0.0f ? display.peak_nits : levels.paper_white;
+        if (peak > 0) {
+            levels.peak =
+                std::min(levels.peak, static_cast<float>(std::clamp(peak, kPeakMin, kPeakMax)));
+        }
+        levels.peak = std::max(levels.peak, levels.paper_white);
+        return levels;
+    }
     if (paper_white > 0) {
         levels.paper_white =
             static_cast<float>(std::clamp(paper_white, kPaperWhiteMin, kPaperWhiteMax));
@@ -99,7 +118,7 @@ inline Output wanted_output(Mode mode, const Display& display, bool prefer_scrgb
     if (!hdr) {
         return Output::Sdr;
     }
-    return prefer_scrgb ? Output::ScRgb : Output::Hdr10;
+    return prefer_scrgb || display.relative ? Output::ScRgb : Output::Hdr10;
 }
 
 // ---- The arithmetic, as the encode pass does it per pixel ----

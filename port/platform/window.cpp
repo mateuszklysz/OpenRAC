@@ -861,6 +861,11 @@ renderer::hdr::Display Window::hdr_display() const {
     const float headroom = SDL_GetFloatProperty(props, SDL_PROP_WINDOW_HDR_HEADROOM_FLOAT, 1.0f);
     // The white level is in scRGB's units (80 nits) on Windows; macOS's EDR puts the system's
     // white at 1.0, which scRGB's 80 nits then is; Wayland's headroom is over BT.2408's 203 nits.
+    display.headroom = headroom;
+#if defined(__APPLE__)
+    // EDR: white is the system's, as on Android (renderer/hdr.h, Display::relative).
+    display.relative = true;
+#endif
 #if defined(_WIN32) || defined(__APPLE__)
     const float white = SDL_GetFloatProperty(props, SDL_PROP_WINDOW_SDR_WHITE_LEVEL_FLOAT, 1.0f);
     display.sdr_white_nits = white * renderer::hdr::kScRgbUnitNits;
@@ -881,9 +886,11 @@ void Window::set_hdr(
 #if defined(__ANDROID__)
         // The window's colour mode follows what is asked, once a change.
         const bool hdr = wanted != renderer::hdr::Output::Sdr;
-        if (hdr != m_hdr_window) {
+        const float headroom = hdr ? levels.peak / levels.paper_white : 0.0f;
+        if (hdr != m_hdr_window || headroom != m_hdr_headroom) {
             m_hdr_window = hdr;
-            android_window_hdr(hdr);
+            m_hdr_headroom = headroom;
+            android_window_hdr(hdr, headroom);
         }
 #endif
     }

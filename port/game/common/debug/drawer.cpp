@@ -355,6 +355,9 @@ void drawer_hdr() {
             changed = true;
         }
     }
+    if (graphics.hdr != hdr::Mode::Off) {
+        drawer_note(frontend::hdr_status().c_str());
+    }
     if (changed) {
         settings::save();
         s.settings_changed = true;

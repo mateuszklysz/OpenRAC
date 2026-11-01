@@ -254,6 +254,7 @@ private:
     bool m_vulkan = false;
     bool m_low_latency = false;
     bool m_hdr_window = false;        // Android: the window's colour mode asked for HDR
+    float m_hdr_headroom = 0.0f;      // Android: the headroom the window asked for
     void (*m_gl_finish)() = nullptr;  // OpenGL's glFinish, for m_low_latency
     bool m_vulkan_library = false;  // macOS: the Vulkan library this window had SDL load
     DisplayMode m_mode = DisplayMode::Windowed;

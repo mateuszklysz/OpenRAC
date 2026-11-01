@@ -189,42 +189,71 @@ public class GameActivity extends SDLActivity {
 
     /**
      * HDR output (docs/port/HDR.md), asked by the game's thread (port/android/display_hdr.cpp):
-     * {1 when the display shows HDR10, else 0; its peak in nits, 0 unknown; the SDR white in nits,
-     * 0 unknown}. SDL does not say this on Android.
+     * {1 when the game can show HDR on the display, else 0; the peak in nits, 0 unknown; the SDR
+     * white in nits, 0 unknown; 1 when HDR is relative to the system's SDR white (the display's
+     * HDR/SDR headroom, Android 14 and later), else 0; 1 when the display shows HDR10; the most
+     * headroom the display gives over SDR white, 0 unknown}. SDL does not say this on Android.
+     *
+     * Android 14 shows HDR on a display by its headroom: the system raises the panel's brightness
+     * and dims what is SDR, and a window that asks for it (COLOR_MODE_HDR) is given values above
+     * SDR white in extended sRGB. That is the game's way where the display reports a headroom; else
+     * HDR10 where the display shows it.
      */
     public static float[] displayHdr() {
-        float[] none = new float[] {0.0f, 0.0f, 0.0f};
+        float[] none = new float[] {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
         if (!(mSingleton instanceof GameActivity)) {
             return none;
         }
         Display display = ((GameActivity) mSingleton).gameDisplay();
-        if (display == null || !display.isHdr()) {
+        if (display == null) {
             return none;
         }
-        Display.HdrCapabilities caps = display.getHdrCapabilities();
         boolean hdr10 = false;
-        if (caps != null) {
-            for (int type : caps.getSupportedHdrTypes()) {
-                hdr10 |= type == Display.HdrCapabilities.HDR_TYPE_HDR10
-                        || type == Display.HdrCapabilities.HDR_TYPE_HDR10_PLUS;
+        float peak = 0.0f;
+        if (display.isHdr()) {
+            Display.HdrCapabilities caps = display.getHdrCapabilities();
+            if (caps != null) {
+                for (int type : caps.getSupportedHdrTypes()) {
+                    hdr10 |= type == Display.HdrCapabilities.HDR_TYPE_HDR10
+                            || type == Display.HdrCapabilities.HDR_TYPE_HDR10_PLUS;
+                }
+                peak = Math.max(caps.getDesiredMaxLuminance(), 0.0f);
             }
         }
-        float peak = caps != null ? caps.getDesiredMaxLuminance() : 0.0f;
-        return new float[] {hdr10 ? 1.0f : 0.0f, peak > 0.0f ? peak : 0.0f, 0.0f};
+        // The most the display gives (Android 16); before, the ratio now, which is 1 while nothing
+        // on the screen is HDR: then 4 is asked, and the system gives what it has.
+        float headroom = 0.0f;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE && display.isHdrSdrRatioAvailable()) {
+            headroom = Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA
+                    ? display.getHighestHdrSdrRatio()
+                    : Math.max(display.getHdrSdrRatio(), 4.0f);
+        }
+        Log.i(TAG, "display HDR: isHdr " + display.isHdr() + ", HDR10 " + hdr10 + ", desired peak " + peak
+                + " nits, HDR/SDR ratio " + (headroom > 0.0f ? "up to " + headroom : "not reported"));
+        // Relative: SDR white is scRGB's 1.0 (80 "nits" in the game's arithmetic), the peak that
+        // times the headroom.
+        if (headroom > 1.01f) {
+            return new float[] {1.0f, 80.0f * headroom, 80.0f, 1.0f, hdr10 ? 1.0f : 0.0f, headroom};
+        }
+        return new float[] {hdr10 ? 1.0f : 0.0f, peak, 0.0f, 0.0f, hdr10 ? 1.0f : 0.0f, headroom};
     }
 
     /**
      * While the game sends HDR, its window asks for the display's HDR headroom (Android 14 and
-     * later), so the system does not hold it at SDR brightness; off again with SDR.
+     * later), so the system does not hold it at SDR brightness, and for `headroom` times SDR white
+     * at most (Android 15 and later; 0: the system's choice); off again with SDR.
      */
-    public static void windowHdr(final boolean on) {
+    public static void windowHdr(final boolean on, final float headroom) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE || !(mSingleton instanceof GameActivity)) {
             return;
         }
         final GameActivity activity = (GameActivity) mSingleton;
         activity.uiThread.post(() -> {
             activity.getWindow().setColorMode(on ? ActivityInfo.COLOR_MODE_HDR : ActivityInfo.COLOR_MODE_DEFAULT);
-            Log.i(TAG, "window colour mode " + (on ? "HDR" : "default"));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                activity.getWindow().setDesiredHdrHeadroom(on && headroom >= 1.0f ? Math.min(headroom, 10000.0f) : 0.0f);
+            }
+            Log.i(TAG, "window colour mode " + (on ? "HDR, headroom " + headroom : "default"));
         });
     }
 

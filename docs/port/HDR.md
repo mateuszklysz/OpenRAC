@@ -40,7 +40,8 @@ Off, Auto or On is given to every start (`OPENRAC_HDR`) over the file's.
 | Linux, Wayland | Vulkan (Mesa or a driver with `VK_EXT_swapchain_colorspace` and a compositor with colour management) | HDR10, else scRGB | SDL (colour-management protocol): HDR on, headroom |
 | Linux, X11 | Vulkan | where the driver offers it | none: `on` only |
 | macOS | Vulkan (MoltenVK) | scRGB (EDR), else HDR10 | SDL: EDR headroom |
-| Android | Vulkan | HDR10, else scRGB | `GameActivity.displayHdr` (JNI): `Display.isHdr` and HDR10 in its capabilities, the desired peak |
+| Android 14+ with an HDR/SDR ratio | Vulkan | scRGB, relative: 1.0 is the system's SDR white | `GameActivity.displayHdr` (JNI): `Display.isHdrSdrRatioAvailable`, the most headroom (`getHighestHdrSdrRatio`, Android 16; before, the ratio now, at least 4 asked) |
+| Android, else | Vulkan | HDR10, else scRGB | `GameActivity.displayHdr`: `Display.isHdr` and HDR10 in its capabilities, the desired peak |
 | any | OpenGL | SDR | |
 
 OpenGL has no HDR output: SDL makes no HDR OpenGL surface on any platform. The OpenGL and
@@ -75,9 +76,19 @@ GLES routes (WGL float pixel formats, EGL `EXT_gl_colorspace_bt2020_pq`) are a l
 - Where the swapchain's images cannot be storage images, the pass writes an image of its own in the
   same format, copied 1:1 into the screen (one more full-screen copy, only then).
 - Android: SDL says nothing of HDR there, so `platform/display_hdr.h` asks the activity
-  (`port/android/display_hdr.cpp`, `GameActivity.displayHdr`), and while HDR is sent the window
-  asks for the display's HDR headroom (`Window.setColorMode(COLOR_MODE_HDR)`, Android 14 and
-  later).
+  (`port/android/display_hdr.cpp`, `GameActivity.displayHdr`). Android shows HDR by headroom: the
+  system raises the panel's brightness for what is above SDR white and keeps SDR (the rest of the
+  screen) at the brightness slider's level. Where the display reports a ratio, the game sends
+  linear extended sRGB relative to SDR white (`Display::relative`; the player's paper white does
+  not apply, white follows the slider), and while HDR is sent the window asks for it
+  (`Window.setColorMode(COLOR_MODE_HDR)`, Android 14; `setDesiredHdrHeadroom` peak / paper white,
+  Android 15). The light is real (more nits from the panel), but only as much as the panel has
+  left over the slider: at full brightness on a 650-nit panel there is none. Without a ratio,
+  HDR10 where the display shows it; Android's Vulkan lists HDR10 for every display, so `on` on a
+  display without HDR sends PQ that the system squeezes back into SDR.
+- macOS's EDR is relative the same way (`Display::relative`).
+- The options drawer shows what is sent and what the display said (`frontend::hdr_status`), and
+  the log has it each time the settings or the display change (`HDR: ...`).
 - `platform/window.cpp` reads SDL's window properties (`SDL_PROP_WINDOW_HDR_ENABLED_BOOLEAN`, the
   SDR white level and the HDR headroom); the frontend asks again on
   `SDL_EVENT_WINDOW_HDR_STATE_CHANGED` and when the window moves to another display.

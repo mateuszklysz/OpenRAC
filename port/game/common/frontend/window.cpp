@@ -10,6 +10,8 @@
 // it is named for a C contract (CODING_CONVENTIONS.md, section 14).
 
 #include <cmath>
+#include <format>
+#include <string>
 
 #include <SDL3/SDL.h>
 
@@ -126,6 +128,7 @@ void apply_hdr() {
     namespace hdr = renderer::hdr;
     const settings::Settings& s = settings::get();
     const hdr::Display display = g->window->hdr_display();
+    g->hdr_display = display;
     // macOS's EDR is linear (scRGB); HDR10 elsewhere, where it costs half the bandwidth.
 #if defined(__APPLE__)
     constexpr bool prefer_scrgb = true;
@@ -146,6 +149,37 @@ void apply_hdr() {
         }
     }
     g->window->set_hdr(wanted, levels);
+    if (s.hdr != hdr::Mode::Off) {
+        log::info("HDR: {}", hdr_status());
+    }
+}
+
+std::string hdr_status() {
+    namespace hdr = renderer::hdr;
+    const hdr::Display& d = g->hdr_display;
+    std::string screen;
+    if (!d.known) {
+        screen = "the system does not say whether the display shows HDR";
+    } else if (d.relative) {
+        screen = std::format("the display gives {:.1f}x SDR white for HDR", d.headroom);
+    } else if (d.hdr_enabled) {
+        screen = d.peak_nits > 0.0f
+                     ? std::format("the display shows HDR10, peak {:.0f} nits", d.peak_nits)
+                     : std::string("the display shows HDR10");
+    } else {
+        screen = "the display shows no HDR";
+    }
+    const hdr::Output shown = g->window->hdr_output();
+    std::string sent = shown == hdr::Output::Sdr ? std::string("Sending SDR")
+                                                 : std::format("Sending {}", hdr::name(shown));
+    if (settings::get().hdr != hdr::Mode::Off) {
+        if (g->window->gl_api() != platform::GlApi::Vulkan) {
+            sent += " (HDR needs the Vulkan renderer)";
+        } else if (!g->hdr_at_start) {
+            sent += " (HDR from the next start)";
+        }
+    }
+    return sent + "; " + screen + ".";
 }
 
 // The window's own keys: F11 and Alt+Return change between fullscreen and the window, F9 and F10

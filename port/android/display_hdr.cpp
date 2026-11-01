@@ -50,13 +50,16 @@ bool android_display_hdr(renderer::hdr::Display& display) {
     const jmethodID method = env->GetStaticMethodID(type, "displayHdr", "()[F");
     if (method != nullptr && !failed(env, "displayHdr")) {
         auto* values = static_cast<jfloatArray>(env->CallStaticObjectMethod(type, method));
-        if (!failed(env, "displayHdr") && values != nullptr && env->GetArrayLength(values) >= 3) {
-            jfloat got[3] = {};
-            env->GetFloatArrayRegion(values, 0, 3, got);
+        if (!failed(env, "displayHdr") && values != nullptr && env->GetArrayLength(values) >= 6) {
+            jfloat got[6] = {};
+            env->GetFloatArrayRegion(values, 0, 6, got);
             display.known = true;
             display.hdr_enabled = got[0] != 0.0f;
             display.peak_nits = got[1];
             display.sdr_white_nits = got[2];
+            display.relative = got[3] != 0.0f;
+            display.hdr10 = got[4] != 0.0f;
+            display.headroom = got[5];
             read = true;
         }
         if (values != nullptr) {
@@ -68,15 +71,17 @@ bool android_display_hdr(renderer::hdr::Display& display) {
     return read;
 }
 
-void android_window_hdr(bool on) {
+void android_window_hdr(bool on, float headroom) {
     JNIEnv* env = nullptr;
     jclass type = activity_class(env);
     if (type == nullptr) {
         return;
     }
-    const jmethodID method = env->GetStaticMethodID(type, "windowHdr", "(Z)V");
+    const jmethodID method = env->GetStaticMethodID(type, "windowHdr", "(ZF)V");
     if (method != nullptr && !failed(env, "windowHdr")) {
-        env->CallStaticVoidMethod(type, method, static_cast<jboolean>(on));
+        env->CallStaticVoidMethod(
+            type, method, static_cast<jboolean>(on), static_cast<jfloat>(headroom)
+        );
     }
     failed(env, "windowHdr");
     env->DeleteLocalRef(type);

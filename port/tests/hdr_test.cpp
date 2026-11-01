@@ -118,6 +118,29 @@ void test_levels() {
     CHECK(l.peak == 600.0f);
 }
 
+// A display whose HDR is relative to the system's white (Android's headroom, macOS's EDR): white
+// is scRGB's 1.0 whatever the player's paper white, the peak its headroom (or less, if asked), and
+// the output linear extended sRGB.
+void test_relative_display() {
+    hdr::Display android;
+    android.known = true;
+    android.hdr_enabled = true;
+    android.relative = true;
+    android.sdr_white_nits = hdr::kScRgbUnitNits;
+    android.peak_nits = hdr::kScRgbUnitNits * 3.0f;
+    hdr::Levels l = hdr::resolve_levels(300, 0, android);
+    CHECK(l.paper_white == hdr::kScRgbUnitNits && near(l.peak, 240.0f, 1e-3f));
+    l = hdr::resolve_levels(0, 400, android);  // asks for more than the headroom: the headroom
+    CHECK(near(l.peak, 240.0f, 1e-3f));
+    android.peak_nits = 2000.0f;
+    l = hdr::resolve_levels(0, 400, android);  // asks for less: less
+    CHECK(near(l.peak, 400.0f, 1e-3f));
+    CHECK(hdr::wanted_output(hdr::Mode::Auto, android, false) == Output::ScRgb);
+    // White comes out at scRGB's 1.0.
+    l = hdr::resolve_levels(0, 0, android);
+    CHECK(near(hdr::encode({1.0f, 1.0f, 1.0f}, Output::ScRgb, l)[0], 1.0f, 1e-5f));
+}
+
 void test_wanted_output() {
     const hdr::Display unknown;
     const hdr::Display sdr_display{true, false, 0.0f, 0.0f};
@@ -140,6 +163,7 @@ int main() {
     test_gamma_and_gamut();
     test_roll_off();
     test_levels();
+    test_relative_display();
     test_wanted_output();
     return openrac::test::result();
 }
