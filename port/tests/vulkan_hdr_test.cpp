@@ -216,6 +216,21 @@ void test_float_frame() {
         "}\n",
         error
     ));
+    // A shader whose one output has no location: clamped too.
+    openrac::renderer::Shader lone;
+    CHECK(lone.build(
+        "hdr frame fixture without a location",
+        "#version 410 core\n"
+        "void main() {\n"
+        "    vec2 p = vec2((gl_VertexID << 1) & 2, gl_VertexID & 2);\n"
+        "    gl_Position = vec4(p * 2.0 - 1.0, 0, 1);\n"
+        "}\n",
+        "#version 410 core\n"
+        "uniform vec4 colour;\n"
+        "out vec4 result;\n"
+        "void main() { result = colour; }\n",
+        error
+    ));
     unsigned vao = 0;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
@@ -226,6 +241,8 @@ void test_float_frame() {
     // A colour past both ends, written as it is: clamped.
     fill(frame, shader, {2.0f, 0.5f, -1.0f, 3.0f}, false);
     CHECK(near4(first_pixel(frame), {1.0f, 0.5f, 0.0f, 1.0f}));
+    fill(frame, lone, {3.0f, 0.25f, -2.0f, 2.0f}, false);
+    CHECK(near4(first_pixel(frame), {1.0f, 0.25f, 0.0f, 1.0f}));
     // Two adds of 0.75: 1.5, above white.
     fill(frame, shader, {0.0f, 0.0f, 0.0f, 0.0f}, false);
     fill(frame, shader, {0.75f, 0.75f, 0.25f, 0.5f}, true);

@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <iterator>
 #include <regex>
 #include <string>
 #include <string_view>
@@ -1050,14 +1051,26 @@ VkShaderModule clamped_fragment(Program& p) {
         R"(layout\s*\(\s*location\s*=\s*0\s*\)\s*out\s+vec4\s+([A-Za-z_][A-Za-z_0-9]*)\s*;)"
     );
     static const std::regex entry(R"(\bvoid\s+main\s*\(\s*(void)?\s*\))");
+    // Or its one output without a location (location 0 then).
+    static const std::regex lone(R"((^|\n)\s*out\s+vec4\s+([A-Za-z_][A-Za-z_0-9]*)\s*;)");
     std::smatch match;
-    if (p.fragment_source.empty() || !std::regex_search(p.fragment_source, match, output)
-        || !std::regex_search(p.fragment_source, entry)) {
+    std::string colour;
+    if (std::regex_search(p.fragment_source, match, output)) {
+        colour = match[1];
+    } else if (std::regex_search(p.fragment_source, match, lone)
+               && std::distance(
+                      std::sregex_iterator(
+                          p.fragment_source.begin(), p.fragment_source.end(), lone
+                      ),
+                      std::sregex_iterator()
+                  ) == 1) {
+        colour = match[2];
+    }
+    if (colour.empty() || !std::regex_search(p.fragment_source, entry)) {
         log::warn("vulkan: a program's colour cannot be clamped (no colour output found)");
         return VK_NULL_HANDLE;
     }
     // The program's own main runs first, then its colour is clamped.
-    const std::string colour = match[1];
     std::string fs = std::regex_replace(p.fragment_source, entry, "void openrac_unclamped_main()");
     fs += "\nvoid main() {\n    openrac_unclamped_main();\n    " + colour + " = clamp(" + colour
           + ", 0.0, 1.0);\n}\n";
