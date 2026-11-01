@@ -354,6 +354,18 @@ void drawer_hdr() {
             graphics.hdr_paper_white = kWhites[std::clamp(at + by, 0, kLast)];
             changed = true;
         }
+        // 0 keeps the picture as in SDR; higher lifts lamps, explosions and sky towards the peak.
+        constexpr int kStep = 10;
+        const int lift = graphics.hdr_highlights;
+        if (const int by = drawer_choice(
+                "HDR highlights",
+                lift == 0 ? std::string("Off") : std::format("{}%", lift),
+                lift > 0,
+                lift < hdr::kHighlightsMax
+            )) {
+            graphics.hdr_highlights = std::clamp(lift + by * kStep, 0, hdr::kHighlightsMax);
+            changed = true;
+        }
     }
     if (changed) {
         settings::save();

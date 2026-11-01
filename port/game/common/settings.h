@@ -159,6 +159,8 @@ struct Settings {
     renderer::hdr::Mode hdr = renderer::hdr::Mode::Off;
     int hdr_paper_white = 0;  // nits of the game's white; 0: the system's SDR white, else 203
     int hdr_peak = 0;         // nits the screen is told it may show; 0: the display's, else 1000
+    // Percent of the way from paper white to the peak the brightest parts are lifted; 0: as in SDR.
+    int hdr_highlights = renderer::hdr::kDefaultHighlights;
 
     VSync vsync = VSync::On;
     FrameRate frame_rate = FrameRate::Display;

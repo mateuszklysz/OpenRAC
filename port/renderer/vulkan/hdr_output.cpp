@@ -26,6 +26,8 @@ struct EncodeConstants {
     float paper_white;
     float sdr_gamma;
     std::int32_t same_size;
+    float boost;
+    float knee;
 };
 
 // Whether the encode pass can write `format`: the device stores to it. Where the surface's images
@@ -202,6 +204,8 @@ bool encode(
                 && colour.height == static_cast<int>(extent.height)
             ? 1
             : 0,
+        renderer::hdr::highlight_boost(levels),
+        renderer::hdr::kHighlightKnee,
     };
     vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, g->hdr.pipeline);
     vkCmdBindDescriptorSets(
@@ -220,7 +224,7 @@ bool encode(
 }
 
 // The screen's metadata: BT.2020 primaries, the display's peak, and content that never comes
-// above paper white (MaxCLL), so that a television need not tone-map it down.
+// above paper white with its highlights (MaxCLL), so that a television need not tone-map it down.
 void set_metadata() {
     auto& hdr = g->hdr;
     if (!hdr.metadata || vkSetHdrMetadataEXT == nullptr || hdr.shown == Output::Sdr) {
@@ -233,7 +237,7 @@ void set_metadata() {
     m.whitePoint = {0.3127f, 0.3290f};
     m.maxLuminance = hdr.asked.levels.peak;
     m.minLuminance = 0.0f;
-    m.maxContentLightLevel = hdr.asked.levels.paper_white;
+    m.maxContentLightLevel = renderer::hdr::max_content_nits(hdr.asked.levels);
     m.maxFrameAverageLightLevel = hdr.asked.levels.paper_white;
     vkSetHdrMetadataEXT(g->device, 1, &g->swapchain, &m);
 }
@@ -309,10 +313,11 @@ void hdr_swapchain_made(const VkSurfaceFormatKHR& format) {
     }
     set_metadata();
     log::info(
-        "vulkan: HDR output {} at {:.0f} nits paper white (peak {:.0f}){}",
+        "vulkan: HDR output {} at {:.0f} nits paper white (peak {:.0f}, highlights up to {:.0f}){}",
         renderer::hdr::name(hdr.shown),
         hdr.asked.levels.paper_white,
         hdr.asked.levels.peak,
+        renderer::hdr::max_content_nits(hdr.asked.levels),
         hdr.direct ? "" : ", through a copy"
     );
 }

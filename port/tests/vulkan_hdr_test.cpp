@@ -158,6 +158,9 @@ int main() {
     test_encode(window, hdr::Output::Hdr10, {480.0f, 1500.0f});
     test_encode(window, hdr::Output::ScRgb, {203.0f, 1000.0f});
     test_encode(window, hdr::Output::ScRgb, {80.0f, 400.0f});
+    // Highlights lifted above paper white, the same on the GPU.
+    test_encode(window, hdr::Output::Hdr10, {203.0f, 1000.0f, 0.5f});
+    test_encode(window, hdr::Output::ScRgb, {160.0f, 1200.0f, 1.0f});
     test_scaled();
     // Without an HDR request the screen is sent SDR, and a hidden window has no HDR to offer.
     CHECK(openrac::vkgl::hdr_output() == hdr::Output::Sdr);

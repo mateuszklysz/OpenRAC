@@ -57,18 +57,40 @@ inline constexpr int kPeakMax = 10000;
 // monitor's real response; the piecewise sRGB curve would lift the game's dark scenes).
 inline constexpr float kSdrGamma = 2.2f;
 
-// The HDR picture's brightness: the game's white at `paper_white` nits; `peak` only goes into the
-// screen's metadata (the picture never comes above paper white).
+// Highlights (`hdr_highlights`, percent): how far the picture's brightest parts are lifted above
+// paper white towards the peak. 0 keeps the picture exactly as in SDR.
+inline constexpr int kHighlightsMax = 100;
+inline constexpr int kDefaultHighlights = 50;
+// Linear light (1.0 = the game's white) below which nothing is lifted: the game's mid tones and
+// dark scenes stay as they are, only what is near white (lamps, explosions, sky) gets brighter.
+inline constexpr float kHighlightKnee = 0.5f;
+
+// The HDR picture's brightness: the game's white at `paper_white` nits, its highlights lifted by
+// `highlights` (0..1) of the way to `peak`; `peak` also goes into the screen's metadata.
 struct Levels {
     float paper_white = kReferenceWhiteNits;
     float peak = kDefaultPeakNits;
+    float highlights = 0.0f;
 };
+
+// How much brighter than paper white the game's white is shown, less one (0: not lifted).
+inline float highlight_boost(const Levels& levels) {
+    const float headroom = std::max(levels.peak / levels.paper_white - 1.0f, 0.0f);
+    return std::clamp(levels.highlights, 0.0f, 1.0f) * headroom;
+}
+
+// The brightest the picture gets, in nits (the screen's MaxCLL).
+inline float max_content_nits(const Levels& levels) {
+    return levels.paper_white * (1.0f + highlight_boost(levels));
+}
 
 // The levels for the player's settings (`paper_white`, `peak`: nits, 0 for the system's) on
 // `display`. The system's SDR white is what the player set for SDR content in the system's own
 // settings (Windows' "SDR content brightness"), so the game looks like the desktop around it.
-inline Levels resolve_levels(int paper_white, int peak, const Display& display) {
+inline Levels resolve_levels(int paper_white, int peak, int highlights, const Display& display) {
     Levels levels;
+    levels.highlights =
+        static_cast<float>(std::clamp(highlights, 0, kHighlightsMax)) / kHighlightsMax;
     if (paper_white > 0) {
         levels.paper_white =
             static_cast<float>(std::clamp(paper_white, kPaperWhiteMin, kPaperWhiteMax));
@@ -139,13 +161,29 @@ inline float sdr_to_linear(float value) {
     return std::pow(std::clamp(value, 0.0f, 1.0f), kSdrGamma);
 }
 
+// Lifts a pixel's linear light (1.0 = the game's white) above the knee by `boost` at most (the
+// game's white comes out at 1 + boost). The colour's luminance is lifted along a curve that
+// starts flat at the knee, and all three channels are scaled alike, so hues stay as they are.
+inline Rgb lift_highlights(const Rgb& linear, float boost) {
+    const float luma = 0.2126f * linear[0] + 0.7152f * linear[1] + 0.0722f * linear[2];
+    if (boost <= 0.0f || luma <= kHighlightKnee) {
+        return linear;
+    }
+    const float t = (std::min(luma, 1.0f) - kHighlightKnee) / (1.0f - kHighlightKnee);
+    const float scale = (luma + boost * t * t) / luma;
+    return {linear[0] * scale, linear[1] * scale, linear[2] * scale};
+}
+
 // The value the screen is sent for one pixel of the picture (`rgb`, 0..1 as stored): PQ signals
 // for Output::Hdr10, scRGB values for Output::ScRgb, the input itself for Output::Sdr.
 inline Rgb encode(const Rgb& rgb, Output output, const Levels& levels) {
     if (output == Output::Sdr) {
         return rgb;
     }
-    const Rgb linear = {sdr_to_linear(rgb[0]), sdr_to_linear(rgb[1]), sdr_to_linear(rgb[2])};
+    const Rgb linear = lift_highlights(
+        {sdr_to_linear(rgb[0]), sdr_to_linear(rgb[1]), sdr_to_linear(rgb[2])},
+        highlight_boost(levels)
+    );
     Rgb out{};
     if (output == Output::ScRgb) {
         const float scale = levels.paper_white / kScRgbUnitNits;

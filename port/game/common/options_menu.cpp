@@ -40,6 +40,7 @@ constexpr const char* kLabels[kRows] = {
     "Scenery detail",
     "VSync",
     "HDR",
+    "HDR highlights",
     "Frame rate",
     "Frame cap",
     "Low-latency frames",
@@ -84,6 +85,11 @@ constexpr Words kWords[] = {
       "Dettaglio scenario"}},
     {{"VSync", "Synchro verticale", "VSync", "Sincronía vertical", "Sincronia verticale"}},
     {{"HDR", "HDR", "HDR", "HDR", "HDR"}},
+    {{"HDR highlights",
+      "Hautes lumières HDR",
+      "HDR-Spitzlichter",
+      "Luces altas HDR",
+      "Luci alte HDR"}},
     {{"Frame rate", "Fréquence d'images", "Bildrate", "Fotogramas", "Frequenza fotogrammi"}},
     {{"Frame cap",
       "Limite d'images",
@@ -337,6 +343,9 @@ std::string value_of(int row) {
             return settings::name(s.vsync);
         case kHdr:
             return renderer::hdr::kModeNames[static_cast<int>(s.hdr)];
+        case kHdrHighlights:
+            // A number: the game's font draws a pad button for the percent sign.
+            return s.hdr_highlights == 0 ? std::string("Off") : std::to_string(s.hdr_highlights);
         case kFrameRate:
             return settings::frame_rate_name(s);
         case kFrameCap:
@@ -425,6 +434,10 @@ void step_value(int row, int by) {
         case kHdr:
             // From Off, it counts from the next start (frontend/window.cpp, apply_hdr).
             s.hdr = stepped_enum(s.hdr, by);
+            break;
+        case kHdrHighlights:
+            // Off (as in SDR) to 100 in tens, around the ends.
+            s.hdr_highlights = (s.hdr_highlights / 10 + by + 11) % 11 * 10;
             break;
         case kFrameRate: {
             // Original, Display, the caps, Unlimited: one list, the cap's number its place in it.

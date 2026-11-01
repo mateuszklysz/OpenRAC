@@ -336,7 +336,7 @@ struct HdrRequest {
 
     bool operator==(const HdrRequest& other) const {
         return wanted == other.wanted && levels.paper_white == other.levels.paper_white
-               && levels.peak == other.levels.peak;
+               && levels.peak == other.levels.peak && levels.highlights == other.levels.highlights;
     }
 };
 
