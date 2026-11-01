@@ -402,7 +402,7 @@ void load(const std::filesystem::path& file) {
         } else if (key == "menu_bar") {
             known = parse_bool(value, s.menu_bar);
         } else if (key == "menu_bar_key") {
-            // Any key name SDL knows; the overlay falls back to Alt for one it does not.
+            // Any key name SDL knows; the overlay uses the default for one it does not.
             known = !value.empty();
             if (known) {
                 s.menu_bar_key = value;

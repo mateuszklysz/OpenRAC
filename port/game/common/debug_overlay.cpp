@@ -553,25 +553,32 @@ bool event(const SDL_Event& e) {
             s.menu_key_capture = false;
             if (e.key.key != SDLK_ESCAPE) {
                 const bool alt = e.key.key == SDLK_LALT || e.key.key == SDLK_RALT;
-                settings::get().menu_bar_key = alt ? "Alt" : SDL_GetKeyName(e.key.key);
+                settings::get().menu_bar_key = alt ? "Alt" : SDL_GetScancodeName(e.key.scancode);
                 settings::save();
             }
             return true;
         }
-        const SDL_Keycode key = menu_bar_keycode();
-        if (key == SDLK_UNKNOWN) {
+        // Alt+Tab: the system takes the Tab, and SDL reports the Alt still held when the window
+        // has the focus again. An Alt that comes with the focus is not one by itself.
+        if (e.type == SDL_EVENT_WINDOW_FOCUS_GAINED || e.type == SDL_EVENT_WINDOW_FOCUS_LOST) {
+            s.alt_alone = false;
+            s.focus_ns = e.window.timestamp;
+        }
+        const SDL_Scancode key = menu_bar_scancode();
+        if (key == SDL_SCANCODE_UNKNOWN) {
             // Alt by itself hides and shows the menus (Alt+Return is fullscreen: another key in
             // between makes it not by itself).
             const bool alt = e.type == SDL_EVENT_KEY_DOWN || e.type == SDL_EVENT_KEY_UP
                                  ? e.key.key == SDLK_LALT || e.key.key == SDLK_RALT
                                  : false;
+            constexpr Uint64 kFocusSettleNs = 300'000'000;
             if (e.type == SDL_EVENT_KEY_DOWN) {
-                s.alt_alone = alt;
+                s.alt_alone = alt && e.key.timestamp - s.focus_ns > kFocusSettleNs;
             } else if (e.type == SDL_EVENT_KEY_UP && alt && s.alt_alone) {
                 s.alt_alone = false;
                 toggle_menu_bar();
             }
-        } else if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat && e.key.key == key
+        } else if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat && e.key.scancode == key
                    && (e.key.mod & (SDL_KMOD_CTRL | SDL_KMOD_ALT)) == 0) {
             toggle_menu_bar();
             return true;

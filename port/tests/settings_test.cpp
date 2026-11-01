@@ -338,19 +338,22 @@ void test_first_start_display(const std::filesystem::path& file) {
     std::filesystem::remove(file);
 }
 
-// The menu bar's key: Alt unless the file names another, which a save keeps.
+// The menu bar's key: the one under Escape unless the file names another, which a save keeps.
 void test_menu_bar_key(const std::filesystem::path& file) {
     using namespace openrac;
     std::filesystem::remove(file);
     settings::load(file);
-    CHECK(settings::get().menu_bar_key == "Alt");
+    CHECK(settings::get().menu_bar_key == "`");
     settings::get().menu_bar_key = "F4";
     settings::save();
     settings::load(file);
     CHECK(settings::get().menu_bar_key == "F4");
-    std::ofstream(file) << "menu_bar_key = \n";
+    std::ofstream(file) << "menu_bar_key = Alt\n";
     settings::load(file);
     CHECK(settings::get().menu_bar_key == "Alt");
+    std::ofstream(file) << "menu_bar_key = \n";
+    settings::load(file);
+    CHECK(settings::get().menu_bar_key == "`");
     std::filesystem::remove(file);
 }
 

@@ -200,7 +200,7 @@ A file with `frame_rate` but no `vsync` gets `vsync = on` when
 | **F9** / **F10** | Volume down / up |
 | **F11** | Full screen |
 | **F12** | Screenshot |
-| **Alt** | Hide and show the in-window menus (on its own) |
+| **`** (key under Escape) | Hide and show the in-window menus (`menu_bar_key`; Controller bindings, Keyboard tab) |
 | **Alt+Return** | Fullscreen |
 
 ## 5. The input map

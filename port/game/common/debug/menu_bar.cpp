@@ -56,19 +56,26 @@ void press(SDL_Keycode key) {
     SDL_PushEvent(&event);
 }
 
-SDL_Keycode menu_bar_keycode() {
+SDL_Scancode menu_bar_scancode() {
     const std::string& name = settings::get().menu_bar_key;
-    if (name == "Alt") {
-        return SDLK_UNKNOWN;
+    const SDL_Scancode key =
+        name == "Alt" ? SDL_SCANCODE_LALT : SDL_GetScancodeFromName(name.c_str());
+    if (key == SDL_SCANCODE_LALT || key == SDL_SCANCODE_RALT) {
+        return SDL_SCANCODE_UNKNOWN;
     }
-    // An Alt of its own, or a name SDL does not know, is the plain Alt.
-    const SDL_Keycode key = SDL_GetKeyFromName(name.c_str());
-    return key == SDLK_LALT || key == SDLK_RALT ? SDLK_UNKNOWN : key;
+    // A name SDL does not know: the default, the key under Escape.
+    return key == SDL_SCANCODE_UNKNOWN ? SDL_SCANCODE_GRAVE : key;
 }
 
 std::string menu_bar_key_label() {
-    const SDL_Keycode key = menu_bar_keycode();
-    return key == SDLK_UNKNOWN ? std::string("Alt") : std::string(SDL_GetKeyName(key));
+    const SDL_Scancode key = menu_bar_scancode();
+    if (key == SDL_SCANCODE_UNKNOWN) {
+        return "Alt";
+    }
+    // What the key prints on the player's own layout, else its place's name.
+    const char* name = SDL_GetKeyName(SDL_GetKeyFromScancode(key, SDL_KMOD_NONE, false));
+    return name != nullptr && *name != '\0' ? std::string(name)
+                                            : std::string(SDL_GetScancodeName(key));
 }
 
 void toggle_menu_bar() {

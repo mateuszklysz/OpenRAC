@@ -681,15 +681,18 @@ void keyboard_tab() {
         if (ImGui::SmallButton("Change")) {
             s.menu_key_capture = true;
         }
-        if (menu_bar_keycode() != SDLK_UNKNOWN) {
+        if (settings::get().menu_bar_key != settings::Settings{}.menu_bar_key) {
             ImGui::SameLine();
-            if (ImGui::SmallButton("Back to Alt")) {
-                settings::get().menu_bar_key = "Alt";
+            if (ImGui::SmallButton("Default")) {
+                settings::get().menu_bar_key = settings::Settings{}.menu_bar_key;
                 settings::save();
             }
         }
     }
-    ImGui::TextDisabled("Alt counts pressed by itself, so Alt+Return still goes fullscreen.");
+    ImGui::TextDisabled(
+        "The key is kept by its place on the keyboard (the default is the one under Escape). Alt "
+        "counts pressed by itself, so Alt+Return still goes fullscreen."
+    );
 }
 
 }  // namespace

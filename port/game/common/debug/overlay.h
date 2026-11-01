@@ -208,6 +208,7 @@ struct State {
     double toast_until = 0.0;  // the ImGui time the toast goes at
     bool alt_alone = false;  // Alt went down and no other key since: its release toggles the menus
     bool menu_key_capture = false;  // the next key pressed becomes the menu bar's (controls window)
+    std::uint64_t focus_ns = 0;     // when the window last gained or lost the focus (SDL's clock)
     bool developer = false;  // the launcher's developer tools (OPENRAC_DEVELOPER): the level select
     std::string dump_path = "openrac_frames.jsonl";  // where the frames' measurements are written
 
@@ -423,10 +424,11 @@ bool menu_bar_shown();
 // port's key for it does. Defined in debug/menu_bar.cpp.
 void press(SDL_Keycode key);
 
-// The key that hides and shows the menu bar, as the player reads it ("Alt", "F4"), and its SDL
-// key (SDLK_UNKNOWN for Alt, which counts only pressed by itself). Defined in debug/menu_bar.cpp.
+// The key that hides and shows the menu bar, as the player reads it ("`", "Alt", "F4"), and its
+// place on the keyboard (SDL_SCANCODE_UNKNOWN for Alt, which counts only pressed by itself).
+// Defined in debug/menu_bar.cpp.
 std::string menu_bar_key_label();
-SDL_Keycode menu_bar_keycode();
+SDL_Scancode menu_bar_scancode();
 
 // Hides or shows the menu bar and saves it, with a toast when it hides. Defined in
 // debug/menu_bar.cpp.
