@@ -37,31 +37,8 @@
  */
 #include "types.h"
 
-/* The console's square root, and `a` over the square root of `b` as its one operation. */
-float openrac_sqrt(float x);
-float openrac_rsqrt(float a, float b);
-
 /* How many game ticks one sixtieth of a second is (1.0 at 60 Hz, 1.2 at 50 Hz), read through $gp. */
 extern float D_0015ED60;
-
-/* The bits of a float, for a field that is copied and not computed. */
-static __inline__ unsigned bits_of(float *v, int field) {
-    return ((unsigned *)v)[field];
-}
-
-/* Stores three computed fields and the copied fourth. */
-static __inline__ void put(float *out, float x, float y, float z, unsigned w) {
-    out[0] = x;
-    out[1] = y;
-    out[2] = z;
-    ((unsigned *)out)[3] = w;
-}
-
-/* The level programs' own copy of the routine above. */
-extern void func_001F9BF8(void *, void *, float);
-void func_L00_001FF500(float *out, float *a, float length) {
-    func_001F9BF8(out, a, length);
-}
 
 /* a = a + b in x, y and z; w stays a's. The first argument is not used. (vadd.xyz, stored back to a) */
 void FUN_L00_001ff290(void *unused, float *a, float *b) {
@@ -81,30 +58,9 @@ float FUN_L00_00200260(float a, float b) {
     return (quotient - whole) * b;
 }
 
-/*
- * out = a scaled to the length `length` over x and y; z and w are a's. A vector whose squared
- * length over x and y is exactly zero gets zeros there.
- */
-void func_L00_001FF550(float *out, float *a, float length) {
-    float x = a[0] * a[0];
-    float y = a[1] * a[1];
-    float sum = x + y;
-    unsigned z = bits_of(a, 2);
-    unsigned w = bits_of(a, 3);
-    float scale;
-    if (bits_of(&sum, 0) == 0) {
-        x = 0.0f + 0.0f;
-        y = 0.0f + 0.0f;
-    } else {
-        scale = openrac_rsqrt(length, sum);
-        x = a[0] * scale;
-        y = a[1] * scale;
-    }
-    out[0] = x;
-    out[1] = y;
-    ((unsigned *)out)[2] = z;
-    ((unsigned *)out)[3] = w;
-}
+/* The level programs' copies of fast_vec_normalize (0x1FF500) and set_vector_length_xy
+ * (0x1FF550) have no C here: their places belong to FUN_001f9bf8 and FUN_001f9c48
+ * (game_fastfunc.c), which hostgen binds at every level's copy. */
 
 /*
  * Counts a byte down by one: 1 if it was zero already (nothing is stored), 0 if it is still
