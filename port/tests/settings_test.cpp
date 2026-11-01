@@ -354,6 +354,15 @@ void test_menu_bar_key(const std::filesystem::path& file) {
     std::ofstream(file) << "menu_bar_key = \n";
     settings::load(file);
     CHECK(settings::get().menu_bar_key == "`");
+    // The controller button: R4 by default, any name kept, "none" too.
+    CHECK(settings::get().menu_bar_button == "paddle1");
+    settings::get().menu_bar_button = "none";
+    settings::save();
+    settings::load(file);
+    CHECK(settings::get().menu_bar_button == "none");
+    std::ofstream(file) << "menu_bar_button = misc1\n";
+    settings::load(file);
+    CHECK(settings::get().menu_bar_button == "misc1");
     std::filesystem::remove(file);
 }
 

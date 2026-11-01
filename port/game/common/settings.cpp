@@ -407,6 +407,12 @@ void load(const std::filesystem::path& file) {
             if (known) {
                 s.menu_bar_key = value;
             }
+        } else if (key == "menu_bar_button") {
+            // Any button name SDL knows, or "none"; the overlay uses the default for another.
+            known = !value.empty();
+            if (known) {
+                s.menu_bar_button = value;
+            }
         } else if (key == "mute_unfocused") {
             known = parse_bool(value, s.mute_unfocused);
         } else if (key == "original_lod") {
@@ -595,6 +601,7 @@ void save() {
         << "show_fps = " << static_cast<int>(s.show_fps) << "\n"
         << "menu_bar = " << (s.menu_bar ? 1 : 0) << "\n"
         << "menu_bar_key = " << s.menu_bar_key << "\n"
+        << "menu_bar_button = " << s.menu_bar_button << "\n"
         << "mute_unfocused = " << (s.mute_unfocused ? 1 : 0) << "\n"
         << "original_lod = " << (s.original_lod ? 1 : 0) << "\n"
         << "responsive_controls = " << (s.responsive_controls ? 1 : 0) << "\n"

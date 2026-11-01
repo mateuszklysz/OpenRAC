@@ -47,8 +47,6 @@ namespace openrac::frontend::debug_overlay {
 
 namespace {
 
-constexpr Uint16 kValveVendor = 0x28DE;  // USB vendor id of Valve's controllers
-
 // ---- The environment ----
 
 // Returns the value `var` was set to as a string of its own, or nothing when it is unset. For the
@@ -551,6 +549,20 @@ bool event(const SDL_Event& e) {
     if (menu_bar_possible()) {
         // The controls window waits for the menu bar's new key: the next one pressed (Escape
         // keeps the old one).
+        // ...or for its new controller button: the next one pressed (Escape keeps the old one).
+        if (s.menu_button_capture) {
+            if (e.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN) {
+                s.menu_button_capture = false;
+                settings::get().menu_bar_button =
+                    SDL_GetGamepadStringForButton(static_cast<SDL_GamepadButton>(e.gbutton.button));
+                settings::save();
+                return true;
+            }
+            if (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_ESCAPE) {
+                s.menu_button_capture = false;
+                return true;
+            }
+        }
         if (s.menu_key_capture && e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat) {
             s.menu_key_capture = false;
             if (e.key.key != SDLK_ESCAPE) {
@@ -585,13 +597,12 @@ bool event(const SDL_Event& e) {
             toggle_menu_bar();
             return true;
         }
-        // The Steam Controller's upper right back button (R4, SDL's right paddle 1; the 2015
-        // controller's right grip) does the same, only on Valve's pads and while the game's window
-        // has the focus. Not "...": a running Steam client opens its own panel on it.
+        // The menu bar's controller button (menu_bar_button; by default R4, the Steam Controller's
+        // upper right back button) does the same, while the game's window has the focus. Not
+        // "...": a running Steam client opens its own panel on it.
         if (e.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN
-            && e.gbutton.button == SDL_GAMEPAD_BUTTON_RIGHT_PADDLE1
-            && SDL_GetGamepadVendorForID(e.gbutton.which) == kValveVendor
-            && SDL_GetKeyboardFocus() != nullptr) {
+            && menu_bar_button() != SDL_GAMEPAD_BUTTON_INVALID
+            && e.gbutton.button == menu_bar_button() && SDL_GetKeyboardFocus() != nullptr) {
             toggle_menu_bar();
         }
     }

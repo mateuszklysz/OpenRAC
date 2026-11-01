@@ -78,6 +78,36 @@ std::string menu_bar_key_label() {
                                             : std::string(SDL_GetScancodeName(key));
 }
 
+SDL_GamepadButton menu_bar_button() {
+    const std::string& name = settings::get().menu_bar_button;
+    if (name == "none") {
+        return SDL_GAMEPAD_BUTTON_INVALID;
+    }
+    const SDL_GamepadButton button = SDL_GetGamepadButtonFromString(name.c_str());
+    // A name SDL does not know: the default, R4.
+    return button == SDL_GAMEPAD_BUTTON_INVALID ? SDL_GAMEPAD_BUTTON_RIGHT_PADDLE1 : button;
+}
+
+std::string menu_bar_button_label() {
+    switch (const SDL_GamepadButton button = menu_bar_button()) {
+        case SDL_GAMEPAD_BUTTON_INVALID:
+            return "none";
+        // The back buttons by the names on Valve's pads (the Steam Controller, the Steam Deck).
+        case SDL_GAMEPAD_BUTTON_RIGHT_PADDLE1:
+            return "R4";
+        case SDL_GAMEPAD_BUTTON_LEFT_PADDLE1:
+            return "L4";
+        case SDL_GAMEPAD_BUTTON_RIGHT_PADDLE2:
+            return "R5";
+        case SDL_GAMEPAD_BUTTON_LEFT_PADDLE2:
+            return "L5";
+        default: {
+            const char* name = SDL_GetGamepadStringForButton(button);
+            return name != nullptr ? std::string(name) : std::string("?");
+        }
+    }
+}
+
 void toggle_menu_bar() {
     settings::get().menu_bar = !settings::get().menu_bar;
     settings::save();
