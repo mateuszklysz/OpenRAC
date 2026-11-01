@@ -585,11 +585,11 @@ bool event(const SDL_Event& e) {
             toggle_menu_bar();
             return true;
         }
-        // The Steam Controller's "..." button (SDL's misc1 on Valve's pads; on others misc1 is a
-        // share or capture button, left alone) does the same, only while the game's window has
-        // the focus: the pad still plays in the background, but a press meant for another
-        // window (Steam's own menu) leaves the bar alone.
-        if (e.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN && e.gbutton.button == SDL_GAMEPAD_BUTTON_MISC1
+        // The Steam Controller's upper right back button (R4, SDL's right paddle 1; the 2015
+        // controller's right grip) does the same, only on Valve's pads and while the game's window
+        // has the focus. Not "...": a running Steam client opens its own panel on it.
+        if (e.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN
+            && e.gbutton.button == SDL_GAMEPAD_BUTTON_RIGHT_PADDLE1
             && SDL_GetGamepadVendorForID(e.gbutton.which) == kValveVendor
             && SDL_GetKeyboardFocus() != nullptr) {
             toggle_menu_bar();
