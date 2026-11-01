@@ -44,6 +44,17 @@
     "resources": {
       "resources/openrac": "openrac"
     },
+    "windows": {
+      "nsis": {
+        "installerHooks": "installer/installer-hooks.nsh",
+        "sidebarImage": "installer/nsis-sidebar.bmp",
+        "headerImage": "installer/nsis-header.bmp"
+      },
+      "wix": {
+        "bannerPath": "installer/wix-banner.bmp",
+        "dialogImagePath": "installer/wix-dialog.bmp"
+      }
+    },
     "linux": {
       "rpm": {
         "compression": { "type": "zstd", "level": 3 }
