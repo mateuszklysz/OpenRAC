@@ -486,7 +486,8 @@ def write_program_files(program: Program, out: Path, game: str) -> dict:
     fn.append("}")
     _write(out / "functions.c", "\n".join(fn) + "\n")
     return {"stubs": stub_count, "unprototyped": unprototyped,
-            "addresses": sum(len(v) for v in code_tables.values())}
+            "addresses": sum(len(v) for v in code_tables.values()),
+            "places_shared": program.places_shared}
 
 
 def thunk_text(sym: str, f: Function, typedefs: dict, k: int) -> str | None:
@@ -681,6 +682,8 @@ def write_report(out: Path, reports: list[UnitReport], program: Program, extra: 
         f"| Functions from candidates (C that is not the matched C) | {len(extra.get('candidates_used', []))} |",
         f"| Matched functions the port's own C overrides | {len(extra.get('overrides_used', []))} |",
         f"| Functions by code address | {extra.get('addresses', 0)} |",
+        f"| ... places with a second function with C, left out of the table (places_shared) | "
+        f"{len(extra.get('places_shared', []))} |",
         f"| Arguments passed through from the caller's registers | {summary['arguments_passed_through']} |",
         f"| Arguments a call leaves out, filled with 0 | "
         f"{sum(len(v) for v in summary['arguments_filled_with_zero'].values())} |",

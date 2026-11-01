@@ -195,6 +195,18 @@ class CatalogueTests(unittest.TestCase):
         self.assertIsNone(missing.unit)
         self.assertEqual(program.symbols['func_00157C58'], 0x157C58)
 
+    def test_one_function_per_code_place(self):
+        # The decompilation defines one function twice under two names: functions.c lists the
+        # first only (the one the runtime keeps) and the report names the other.
+        program = Program()
+        sig = Signature(ctype.Base('void'), (), False, True)
+        for sym in ('func_00100000', 'func_00100000_1', 'func_00100040'):
+            program.functions[sym] = Function(sym, sig, f'src/{sym}.c')
+        self.assertEqual(program.code_tables(), {-1: [(0x100000, 'func_00100000'), (0x100040, 'func_00100040')]})
+        self.assertEqual(program.function_at(-1, 0x100000), 'func_00100000')
+        self.assertEqual(program.places_shared,
+                         ['func_00100000_1 at 0x00100000 in the executable: func_00100000 has the place'])
+
 
 if __name__ == '__main__':
     unittest.main()

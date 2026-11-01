@@ -136,13 +136,13 @@ answer:
 1. **The log's own words.** `X has no C in the port yet; it does nothing`
    (the function's C is missing; the count says how hot it is), `call to code
    address ..., which no function of the port has` (a pointer into code the
-   port has not bound), `two functions at ...; keeping the first` (two names
-   at one address, and the one kept may be the stub).
+   port has not bound).
 2. **hostgen's report**, `port/build/release/games/<id>/gen/report.md`: stubs,
    functions without C, and *calls short of arguments, filled with 0*. On the
    console a register still held the caller's value; in C the callee gets 0.
    That one bug made the US title menu show the Bomb Glove's tip for every
-   entry.
+   entry. `places_shared` lists two functions with C at one address; the
+   table keeps the first.
 3. **Hide and show.** `OPENRAC_HIDE_PASSES` says which renderer draws a wrong
    thing; `OPENRAC_SHOW_MISSING=1` paints textures the 2D path cannot find in
    magenta.

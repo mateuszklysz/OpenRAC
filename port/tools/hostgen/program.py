@@ -242,8 +242,18 @@ class Program:
                 offset = getattr(self, "entries", {}).get(sym)
                 if offset:
                     tables[overlay].append((addr + offset, sym))
-        for entries in tables.values():
-            entries.sort()
+        # Two functions with C at one place (the decompilation defines it twice, under two names):
+        # only the first is listed, the one the runtime would keep (guest.cpp), and the others go
+        # in the report instead of the game's log.
+        self.places_shared = []
+        for overlay, entries in tables.items():
+            kept: dict[int, str] = {}
+            for addr, sym in sorted(set(entries)):
+                first = kept.setdefault(addr, sym)
+                if first != sym:
+                    where = "the executable" if overlay < 0 else f"level {overlay}"
+                    self.places_shared.append(f"{sym} at {addr:#010x} in {where}: {first} has the place")
+            tables[overlay] = sorted((addr, sym) for addr, sym in kept.items())
         self._code_tables = tables
         return tables
 
