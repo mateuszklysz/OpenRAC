@@ -22,6 +22,7 @@
 #include "platform/bindings.h"
 #include "platform/input.h"
 #include "platform/players.h"
+#include "settings.h"
 
 namespace openrac::frontend::debug_overlay {
 namespace {
@@ -666,6 +667,31 @@ void players_tab(controls::Store& store, platform::Input& input) {
     ImGui::TextDisabled("Players are the same in every game.");
 }
 
+// The port's own keys the player can change: for now the one that hides and shows the menu bar
+// (settings.ini's menu_bar_key, read in debug_overlay.cpp).
+void keyboard_tab() {
+    ImGui::SeparatorText("Menu bar");
+    ImGui::TextUnformatted("Hide or show the menus:");
+    ImGui::SameLine();
+    if (s.menu_key_capture) {
+        ImGui::TextColored(kGreen, "press a key (Escape keeps %s)", menu_bar_key_label().c_str());
+    } else {
+        ImGui::TextUnformatted(menu_bar_key_label().c_str());
+        ImGui::SameLine();
+        if (ImGui::SmallButton("Change")) {
+            s.menu_key_capture = true;
+        }
+        if (menu_bar_keycode() != SDLK_UNKNOWN) {
+            ImGui::SameLine();
+            if (ImGui::SmallButton("Back to Alt")) {
+                settings::get().menu_bar_key = "Alt";
+                settings::save();
+            }
+        }
+    }
+    ImGui::TextDisabled("Alt counts pressed by itself, so Alt+Return still goes fullscreen.");
+}
+
 }  // namespace
 
 void controls_window() {
@@ -678,6 +704,7 @@ void controls_window() {
         }
         s.controls.capture_target = -1;
         s.controls.confirm_reset = false;
+        s.menu_key_capture = false;
         return;
     }
     ImGui::SetNextWindowSize(ImVec2(dp(720), dp(560)), ImGuiCond_FirstUseEver);
@@ -752,6 +779,10 @@ void controls_window() {
         }
         if (ImGui::BeginTabItem("Players")) {
             players_tab(*store, *input);
+            ImGui::EndTabItem();
+        }
+        if (menu_bar_possible() && ImGui::BeginTabItem("Keyboard")) {
+            keyboard_tab();
             ImGui::EndTabItem();
         }
         ImGui::EndTabBar();

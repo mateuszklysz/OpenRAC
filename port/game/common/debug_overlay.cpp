@@ -546,6 +546,37 @@ bool event(const SDL_Event& e) {
     if (drawer_possible() && drawer_event(e)) {
         return true;
     }
+    if (menu_bar_possible()) {
+        // The controls window waits for the menu bar's new key: the next one pressed (Escape
+        // keeps the old one).
+        if (s.menu_key_capture && e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat) {
+            s.menu_key_capture = false;
+            if (e.key.key != SDLK_ESCAPE) {
+                const bool alt = e.key.key == SDLK_LALT || e.key.key == SDLK_RALT;
+                settings::get().menu_bar_key = alt ? "Alt" : SDL_GetKeyName(e.key.key);
+                settings::save();
+            }
+            return true;
+        }
+        const SDL_Keycode key = menu_bar_keycode();
+        if (key == SDLK_UNKNOWN) {
+            // Alt by itself hides and shows the menus (Alt+Return is fullscreen: another key in
+            // between makes it not by itself).
+            const bool alt = e.type == SDL_EVENT_KEY_DOWN || e.type == SDL_EVENT_KEY_UP
+                                 ? e.key.key == SDLK_LALT || e.key.key == SDLK_RALT
+                                 : false;
+            if (e.type == SDL_EVENT_KEY_DOWN) {
+                s.alt_alone = alt;
+            } else if (e.type == SDL_EVENT_KEY_UP && alt && s.alt_alone) {
+                s.alt_alone = false;
+                toggle_menu_bar();
+            }
+        } else if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat && e.key.key == key
+                   && (e.key.mod & (SDL_KMOD_CTRL | SDL_KMOD_ALT)) == 0) {
+            toggle_menu_bar();
+            return true;
+        }
+    }
     if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat) {
         if (e.key.key == SDLK_F3 && (e.key.mod & SDL_KMOD_CTRL) != 0) {
             toggle_capture(false);
@@ -582,20 +613,6 @@ bool event(const SDL_Event& e) {
                 return true;
             default:
                 break;
-        }
-    }
-    if (menu_bar_possible()) {
-        // Alt by itself hides and shows the menus (Alt+Return is fullscreen: another key in between
-        // makes it not by itself).
-        const bool alt = e.type == SDL_EVENT_KEY_DOWN || e.type == SDL_EVENT_KEY_UP
-                             ? e.key.key == SDLK_LALT || e.key.key == SDLK_RALT
-                             : false;
-        if (e.type == SDL_EVENT_KEY_DOWN) {
-            s.alt_alone = alt;
-        } else if (e.type == SDL_EVENT_KEY_UP && alt && s.alt_alone) {
-            s.alt_alone = false;
-            settings::get().menu_bar = !settings::get().menu_bar;
-            settings::save();
         }
     }
     if (!(s.visible || s.enhanced_settings || s.controls_window || picker_enabled()

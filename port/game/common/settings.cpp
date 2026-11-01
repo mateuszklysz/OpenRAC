@@ -401,6 +401,12 @@ void load(const std::filesystem::path& file) {
             }
         } else if (key == "menu_bar") {
             known = parse_bool(value, s.menu_bar);
+        } else if (key == "menu_bar_key") {
+            // Any key name SDL knows; the overlay falls back to Alt for one it does not.
+            known = !value.empty();
+            if (known) {
+                s.menu_bar_key = value;
+            }
         } else if (key == "mute_unfocused") {
             known = parse_bool(value, s.mute_unfocused);
         } else if (key == "original_lod") {
@@ -588,6 +594,7 @@ void save() {
         << "frame_rate = " << frame_rate_value(s) << "\n"
         << "show_fps = " << static_cast<int>(s.show_fps) << "\n"
         << "menu_bar = " << (s.menu_bar ? 1 : 0) << "\n"
+        << "menu_bar_key = " << s.menu_bar_key << "\n"
         << "mute_unfocused = " << (s.mute_unfocused ? 1 : 0) << "\n"
         << "original_lod = " << (s.original_lod ? 1 : 0) << "\n"
         << "responsive_controls = " << (s.responsive_controls ? 1 : 0) << "\n"

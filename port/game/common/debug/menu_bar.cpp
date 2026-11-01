@@ -56,10 +56,35 @@ void press(SDL_Keycode key) {
     SDL_PushEvent(&event);
 }
 
+SDL_Keycode menu_bar_keycode() {
+    const std::string& name = settings::get().menu_bar_key;
+    if (name == "Alt") {
+        return SDLK_UNKNOWN;
+    }
+    // An Alt of its own, or a name SDL does not know, is the plain Alt.
+    const SDL_Keycode key = SDL_GetKeyFromName(name.c_str());
+    return key == SDLK_LALT || key == SDLK_RALT ? SDLK_UNKNOWN : key;
+}
+
+std::string menu_bar_key_label() {
+    const SDL_Keycode key = menu_bar_keycode();
+    return key == SDLK_UNKNOWN ? std::string("Alt") : std::string(SDL_GetKeyName(key));
+}
+
+void toggle_menu_bar() {
+    settings::get().menu_bar = !settings::get().menu_bar;
+    settings::save();
+    if (!settings::get().menu_bar) {
+        s.toast = menu_bar_key_label() + " shows the menus again";
+        s.toast_until = ImGui::GetTime() + 4.0;
+    }
+}
+
 void menu_bar() {
     if (!ImGui::BeginMainMenuBar()) {
         return;
     }
+    const std::string key = menu_bar_key_label();
     if (ImGui::BeginMenu("View")) {
         if (ImGui::MenuItem("Full screen", "F11")) {
             press(SDLK_F11);
@@ -70,11 +95,8 @@ void menu_bar() {
             press(SDLK_F2);
         }
         ImGui::Separator();
-        if (ImGui::MenuItem("Hide these menus", "Alt")) {
-            settings::get().menu_bar = false;
-            settings::save();
-            s.toast = "Alt shows the menus again";
-            s.toast_until = ImGui::GetTime() + 4.0;
+        if (ImGui::MenuItem("Hide these menus", key.c_str())) {
+            toggle_menu_bar();
         }
         ImGui::EndMenu();
     }
@@ -216,6 +238,13 @@ void menu_bar() {
             ImGui::EndMenu();
         }
         ImGui::EndMenu();
+    }
+    // At the right, greyed: the key that hides the bar (and brings it back).
+    const std::string hint = key + ": hide or show the menus";
+    const float width = ImGui::CalcTextSize(hint.c_str()).x + ImGui::GetStyle().ItemSpacing.x;
+    if (ImGui::GetContentRegionAvail().x > width) {
+        ImGui::SetCursorPosX(ImGui::GetWindowWidth() - width - ImGui::GetStyle().WindowPadding.x);
+        ImGui::TextDisabled("%s", hint.c_str());
     }
     ImGui::EndMainMenuBar();
 }

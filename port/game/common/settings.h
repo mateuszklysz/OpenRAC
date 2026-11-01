@@ -158,6 +158,9 @@ struct Settings {
     FrameCounter show_fps = FrameCounter::Off;  // Counter mode in the picture's corner.
     bool menu_bar =
         true;  // the menus along the window's top (not on macOS, whose menu bar has them); Alt hides and shows it
+    // The key that hides and shows the menu bar: an SDL key name ("F4", "M"), or "Alt" (either Alt
+    // pressed and let go by itself).
+    std::string menu_bar_key = "Alt";
     bool mute_unfocused = false;  // silence while another window has the keyboard
     bool skip_cutscenes = true;   // Start skips an in-game cutscene (without the game's L1 L2 R1 R2 hold)
     // Lower input latency, off by default (the timing players know). Reads the pad again just
