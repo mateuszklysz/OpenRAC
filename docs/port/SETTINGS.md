@@ -40,7 +40,7 @@ The legacy `probe_lighting` key is accepted but ignored and is omitted when savi
 
 | Row | Key | Values (default first) | What it does |
 |---|---|---|---|
-| Display mode | `display_mode` | `windowed`, `borderless`, `fullscreen` | A window; a window covering the desktop at the desktop's own mode; or the display taken for the game at `resolution`. F11 and Alt+Return go between the window and the fullscreen kind last used |
+| Display mode | `display_mode` | `windowed`, `borderless`, `fullscreen` | A window; a window covering the desktop at the desktop's own mode; or the display taken for the game at `resolution`. F11 and Alt+Return go between the window and the fullscreen kind last used. A first start (a file with no `display_mode`, nor the older `fullscreen`) is `borderless`; a file that has either keeps what it says, and a hidden window or an offscreen video driver (checks, tools) keeps the window |
 | Monitor | `monitor` | `0`, `1`, `2`, ... | The display borderless and fullscreen cover, and the one the window opens on: `0` is wherever the window is, `1` the first display SDL lists (the primary one) |
 | Resolution | `resolution` | `desktop`, `WIDTHxHEIGHT` | The display's mode in `fullscreen`. The page offers the modes the chosen display lists; a size it does not have becomes the closest it has |
 | (the window) | `window_size` | `WIDTHxHEIGHT` | The window's size when last sized, kept for the next start. Absent: 1280 x 960, or as wide as `aspect` makes it |

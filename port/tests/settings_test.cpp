@@ -303,6 +303,41 @@ void test_bindings_survive_a_save(const std::filesystem::path& file) {
     CHECK(settings::get().bindings.at("bind_cross") == "KeyF,PadWest");
 }
 
+// A first start covers the screen; a file that already says how the window is keeps it.
+void test_first_start_display(const std::filesystem::path& file) {
+    using namespace openrac;
+    using settings::DisplayMode;
+    const auto mode_after = [&](const char* text, bool scripted) {
+        std::filesystem::remove(file);
+        if (text != nullptr) {
+            std::ofstream(file) << text;
+        }
+        settings::load(file);
+        settings::first_start_display(scripted);
+        return settings::get().display_mode;
+    };
+    // No file at all, or one without the key (the launcher writes some keys before a first game).
+    CHECK(mode_after(nullptr, false) == DisplayMode::Borderless);
+    CHECK(mode_after("enhanced_rendering = 1\n", false) == DisplayMode::Borderless);
+    // A player's own choice stays, whatever it is.
+    CHECK(mode_after("display_mode = windowed\n", false) == DisplayMode::Windowed);
+    CHECK(mode_after("display_mode = fullscreen\n", false) == DisplayMode::Fullscreen);
+    CHECK(mode_after("display_mode = something\n", false) == DisplayMode::Windowed);
+    // The older key: false is a choice of the window too.
+    CHECK(mode_after("fullscreen = false\n", false) == DisplayMode::Windowed);
+    CHECK(mode_after("fullscreen = true\n", false) == DisplayMode::Borderless);
+    // Checks and tools keep the window.
+    CHECK(mode_after(nullptr, true) == DisplayMode::Windowed);
+    // Once saved, the file has the key, and a later start reads it as it is.
+    mode_after(nullptr, false);
+    settings::get().display_mode = DisplayMode::Windowed;  // the player pressed F11
+    settings::save();
+    settings::load(file);
+    CHECK(!settings::first_start_display(false));
+    CHECK(settings::get().display_mode == DisplayMode::Windowed);
+    std::filesystem::remove(file);
+}
+
 }  // namespace
 
 int main() {
@@ -338,6 +373,7 @@ int main() {
     test_game_options_load_from_the_file(file);
     test_game_options_are_saved_when_they_change(file);
     test_bindings_survive_a_save(file);
+    test_first_start_display(file);
     CHECK(settings::get().texture_filter == renderer::TextureFilter::EdgeAware);
     CHECK(settings::get().anisotropy == 0);
     CHECK(settings::get().anisotropy_samples(true) == 4);

@@ -153,7 +153,7 @@ unknown *value* warns in the log and falls back to the default; an unknown
 
 | Key | Values | Default | Note |
 |---|---|---|---|
-| `display_mode` | `windowed`, `borderless`, `fullscreen` | `windowed` | |
+| `display_mode` | `windowed`, `borderless`, `fullscreen` | `windowed` | Absent on a first start: `borderless`. |
 | `fullscreen` | `0`/`1` | — | Legacy: `1` means `borderless`. |
 | `monitor` | `0`–`64` | `0` | |
 | `resolution` | `desktop` or `WIDTHxHEIGHT` | desktop | Fullscreen mode. |

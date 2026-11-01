@@ -193,6 +193,12 @@ Settings& get();
 // Reads `file` (missing or unreadable: the defaults) and remembers it for save().
 void load(const std::filesystem::path& file);
 
+// A first start, the file load() read having no display_mode (nor the older fullscreen key): the
+// game covers the screen (borderless) instead of opening a window. A file with either key keeps
+// what it says, so a player's own setup never changes. `scripted` (a hidden window, an offscreen
+// video driver: checks and tools) keeps the window. Returns whether the mode changed.
+bool first_start_display(bool scripted);
+
 // The settings in one line, for the log and its header.
 std::string summary();
 
