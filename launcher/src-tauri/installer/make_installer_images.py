@@ -1,7 +1,7 @@
 """Build the Windows installers' pictures from the launcher's icon.
 
-The look follows DualTouch's installer: the app's icon tile, with a soft
-shadow, on the launcher's dark colour beside Windows' light pages. Only pictures: the installers'
+The look: the app's icon tile, with a soft shadow, on the launcher's dark
+colour beside Windows' light pages. Only pictures: the installers'
 pages, paths and steps are Tauri's own and stay as they are.
 
     python3 make_installer_images.py    # needs Pillow
