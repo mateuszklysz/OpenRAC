@@ -445,6 +445,8 @@ the launcher or a shortcut needs no "non-Steam game" entry in Steam. The port
 asks for the driver on every desktop (`SDL_JOYSTICK_HIDAPI_STEAM=1`,
 `platform/window.cpp`); `SDL_JOYSTICK_HIDAPI_STEAM=0` in the environment turns
 it off. Android keeps SDL's default (off: it would ask for Bluetooth rights).
+On PC the 2026 controller's "..." button (SDL's `misc1`, only on Valve's
+pads) hides and shows the menu bar, as its key does.
 
 With the Steam client open, Steam's desktop layout may still move the mouse
 from the controller while the game plays; Steam's "desktop configuration"

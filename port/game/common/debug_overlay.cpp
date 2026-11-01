@@ -47,6 +47,8 @@ namespace openrac::frontend::debug_overlay {
 
 namespace {
 
+constexpr Uint16 kValveVendor = 0x28DE;  // USB vendor id of Valve's controllers
+
 // ---- The environment ----
 
 // Returns the value `var` was set to as a string of its own, or nothing when it is unset. For the
@@ -582,6 +584,12 @@ bool event(const SDL_Event& e) {
                    && (e.key.mod & (SDL_KMOD_CTRL | SDL_KMOD_ALT)) == 0) {
             toggle_menu_bar();
             return true;
+        }
+        // The Steam Controller's "..." button (SDL's misc1 on Valve's pads; on others misc1 is a
+        // share or capture button, left alone) does the same.
+        if (e.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN && e.gbutton.button == SDL_GAMEPAD_BUTTON_MISC1
+            && SDL_GetGamepadVendorForID(e.gbutton.which) == kValveVendor) {
+            toggle_menu_bar();
         }
     }
     if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat) {
