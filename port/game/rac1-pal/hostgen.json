@@ -42,6 +42,7 @@
     "rac1_check_level_heap",
     "rac1_update_expanded_moby_grid",
     "openrac_game_moby_colour",
+    "openrac_game_moby_local_pose",
     "func_001F7560",
     "func_001F75D0",
     "func_0020C268",

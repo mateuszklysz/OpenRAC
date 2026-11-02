@@ -39,6 +39,9 @@ static float rsq_255B90(float ll)
 
 #define LSQ4(v) ((((v)[0] * (v)[0] + (v)[1] * (v)[1]) + (v)[2] * (v)[2]) + (v)[3] * (v)[3])
 
+/* The port's: a mod's joint offsets on the moby (game_host.h). */
+extern void openrac_game_moby_local_pose(unsigned int moby);
+
 void func_L00_00255B90(char *s)
 {
     char *sp = (char *)0x70000000;
@@ -497,4 +500,5 @@ void func_L00_00255B90(char *s)
         PUT4(tg + 0x10, v8);
         PUT4(tg + 0x20, v10);
     }
+    openrac_game_moby_local_pose((unsigned int)s);
 }

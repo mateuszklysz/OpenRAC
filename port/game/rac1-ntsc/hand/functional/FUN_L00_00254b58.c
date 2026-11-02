@@ -41,6 +41,9 @@ static void spr_dma_255B90_c254b58(unsigned int sadr, unsigned int madr, int qwc
 
 
 
+/* The port's: a mod's joint offsets on the moby (game_host.h). */
+extern void openrac_game_moby_local_pose(unsigned int moby);
+
 void FUN_L00_00254b58(char *s)
 {
     char *sp = (char *)0x70000000;
@@ -499,4 +502,5 @@ void FUN_L00_00254b58(char *s)
         PUT4(tg + 0x10, v8);
         PUT4(tg + 0x20, v10);
     }
+    openrac_game_moby_local_pose((unsigned int)s);
 }
