@@ -138,9 +138,20 @@ uint64_t openrac_guest_call_regs(gaddr address, const uint64_t* ints, const floa
             return thunks[i].thunk(ints, floats, result);
         }
     }
-    (void)float_result;
-    fprintf(stderr, "no thunk for %08x\n", address);
-    exit(3);
+    /* The port's own function (a stub, the test's host C): by the cast, as the runtime does. */
+    typedef uint64_t U8;
+    typedef float F8;
+    typedef U8 (*IntFn)(U8, U8, U8, U8, U8, U8, U8, U8, F8, F8, F8, F8, F8, F8, F8, F8);
+    typedef F8 (*FloatFn)(U8, U8, U8, U8, U8, U8, U8, U8, F8, F8, F8, F8, F8, F8, F8, F8);
+#define REGS_ARGS                                                                                  \
+    ints[0], ints[1], ints[2], ints[3], ints[4], ints[5], ints[6], ints[7], floats[0], floats[1],  \
+        floats[2], floats[3], floats[4], floats[5], floats[6], floats[7]
+    if (float_result) {
+        *result = ((FloatFn)fn)(REGS_ARGS);
+        return 0;
+    }
+    return ((IntFn)fn)(REGS_ARGS);
+#undef REGS_ARGS
 }
 
 const char* openrac_guest_function_name(gaddr address) {
