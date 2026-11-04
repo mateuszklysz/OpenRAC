@@ -285,9 +285,10 @@ path has three parts:
    set of OpenGL calls the renderers use (`renderer/gl.h`,
    `renderer/world/gl_world.h`) on Vulkan 1.3: shaders through glslang,
    pipelines cached by state, buffers streamed through a per-frame ring.
-   It is the default; "Renderer" in Settings can pick OpenGL ES instead
-   (the launcher sets `OPENRAC_GL_API=vulkan` otherwise); if Vulkan 1.3
-   cannot start, the game falls back to OpenGL ES.
+   It is the default except on Mali GPUs, where OpenGL ES is (a Mali-G57
+   driver, r54p1, crashed compiling the world's Vulkan shaders); "Renderer"
+   in Settings picks either (the launcher sets `OPENRAC_GL_API=vulkan` for
+   Vulkan); if Vulkan 1.3 cannot start, the game falls back to OpenGL ES.
 
 **Decided:** the Vulkan renderer stays a translation layer, measured before
 any part becomes native Vulkan. `--debug-dump` writes its numbers per frame
