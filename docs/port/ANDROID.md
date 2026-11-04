@@ -23,8 +23,8 @@ and device tests are in [port/android/README.md](../../port/android/README.md).
 - A controller works everywhere; touch controls appear when you touch the
   screen.
 - The launcher updates itself from GitHub releases.
-- The game draws with its Vulkan renderer by default, else OpenGL ES. The
-  Vulkan renderer can use a custom Adreno driver (Turnip).
+- The game draws with OpenGL ES by default; its Vulkan renderer is one tap
+  away in Settings and can use a custom Adreno driver (Turnip).
 
 ## One APK, two parts
 
@@ -285,9 +285,10 @@ path has three parts:
    set of OpenGL calls the renderers use (`renderer/gl.h`,
    `renderer/world/gl_world.h`) on Vulkan 1.3: shaders through glslang,
    pipelines cached by state, buffers streamed through a per-frame ring.
-   It is the default; "Renderer" in Settings can pick OpenGL ES instead
-   (the launcher sets `OPENRAC_GL_API=vulkan` otherwise); if Vulkan 1.3
-   cannot start, the game falls back to OpenGL ES.
+   "Renderer" in Settings picks it (the launcher then sets
+   `OPENRAC_GL_API=vulkan`); OpenGL ES is the default, as players saw lower
+   frame rates that fell further as the phone warmed up on Vulkan
+   (Snapdragon). If Vulkan 1.3 cannot start, the game falls back to OpenGL ES.
 
 **Decided:** the Vulkan renderer stays a translation layer, measured before
 any part becomes native Vulkan. `--debug-dump` writes its numbers per frame

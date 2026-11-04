@@ -10,12 +10,12 @@
   let busy = $state(false);
   // The radios show the choice, then what is saved (load): one that failed to save goes back
   // ("" is the system's driver).
-  let rendererPick = $state<Renderer>("vulkan");
+  let rendererPick = $state<Renderer>("gles");
   let driverPick = $state("");
 
   async function load() {
     info = (await guard(api.gpuDrivers())) ?? null;
-    rendererPick = info?.renderer === "gles" ? "gles" : "vulkan";
+    rendererPick = info?.renderer === "vulkan" ? "vulkan" : "gles";
     driverPick = info?.selected ?? "";
   }
 
@@ -81,7 +81,7 @@
     <span class="text">
       <strong>Renderer</strong>
       <small>
-        {rendererPick === "vulkan" ? "Vulkan 1.3, the default; without it OpenGL ES." : "OpenGL ES 3.2."}
+        {rendererPick === "vulkan" ? "Vulkan 1.3; without it OpenGL ES." : "OpenGL ES 3.2, the default."}
         From the game's next start.
       </small>
     </span>
