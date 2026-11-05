@@ -56,6 +56,16 @@ function newer(a: string, b: string): boolean {
 
 export const upgradeable = (r: Row) => !!r.installed && !!r.here && newer(r.here.version, r.installed);
 
+/** How many mods All shows before a search: the most downloaded, the rest on the website. */
+export const TOP_COUNT = 5;
+
+/** The N most downloaded rows, most first (ties by name). */
+export function topDownloaded<T extends { mod: IndexMod }>(rows: T[], n = TOP_COUNT): T[] {
+  return [...rows]
+    .sort((a, b) => b.mod.downloads - a.mod.downloads || a.mod.name.localeCompare(b.mod.name))
+    .slice(0, n);
+}
+
 export function inPreset(r: Row, preset: Preset): boolean {
   switch (preset) {
     case "compatible":

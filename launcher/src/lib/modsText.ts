@@ -649,6 +649,9 @@ export const BROWSE = {
   devOnly: "Dev build only",
   clearFilters: "Clear filters",
   viewOnSite: "View on openrac.dev",
+  /** Under All's most downloaded mods, before a search. */
+  topNote: (shown: number, all: number) => `The ${shown} most downloaded of ${all}.`,
+  more: "More mods on openrac.dev",
   watch: "Watch on YouTube",
   noReadme: "No description yet.",
   noVersions: "No versions.",

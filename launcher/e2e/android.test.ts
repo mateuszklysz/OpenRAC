@@ -335,6 +335,32 @@ describe("A controller", () => {
     await press("accept");
     await dumping.waitFor();
     expect(await dumping.isVisible()).toBe(true);
+    // Its arrow says it opens, and turns when it is open.
+    const arrow = page.locator("#texture-make summary .chevron");
+    expect(await arrow.isVisible()).toBe(true);
+    expect(await arrow.evaluate((el) => getComputedStyle(el).transform)).not.toBe("none");
+  });
+
+  it("shows only the most downloaded mods in All, and the rest on openrac.dev", async () => {
+    await open("page=mods&version=rac1/pal");
+    const cards = page.locator(".browse .card");
+    await page.locator(".browse").getByRole("radio", { name: "All", exact: true }).click();
+    await page.getByRole("button", { name: "More mods on openrac.dev" }).waitFor();
+    expect(await cards.count()).toBe(5);
+    expect(await cards.first().locator("strong").textContent()).toBe("Item randomizer");
+    const opened: string[] = [];
+    page.on("console", (m) => {
+      if (m.text().includes("open_url"))
+        void m
+          .args()[1]
+          ?.jsonValue()
+          .then((a: unknown) => opened.push(JSON.stringify(a)));
+    });
+    await page.getByRole("button", { name: "More mods on openrac.dev" }).click();
+    await expect.poll(() => opened.join(" ")).toContain("https://openrac.dev/mods");
+    // A search shows every match again.
+    await page.getByPlaceholder("Search mods").fill("camera");
+    await expect.poll(() => page.getByRole("button", { name: "More mods on openrac.dev" }).count()).toBe(0);
   });
 
   it("finds a mod and shows one kind when there are many", async () => {

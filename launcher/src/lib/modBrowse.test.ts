@@ -10,6 +10,8 @@ import {
   PRESETS,
   regions,
   siteUrl,
+  TOP_COUNT,
+  topDownloaded,
   upgradeable,
   versionHere,
   youtube,
@@ -137,5 +139,28 @@ describe("media", () => {
     });
     expect(youtube('x" onerror=1')).toBeNull();
     expect(siteUrl("lock-strafe")).toBe("https://openrac.dev/mods/lock-strafe");
+  });
+});
+
+describe("topDownloaded", () => {
+  it("keeps the most downloaded, most first, and leaves the list as it was", () => {
+    const rows = index.mods.map((mod) => ({ mod }));
+    const before = rows.map((r) => r.mod.id);
+    const top = topDownloaded(rows);
+    expect(top.map((r) => r.mod.id)).toEqual([
+      "item-randomizer",
+      "lock-strafe",
+      "xbox-icons",
+      "camera-tweaks",
+      "camera-base",
+    ]);
+    expect(top).toHaveLength(TOP_COUNT);
+    expect(rows.map((r) => r.mod.id)).toEqual(before);
+  });
+  it("breaks ties by name and keeps short lists whole", () => {
+    const first = index.mods[0];
+    if (!first) throw new Error("the fixture has mods");
+    const at = (name: string, downloads: number) => ({ mod: { ...first, name, downloads } });
+    expect(topDownloaded([at("b", 1), at("a", 1)], 5).map((r) => r.mod.name)).toEqual(["a", "b"]);
   });
 });

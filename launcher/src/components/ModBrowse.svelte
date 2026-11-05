@@ -16,6 +16,8 @@
     LAUNCHER_API,
     PRESETS,
     siteUrl,
+    topDownloaded,
+    TOP_COUNT,
     upgradeable,
     versionHere,
     youtube,
@@ -23,6 +25,7 @@
     type Row,
   } from "$lib/modBrowse";
   import {
+    ADD,
     BROWSE as T,
     DETAIL_TAB,
     IMPACT_LABEL,
@@ -95,12 +98,15 @@
       installed: installed[mod.id] ?? null,
     })),
   );
-  const shown = $derived(
+  const found = $derived(
     search(
       rows.filter((r) => inPreset(r, preset)).map((r) => ({ ...r, ...r.mod })),
       query,
     ),
   );
+  /** All with nothing searched: only the most downloaded, the rest on the website. */
+  const topOnly = $derived(preset === "all" && query.trim() === "" && found.length > TOP_COUNT);
+  const shown = $derived(topOnly ? topDownloaded(found) : found);
   const suggestion = $derived(
     shown.length === 0 && query
       ? closest(
@@ -363,6 +369,17 @@
           {/if}
         </aside>
       {/if}
+    </div>
+  {/if}
+  {#if topOnly}
+    <div class="more-row">
+      <span class="dim">{T.topNote(shown.length, found.length)}</span>
+      <button
+        class="small"
+        onclick={() => {
+          open(ADD.modsUrl);
+        }}>{T.more}<Icon name="external" size={14} /></button
+      >
     </div>
   {/if}
 </section>
@@ -641,6 +658,15 @@
     min-width: 0;
     display: flex;
     flex-direction: column;
+  }
+
+  .more-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 12px;
+    font-size: 0.8125rem;
   }
 
   .none {
