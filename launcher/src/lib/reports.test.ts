@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ReportEntry } from "./api";
-import { duration, headline, place, stopText, unseenRecent, when } from "./reports";
+import { duration, headline, place, stopText, unseenRecent, vulkanDeviceLost, when } from "./reports";
 
 const crash: ReportEntry = {
   kind: "crash",
@@ -80,5 +80,15 @@ describe("unseenRecent", () => {
 
   it("leaves out the old ones", () => {
     expect(unseenRecent([at(100), at(200)], 0, 150).map((e) => e.time)).toEqual([200]);
+  });
+});
+
+describe("vulkanDeviceLost", () => {
+  it("knows a lost Vulkan device from the port's reason", () => {
+    expect(vulkanDeviceLost("vulkan: submit frame failed (-4)")).toBe(true);
+    expect(vulkanDeviceLost("vulkan: wait for frame failed (-4)")).toBe(true);
+    expect(vulkanDeviceLost("vulkan: submit frame failed (-2)")).toBe(false);
+    expect(vulkanDeviceLost("access (SIGSEGV) at 0x4")).toBe(false);
+    expect(vulkanDeviceLost(null)).toBe(false);
   });
 });

@@ -31,6 +31,12 @@ export function place(e: Pick<ReportEntry, "planet" | "level">): string {
   return "in the menus";
 }
 
+/** The game stopped because the graphics card's Vulkan driver lost the device
+ *  (VK_ERROR_DEVICE_LOST, -4): a GPU hang or a driver fault, which OpenGL may not hit. */
+export function vulkanDeviceLost(reason: string | null): boolean {
+  return !!reason && reason.startsWith("vulkan: ") && (reason.includes("(-4)") || reason.includes("DEVICE_LOST"));
+}
+
 /** "23 minutes", "1 hour 14 minutes", "less than a minute". */
 export function duration(seconds: number): string {
   if (seconds < 60) return "less than a minute";

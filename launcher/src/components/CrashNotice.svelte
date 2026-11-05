@@ -5,12 +5,12 @@
   // to its end since, the notice is a line.
   import Icon from "$components/Icon.svelte";
   import { api, onAndroid } from "$lib/api";
-  import { app, dismissStopped, guard } from "$lib/app.svelte";
+  import { app, dismissStopped, guard, saveConfig } from "$lib/app.svelte";
   import { copyText } from "$lib/clipboard";
   import { DISCORD_URL, ISSUES_URL } from "$lib/links";
   import { crashAfterUpdate, crashModsLine, rollBackTo, rolledBack } from "$lib/modsText";
   import type { LastUpdate } from "$lib/api";
-  import { place, stopText, type StopNotice } from "$lib/reports";
+  import { place, stopText, vulkanDeviceLost, type StopNotice } from "$lib/reports";
 
   let { notice, title }: { notice: StopNotice; title: string } = $props();
 
@@ -62,6 +62,16 @@
     if (!done) return;
     rolled = rolledBack(name, version);
     if (lastUpdate) lastUpdate = { ...lastUpdate, mods: lastUpdate.mods.filter((m) => m.id !== id) };
+  }
+
+  /** The graphics card's Vulkan driver gave up (device lost): on the desktops, where the
+   *  launcher picks the renderer, OpenGL is one click away. Android picks its own in Graphics. */
+  const deviceLost = $derived(!!crash && !onAndroid && vulkanDeviceLost(crash.reason));
+  let switchedToOpenGl = $state(false);
+
+  async function useOpenGl() {
+    if (!app.config) return;
+    if (await saveConfig({ ...app.config, renderer: "opengl" })) switchedToOpenGl = true;
   }
 
   async function copy() {
@@ -126,6 +136,20 @@
         us. Its log is under Logs and crash reports, if you want to look at it.
       {/if}
     </p>
+    {#if deviceLost}
+      <p class="say">
+        Your graphics card's Vulkan driver stopped responding. The game can draw with OpenGL instead; you can switch
+        back in Settings, under Renderer. Enhanced graphics (on the Mods tab) always draws with Vulkan, so turn it off
+        as well if it is on.
+      </p>
+      <div class="actions">
+        {#if switchedToOpenGl || app.config?.renderer === "opengl"}
+          <p class="say" role="status">The game draws with OpenGL from its next start.</p>
+        {:else}
+          <button onclick={() => void useOpenGl()}><Icon name="reset" size={16} />Play with OpenGL</button>
+        {/if}
+      </div>
+    {/if}
     {#if crash && modsLoaded.length}
       <p class="say">{crashModsLine(modsLoaded)}</p>
     {/if}

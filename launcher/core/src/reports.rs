@@ -421,6 +421,25 @@ pub fn copy_text(data: &Path, file: &str, launcher_version: &str) -> Result<Stri
                 }
                 out.push_str("```\n");
             }
+            // A lost Vulkan device: what the driver said and the GPU's last pass, which the
+            // backtrace (the next submit, not the failing work) cannot show.
+            let gpu: Vec<&str> = text
+                .lines()
+                .skip_while(|l| !l.starts_with("Vulkan diagnostics"))
+                .skip(1)
+                .take_while(|l| l.starts_with("  "))
+                .map(str::trim)
+                .filter(|l| l.starts_with("GPU fault") || l.starts_with("GPU breadcrumb"))
+                .take(8)
+                .collect();
+            if !gpu.is_empty() {
+                out.push_str("\nThe GPU's last work:\n```\n");
+                for l in gpu {
+                    out.push_str(&squeeze(l));
+                    out.push('\n');
+                }
+                out.push_str("```\n");
+            }
         }
         ReportKind::Session => {
             out.push_str("**OpenRAC: a game session's log**\n\n");
@@ -671,6 +690,11 @@ Backtrace (the newest call first):
 3   Ratchet & Clank (PAL)               0x0000000104f82c48 func_001E99D8 + 596
 (the program is loaded at 0x104F18000; less that, an address is the one in its symbols)
 
+Vulkan diagnostics (oldest first):
+  Vulkan submit frame: VK_ERROR_DEVICE_LOST (-4)
+  GPU breadcrumb: marker 41 begin world opaque (stage 0x1)
+  GPU fault: driver supplied no description
+
 The log's last lines (the oldest first):
   [info] now playing level 3
 
@@ -765,6 +789,9 @@ graphics  Apple M5 Max (Apple), OpenGL 4.1 Metal, hardware through SDL's cocoa d
         assert!(text.contains("Graphics: Apple M5 Max"), "{text}");
         assert!(text.contains("openrac_game_vsync"), "{text}");
         assert!(!text.contains("_sigtramp") && !text.contains("openrac5crash"), "{text}");
+        assert!(text.contains("GPU breadcrumb: marker 41 begin world opaque"), "{text}");
+        assert!(text.contains("GPU fault: driver supplied no description"), "{text}");
+        assert!(!text.contains("Vulkan submit frame: VK_ERROR"), "{text}");
         let session = copy_text(data.path(), "openrac-rac1-pal.1.log", "0.7.1").unwrap();
         assert!(session.contains("Ended in a crash: no"), "{session}");
         assert!(session.contains("[warning] something odd"), "{session}");
