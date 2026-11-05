@@ -6,7 +6,7 @@
 //
 // | call      | args                                   | value                                         |
 // |-----------|----------------------------------------|-----------------------------------------------|
-// | info      |                                        | the game, its disc, its texture pack's id, the mod, the system |
+// | info      |                                        | the game, its disc, its texture pack's id, the mod, the system, the colours |
 // | list      | root ("levels" or "dump")              | the files there: [{ path, size }]             |
 // | read      | root, path, start?, length?            | the file's bytes, or that part (ArrayBuffer)  |
 // | storeGet  | key                                    | what the mod stored under key, or null        |
@@ -17,6 +17,9 @@
 // | saveEnd   | token, keep                            | the name it was saved under, "" if dropped    |
 // | open      | extension ("json")                     | the bytes the player picked, null if backed out |
 // | close     |                                        | (none: the launcher goes back to the mod)     |
+//
+// Events the page gets: { openrac: 1, event: "pad", button, down } for a controller's buttons, and
+// { openrac: 1, event: "theme", theme } when the launcher's colours change.
 import { api, type ToolFile, type ToolRoot } from "./api";
 
 export const PROTOCOL = 1;
@@ -30,6 +33,50 @@ export interface ToolInfo {
   mod: { id: string; name: string; version: string };
   /** "android" or "desktop". */
   system: string;
+  /** The launcher's colours now (its theme and the picked game's accent): THEME_TOKENS. */
+  theme: Record<string, string>;
+}
+
+/** The app.css tokens a page is given, so it can wear the launcher's look. */
+export const THEME_TOKENS = [
+  "--ink",
+  "--ink-deep",
+  "--panel",
+  "--panel-hi",
+  "--brand",
+  "--amber",
+  "--gold",
+  "--lav",
+  "--soft",
+  "--dim",
+  "--line",
+  "--line-strong",
+  "--line-field",
+  "--text",
+  "--body",
+  "--ok",
+  "--warn",
+  "--err",
+  "--bar-top",
+  "--bar-bottom",
+  "--bar-ink",
+  "--bar-ink-deep",
+  "--radius",
+  "--radius-sm",
+] as const;
+
+/** The tokens' values as `style` (the root's computed style) has them; empty ones left out. */
+export function readTheme(style: Pick<CSSStyleDeclaration, "getPropertyValue">): Record<string, string> {
+  const theme: Record<string, string> = {};
+  for (const name of THEME_TOKENS) {
+    const value = style.getPropertyValue(name).trim();
+    if (value) theme[name] = value;
+  }
+  return theme;
+}
+
+export function sameTheme(a: Record<string, string>, b: Record<string, string>): boolean {
+  return THEME_TOKENS.every((name) => a[name] === b[name]);
 }
 
 export type ToolRequest =

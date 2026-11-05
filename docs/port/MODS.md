@@ -732,7 +732,7 @@ The page is the mod's own code, so it is kept apart from the launcher
 
 | Call | Arguments | Answer |
 |---|---|---|
-| `info` | | `{game, version, packId, mod: {id, name, version}, system}`. `packId` is the game's texture pack id (`rac1-pal`), `system` is `android` or `desktop` |
+| `info` | | `{game, version, packId, mod: {id, name, version}, system, theme}`. `packId` is the game's texture pack id (`rac1-pal`), `system` is `android` or `desktop`, `theme` is the launcher's colours (below) |
 | `list` | `root`: `levels` or `dump` | `[{path, size}]`: the levels read from the disc, or the textures the game dumped. Only `.png .gif .glb .gltf .bin .json .txt` |
 | `read` | `root`, `path`, optional `start` and `length` | the bytes (an `ArrayBuffer`, at most 64 MB), or that part of the file |
 | `storeGet`, `storeSet` | `key` (`[a-z0-9_-]`, at most 64), `value` (JSON, at most 1 MB; null removes it) | the mod's own value, kept across updates |
@@ -753,6 +753,14 @@ Controller buttons go to the page as `{openrac: 1, event: "pad", button, down}`
 (`up`, `down`, `left`, `right`, `accept`, `back`, `prev`, `next`, `more`), and
 the page moves its own focus. Escape, the Back button or the `close` call
 return to the mod's page.
+
+To look like the launcher, a page can use `theme`: the launcher's CSS
+colours as they are now, with the picked game's accent, for example
+`{"--ink": "#181820", "--amber": "#ffb443", ...}` (the list is
+`THEME_TOKENS` in lib/modTool.ts). When the player changes the theme, the page
+gets `{openrac: 1, event: "theme", theme}`. Set them on the page's own root
+(`document.documentElement.style.setProperty(name, value)`), and only the
+names you use.
 
 ## 10. Mods in a git repository
 

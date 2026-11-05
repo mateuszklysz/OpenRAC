@@ -1,5 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { pageOrigin, pageUrl, readRequest, reply, trackSaves, type ToolBackend, type ToolInfo } from "./modTool";
+import {
+  pageOrigin,
+  pageUrl,
+  readRequest,
+  readTheme,
+  reply,
+  sameTheme,
+  THEME_TOKENS,
+  trackSaves,
+  type ToolBackend,
+  type ToolInfo,
+} from "./modTool";
 
 const info: ToolInfo = {
   game: "rac1",
@@ -7,6 +18,7 @@ const info: ToolInfo = {
   packId: "rac1-pal",
   mod: { id: "nanotech-upscaler", name: "Nanotech Upscaler", version: "0.1.0" },
   system: "desktop",
+  theme: { "--ink": "#181820", "--amber": "#7fcff5" },
 };
 
 /** A backend that records what it was asked. */
@@ -228,5 +240,27 @@ describe("a mod page's site", () => {
   it("is the scheme and host", () => {
     expect(pageOrigin("openrac-mod://localhost/rac1/a/ui/index.html")).toBe("openrac-mod://localhost");
     expect(pageOrigin("http://openrac-mod.localhost/rac1/a/ui/index.html")).toBe("http://openrac-mod.localhost");
+  });
+});
+
+describe("the launcher's colours for a page", () => {
+  const style = (values: Record<string, string>) => ({ getPropertyValue: (name: string) => values[name] ?? "" });
+
+  it("reads only the tokens, trimmed, leaving out the empty ones", () => {
+    const theme = readTheme(style({ "--ink": " #181820", "--amber": "#7fcff5 ", "--panel": "  ", "--secret": "x" }));
+    expect(theme).toEqual({ "--ink": "#181820", "--amber": "#7fcff5" });
+  });
+
+  it("tells a change of any token", () => {
+    const all = Object.fromEntries(THEME_TOKENS.map((name) => [name, "#000"]));
+    expect(sameTheme(all, { ...all })).toBe(true);
+    expect(sameTheme(all, { ...all, "--radius": "8px" })).toBe(false);
+    expect(sameTheme(all, { ...all, "--other": "#fff" })).toBe(true);
+    expect(sameTheme({}, {})).toBe(true);
+  });
+
+  it("are in the answer to info", async () => {
+    const answered = await reply({ openrac: 1, id: 1, call: "info" }, info, backend());
+    expect(answered?.message.value).toMatchObject({ theme: info.theme });
   });
 });

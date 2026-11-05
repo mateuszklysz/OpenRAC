@@ -1,11 +1,22 @@
 <script lang="ts">
   // A mod's own page (core/src/mod_tools.rs) in a frame, with a way back. The frame is another
   // site: it can only send the messages lib/modTool.ts answers. Controller buttons go to the page as
-  // { openrac: 1, event: "pad", button, down }. The page's "close" call, Back or Escape return here.
+  // { openrac: 1, event: "pad", button, down }, the launcher's colours as { openrac: 1, event:
+  // "theme", theme } when they change. The page's "close" call, Back or Escape return here.
   import { onDestroy, onMount } from "svelte";
   import { convertFileSrc } from "@tauri-apps/api/core";
   import { inTauri, onAndroid, type PluginView } from "$lib/api";
-  import { launcherBackend, pageOrigin, pageUrl, PROTOCOL, reply, trackSaves, type ToolInfo } from "$lib/modTool";
+  import {
+    launcherBackend,
+    pageOrigin,
+    pageUrl,
+    PROTOCOL,
+    readTheme,
+    reply,
+    sameTheme,
+    trackSaves,
+    type ToolInfo,
+  } from "$lib/modTool";
   import { routePad } from "$lib/pad";
   import * as T from "$lib/modsText";
   import Icon from "./Icon.svelte";
@@ -25,6 +36,8 @@
 
   let frame = $state<HTMLIFrameElement | null>(null);
   let failure = $state<string | null>(null);
+  // The launcher's colours as the page was last told them (a plain object: it is posted).
+  let theme = $state.raw<Record<string, string>>(readTheme(getComputedStyle(document.documentElement)));
 
   const info = $derived<ToolInfo>({
     game,
@@ -32,6 +45,7 @@
     packId: `${game}-${version}`,
     mod: { id: mod.id, name: mod.name, version: mod.version },
     system: onAndroid ? "android" : "desktop",
+    theme,
   });
   // The scheme's root as this system reaches it: openrac-mod://localhost/, or
   // http://openrac-mod.localhost/ on Windows and Android.
@@ -83,8 +97,26 @@
       }
     };
     window.addEventListener("keydown", key);
+    // A new theme or accent (palettes.ts, themes.ts) goes to the page; read again once the accent
+    // has eased into its colours (app.css, 0.5 s), as they are mid-way at first.
+    const html = document.documentElement;
+    const look = () => {
+      const now = readTheme(getComputedStyle(html));
+      if (sameTheme(now, theme)) return;
+      theme = now;
+      post({ openrac: PROTOCOL, event: "theme", theme: now });
+    };
+    let settled = 0;
+    const watch = new MutationObserver(() => {
+      look();
+      clearTimeout(settled);
+      settled = window.setTimeout(look, 600);
+    });
+    watch.observe(html, { attributes: true, attributeFilter: ["style", "data-theme"] });
     return () => {
       window.removeEventListener("keydown", key);
+      watch.disconnect();
+      clearTimeout(settled);
     };
   });
 
