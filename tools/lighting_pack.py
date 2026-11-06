@@ -115,10 +115,31 @@ def profile_format(profile_text: str) -> str:
     return "r11g11b10"
 
 
-def make(version: str, levels_dir: Path, probes_dir: Path, out: Path) -> int:
+# What the baker leaves beside the probes only for itself (--update, its own inputs) or for people
+# reading a bake; the game and the launcher never open them, so a pack leaves them out.
+BAKER_ONLY = {
+    "interior-input.json",
+    "interior-inference.json",
+    "seed-plan.json",
+    "emission-audit.json",
+    "probe-density-report.json",
+    "environment-report.json",
+    "environment-placement-report.json",
+}
+
+
+def needed_to_play(rel: Path) -> bool:
+    """Whether a bake's file (relative to its level's folder) goes into a pack."""
+    return not (
+        rel.suffix in (".log", ".txt")
+        or rel.name in BAKER_ONLY
+        or rel.parts[0] == "adaptive-reference"
+    )
+
+
+def make(version: str, levels_dir: Path, probes_dir: Path, out: Path, texture_format: str) -> int:
     """Packs every level whose bake is finished and verified (its stamp is there)."""
-    manifest: dict = {"format": FORMAT, "version": version, "levels": {}}
-    formats = set()
+    manifest: dict = {"format": FORMAT, "version": version, "texture_format": texture_format, "levels": {}}
     out.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as pack:
         for name in levels_in(levels_dir):
@@ -138,8 +159,8 @@ def make(version: str, levels_dir: Path, probes_dir: Path, out: Path) -> int:
             requires = {i: (sha256_file(level / i) if (level / i).is_file() else None) for i in INPUTS}
             files: dict[str, str] = {}
             for path in sorted(p for p in baked.rglob("*") if p.is_file()):
-                if path.suffix == ".log":
-                    continue  # the bake's diagnostics, not needed to play
+                if not needed_to_play(path.relative_to(baked)):
+                    continue
                 arc = f"probes/{name}/{path.relative_to(baked).as_posix()}"
                 files[arc] = sha256_file(path)
                 pack.write(path, arc)
@@ -149,18 +170,35 @@ def make(version: str, levels_dir: Path, probes_dir: Path, out: Path) -> int:
                     arc = f"levels/{name}/{rel}"
                     files[arc] = sha256_file(path)
                     pack.write(path, arc)
-            fmt = str(stamp.get("texture_compression") or stamp.get("compression") or "")
             manifest["levels"][name] = {
                 "requires": requires,
                 "files": files,
                 "baker_profile_sha256": stamp.get("baker_profile_sha256"),
             }
-            formats.add(fmt)
             print(f"{name}: {len(files)} files")
         manifest["level_count"] = len(manifest["levels"])
         pack.writestr("pack.json", json.dumps(manifest, indent=1, sort_keys=True))
     print(f"{out}: {len(manifest['levels'])} levels, {out.stat().st_size / 1e6:.1f} MB, sha256 {sha256_file(out)}")
     return 0 if manifest["levels"] else 1
+
+
+def make_feed(base_url: str, packs: list[Path], out: Path) -> int:
+    """Writes the feed that lists packs uploaded under base_url (a release's download folder)."""
+    entries = []
+    for path in packs:
+        with zipfile.ZipFile(path) as pack:
+            manifest = json.loads(pack.read("pack.json"))
+        entries.append(
+            {
+                "version": manifest["version"],
+                "format": manifest["texture_format"],
+                "url": f"{base_url.rstrip('/')}/{path.name}",
+                "sha256": sha256_file(path),
+            }
+        )
+    out.write_text(json.dumps({"packs": entries}, indent=1) + "\n")
+    print(f"{out}: {len(entries)} pack(s)")
+    return 0
 
 
 def fetch(url: str, sha256: str | None, into: Path) -> Path:
@@ -214,7 +252,7 @@ def install(pack_path: Path, levels_dir: Path, probes_dir: Path, baker: Path | N
             # Read and check every file first; nothing is replaced unless all of them are right.
             data = {}
             for arc, digest in entry["files"].items():
-                if ".." in Path(arc).parts or not (arc.startswith(f"probes/{name}/") or arc.startswith(f"levels/{name}/")):
+                if ".." in Path(arc).parts or not arc.startswith((f"probes/{name}/", f"levels/{name}/")):
                     raise ValueError(f"{arc}: outside its level")
                 blob = pack.read(arc)
                 if sha256_bytes(blob) != digest:
@@ -260,6 +298,12 @@ def main(argv: list[str] | None = None) -> int:
     m.add_argument("--levels-dir", type=Path, required=True)
     m.add_argument("--probes-dir", type=Path, required=True)
     m.add_argument("--out", type=Path, required=True)
+    m.add_argument("--texture-format", choices=("bc6h", "astc", "r11g11b10"), required=True,
+                   help="the probe texture format the bakes were made with (--compression)")
+    f = sub.add_parser("feed", help="write the feed.json for packs uploaded to one release")
+    f.add_argument("--base-url", required=True)
+    f.add_argument("--out", type=Path, required=True)
+    f.add_argument("packs", type=Path, nargs="+")
     i = sub.add_parser("install", help="install the levels of a pack that match this export")
     i.add_argument("--levels-dir", type=Path, required=True)
     i.add_argument("--probes-dir", type=Path, required=True)
@@ -272,7 +316,9 @@ def main(argv: list[str] | None = None) -> int:
     i.add_argument("--baker", type=Path, help="checks each level's bake profile against the pack's")
     args = parser.parse_args(argv)
     if args.command == "make":
-        return make(args.version, args.levels_dir, args.probes_dir, args.out)
+        return make(args.version, args.levels_dir, args.probes_dir, args.out, args.texture_format)
+    if args.command == "feed":
+        return make_feed(args.base_url, args.packs, args.out)
     baker = args.baker if args.baker and args.baker.is_file() else None
     if args.pack:
         install(args.pack, args.levels_dir, args.probes_dir, baker, args.version)

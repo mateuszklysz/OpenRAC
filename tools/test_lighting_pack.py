@@ -42,11 +42,17 @@ class TestLightingPack(unittest.TestCase):
             bake(ours / "probes", ours / "levels", "level_03", verified=False)
             pack = root / "pack.zip"
             self.assertEqual(
-                lighting_pack.make("rac1/ntsc", ours / "levels", ours / "probes", pack), 0
+                lighting_pack.make("rac1/ntsc", ours / "levels", ours / "probes", pack, "bc6h"), 0
             )
             manifest = json.loads(__import__("zipfile").ZipFile(pack).read("pack.json"))
             self.assertEqual(sorted(manifest["levels"]), ["level_01", "level_02"])
             self.assertNotIn("probes/level_01/batch.log", manifest["levels"]["level_01"]["files"])
+            self.assertEqual(manifest["texture_format"], "bc6h")
+            feed = root / "feed.json"
+            lighting_pack.make_feed("https://example.invalid/dl/", [pack], feed)
+            entry = json.loads(feed.read_text())["packs"][0]
+            self.assertEqual((entry["format"], entry["url"]), ("bc6h", "https://example.invalid/dl/pack.zip"))
+            self.assertEqual(lighting_pack.choose_from_feed(feed.as_uri(), "rac1/ntsc", "bc6h")["sha256"], entry["sha256"])
 
             # The player's export: level 01 the same, level 02 exported differently.
             level(theirs / "levels", "level_01", manifest='{"n": "level_01"}')
@@ -61,6 +67,13 @@ class TestLightingPack(unittest.TestCase):
 
             with self.assertRaises(ValueError):
                 lighting_pack.install(pack, theirs / "levels", theirs / "probes", None, "rac1/pal")
+
+    def test_needed_to_play(self):
+        self.assertTrue(lighting_pack.needed_to_play(Path("region-001.orpg")))
+        self.assertTrue(lighting_pack.needed_to_play(Path("interior-lights-report.json")))
+        self.assertFalse(lighting_pack.needed_to_play(Path("region-001.orpg.txt")))
+        self.assertFalse(lighting_pack.needed_to_play(Path("interior-input.json")))
+        self.assertFalse(lighting_pack.needed_to_play(Path("adaptive-reference/region-001.orpg")))
 
     def test_format_from_profile(self):
         self.assertEqual(lighting_pack.profile_format('{"texture_compression":"BC6H UFLOAT"}'), "bc6h")
