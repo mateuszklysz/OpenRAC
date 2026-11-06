@@ -1,6 +1,7 @@
 import json
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 
 import lighting_pack
@@ -40,33 +41,45 @@ class TestLightingPack(unittest.TestCase):
             bake(ours / "probes", ours / "levels", "level_01")
             bake(ours / "probes", ours / "levels", "level_02")
             bake(ours / "probes", ours / "levels", "level_03", verified=False)
-            pack = root / "pack.zip"
+            packs = root / "packs"
             self.assertEqual(
-                lighting_pack.make("rac1/ntsc", ours / "levels", ours / "probes", pack, "bc6h"), 0
+                lighting_pack.make("rac1/ntsc", ours / "levels", ours / "probes", packs, "bc6h"), 0
             )
-            manifest = json.loads(__import__("zipfile").ZipFile(pack).read("pack.json"))
-            self.assertEqual(sorted(manifest["levels"]), ["level_01", "level_02"])
-            self.assertNotIn("probes/level_01/batch.log", manifest["levels"]["level_01"]["files"])
-            self.assertEqual(manifest["texture_format"], "bc6h")
-            feed = root / "feed.json"
-            lighting_pack.make_feed("https://example.invalid/dl/", [pack], feed)
-            entry = json.loads(feed.read_text())["packs"][0]
-            self.assertEqual((entry["format"], entry["url"]), ("bc6h", "https://example.invalid/dl/pack.zip"))
-            self.assertEqual(lighting_pack.choose_from_feed(feed.as_uri(), "rac1/ntsc", "bc6h")["sha256"], entry["sha256"])
+            made = sorted(p.name for p in packs.iterdir())
+            self.assertEqual(made, ["rac1-ntsc-bc6h-level_01.zip", "rac1-ntsc-bc6h-level_02.zip"])
+            with zipfile.ZipFile(packs / made[0]) as z:
+                manifest = json.loads(z.read("pack.json"))
+                self.assertEqual(z.getinfo("probes/level_01/sparse.orpg").compress_type, zipfile.ZIP_LZMA)
+            self.assertEqual((manifest["level"], manifest["texture_format"]), ("level_01", "bc6h"))
+            self.assertNotIn("probes/level_01/batch.log", manifest["files"])
+
+            feed_path = root / "feed.json"
+            lighting_pack.make_feed("https://example.invalid/dl/", sorted(packs.iterdir()), feed_path)
+            # The feed's URLs point at the local files for the test.
+            feed = json.loads(feed_path.read_text())
+            for entry in feed["packs"]:
+                entry["url"] = (packs / entry["url"].rsplit("/", 1)[1]).as_uri()
+            feed_path.write_text(json.dumps(feed))
+            chosen = lighting_pack.read_feed(feed_path.as_uri(), "rac1/ntsc", "bc6h")
+            self.assertEqual(sorted(chosen), ["level_01", "level_02"])
+            self.assertEqual(lighting_pack.read_feed(feed_path.as_uri(), "rac1/ntsc", "astc"), {})
 
             # The player's export: level 01 the same, level 02 exported differently.
             level(theirs / "levels", "level_01", manifest='{"n": "level_01"}')
             level(theirs / "levels", "level_02", manifest='{"n": "other"}')
-            installed = lighting_pack.install(
-                pack, theirs / "levels", theirs / "probes", None, "rac1/ntsc"
-            )
+            installed = lighting_pack.install_from_feed(chosen, theirs / "levels", theirs / "probes", None, "rac1/ntsc")
             self.assertEqual(installed, 1)
             self.assertEqual((theirs / "probes/level_01/sparse.orpg").read_bytes(), b"probes")
             self.assertEqual((theirs / "levels/level_01/water.bin").read_bytes(), b"water")
             self.assertFalse((theirs / "probes/level_02").exists())
+            self.assertEqual(sorted(p.name for p in (theirs / "probes").iterdir()), ["level_01"])
+            # Installed and current: nothing is downloaded again.
+            self.assertEqual(
+                lighting_pack.install_from_feed(chosen, theirs / "levels", theirs / "probes", None, "rac1/ntsc"), 0
+            )
 
             with self.assertRaises(ValueError):
-                lighting_pack.install(pack, theirs / "levels", theirs / "probes", None, "rac1/pal")
+                lighting_pack.install(packs / made[0], theirs / "levels", theirs / "probes", None, "rac1/pal")
 
     def test_needed_to_play(self):
         self.assertTrue(lighting_pack.needed_to_play(Path("region-001.orpg")))
