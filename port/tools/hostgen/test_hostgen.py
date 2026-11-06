@@ -2023,6 +2023,37 @@ class Places(unittest.TestCase):
                           (out / "levels" / "16_x" / "L16_00435CE8.c").read_text())
 
     @unittest.skipUnless(have_compiler(), "needs Clang on a POSIX host")
+    def test_another_levels_datum_the_retail_places_in_the_functions_level_is_that_address(self):
+        # Joba's spark burst func_L11_00397A30 says D_L18_001B0730 (Damosel's particle settings),
+        # which Joba has at 0x001AECB8 (foreign_data.tsv): looked up through level 18 it was
+        # Damosel's address, a float in Joba read as the settings' frame range, and the game crashed.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            src = root / "game"
+            (src / "src" / "levels" / "11_x").mkdir(parents=True)
+            (src / "src" / "levels" / "11_x" / "L11_00397A30.c").write_text(
+                "extern int D_L18_001B0730;\nextern int D_L18_001B0740;\n"
+                "int func_L11_00397A30(void) { return D_L18_001B0730 + D_L18_001B0740; }\n")
+            (src / "functions.tsv").write_text(
+                "func_L11_00397A30\tlevel\t4\tfingerprint\t1\t11:00397A30\n")
+            (root / "foreign_data.tsv").write_text("# level\tname\taddress\tfunctions\n"
+                                                   "11\tD_L18_001B0730\t001AECB8\tfunc_L11_00397A30\n")
+            (root / "hostgen.json").write_text(json.dumps({
+                "sources": ["src"], "includes": [], "places": "functions.tsv",
+                "relocate": [0x1A7C80, 0x500000], "foreign_data": "foreign_data.tsv",
+                "level_short_names": "^func_(?P<addr>[0-9A-F]{6,8})$",
+            }))
+            out = root / "gen"
+            self.assertEqual(hostgen.main(["--game", str(root / "hostgen.json"),
+                                           "--source", str(src), "--out", str(out),
+                                           "--jobs", "1", "--quiet"]), 0)
+            text = (out / "levels" / "11_x" / "L11_00397A30.c").read_text()
+            self.assertIn("OPENRAC_LDATA(11, 0x001AECB8u)", text)
+            self.assertNotIn("OPENRAC_LDATA(18, 0x001B0730u)", text)
+            # A name the table does not place keeps the lookup through its level.
+            self.assertIn("OPENRAC_LDATA(18, 0x001B0740u)", text)
+
+    @unittest.skipUnless(have_compiler(), "needs Clang on a POSIX host")
     def test_a_function_entered_away_from_its_name_calls_the_levels_hook(self):
         # Going Commando's func_0031FC28 (the ammo pickup's update) is entered at 0x0031FC60, after
         # another function's leftover instructions, and the level catalogue lists its copies under
@@ -3833,6 +3864,39 @@ class CopyCalls(unittest.TestCase):
         self.assertEqual(copycalls.exe_copy(exe, 0x2DC900, 16, level)[1], jal(0x27C660))
         # Code that matches nowhere (a false fold) gives the executable no targets at all.
         self.assertIsNone(copycalls.exe_copy(exe, 0x2DC900, 16, (0x24020001,) * 4))
+
+    def test_foreign_data_lines_up_the_function_with_the_other_levels_copy(self):
+        # Joba's func_L11_00397A30 was matched from Damosel's func_L18_003FCD70 and keeps its name
+        # D_L18_001B0730; Joba's copy has one more word in front and reads the global elsewhere.
+        import copycalls
+        gp = 0x001AEFF0
+        body = [0x27BDFFC0, 0x7FBF0000, 0x0080802D, 0x24040005, 0x0040182D, 0x24620001, 0x03A0202D]
+        theirs = body + [0x27860000 | ((0x001B0730 - gp) & 0xFFFF), 0x7BBF0000, 0x03E00008, 0x27BD0040]
+        mine = [0x00000000] + body + [0x27860000 | ((0x001AECB8 - gp) & 0xFFFF), 0x7BBF0000, 0x03E00008,
+                                      0x27BD0040]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for name, level, address, code in (("18_damosel", 18, 0x003FCD70, theirs),
+                                                ("11_joba", 11, 0x00397A30, mine)):
+                folder = root / "baserom" / "levels" / name
+                folder.mkdir(parents=True)
+                (folder / "text.bin").write_bytes(struct.pack(f"<{len(code)}I", *code))
+                (folder / "manifest.json").write_text(json.dumps({"level": level, "sections": [
+                    {"name": "text", "address": address, "size": len(code) * 4, "type": 1}]}))
+            (root / "config" / "levels").mkdir(parents=True)
+            (root / "config" / "levels" / "functions.tsv").write_text(
+                f"func_L18_003FCD70\tshared\t{len(theirs) * 4}\tf\t1\t18:003FCD70\n"
+                f"func_L11_00397A30\tlevel\t{len(mine) * 4}\tf\t1\t11:00397A30\n")
+            (root / "src" / "levels" / "11_joba").mkdir(parents=True)
+            (root / "src" / "levels" / "11_joba" / "L11_00397A30.c").write_text(
+                "extern int D_L18_001B0730 __attribute__((sda));\n"
+                "void func_L11_00397A30(char *self) {\n    use(&D_L18_001B0730);\n}\n")
+            self.assertEqual(copycalls.foreign_data(root, 0x1A7C80, 0x500000, gp),
+                             [(11, "D_L18_001B0730", 0x001AECB8, "func_L11_00397A30")])
+            # Code too unlike the other level's to line up says nothing.
+            (root / "baserom" / "levels" / "11_joba" / "text.bin").write_bytes(
+                struct.pack(f"<{len(mine)}I", *([0x24020001] * 8 + mine[8:])))
+            self.assertEqual(copycalls.foreign_data(root, 0x1A7C80, 0x500000, gp), [])
 
     def test_call_expression(self):
         from program import call_copy_expr

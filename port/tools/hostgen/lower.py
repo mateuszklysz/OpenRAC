@@ -1950,6 +1950,14 @@ class Unit:
         symbol = symbol.removesuffix("__gp") if symbol else symbol
         if symbol and getattr(self.program, "global_views", False):
             symbol = GLOBAL_VIEW.sub(r"\1", symbol)
+        # A function of one level that names another level's datum (hostgen.json "foreign_data"):
+        # that datum's place in the function's own level, read from the retail programs. Pairing the
+        # two levels' functions finds nothing when no function they share forms it (Joba's sparks,
+        # func_L11_00397A30, read Damosel's D_L18_001B0730 at Damosel's address).
+        own_level = self._one_level()
+        foreign = getattr(self.program, "foreign_data", {}).get((own_level, symbol)) if symbol and not code else None
+        if foreign is not None:
+            return f"OPENRAC_LDATA({own_level}, {hexaddr(foreign)})"
         # A level function's datum by its name, where the build's derived table holds the address of
         # the executable's copy (D_L00_001B043C as 0x001B00FC): the name's own place in that level.
         named = re.fullmatch(r"D_L(\d\d)_([0-9A-Fa-f]{8})(?:_\d+)?", symbol or "")
@@ -2091,6 +2099,14 @@ class Unit:
         home = level if level is not None else places[0][0]
         canon = next((a for o, a in places if o == home), places[0][1])
         return home, canon, getattr(self.program, "sizes", {}).get(fn.code) or 0x400
+
+    def _one_level(self) -> int | None:
+        """The level of a function only one level's program carries, else None."""
+        fn = self.fn
+        if fn is None or not LEVEL_NAME.match(fn.code):
+            return None
+        levels = {o for o, _ in self.program.code_places(fn.code)}
+        return next(iter(levels)) if len(levels) == 1 else None
 
     def _shared_level(self) -> int | None:
         """For a function several levels' programs carry (func_LNN_..., placed in more than one

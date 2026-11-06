@@ -166,6 +166,19 @@ that level's names (`func_L20_002C7588` in level 13's hero update is `func_L00_0
 and some calls are spelled with another level's addresses or a kseg0 one (`func_80338398`). Each row
 comes from comparing the function's calls with retail's jals.
 
+`foreign_data` (`foreign_data.tsv`, written by `port/tools/hostgen/copycalls.py --foreign`): the same
+for data. A function only one level has can keep another level's data names (Joba's spark burst
+`func_L11_00397A30` says `D_L18_001B0730`, Damosel's particle settings, which Joba has at
+`0x001AECB8`). Each row is where the function's own level has that datum, read from the retail
+programs. Before, the port looked the name up through level 18, found nothing to pair, and read
+Damosel's address in Joba: a float there, read as a pointer, crashed the game in the second arena.
+Write it again after a sync:
+
+```sh
+python3 port/tools/hostgen/copycalls.py --source games/rac2/ntsc --out port/game/rac2-ntsc/call_copies.tsv \
+    --config port/game/rac2-ntsc/hostgen.json --foreign port/game/rac2-ntsc/foreign_data.tsv
+```
+
 `small_copies_own_data`: the catalogue's fingerprint leaves operands out, so a leaf of up to this
 many bytes can be another field in another level: it reads what the running copy forms.
 

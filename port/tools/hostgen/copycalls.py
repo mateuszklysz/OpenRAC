@@ -18,11 +18,15 @@ of the caller, or 0.
 
     python3 port/tools/hostgen/copycalls.py --source games/rac2/ntsc \\
         --out port/game/rac2-ntsc/call_copies.tsv
+
+--foreign also writes where a level has the data its own functions name after another level
+(foreign_data below, hostgen.json "foreign_data"); it needs --config, the game's hostgen.json.
 """
 from __future__ import annotations
 
 import argparse
 import json
+import re
 import struct
 from pathlib import Path
 
@@ -244,12 +248,109 @@ def data_conflicts(source: Path, low: int, high: int, gp: int) -> list[tuple[str
     return sorted(out)
 
 
+# How alike two functions' code must be to line up their instructions: the share of words equal
+# without the linker's fields, and the shortest run of equal words an instruction is taken from.
+# Unrelated functions line up by chance; on 3,000 globals of the levels' shared functions, lined up
+# with another function of the same level forming the same global, these gave no wrong address.
+SAME_CODE = 0.9
+SAME_RUN = 4
+FOREIGN_NAME = re.compile(r"\bD_L(\d\d)_([0-9A-Fa-f]{8})\b")
+DEFINITION = re.compile(r"^[A-Za-z_][\w \t\*]*?\b(func_L\d\d_[0-9A-Fa-f]{8})\s*\([^;]*$", re.M)
+
+
+def foreign_data(source: Path, low: int, high: int, gp: int) -> list[tuple[int, str, int, str]]:
+    """The data names of another level in functions of one level, and where that level has them.
+    A function matched beside another level's copy keeps that level's names: Joba's spark burst
+    func_L11_00397A30 says D_L18_001B0730 (Damosel's particle settings), which Joba has at
+    0x001AECB8. The decompilation's build derives each such name's address in each level from the
+    retail bytes; the port's derived table has only the executable's names, and pairing level 18's
+    functions with Joba's finds nothing there to pair, so the port read Damosel's address in Joba
+    (a float there, read as a pointer). Here each name's address in the function's level comes from
+    the retail programs: the instruction in the other level's function that forms the name, lined
+    up with the same instruction of this level's function (their code without the linker's fields).
+    A name is kept when every such function agrees. One row per level and name:
+
+        level  name  address  functions"""
+    import difflib
+
+    baserom = source / "baserom"
+    programs = {int(d.name[:2]): level_sections(d) for d in sorted((baserom / "levels").iterdir())
+                if d.is_dir() and d.name[:2].isdigit()}
+    catalogue: dict[str, tuple[int, list[tuple[int, int]]]] = {}
+    for line in (source / "config/levels/functions.tsv").read_text().splitlines():
+        cols = line.split("\t")
+        if line.startswith("#") or len(cols) < 6:
+            continue
+        places = [(int(p[:2]), int(p[3:], 16)) for p in cols[5].split(",") if p]
+        catalogue[cols[0]] = (int(cols[2]) & ~3, places)
+    # The names each one-level function's file spells with another level's number.
+    wanted: dict[str, set[tuple[int, int]]] = {}
+    files = sorted((source / "src/levels").rglob("*.c")) + sorted((source / "nonmatching/functional").glob("*.c"))
+    for path in files:
+        text = path.read_text(errors="replace")
+        names = {(int(lv), int(a, 16)) for lv, a in FOREIGN_NAME.findall(text)}
+        if not names:
+            continue
+        for fn in set(DEFINITION.findall(text)):
+            size, places = catalogue.get(fn, (0, []))
+            levels = {lv for lv, _ in places}
+            if len(levels) == 1 and size >= 8:
+                (own,) = levels
+                wanted.setdefault(fn, set()).update(n for n in names if n[0] != own and low <= n[1] < high)
+    code_cache: dict[tuple[int, int, int], tuple[int, ...] | None] = {}
+
+    def code(level: int, address: int, size: int) -> tuple[int, ...] | None:
+        key = (level, address, size)
+        if key not in code_cache:
+            code_cache[key] = words(programs[level], address, size) if level in programs else None
+        return code_cache[key]
+
+    # Each level's functions by the addresses they form, for the levels the names are of.
+    formers: dict[int, dict[int, list[tuple[int, int]]]] = {}
+    for level in sorted({lv for names in wanted.values() for lv, _ in names}):
+        found = formers.setdefault(level, {})
+        for size, places in catalogue.values():
+            for lv, address in places:
+                c = code(lv, address, size) if lv == level and size >= 8 else None
+                for address_formed in set(formed(c, gp).values()) if c is not None else ():
+                    found.setdefault(address_formed, []).append((address, size))
+    answers: dict[tuple[int, str], dict[int, set[str]]] = {}
+    for fn, names in sorted(wanted.items()):
+        size, places = catalogue[fn]
+        own = places[0][0]
+        for level, address in sorted(names):
+            for other, other_size in formers.get(level, {}).get(address, []):
+                theirs = code(level, other, other_size)
+                for _, place in places:
+                    mine = code(own, place, size)
+                    if theirs is None or mine is None:
+                        continue
+                    lined = difflib.SequenceMatcher(None, [masked(w) for w in theirs], [masked(w) for w in mine],
+                                                    autojunk=False)
+                    if lined.ratio() < SAME_CODE:
+                        continue
+                    at = {a + k: b + k for a, b, n in lined.get_matching_blocks() if n >= SAME_RUN for k in range(n)}
+                    mine_formed = formed(mine, gp)
+                    for i, value in formed(theirs, gp).items():
+                        if value == address and at.get(i) in mine_formed:
+                            answers.setdefault((own, f"D_L{level:02d}_{address:08X}"), {}).setdefault(
+                                mine_formed[at[i]], set()).add(fn)
+    out = []
+    for (own, name), seen in sorted(answers.items()):
+        if len(seen) == 1:
+            ((address, users),) = seen.items()
+            out.append((own, name, address, ",".join(sorted(users))))
+    return out
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--source", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--data", type=Path, help="also write the functions that take globals from their copy")
     parser.add_argument("--config", type=Path, help="the game's hostgen.json")
+    parser.add_argument("--foreign", type=Path, help="also write where a level has the data its own functions name "
+                        "after another level (hostgen.json \"foreign_data\"); needs --config")
     parser.add_argument("--twins", type=Path, help="also write the level copies of the executable's "
                         "functions entered away from their name (hostgen.json \"level_twins\")")
     args = parser.parse_args()
@@ -267,10 +368,19 @@ def main() -> int:
     lines += [f"{a}\t{b}\t{c}\t{d:08X}\t{e}\t{f:08X}\t{g:08X}" for a, b, c, d, e, f, g in found]
     args.out.write_text("\n".join(lines) + "\n")
     print(f"{len(found)} calls of {len({r[0] for r in found})} functions")
-    if args.data:
+    if args.data or args.foreign:
         config = json.loads(args.config.read_text())
         low, high = config["relocate"][:2] if isinstance(config["relocate"], list) else (config["relocate"]["low"], config["relocate"]["high"])
-        names = data_conflicts(args.source, int(str(low), 0), int(str(high), 0), int(config["asm"]["gp"], 0))
+        low, high, gp = int(str(low), 0), int(str(high), 0), int(config["asm"]["gp"], 0)
+    if args.foreign:
+        rows_found = foreign_data(args.source, low, high, gp)
+        args.foreign.write_text(
+            "# Written by port/tools/hostgen/copycalls.py --foreign from the retail programs; do not edit.\n"
+            "# level\tname\taddress\tfunctions\n"
+            + "".join(f"{lv:02d}\t{n}\t{a:08X}\t{u}\n" for lv, n, a, u in rows_found))
+        print(f"{len(rows_found)} names of other levels' data placed in the level of the function using them")
+    if args.data:
+        names = data_conflicts(args.source, low, high, gp)
         args.data.write_text("# Written by port/tools/hostgen/copycalls.py from the retail programs; do not edit.\n"
                              + "".join(f"{n}\t{a:08X}\n" for n, a in names))
         print(f"{len(names)} uses, by {len({n for n, _ in names})} functions, of globals that do not pair")

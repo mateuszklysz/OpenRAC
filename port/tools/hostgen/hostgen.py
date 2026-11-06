@@ -874,7 +874,8 @@ def inputs_digest(source: Path, config: Path, cfg: dict, options: list[str]) -> 
                     if p.is_file() and p.suffix in (".json", ".tsv", ".c", ".h", ".txt", ".inc"))
     paths += [config.parent / cfg.get("library_api", "../common/libraries.tsv"), HERE / "include"]
     paths += sorted((config.parent.parent / str(cfg.get("game", "")) / "host").glob("*.c"))
-    for key in ("libraries", "hand", "overrides", "split_places", "call_copies", "data_copies", "level_twins"):
+    for key in ("libraries", "hand", "overrides", "split_places", "call_copies", "data_copies", "level_twins",
+                "foreign_data"):
         if cfg.get(key):
             paths.append(config.parent / cfg[key])
     if cfg.get("drafts"):
@@ -1108,6 +1109,12 @@ def configure_program(program: Program, args: argparse.Namespace, cfg: dict, sou
     if cfg.get("data_copies"):
         program.data_copies = {(row[0], int(row[1], 16)) for row in (
             line.split("\t") for line in (args.game.parent / cfg["data_copies"]).read_text().splitlines()
+            if line and not line.startswith("#"))}
+    # Data names of another level in a level's own functions, placed in that level (copycalls.py
+    # --foreign): level, name, address.
+    if cfg.get("foreign_data"):
+        program.foreign_data = {(int(row[0]), row[1]): int(row[2], 16) for row in (
+            line.split("\t") for line in (args.game.parent / cfg["foreign_data"]).read_text().splitlines()
             if line and not line.startswith("#"))}
     # Copies the catalogue has under another name, starting early (hostgen.json "more_places":
     # function -> "level:address,..."): rac2's Galactic Map list is matched at its level 0 place and
