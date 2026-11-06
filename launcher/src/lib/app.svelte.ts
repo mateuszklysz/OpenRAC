@@ -395,14 +395,40 @@ function handleExit(job: Job) {
   if (job.state === "succeeded" && played && app.stopped && version.startsWith(`${app.stopped.game}/`)) {
     app.stopped = { ...app.stopped, playedSince: true };
   }
-  // The levels were read again and checked: Enhanced graphics' lighting is baked again for them.
+  // The levels were read again and checked: Enhanced graphics' lighting is prepared again for them.
   if (job.state === "succeeded" && version !== null && job.actionId === "port-levels-check") {
+    void prepareLighting(version);
+  }
+  // The ready-made lighting is in (or there was none for these levels): what it left is baked.
+  if (job.state !== "queued" && job.state !== "running" && version !== null && job.actionId === "probe-pack") {
     void bakeAfterLevels(version);
   }
   settle(job.key, job.state === "succeeded");
   void refresh();
   updateDiscordPresence();
   pump();
+}
+
+/** Prepares Enhanced graphics' lighting for a version: first the ready-made lighting packs
+ *  (probe-pack, tools/lighting_pack.py), so the device bakes nothing a pack covers; when that job
+ *  ends, the bake of what is left (bakeAfterLevels). Without a probe-pack action, the bake alone. */
+export async function prepareLighting(key: string) {
+  const [game, name] = key.split("/");
+  if (!game || !name) return;
+  const version = app.library?.games.find((g) => g.id === game)?.versions.find((v) => v.key === key);
+  const pack = version?.actions.find((a) => a.id === "probe-pack" && a.thisPlatform);
+  if (!pack) return bakeAfterLevels(key);
+  const view = await api.enhancedView(game, name).catch(() => null);
+  const bake = view?.bake;
+  if (!view?.mod.enabled || !bake || bake.levels === 0 || bake.ready >= bake.levels) return;
+  const busy = jobs.list.some(
+    (j) =>
+      (j.actionId === "probe-pack" || j.actionId === "probe-bake") &&
+      j.scope.kind === "version" &&
+      j.scope.key === key &&
+      (j.state === "queued" || j.state === "running"),
+  );
+  if (!busy) void run({ kind: "version", key }, pack);
 }
 
 /** With Enhanced graphics on (core/src/enhanced.rs), bakes the lighting of the levels whose bake is

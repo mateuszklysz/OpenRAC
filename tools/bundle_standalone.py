@@ -383,7 +383,9 @@ def main() -> int:
     out.mkdir(parents=True, exist_ok=True)
 
     # The tools, without their tests; the catalogue; the progress the library shows.
-    for name in ("openrac.py", "extractor.py", "asm_part.py") + (() if args.android else ("build_game.py",)):
+    for name in ("openrac.py", "extractor.py", "asm_part.py", "lighting_pack.py") + (
+        () if args.android else ("build_game.py",)
+    ):
         (out / "tools").mkdir(exist_ok=True)
         shutil.copy2(ROOT / "tools" / name, out / "tools" / name)
     # The helpers they import, found from the copy's own tools/ (they find the copy's root by

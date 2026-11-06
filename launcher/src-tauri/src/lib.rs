@@ -2898,6 +2898,12 @@ fn with_plugins(builder: tauri::Builder<tauri::Wry>) -> tauri::Builder<tauri::Wr
 /// command shares ([`AppState`]).
 fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     set_up_desktop(app);
+    // The repository that built this launcher, for the tools its jobs run: the lighting packs
+    // (tools/lighting_pack.py) come from its releases, as its updates do. Read before any job starts.
+    let built = update_source(app.handle());
+    if built.repository.split('/').count() == 2 && !built.repository.contains(':') {
+        std::env::set_var("OPENRAC_REPOSITORY", &built.repository);
+    }
     // A start for one game (`--play`, a shortcut) keeps the window away until it fails to start.
     #[cfg(desktop)]
     let play = openrac_launcher_core::shortcut::play_arg(&std::env::args().collect::<Vec<_>>());

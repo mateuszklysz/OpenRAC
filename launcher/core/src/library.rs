@@ -456,7 +456,7 @@ mod tests {
         let file = actions::load(&checkout()).unwrap();
         for key in ["rac1/pal", "rac1/ntsc"] {
             let scope = Scope::Version(key.into());
-            for id in ["port-levels", "port-levels-check", "probe-bake"] {
+            for id in ["port-levels", "port-levels-check", "probe-pack", "probe-bake"] {
                 let action = file.find(&scope, id).unwrap_or_else(|| panic!("{key} has no {id}"));
                 assert!(action.platforms.contains(&Platform::Android), "{key} {id} does not run on Android");
             }

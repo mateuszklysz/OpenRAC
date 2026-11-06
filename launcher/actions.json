@@ -437,6 +437,47 @@
         "todo": "Run it from the desktop app. From a shell on macOS it passed a whole export (21 levels) and named the two levels of one with a folder removed and a file emptied."
       },
       {
+        "id": "probe-pack",
+        "label": "Download the enhanced lighting",
+        "description": "Downloads ready-made enhanced lighting for this disc and installs each level whose export matches it, so the device need not bake those levels. Levels that do not match are left to Prepare the enhanced lighting.",
+        "kind": "build",
+        "area": "port",
+        "state": "unverified",
+        "program": "{python}",
+        "args": [
+          "tools/lighting_pack.py",
+          "install",
+          "--version",
+          "rac1/pal",
+          "--levels-dir",
+          "{root}/assets/port/rac1/pal",
+          "--probes-dir",
+          "{data}/probes/pal",
+          "--baker",
+          "{artifact}"
+        ],
+        "output": "{data}/probes/pal",
+        "cwd": ".",
+        "platforms": [
+          "linux",
+          "macos",
+          "windows",
+          "android"
+        ],
+        "requires": [
+          "python"
+        ],
+        "artifact": "port/build/release/openrac-enhanced-baker.exe",
+        "needs": [
+          {
+            "path": "assets/port/rac1/pal/verified-4.json",
+            "from": "a check of the levels (Check the levels)"
+          }
+        ],
+        "docs": "port/enhanced/lighting/README.md",
+        "todo": "Run it from the launcher once a lighting-packs release holds packs for this version (tools/lighting_pack.py make)."
+      },
+      {
         "id": "probe-bake",
         "label": "Prepare the enhanced lighting",
         "description": "Prepares enhanced water, interior lighting, bounced light and reflections from your extracted levels. Native workers share CPU and memory budgets; verified cached levels are reused.",
@@ -1179,6 +1220,47 @@
         "todo": "Run it from the desktop app. The game is built by tools/build_port.py rac1-ntsc (no launcher action yet). From a shell on macOS, openrac-rac1-ntsc --data <data> --levels <the export> --check-levels passed all 21 levels (2026-10-16)."
       },
       {
+        "id": "probe-pack",
+        "label": "Download the enhanced lighting",
+        "description": "Downloads ready-made enhanced lighting for this disc and installs each level whose export matches it, so the device need not bake those levels. Levels that do not match are left to Prepare the enhanced lighting.",
+        "kind": "build",
+        "area": "port",
+        "state": "unverified",
+        "program": "{python}",
+        "args": [
+          "tools/lighting_pack.py",
+          "install",
+          "--version",
+          "rac1/ntsc",
+          "--levels-dir",
+          "{root}/assets/port/rac1/ntsc",
+          "--probes-dir",
+          "{data}/probes/ntsc",
+          "--baker",
+          "{artifact}"
+        ],
+        "output": "{data}/probes/ntsc",
+        "cwd": ".",
+        "platforms": [
+          "linux",
+          "macos",
+          "windows",
+          "android"
+        ],
+        "requires": [
+          "python"
+        ],
+        "artifact": "port/build/release/openrac-enhanced-baker.exe",
+        "needs": [
+          {
+            "path": "assets/port/rac1/ntsc/verified-4.json",
+            "from": "a check of the levels (Check the levels)"
+          }
+        ],
+        "docs": "port/enhanced/lighting/README.md",
+        "todo": "Run it from the launcher once a lighting-packs release holds packs for this version (tools/lighting_pack.py make)."
+      },
+      {
         "id": "probe-bake",
         "label": "Prepare the enhanced lighting",
         "description": "Prepares enhanced water, interior lighting, bounced light and reflections from your extracted levels. Native workers share CPU and memory budgets; verified cached levels are reused.",
@@ -1918,6 +2000,47 @@
         ],
         "docs": "port/game/rac2-ntsc/README.md",
         "todo": "Run it on a device. An Android launcher's copy (tools/bundle_standalone.py --android) writes it to a folder named by what it is built from (its kit and hostgen, bundle_standalone.py part_tag) and Play waits for it there; the APK carries the kit (tools/asm_part.py kit) and Clang and lld from Zig's static AArch64 release (tools/build_android.py ZIG_FILES)."
+      },
+      {
+        "id": "probe-pack",
+        "label": "Download the enhanced lighting",
+        "description": "Downloads ready-made enhanced lighting for this disc and installs each level whose export matches it, so the device need not bake those levels. Levels that do not match are left to Prepare the enhanced lighting.",
+        "kind": "build",
+        "area": "port",
+        "state": "unverified",
+        "program": "{python}",
+        "args": [
+          "tools/lighting_pack.py",
+          "install",
+          "--version",
+          "rac2/ntsc",
+          "--levels-dir",
+          "{root}/assets/port/rac2/ntsc",
+          "--probes-dir",
+          "{data}/probes/ntsc",
+          "--baker",
+          "{artifact}"
+        ],
+        "output": "{data}/probes/ntsc",
+        "cwd": ".",
+        "platforms": [
+          "linux",
+          "macos",
+          "windows",
+          "android"
+        ],
+        "requires": [
+          "python"
+        ],
+        "artifact": "port/build/release/openrac-enhanced-baker.exe",
+        "needs": [
+          {
+            "path": "assets/port/rac2/ntsc/levels-20.json",
+            "from": "the levels (Get the levels ready)"
+          }
+        ],
+        "docs": "port/enhanced/lighting/README.md",
+        "todo": "Run it from the launcher once a lighting-packs release holds packs for this version (tools/lighting_pack.py make)."
       },
       {
         "id": "probe-bake",

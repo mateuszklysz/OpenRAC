@@ -24,7 +24,7 @@
     type VersionView,
   } from "$lib/api";
   import { addMods } from "$lib/addMods";
-  import { app, guardShown, jobs, run } from "$lib/app.svelte";
+  import { app, guardShown, jobs, prepareLighting, run } from "$lib/app.svelte";
   import { modBadge, hasSettings } from "$lib/plugins";
   import * as T from "$lib/modsText";
   import { closeMod, modNav, openMod } from "$lib/modNav.svelte";
@@ -109,6 +109,11 @@
     if (bakeAction && !bakeJob) void run({ kind: "version", key: v.key }, bakeAction);
   }
 
+  /** Switched on: the ready-made lighting first, then the bake of what it left (prepareLighting). */
+  function prepare() {
+    if (!bakeJob) void prepareLighting(v.key);
+  }
+
   /** Every bake of this version gone, after the player says yes. */
   async function deleteBakes() {
     const b = enhanced?.bake;
@@ -132,7 +137,7 @@
     }
     // Switched on: the lighting is baked for the levels that have none yet.
     const b = enhanced?.bake;
-    if (on && b && b.available && b.ready < b.levels) bake();
+    if (on && b && b.available && b.ready < b.levels) prepare();
   }
 
   // The bake ended: its status again.
