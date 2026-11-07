@@ -724,11 +724,10 @@ jobs:
           gh release view "$channel" --json assets --jq '.assets[].name' | while IFS= read -r name; do
             grep -qxF "$name" <<< "$keep" || gh release delete-asset "$channel" "$name" --yes
           done
-          # Moving the tag over a commit that changes .github/workflows needs the `workflows`
-          # permission, which this token can't have (HTTP 403). Launchers read only the release's
-          # files, already up by now, so the tag may stay behind (move it by hand if it matters).
+          # Launchers read only the release's files, all up by now: a tag GitHub refuses to move
+          # (HTTP 403) is a warning, not a failed update.
           if ! gh api -X PATCH "repos/$GH_REPO/git/refs/tags/$channel" -f sha="$GITHUB_SHA" -F force=true > /dev/null; then
-            echo "::warning::could not move tag $channel to $GITHUB_SHA (workflow files changed since its commit?); the release's files are up to date"
+            echo "::warning::could not move tag $channel to $GITHUB_SHA; the release's files are up to date"
           fi
           gh release edit "$channel" --prerelease --title "$title" --notes "$notes"
 
