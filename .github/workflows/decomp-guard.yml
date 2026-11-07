@@ -1,0 +1,43 @@
+# Pull requests that change a decompilation tree OpenRAC syncs in from another repository
+# (games/*/game.json "source", docs/SOURCES.md). Such a change belongs in that project: here it is
+# overwritten or left as a conflict at the next sync. A pull request from outside the project fails
+# with a pointer to the right repository; a maintainer's only gets a warning. A sync passes when its
+# title starts with chore(import) or it has the decomp-sync label (tools/decomp_guard.py).
+name: decomp-guard
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: decomp-guard-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  guard:
+    name: Decomp changes go to their own repository
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Synced trees left alone
+        env:
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+          AUTHOR: ${{ github.event.pull_request.author_association }}
+        run: |
+          git fetch --no-tags --depth=1 origin "$PR_BASE"
+          # The base's copy of the check and its manifests, so a pull request can't loosen them.
+          script="$RUNNER_TEMP/decomp_guard.py"
+          git show "$PR_BASE:tools/decomp_guard.py" > "$script" 2>/dev/null || cp tools/decomp_guard.py "$script"
+          strict=--strict
+          case "$AUTHOR" in OWNER|MEMBER|COLLABORATOR) strict= ;; esac
+          git diff --name-only --no-renames "$PR_BASE" HEAD |
+            python3 "$script" --root . --base "$PR_BASE" --files-from - \
+              --title "$PR_TITLE" --labels "$PR_LABELS" $strict

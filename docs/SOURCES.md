@@ -148,6 +148,9 @@ that touches a line changed here is left as a `.rej` file to resolve by hand.
 After syncing rac2/ntsc, write the port's copy of the names its build derives
 again from a build of that commit
 ([port/game/rac2-ntsc](../port/game/rac2-ntsc/README.md#building-and-running)).
+Paths OpenRAC keeps itself inside a synced tree go in `"local"` under the
+version's `source` (relative to its directory): the `decomp-guard` check
+(`tools/decomp_guard.py`) never counts them as a change that belongs upstream.
 Before committing a sync, check it against the
 [sourcing policy](policy/SOURCING.md), including the removal requests, and
 commit it as one `chore(import)` commit per project, naming the new commit.

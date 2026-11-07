@@ -42,6 +42,10 @@
           "tools/extract",
           "docs/GDSCRIPT_CONVENTIONS.md"
         ],
+        "local": [
+          "VERSIONS.md",
+          "versions/ntsc"
+        ],
         "commit": "b4a462a5325759dd466bebe8cc06747e00d665d2",
         "date": "2026-11-05",
         "imported": "2026-11-06"
@@ -176,6 +180,11 @@
         "checkout": "../rac1-decomp-ntsc",
         "license": "GPL-3.0 (GPL-2.0 and newlib parts keep theirs)",
         "exclude": [],
+        "local": [
+          "OPENRAC_PATCHES.md",
+          "host",
+          "config/us/port_symbols.txt"
+        ],
         "commit": "d29807486aeb11039de60a7c871553ce38318730",
         "date": "2026-10-31",
         "imported": "2026-10-31"

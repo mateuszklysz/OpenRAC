@@ -42,6 +42,28 @@ launcher (`launcher/`); the decompilations the port is built from live in
   [docs/decomp](docs/decomp/README.md): work from the game's directory, and
   let its checks have the last word.
 
+## Decompilation changes
+
+Most trees under `games/` are copied from the games' own decompilation
+repositories and synced in from time to time
+([docs/SOURCES.md](docs/SOURCES.md) lists each tree with its repository). A
+change made only here is overwritten, or left as a conflict, at the next sync.
+
+- **A decomp change** (a match, a name, a header, the project's own tools):
+  open it in that project's repository. It reaches OpenRAC with the next sync.
+- **A change the native port needs**: keep it out of the decomp C. Wrap the
+  function in the port instead (`port/game/<program>/`). Where an edit inside a
+  tree can't be avoided, list it with its reason as docs/SOURCES.md describes.
+- **A sync** is one `chore(import)` pull request per project, made by a
+  maintainer with `tools/sources.py`.
+
+The `decomp-guard` check (`tools/decomp_guard.py`) lists the synced files a
+pull request changes. It fails for a pull request from outside the project and
+only warns for maintainers. A `chore(import)` title or the `decomp-sync`
+label marks a sync, which passes. Paths OpenRAC keeps itself inside a tree
+(port patches, its notes) are listed under `"local"` in that version's
+`source` in `games/<game>/game.json` and never count.
+
 ## Commits
 
 [Conventional Commits](https://www.conventionalcommits.org/):
