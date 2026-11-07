@@ -29,6 +29,13 @@
 
 namespace openrac::settings {
 
+// Low-power GPUs (Android, Apple Silicon) start with cheaper Enhanced shadows and upscaling.
+#if defined(__ANDROID__) || (defined(__APPLE__) && defined(__aarch64__))
+inline constexpr bool kHandheldDefaults = true;
+#else
+inline constexpr bool kHandheldDefaults = false;
+#endif
+
 // The F2 cycle: hidden, the existing frame counter, or separate CPU/GPU measurements.
 using FrameCounter = renderer::ui::fps_counter::Mode;
 
@@ -103,7 +110,8 @@ struct Settings {
     bool enhanced_rendering = false;
     bool enhanced_graphics = true;  // F4 within it; retains individual feature preferences
     bool enhanced_shadows = true;   // cascades and Ratchet map; off restores original shadows
-    renderer::ShadowQuality shadow_quality = renderer::ShadowQuality::High;
+    renderer::ShadowQuality shadow_quality =
+        kHandheldDefaults ? renderer::ShadowQuality::Low : renderer::ShadowQuality::High;
     renderer::VolumetricQuality volumetric_quality = renderer::VolumetricQuality::Off;
     bool rim_light = true;
     // A texture pack from <data>/texture_packs/<game id>/ (docs/port/TEXTURE_PACKS.md); takes
@@ -137,8 +145,10 @@ struct Settings {
     // Low and ambient occlusion at half size; nothing is switched off. Leaves the rest alone.
     void apply_handheld_enhanced();
     bool gtao = true;  // ground-truth ambient occlusion when enhanced rendering is enabled
+    // Enhanced Vulkan only.
     renderer::TemporalQuality temporal_quality =
-        renderer::TemporalQuality::Quality;  // Enhanced Vulkan only.
+        kHandheldDefaults ? renderer::TemporalQuality::Balanced
+                          : renderer::TemporalQuality::Quality;
     bool agx_preview = true;                 // SDR-only AgX colour treatment experiment.
     float agx_exposure = 0.25f;              // Base exposure in stops, before AgX.
     float agx_brightness = 0.5f;             // 0..1 adds -0.8..+0.8 EV; midpoint is neutral.
