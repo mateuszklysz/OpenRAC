@@ -115,6 +115,8 @@ bool motion_blur_controls(settings::Settings& graphics) {
         "Strength", &graphics.motion_blur_strength, 0, 1, "%.2f", ImGuiSliderFlags_AlwaysClamp
     );
     control_tip("Exposure strength. 0.5 is a 1/120-second exposure; 1 is 1/60 second.");
+    changed |= checkbox("Quality##motion_blur", &blur.quality);
+    control_tip("Finds trails at full resolution; off (Performance) searches a half-size grid.");
     if (ImGui::TreeNode("Advanced##motion_blur")) {
         changed |= slider_float(
             "Cutscene multiplier",

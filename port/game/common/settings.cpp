@@ -90,6 +90,7 @@ constexpr int kGameOptionLimit = 1'000'000;
 constexpr const char* kDisplayMode[] = {"windowed", "borderless"};
 constexpr const char* kAspect[] = {"4:3", "16:10", "16:9", "21:9", "32:9", "window", "custom"};
 constexpr const char* kHud[] = {"centre", "edges"};
+// Also motion_blur_quality's names.
 constexpr const char* kGtaoQuality[] = {"performance", "quality"};
 constexpr const char* kTextureFilter[] = {"normal", "edge-aware"};
 constexpr const char* kVSync[] = {"off", "on", "adaptive"};
@@ -379,6 +380,8 @@ void load(const std::filesystem::path& file) {
             known = parse_float(value, 0.0f, 1.0f, s.lily_momentum);
         } else if (key == "motion_blur_strength") {
             known = parse_float(value, 0.0f, 1.0f, s.motion_blur_strength);
+        } else if (key == "motion_blur_quality") {
+            known = parse(value, kGtaoQuality, s.motion_blur_settings.quality);
         } else if (key == "motion_blur_radius") {
             known = parse_int(value, 1, 128, s.motion_blur_settings.max_radius);
         } else if (key == "motion_blur_samples") {
@@ -619,6 +622,8 @@ void save() {
         << "motion_blur = " << (s.motion_blur ? 1 : 0) << "\n"
         << "lily_momentum = " << s.lily_momentum << "\n"
         << "motion_blur_strength = " << s.motion_blur_strength << "\n"
+        << "motion_blur_quality = " << kGtaoQuality[s.motion_blur_settings.quality ? 1 : 0]
+        << "\n"
         << "motion_blur_radius = " << s.motion_blur_settings.max_radius << "\n"
         << "motion_blur_samples = " << s.motion_blur_settings.samples << "\n"
         << "motion_blur_min_motion = " << s.motion_blur_settings.min_motion << "\n"

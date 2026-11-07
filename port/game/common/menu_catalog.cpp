@@ -114,6 +114,9 @@ constexpr Entry kEntries[] = {
      "How much the upscaler sharpens the picture it builds."},
     {Id::MotionBlur, Tab::Enhanced, "Enhanced graphics", kSwitch, A, "Motion blur",
      "Blurs what moves fast across the picture."},
+    {Id::MotionBlurQuality, Tab::Enhanced, "Enhanced graphics", kChoice, A, "Motion blur quality",
+     "Quality finds blur trails at full resolution; Performance costs less with nearly the same "
+     "trails."},
     {Id::ColorCorrection, Tab::Enhanced, "Enhanced graphics", kSwitch, A, "Color correction",
      "A filmic tone curve (AgX) for the enhanced lighting's brighter colours."},
     {Id::Brightness, Tab::Enhanced, "Enhanced graphics", kChoice, A, "Brightness",

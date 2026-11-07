@@ -322,6 +322,14 @@ Item item(Id id, std::uint8_t where) {
             it.shown = enhanced_on() && enhanced::Fsr3::available();
             it.on = set.motion_blur;
             return it;
+        case Id::MotionBlurQuality: {
+            it.shown = enhanced_on() && enhanced::Fsr3::available() && set.motion_blur;
+            const bool quality = set.motion_blur_settings.quality;
+            it.value = quality ? "Quality" : "Performance";
+            it.can_lower = quality;
+            it.can_raise = !quality;
+            return it;
+        }
         case Id::ColorCorrection:
             it.shown = enhanced_on();
             it.on = set.agx_preview;
@@ -645,6 +653,10 @@ bool act(Id id, int by) {
             return false;
         case Id::MotionBlur:
             set.motion_blur = !set.motion_blur;
+            changed();
+            return false;
+        case Id::MotionBlurQuality:
+            set.motion_blur_settings.quality = !set.motion_blur_settings.quality;
             changed();
             return false;
         case Id::ColorCorrection:

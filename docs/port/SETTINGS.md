@@ -545,6 +545,7 @@ Motion Blur tuning is saved with the graphics settings:
 
 | Key | Range | Default |
 |---|---|---|
+| `motion_blur_quality` | `performance`, `quality` | `performance` |
 | `motion_blur_radius` | 1 to 128 display pixels | 64 |
 | `motion_blur_samples` | 8 to 64 | 16 |
 | `motion_blur_min_motion` | 0.1 to 4 display pixels | 1 |

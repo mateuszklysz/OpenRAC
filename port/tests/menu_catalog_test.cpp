@@ -100,6 +100,7 @@ constexpr Old kOld[] = {
     {kTouch, "Upscaling", Id::Upscaling},
     {kTouch, "Sharpening", Id::Sharpening},
     {kTouch, "Motion blur", Id::MotionBlur},
+    {kTouch, "Motion blur quality", Id::MotionBlurQuality},
     {kTouch, "Color correction", Id::ColorCorrection},
     {kTouch, "Brightness", Id::Brightness},
     {kTouch, "Reset to defaults", Id::EnhancedReset},

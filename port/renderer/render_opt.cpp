@@ -213,6 +213,9 @@ constexpr std::array<Entry, kOptCount> kEntries = {{
     {Opt::OpaqueDepthGequal, "opaque-depth-gequal",
      "opaque colour over the reused prepass depth tests GEQUAL, which keeps Adreno's low-resolution Z on",
      true, Tolerance{}},
+    {Opt::MotionBlurHalfFlood, "motion-blur-half-flood",
+     "the blur's jump flood runs on a half-resolution seed grid, a quarter of its pixels in every pass",
+     true, Tolerance{0.01, 32}},
 }};
 // clang-format on
 

@@ -33,10 +33,20 @@ void test_temporal_settings(const std::filesystem::path& file) {
     std::ofstream(file) << "temporal_quality = unsupported\ntemporal_sharpness = nan\nmotion_blur "
                            "= invalid\nmotion_blur_strength = nan\n";
     settings::load(file);
-    CHECK(settings::get().temporal_quality == renderer::TemporalQuality::Quality);
+    CHECK(settings::get().temporal_quality == settings::Settings{}.temporal_quality);
     CHECK(settings::get().temporal_sharpness == .2f);
     CHECK(settings::get().motion_blur);
     CHECK(settings::get().motion_blur_strength == .5f);
+    CHECK(!settings::get().motion_blur_settings.quality);
+    for (const bool quality : {true, false}) {
+        std::ofstream(file) << "motion_blur_quality = " << (quality ? "quality" : "performance")
+                            << "\n";
+        settings::load(file);
+        CHECK(settings::get().motion_blur_settings.quality == quality);
+        settings::save();
+        settings::load(file);
+        CHECK(settings::get().motion_blur_settings.quality == quality);
+    }
 }
 
 void test_lily_momentum(const std::filesystem::path& file) {
@@ -111,7 +121,7 @@ void test_reset_enhanced() {
     CHECK(s.enhanced_rendering && s.enhanced_graphics);
     CHECK(s.volume == 37 && s.render_scale == 75 && s.frame_cap == 144);
     CHECK(s.texture_filter == renderer::TextureFilter::EdgeAware);
-    CHECK(s.shadow_quality == renderer::ShadowQuality::High);
+    CHECK(s.shadow_quality == settings::Settings{}.shadow_quality);
     CHECK(s.volumetric_quality == renderer::VolumetricQuality::Off);
     CHECK(s.agx_preview && s.agx_exposure == .25f && s.agx_brightness == .5f);
     CHECK(!s.sun_direction_override && !s.probe_spheres);
@@ -223,7 +233,12 @@ void test_volumetric_quality(const std::filesystem::path& file) {
 
 void test_shadow_quality(const std::filesystem::path& file) {
     using namespace openrac;
-    CHECK(settings::Settings{}.shadow_quality == renderer::ShadowQuality::High);
+    // Low-power GPUs (Android, Apple Silicon) start at Low.
+    CHECK(
+        settings::Settings{}.shadow_quality
+        == (settings::kHandheldDefaults ? renderer::ShadowQuality::Low
+                                        : renderer::ShadowQuality::High)
+    );
     for (std::size_t n = 0; n < std::size(renderer::kShadowQualityKeys); ++n) {
         std::ofstream(file) << "shadow_quality = " << renderer::kShadowQualityKeys[n] << "\n";
         settings::load(file);
@@ -234,7 +249,7 @@ void test_shadow_quality(const std::filesystem::path& file) {
     }
     std::ofstream(file) << "shadow_quality = invalid\n";
     settings::load(file);
-    CHECK(settings::get().shadow_quality == renderer::ShadowQuality::High);
+    CHECK(settings::get().shadow_quality == settings::Settings{}.shadow_quality);
 }
 
 void test_sunlight_settings(const std::filesystem::path& file) {
@@ -459,7 +474,7 @@ int main() {
     settings::load(file);
     CHECK(settings::get().ceiling_area_lights);
     CHECK(settings::get().medial_axis_debug);
-    CHECK(settings::get().temporal_quality == renderer::TemporalQuality::Quality);
+    CHECK(settings::get().temporal_quality == settings::Settings{}.temporal_quality);
     test_temporal_settings(file);
     test_lily_momentum(file);
     test_hdr_settings(file);

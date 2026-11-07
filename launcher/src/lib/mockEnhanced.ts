@@ -104,6 +104,19 @@ export const mockEnhanced: EnhancedView = {
         description: "Subtle motion blur to enhance animations.",
       },
       {
+        key: "motion_blur_quality",
+        name: "Motion blur quality",
+        type: "choice",
+        default: "performance",
+        value: "performance",
+        description:
+          "Quality finds blur trails at full resolution. Performance costs less with nearly the same trails.",
+        choices: [
+          { value: "performance", name: "Performance" },
+          { value: "quality", name: "Quality" },
+        ],
+      },
+      {
         key: "temporal_sharpness",
         group: "advanced",
         name: "Upscaling sharpening",

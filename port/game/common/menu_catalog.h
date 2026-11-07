@@ -88,6 +88,7 @@ enum class Id : std::uint8_t {
     Upscaling,
     Sharpening,
     MotionBlur,
+    MotionBlurQuality,
     ColorCorrection,
     Brightness,
     EnhancedReset,
