@@ -691,6 +691,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
+          DEV_RELEASE_TOKEN: ${{ secrets.DEV_RELEASE_TOKEN }}
         run: |
           if ! find installers -name '*.sig' | grep -q .; then
             echo "::notice::no update signatures (TAURI_SIGNING_PRIVATE_KEY is not set): nothing to publish"
@@ -724,10 +725,14 @@ jobs:
           gh release view "$channel" --json assets --jq '.assets[].name' | while IFS= read -r name; do
             grep -qxF "$name" <<< "$keep" || gh release delete-asset "$channel" "$name" --yes
           done
-          # Launchers read only the release's files, all up by now: a tag GitHub refuses to move
-          # (HTTP 403) is a warning, not a failed update.
-          if ! gh api -X PATCH "repos/$GH_REPO/git/refs/tags/$channel" -f sha="$GITHUB_SHA" -F force=true > /dev/null; then
-            echo "::warning::could not move tag $channel to $GITHUB_SHA; the release's files are up to date"
+          # GitHub won't let this job's token point a tag at a commit whose .github/workflows differ
+          # from the default branch's (HTTP 403: it needs the `workflows` permission, which no
+          # GITHUB_TOKEN gets). That happens whenever a workflow change lands while this commit
+          # builds. DEV_RELEASE_TOKEN (Contents and Workflows: read and write) can move it.
+          if ! GH_TOKEN="${DEV_RELEASE_TOKEN:-$GH_TOKEN}" \
+            gh api -X PATCH "repos/$GH_REPO/git/refs/tags/$channel" -f sha="$GITHUB_SHA" -F force=true > /dev/null; then
+            if [ -n "$DEV_RELEASE_TOKEN" ]; then exit 1; fi
+            echo "::warning::could not move tag $channel to $GITHUB_SHA: a workflow change landed on $GITHUB_REF_NAME during this build, and moving it then needs the DEV_RELEASE_TOKEN secret. The release's files are up to date."
           fi
           gh release edit "$channel" --prerelease --title "$title" --notes "$notes"
 

@@ -123,6 +123,11 @@ git push origin launcher-vX.Y.Z
    launchers built from a branch read that pre-release; one built from a tag reads the
    repository's latest release. Either way the updater asks the repository that built it
    (`github.repository`), so a fork's builds update from the fork's releases with no setting.
+   The job also moves the tag to the commit built. When a change to `.github/workflows` lands
+   while that commit builds, GitHub refuses the move with the job's own token (HTTP 403, it needs
+   the `workflows` permission); a `DEV_RELEASE_TOKEN` secret (a fine-grained token for this
+   repository with Contents and Workflows: read and write) moves it then. Without the secret the
+   job warns and the tag waits for the next build; the release's files are up to date either way.
    The player can switch channels in Settings: Stable (the latest release, tagged on `master`) or
    Development (`launcher-dev-develop`, the builds of `develop`, for OpenRAC's own launcher
    whatever branch it was built from; `update.rs`, `DEV_BRANCH`). A fork's launcher follows the
