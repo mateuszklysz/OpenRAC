@@ -230,8 +230,13 @@ N as every player" takes their own controls away):
 - Keyboard keys on the sticks, chords of keys, the mouse: later, with
   keyboard remapping. The `keyboard-mouse` mod does them now.
 - A controller SDL does not know as a gamepad, and that no mapping in
-  `gamecontrollerdb.txt` (section 1) names, is not read. SDL's own list
-  covers most.
+  `gamecontrollerdb.txt` (section 1) names (on Windows, most pads in
+  DirectInput mode), is read with a generic layout
+  ([gamepad_fallback.h](../../port/platform/gamepad_fallback.h)): 8BitDo's
+  for an 8BitDo pad, the usual DirectInput order for any other. A button out
+  of place can be rebound, or fixed for good with the mapping line the log
+  prints ("read with a generic layout") put in `gamecontrollerdb.txt`. A
+  device without four buttons and a stick or a d-pad is not read.
 - The port's keys (F1 to F13, Alt) do what they do whatever is bound.
 - The defaults are the same DualShock 2 layout for every game.
 

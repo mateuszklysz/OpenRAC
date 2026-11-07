@@ -439,6 +439,71 @@ void test_rumble() {
     CHECK(input.rumble_output(0).silent());
 }
 
+// A joystick SDL has no mapping for, as an 8BitDo pad in DirectInput mode is on Windows: it is
+// read as a gamepad and listed, its buttons where 8BitDo puts them. Something with two buttons is
+// not a gamepad.
+SDL_JoystickID attach_unknown(const char* name, Uint16 vendor, int buttons, int axes, int hats) {
+    SDL_VirtualJoystickDesc desc;
+    SDL_INIT_INTERFACE(&desc);
+    desc.type = SDL_JOYSTICK_TYPE_UNKNOWN;
+    desc.vendor_id = vendor;
+    desc.product_id = 0x3010;
+    desc.naxes = static_cast<Uint16>(axes);
+    desc.nbuttons = static_cast<Uint16>(buttons);
+    desc.nhats = static_cast<Uint16>(hats);
+    desc.name = name;
+    return SDL_AttachVirtualJoystick(&desc);
+}
+
+void test_unknown_joystick() {
+    Input input;
+    play_in_background(input);
+    const SDL_JoystickID odd = attach_unknown("Two buttons", 0x1234, 2, 0, 0);
+    pump(input);
+    CHECK(input.devices().empty());
+    const SDL_JoystickID pad = attach_unknown("8BitDo Pro 2 Wired Controller", 0x2dc8, 15, 5, 1);
+    pump(input);
+    pump(input);  // the gamepad SDL adds once it has the mapping comes with the next events
+    CHECK(input.devices().size() == 1);
+    CHECK(!input.devices().empty() && input.devices()[0].name == "8BitDo Pro 2 Wired Controller");
+    SDL_Joystick* joystick = SDL_GetJoystickFromID(pad);
+    const auto pressed = [&](int button, Button expect) {
+        SDL_SetJoystickVirtualButton(joystick, button, true);
+        SDL_UpdateJoysticks();
+        input.refresh_pads();
+        const bool ok = input.pad(0).held(expect);
+        SDL_SetJoystickVirtualButton(joystick, button, false);
+        SDL_UpdateJoysticks();
+        input.refresh_pads();
+        return ok;
+    };
+    CHECK(pressed(0, Button::Cross));
+    CHECK(pressed(1, Button::Circle));
+    CHECK(pressed(3, Button::Square));
+    CHECK(pressed(4, Button::Triangle));
+    CHECK(pressed(11, Button::Start));
+    SDL_SetJoystickVirtualHat(joystick, 0, SDL_HAT_UP);
+    SDL_UpdateJoysticks();
+    input.refresh_pads();
+    CHECK(input.pad(0).held(Button::Up));
+    SDL_SetJoystickVirtualHat(joystick, 0, SDL_HAT_CENTERED);
+    SDL_DetachVirtualJoystick(pad);
+    SDL_DetachVirtualJoystick(odd);
+    pump(input);
+    CHECK(input.devices().empty());
+    // Any other maker's: the usual DirectInput order, south on the second button.
+    const SDL_JoystickID generic = attach_unknown("USB Gamepad", 0x0079, 12, 4, 1);
+    pump(input);
+    pump(input);
+    CHECK(input.devices().size() == 1);
+    joystick = SDL_GetJoystickFromID(generic);
+    CHECK(pressed(1, Button::Cross));
+    CHECK(pressed(0, Button::Square));
+    CHECK(pressed(9, Button::Start));
+    SDL_DetachVirtualJoystick(generic);
+    pump(input);
+}
+
 }  // namespace
 
 int main() {
@@ -457,6 +522,7 @@ int main() {
     test_unfocused();
     test_quick_tap();
     test_rumble();
+    test_unknown_joystick();
     SDL_Quit();
     return openrac::test::result();
 }

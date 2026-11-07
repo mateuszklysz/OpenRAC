@@ -205,6 +205,8 @@ private:
     std::vector<Connected>::iterator find(std::uint32_t which);  // SDL_JoystickID
     // A gamepad's button pressed at SDL's time `ns`: the gamepad may move up the ports.
     void pressed(std::uint32_t which, std::uint64_t ns);
+    // A joystick SDL has no gamepad mapping for: one from platform/gamepad_fallback.h.
+    void map_unknown_joystick(std::uint32_t which);  // SDL_JoystickID
     // Moves the gamepad at from to to, its device with it (the others keep their order).
     void move_gamepad(std::size_t from, std::size_t to);
 

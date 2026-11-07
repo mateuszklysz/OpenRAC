@@ -5,12 +5,14 @@
 
 #include <algorithm>
 #include <cmath>
+#include <string>
 #include <utility>
 
 #include <SDL3/SDL.h>
 
 #include "common/log.h"
 #include "platform/bindings.h"
+#include "platform/gamepad_fallback.h"
 
 namespace openrac::platform {
 namespace {
@@ -68,6 +70,13 @@ Input::~Input() {
 
 void Input::handle_event(const SDL_Event& event) {
     switch (event.type) {
+        // A controller SDL has no mapping for is no gamepad, and would never come as one: it gets
+        // the layout most of its kind use (platform/gamepad_fallback.h), and SDL then adds it.
+        case SDL_EVENT_JOYSTICK_ADDED:
+            if (!SDL_IsGamepad(event.jdevice.which)) {
+                map_unknown_joystick(event.jdevice.which);
+            }
+            break;
         case SDL_EVENT_GAMEPAD_ADDED: {
             SDL_Gamepad* g = SDL_OpenGamepad(event.gdevice.which);
             if (g != nullptr) {
@@ -194,6 +203,41 @@ void Input::handle_event(const SDL_Event& event) {
         default:
             break;
     }
+}
+
+void Input::map_unknown_joystick(std::uint32_t which) {
+    SDL_Joystick* joystick = SDL_OpenJoystick(which);
+    if (joystick == nullptr) {
+        return;
+    }
+    const SDL_JoystickType type = SDL_GetJoystickType(joystick);
+    const JoystickShape shape{
+        SDL_GetJoystickVendor(joystick),
+        SDL_GetNumJoystickButtons(joystick),
+        SDL_GetNumJoystickAxes(joystick),
+        SDL_GetNumJoystickHats(joystick),
+        type != SDL_JOYSTICK_TYPE_GAMEPAD && type != SDL_JOYSTICK_TYPE_UNKNOWN,
+    };
+    const char* name = SDL_GetJoystickName(joystick);
+    char guid[33] = {};
+    SDL_GUIDToString(SDL_GetJoystickGUID(joystick), guid, sizeof guid);
+    const std::string mapping = fallback_gamepad_mapping(guid, name != nullptr ? name : "", shape);
+    if (mapping.empty()) {
+        log::info(
+            "joystick not read as a gamepad: {} ({}, {} buttons, {} axes, {} hats)",
+            name != nullptr ? name : "?",
+            guid,
+            shape.buttons,
+            shape.axes,
+            shape.hats
+        );
+    } else if (SDL_SetGamepadMapping(which, mapping.c_str())) {
+        // The line to correct in a gamecontrollerdb.txt if a button is out of place.
+        log::info("controller SDL does not know, read with a generic layout: {}", mapping);
+    } else {
+        log::warn("controller {} cannot be mapped: {}", guid, SDL_GetError());
+    }
+    SDL_CloseJoystick(joystick);
 }
 
 std::vector<Input::Connected>::iterator Input::find(std::uint32_t which) {

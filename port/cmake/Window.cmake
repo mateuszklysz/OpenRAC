@@ -52,6 +52,7 @@ add_library(openrac_platform STATIC
   platform/bindings.cpp
   platform/clock.cpp
   platform/controls_file.cpp
+  platform/gamepad_fallback.cpp
   platform/gpu_driver.cpp
   platform/input.cpp
   platform/menu_chord.cpp
