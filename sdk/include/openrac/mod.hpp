@@ -865,7 +865,8 @@ public:
     }
 
     // Returns a game function by its name in this disc's build, as Fn (a function pointer type);
-    // nullptr when there is none. required_function throws openrac::Error instead.
+    // nullptr when there is none. required_function throws openrac::Error instead. Experimental:
+    // the name follows the decompilation; function_at, by the disc's address, does not.
     template <class Fn>
     Fn function(const char* name) const {
         static_assert(

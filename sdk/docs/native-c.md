@@ -118,18 +118,20 @@ api->capture_mouse(mod, 1);                     /* hidden cursor, relative motio
 `api->log(mod, level, text)` with `OPENRAC_LOG_DEBUG`, `_INFO`, `_WARN`,
 `_ERROR`.
 
-## Game memory and functions (experimental)
+## Game memory and functions
 
-These name the game's internals: what is where changes with the disc and with
-the decompilation's progress.
+These take the disc's own addresses (the console's), which no renaming in the
+decompilation moves: what is where changes only with the disc.
 
 - `api->memory` is the base of game memory: address `a` is `api->memory + a`
   (`OPENRAC_GREF(api, uint32_t, a)` reads or writes a word).
 - `api->relocate_data(a)` and `api->relocate_level_data(level, a)` give a
   global's address in the code loaded now; ask each time, since a level moves
   its globals. `api->loaded_level()` is the level loaded, -1 for none.
-- `api->function(name)` and `api->function_at(address)` find a game function to
-  call, by its name in this disc's build or by code address.
+- `api->function_at(address)` finds a game function to call by its code
+  address. `api->function(name)` finds one by its name in this disc's build;
+  that name follows the decompilation, so it is **experimental**: a rename
+  there makes it return null. Prefer the address.
 - `api->stack_push(size, &saved)` / `api->stack_pop(saved)` give room on the
   game's stack for a call that takes the address of a local.
 

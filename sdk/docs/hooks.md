@@ -75,15 +75,17 @@ job it has the same `<area>.<name>` (`rac2.player.take_damage`), so a mod for
 both games ([several games](manifest.md#a-mod-for-several-games)) reads alike in
 each. Its signatures are rac2's own.
 
-## Moby updates (experimental)
+## Moby updates
 
 The behaviour catalogue lists the game's moby classes (crates, enemies, ...),
 their update functions and their per-class variables (pvars). A class's update
 is a hook point with the id `rac1.moby.<class>.update` (alias
 `Moby_<Class>_Update`), once OpenRAC has made it one. Several classes may share
-one update function: check the moby's class in your hook. This part names the
-game's internals and is **experimental**: names, fields and signatures may
-change as the decompilation goes on.
+one update function: check the moby's class in your hook. These hook points are
+as stable as the others: the id and the signature never change, and a name the
+decompilation drops stays an alias (in C++ too, as a type alias). Only the
+pvars by name (`openrac.pvars`) are **experimental**: they are the names of the
+decompilation's structs and may change as it goes on.
 
 ## Moving the hero yourself (interface 1.12)
 

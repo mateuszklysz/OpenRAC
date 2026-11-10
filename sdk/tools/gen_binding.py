@@ -14,8 +14,10 @@ reads sdk/bindings/<game>.json (every game's when none is named), with the behav
                                            (port/game/common/include/openrac/script_binding.h)
   sdk/include/openrac/games/<game>.hpp     the hook points as C++ types, for the SDK's C++ layer
   sdk/types/<game>.d.luau                  the `openrac` global's types, for an editor's autocomplete
-  sdk/bindings/<game>.ids.lock             every hook point's id, its anchor and its aliases: it only
-                                           grows (below)
+  sdk/bindings/<game>.ids.lock             every hook point's id, its anchor, its aliases and its
+                                           signature: it only grows (below)
+  sdk/bindings/<game>.fields.lock          every field's name, type and whether a script may write it
+                                           (below)
   launcher/core/src/hook_ids.json          names to ids, for the launcher's shared-hook check
   port/game/<game>-<disc>/libraries.tsv    the block of `hook` rows for the catalogue's update
                                            functions, between its markers
@@ -27,7 +29,14 @@ hook point is anchored to its function's place on the table's first disc (`pal:L
 which a rename of the function does not move. The lock keeps, for each id ever given, its anchor
 and every alias it has had: the generator reuses an anchor's id, keeps its old aliases, and fails
 when an id of the lock is no longer produced. So ids are never removed or reused, and a mod that
-names a hook point by an old name still binds after the decompilation renames it.
+names a hook point by an old name still binds after the decompilation renames it. The lock also
+keeps each id's signature, and the generator fails when it changes (i32 and u32 count as one, as the
+port's loader counts them): a mod built against a hook point keeps calling it right. The C++ header
+keeps every earlier name of a hook point as an alias of its type, so a mod's source still builds.
+
+**Fields.** A field's name is OpenRAC's own and its address the disc's, so neither follows the
+decompilation. The fields lock keeps every field ever given with its type and whether it is
+read-only; the generator fails when one is gone, changes type, or becomes read-only.
 
 **Catalogue hook points.** Each update function of the behaviour catalogue
 (sdk/catalogue/<game>/classes.json, sdk/tools/catalogue.py) is a hook point, but those the table's
@@ -137,12 +146,51 @@ def read_lock(path: Path) -> dict[str, tuple[str, set[str]]]:
     return out
 
 
+def lock_signatures(path: Path) -> dict[str, str]:
+    """id -> its signature, of the lock's fourth column (none in a lock written before it had one)."""
+    out = {}
+    if path.is_file():
+        for line in path.read_text().splitlines():
+            cols = line.split("\t")
+            if line and not line.startswith("#") and len(cols) > 3 and cols[3]:
+                out[cols[0]] = cols[3]
+    return out
+
+
+def same_signature(a: str, b: str) -> bool:
+    """Whether two signatures are one to the port's loader: i32 and u32 have the same width."""
+    def norm(sig: str) -> str:
+        return re.sub(r"\bi32\b", "u32", sig.replace(" ", ""))
+    return norm(a) == norm(b)
+
+
 def lock_text(game: str, hooks: list[dict]) -> str:
     lines = [f"# The hook points' ids of {game}, by sdk/tools/gen_binding.py: id, anchor (the function's place",
-             "# on the first disc) and every alias it has had. It only grows: an id is never removed or reused,",
-             "# and an alias once given stays (docs/port/MODS.md, section 4). Regenerated, never edited."]
+             "# on the first disc), every alias it has had and its signature. It only grows: an id is never",
+             "# removed or reused, an alias once given stays, and a signature never changes (docs/port/MODS.md,",
+             "# section 4). Regenerated, never edited."]
     for h in sorted(hooks, key=lambda h: h["id"]):
-        lines.append(f"{h['id']}\t{h['anchor']}\t{','.join(sorted(h['aliases']))}")
+        lines.append(f"{h['id']}\t{h['anchor']}\t{','.join(sorted(h['aliases']))}\t{h['signature']}")
+    return "\n".join(lines) + "\n"
+
+
+def read_fields_lock(path: Path) -> dict[str, tuple[str, bool]]:
+    """name -> (type, read-only) of a fields lock."""
+    out = {}
+    if path.is_file():
+        for line in path.read_text().splitlines():
+            cols = line.split("\t")
+            if line and not line.startswith("#") and len(cols) >= 3:
+                out[cols[0]] = (cols[1], cols[2] == "read-only")
+    return out
+
+
+def fields_lock_text(game: str, fields: list[dict]) -> str:
+    lines = [f"# The fields {game}'s scripts read by name (openrac.fields), by sdk/tools/gen_binding.py: name, type",
+             "# and whether a script may write it. It only grows: a field is never removed, never changes type",
+             "# and never becomes read-only (docs/port/MODS.md, section 11). Regenerated, never edited."]
+    for f in sorted(fields, key=lambda f: f["name"]):
+        lines.append(f"{f['name']}\t{f['type']}\t{'read-only' if f['readonly'] else 'read-write'}")
     return "\n".join(lines) + "\n"
 
 
@@ -318,7 +366,9 @@ def load(game: str, catalogue: Path | None = None, table_path: Path | None = Non
         h["params"] = h.get("params") or [f"a{i}" for i in range(len(params))]
         if len(h["params"]) != len(params) or not all(NAME.match(p) for p in h["params"]):
             raise BindingError(f"hook point {h['name']}: one parameter name per argument")
-    lock = read_lock(lock_path or path.with_suffix(".ids.lock")) if (lock_path or table_path is None) else {}
+    locked = lock_path or table_path is None
+    lock_file = lock_path or path.with_suffix(".ids.lock")
+    lock = read_lock(lock_file) if locked else {}
     assign_ids(game, hooks, lock, discs[0])
     ids = {h["id"]: h for h in hooks}
     if len(ids) != len(hooks):
@@ -326,6 +376,12 @@ def load(game: str, catalogue: Path | None = None, table_path: Path | None = Non
     for i, (a, _) in sorted(lock.items()):
         if i not in ids:
             raise BindingError(f"id {i} ({a}) is in the lock but no hook point has it: ids are never removed")
+    for i, sig in sorted((lock_signatures(lock_file) if locked else {}).items()):
+        if not same_signature(sig, ids[i]["signature"]):
+            raise BindingError(f"hook point {i}: its signature is {sig} in the lock, not {ids[i]['signature']}: "
+                               "a hook point's signature never changes (make a new hook point)")
+    for h in hooks:
+        h["experimental"] = False
     aliases: dict[str, str] = {}
     for h in hooks:
         al = {h["name"], *h["symbols"].values(), *h.get("aliases", [])}
@@ -357,6 +413,20 @@ def load(game: str, catalogue: Path | None = None, table_path: Path | None = Non
     for n in names_f:
         if any(o.startswith(n + ".") for o in names_f):
             raise BindingError(f"field {n} is also a table of fields")
+    by_name = {f["name"]: f for f in fields}
+    fields_lock = lock_file.with_name(lock_file.name.replace(".ids.lock", ".fields.lock"))
+    for n, (t, readonly) in sorted((read_fields_lock(fields_lock) if locked else {}).items()):
+        f = by_name.get(n)
+        if f is None:
+            raise BindingError(f"field {n} is in the fields lock but not in the table: fields are never removed")
+        if f["type"] != t:
+            raise BindingError(f"field {n}: {t} in the fields lock, not {f['type']}: a field's type never changes")
+        if f["readonly"] and not readonly:
+            raise BindingError(f"field {n}: a script may write it (the fields lock): it never becomes read-only")
+    for f in fields:
+        f["experimental"] = False
+    for c in classes:
+        c["experimental"] = True  # its pvars: names of the decompilation's structs
     return {"game": game, "discs": discs, "hooks": hooks, "fields": fields, "classes": classes, "moby": moby,
             "aliases": aliases, "left": left, "table": path}
 
@@ -510,6 +580,16 @@ def example_id(b: dict) -> str:
     return want if want in ids else (ids[0] if ids else want)
 
 
+def earlier_names(h: dict, names: set[str]) -> list[str]:
+    """A hook point's earlier names (the lock's aliases that are neither a symbol nor a name now), which
+    the C++ header keeps as aliases of its type: a mod's source written against one still builds."""
+    symbols = set(h["symbols"].values())
+    for more in h.get("copies", {}).values():
+        symbols |= set(more)
+    return [a for a in h["aliases"] if NAME.match(a) and not SYMBOL.match(a) and a not in symbols
+            and a not in names and a not in CPP_KEYWORDS and not a.startswith(("func_", "FUN_"))]
+
+
 def cpp_header(b: dict) -> str:
     g = b["game"]
     out = [f"// Generated from sdk/bindings/{g}.json by sdk/tools/gen_binding.py. Do not edit.",
@@ -525,17 +605,20 @@ def cpp_header(b: dict) -> str:
            "",
            f"namespace openrac::{g} {{",
            ""]
+    names = {h["name"] for h in b["hooks"]}
     for h in b["hooks"]:
         ret = "void" if h["ret"] == "void" else KINDS[h["ret"]][0]
         args = ", ".join(KINDS[k][0] for k in h["kinds"])
         if h.get("about"):
-            out.append(f"// {h['about']}" + (" Experimental: from the behaviour catalogue." if h["origin"] == "catalogue" else ""))
+            out.append(f"// {h['about']}" + (" From the behaviour catalogue." if h["origin"] == "catalogue" else ""))
         out.append(f"struct {h['name']} {{")
         out.append(f"    static constexpr const char* id = \"{h['id']}\";")
         out.append(f"    static constexpr const char* name = \"{h['name']}\";")
         out.append(f"    static constexpr const char* signature = \"{h['signature']}\";")
         out.append(f"    using fn = {ret} (*)({args});")
         out.append("};")
+        for old in earlier_names(h, names):
+            out.append(f"using {old} = {h['name']};  // its earlier name")
         out.append("")
     # The same by id: nested namespaces, the last part a type alias (a C++ keyword gets an underscore).
     tree: dict = {}
@@ -581,8 +664,8 @@ def luau_types(b: dict) -> str:
            "-- file where your editor's Luau language server reads definitions (luau-lsp: --definitions).",
            f"-- A hook point is named by its permanent id ({example_id(b)}) or one of its aliases."]
     if any(h["origin"] == "catalogue" for h in b["hooks"]):
-        out += [f"-- EXPERIMENTAL: the {g}.moby.* hook points and openrac.pvars come from the behaviour catalogue,",
-                "-- whose names may still change; their ids do not."]
+        out += [f"-- The {g}.moby.* hook points come from the behaviour catalogue; their ids and signatures are stable,",
+                "-- as every hook point's. EXPERIMENTAL: openrac.pvars, whose names follow the decompilation's structs."]
     out.append("")
     hooks = b["hooks"]
     if hooks:
@@ -631,7 +714,7 @@ def luau_types(b: dict) -> str:
         out.append(f"-- {h['id']} ({h['name']}) {h['signature']}: {h.get('about', '')}")
         out.append(f"type {h['name']}Fn = ({params}) -> {ret}")
     if any(h["origin"] == "catalogue" for h in hooks):
-        out.append("-- rac1.moby.<class>.update (experimental): (moby: number) -> (), or () -> () where it gets no moby.")
+        out.append(f"-- {g}.moby.<class>.update: (moby: number) -> (), or () -> () where it gets no moby.")
         out.append("type MobyUpdateFn = (moby: number) -> ()")
     out.append("")
     out.append("declare openrac: {")
@@ -709,6 +792,8 @@ def outputs(b: dict) -> dict[Path, str]:
         ROOT / "sdk" / "types" / f"{g}.d.luau": luau_types(b),
         b["table"].with_suffix(".ids.lock"): lock_text(g, b["hooks"]),
     }
+    if b["fields"]:
+        out[b["table"].with_suffix(".fields.lock")] = fields_lock_text(g, b["fields"])
     if any(h["origin"] == "catalogue" for h in b["hooks"]):
         for d in b["discs"]:
             path = ROOT / "port" / "game" / f"{g}-{d}" / "libraries.tsv"

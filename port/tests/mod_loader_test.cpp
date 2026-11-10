@@ -1605,6 +1605,46 @@ void motion_reaches_the_game(const fs::path& plugins, const fs::path& dir) {
     CHECK((g_motion == std::vector<std::string>{"camera off"}));
 }
 
+// Game memory by the disc's own addresses (interface 1.0; stable): the table's calls answer as the
+// runtime does, whatever the decompilation names things. A lookup by name finds only the name the
+// build has now.
+int g_level = -1;
+
+void game_memory_by_address(const fs::path& plugins) {
+    write(plugins / "plugins.json", R"({"format": 1, "mods": [
+        {"id": "test-a", "enabled": true}, {"id": "test-b", "enabled": false}]})");
+    mods::Host h = host(plugins);
+    h.loaded_level = [] {
+        return g_level;
+    };
+    CHECK(mods::load(h) == "test-a 1.0.0");
+    const openrac_api& api = mods::api_for_tests();
+    CHECK(api.memory == openrac_guest_base);
+    // A code address, and the build's name of it (with or without game_); an earlier name finds nothing.
+    CHECK(api.function_at(0x00100100u) == reinterpret_cast<void*>(test_record));
+    CHECK(api.function("Test_Record") == reinterpret_cast<void*>(test_record));
+    CHECK(api.function("game_Test_Record") == reinterpret_cast<void*>(test_record));
+    CHECK(api.function("Old_Record") == nullptr);
+    // No level's code loaded: a global stays where the executable has it.
+    CHECK(api.relocate_data(0x0015EE98u) == 0x0015EE98u);
+    CHECK(api.relocate_level_data(3, 0x0015EE98u) == 0x0015EE98u);
+    CHECK(api.loaded_level() == -1);
+    g_level = 4;
+    CHECK(api.loaded_level() == 4);
+    g_level = -1;
+    // Room on the game's stack, aligned to 16, given back as it was.
+    const gaddr sp = openrac_guest_sp;
+    openrac_guest_sp = GUEST_STACK_BOTTOM + 0x1004u;
+    openrac_gaddr saved = 0;
+    const openrac_gaddr room = api.stack_push(20, &saved);
+    CHECK(saved == GUEST_STACK_BOTTOM + 0x1004u);
+    CHECK(room == GUEST_STACK_BOTTOM + 0x0FF0u && room % 16 == 0);
+    api.stack_pop(saved);
+    CHECK(openrac_guest_sp == GUEST_STACK_BOTTOM + 0x1004u);
+    openrac_guest_sp = sp;
+    mods::reset();
+}
+
 int main() {
     const fs::path dir = fs::temp_directory_path() / ("openrac_mod_loader_test_" + std::to_string(std::rand()));
     fs::remove_all(dir);
@@ -1639,6 +1679,7 @@ int main() {
     the_world_reaches_the_game(plugins, dir);
     motion_reaches_the_game(plugins, dir);
     a_mod_for_1_5_still_loads(plugins);
+    game_memory_by_address(plugins);
     std::error_code e;
     fs::remove_all(dir, e);
     return test::result();

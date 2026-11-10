@@ -495,7 +495,7 @@ type Vendor_OpenMenuFn = (moby: number) -> ()
 
 ### `MobyUpdateFn`
 
-rac1.moby.<class>.update (experimental): (moby: number) -> (), or () -> () where it gets no moby.
+rac1.moby.<class>.update: (moby: number) -> (), or () -> () where it gets no moby.
 
 ```lua
 type MobyUpdateFn = (moby: number) -> ()

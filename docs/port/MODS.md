@@ -26,9 +26,12 @@ generated from the SDK's headers, bindings and type files
 ([sdk/tools/gen_reference.py](../../sdk/tools/gen_reference.py), checked in
 CI). This page is the design and the internals: why things are as they are,
 and how the port, the launcher and the generators do them. Marked
-**experimental** in both: the behaviour catalogue and anything that names the
-game's internals (moby classes and pvars, the fields exposed to scripts, game
-functions and addresses), which follow the decompilation. Guides to the port's
+**experimental** in both: what is named after the decompilation's own names
+(a moby's pvars by name, a game function looked up by its name, the
+catalogue's function and struct names), which follow it. Every hook point (the
+catalogue's moby updates too), the fields exposed to scripts and game memory by
+the disc's addresses are stable: the generator's locks hold their ids,
+signatures and fields (section 4). Guides to the port's
 internals wait for its move to C++.
 
 Status words as in [DESIGN.md](DESIGN.md): **decided**, **proposed**, **open**.
@@ -395,7 +398,11 @@ names will change (the port's C++ refactor renames functions); ids do not:
   a locked hook point another id or reuses an id, and fails when an id of the
   lock is no longer given. So **an id is never removed, reused or changed**,
   and a mod written today against `Hero_TurnToHeading` (or the id) binds
-  after the function is renamed;
+  after the function is renamed. The lock also keeps each id's signature,
+  and the generator refuses a table that changes it (`i32` and `u32` count as
+  one), so a built mod keeps calling a hook point right; the C++ header keeps
+  a hook point's earlier names as type aliases (`using Old = New;`), so a
+  mod's source still builds;
 - the launcher carries the names-to-ids table
   ([launcher/core/src/hook_ids.json](../../launcher/core/src/hook_ids.json),
   generated) to tell two mods that name one hook point differently that they
@@ -432,14 +439,16 @@ last) is the order they wrap the game in. A mod that does not call the
 original takes the call for itself; two such mods on one hook point are
 legal, but the launcher shows that they share it.
 
-**The behaviour catalogue's hook points (experimental).** Every update
+**The behaviour catalogue's hook points.** Every update
 function of the behaviour catalogue is a hook point: 637 of them in
 Ratchet & Clank, on both discs, covering 1,114 classes' updates (a function
 several classes share is one hook point; its replacement tells them apart by
-the moby's class, `oclass`, an `i16` at +0xA6). Their ids are permanent; what
-is experimental is everything else about them: their names follow the
-decompilation, and the catalogue's pvar names follow its structs, both of
-which the C++ refactor will change. Section 11 says how they are made; the
+the moby's class, `oclass`, an `i16` at +0xA6). They are as stable as the
+table's: the id is anchored to the function's place on the PAL disc, which no
+renaming moves; the lock keeps every name it has had as an alias (and the C++
+header as a type alias) and its signature, which the generator refuses to
+change. What stays experimental is the pvars by name (`openrac.pvars`): they
+are the decompilation's struct fields, which the C++ refactor will rename. Section 11 says how they are made; the
 catalogue itself, shipped in the SDK archive:
 
 - **`sdk/catalogue/rac1/classes.json`**, the stable table for bindings (the Luau
@@ -1195,6 +1204,12 @@ base's plus its offset, or its own per disc (none: not on that disc). The
 table holds the six hook points and the fields the port's own C already
 names: the hero's position, facing, move yaw and state, and the bolts.
 
+A field's name is OpenRAC's and its address the disc's, so neither moves with
+the decompilation. [sdk/bindings/rac1.fields.lock](../../sdk/bindings/rac1.fields.lock)
+keeps each field ever given with its type and whether a script may write it,
+and the generator fails when a field is gone, changes type or becomes
+read-only: the fields are stable, as the hook points are.
+
 [sdk/tools/gen_binding.py](../../sdk/tools/gen_binding.py) writes from it,
 all committed:
 
@@ -1217,7 +1232,7 @@ there needs its line in the table, and the other way round.
 **The behaviour catalogue** (the SDK's,
 [sdk/catalogue/rac1/classes.json](../../sdk/catalogue/rac1/classes.json),
 format 1 of [sdk/tools/catalogue.py](../../sdk/tools/catalogue.py)) is the
-generator's other input, and experimental (section 4). From it:
+generator's other input (section 4). From it:
 
 - **hook points**: each update function, but those `catalogue_exclude` names
   with a reason, is a hook point (`void(u32)` with the moby, or `void()` for

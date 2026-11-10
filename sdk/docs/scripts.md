@@ -39,7 +39,7 @@ end)
 | `openrac.before(id, fn)`, `openrac.after(id, fn)` | `fn(...)` before or after the rest of the chain, which runs whatever `fn` does |
 | `openrac.on_frame(fn)` | `fn()` after each game tick |
 | `openrac.on_pad(fn)` | `fn(port, report)` for each pad report before the game reads it; `report` is a `buffer` you may change |
-| `openrac.fields` | game state by name, read and written as plain values: `openrac.fields.bolts`, `openrac.fields.hero.position.x` (experimental: see the [reference](reference/hooks-rac1.md#fields)) |
+| `openrac.fields` | game state by name, read and written as plain values: `openrac.fields.bolts`, `openrac.fields.hero.position.x` ([reference](reference/hooks-rac1.md#fields): a field is never removed or retyped) |
 | `openrac.read(type, address)`, `openrac.write(type, address, value)` | game memory; `type` is `u8 i8 u16 i16 u32 i32 f32`; addresses in game RAM only (below 32 MB) |
 | `openrac.pvars(moby)` | with the behaviour catalogue: the per-class variables of the moby at that address, by name (experimental) |
 | `openrac.key(bind)`, `openrac.pressed(bind)` (1.2) | whether a key, mouse button or wheel direction is held, or went down since the last tick, by its name: `openrac.key("KeyW")`, `openrac.pressed("MouseLeft")`, `openrac.pressed("WheelUp")` ([settings](settings.md#key-bindings)) |

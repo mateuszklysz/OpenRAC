@@ -219,6 +219,10 @@ class Binding(unittest.TestCase):
             self.assertEqual(newer["id"], "t.moby.crate_1.update")  # the taken id is never reused
             # The C binding resolves the old name to the id.
             self.assertIn('{"Moby_Crate_Update", "t.moby.crate.update"},', gen_binding.c_binding(b))
+            # The C++ header keeps the old name as an alias of the type, so a mod's source still builds.
+            cpp = gen_binding.cpp_header(b)
+            self.assertIn("using Moby_Crate_Update = Moby_CrateBox_Update;  // its earlier name", cpp)
+            self.assertNotIn("using func_L05_00200000", cpp)
             # A hook point of the lock that is gone: refused (ids are never removed).
             gone = [c for c in renamed if c["id"] != 500]
             h = Fixture(tmp, table(), gone)
@@ -230,6 +234,54 @@ class Binding(unittest.TestCase):
             m = Fixture(tmp, moved, CLASSES)
             with self.assertRaises(gen_binding.BindingError):
                 m.load()
+
+    def test_signatures_never_change(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            f = Fixture(tmp, table(), CLASSES)
+            f.write_lock(f.load())
+            self.assertIn("\ti32(i32)\n", f.lock.read_text())
+            self.assertIn("t.moby.crate.update\tone:L05:00200000\t", f.lock.read_text())
+            # i32 and u32 are one to the port's loader: the lock takes either.
+            same = table([{"id": "t.player.add", "name": "Test_Add", "signature": "u32(u32)", "params": ["x"],
+                           "symbols": {"one": "func_00100000", "two": "FUN_00100000"}}])
+            Fixture(tmp, same, CLASSES).load()
+            # Another width or another count of arguments: refused.
+            for sig in ["f32(i32)", "i32(i32,i32)", "void(i32)"]:
+                other = table([{"id": "t.player.add", "name": "Test_Add", "signature": sig,
+                                "params": [f"a{i}" for i in range(sig.count(",") + 1)],
+                                "symbols": {"one": "func_00100000", "two": "FUN_00100000"}}])
+                with self.assertRaises(gen_binding.BindingError, msg=sig):
+                    Fixture(tmp, other, CLASSES).load()
+            # A catalogue hook point too: its update stops taking the moby.
+            changed = json.loads(json.dumps(CLASSES))
+            changed[0]["updates"][0].update(signature="void()", gets_moby=False)
+            with self.assertRaises(gen_binding.BindingError):
+                Fixture(tmp, table(), changed).load()
+            # A lock of before the signatures (three columns) checks none.
+            f.lock.write_text("".join("\t".join(line.split("\t")[:3]) + "\n" for line in f.lock.read_text().splitlines()))
+            Fixture(tmp, table(), changed).load()
+
+    def test_fields_never_go(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fields = [{"name": "bolts", "type": "i32", "address": {"one": "0x10", "two": "0x20"}},
+                      {"name": "hero.state", "type": "i32", "address": {"one": "0x14"}, "readonly": True}]
+            f = Fixture(tmp, table(fields=fields))
+            b = f.load()
+            self.assertTrue(all(not x["experimental"] for x in b["fields"] + b["hooks"]))
+            lock = f.dir / "t.fields.lock"
+            lock.write_text(gen_binding.fields_lock_text("t", b["fields"]))
+            self.assertIn("bolts\ti32\tread-write\n", lock.read_text())
+            self.assertIn("hero.state\ti32\tread-only\n", lock.read_text())
+            # More fields, a new address, or a read-only one a script may now write: fine.
+            more = fields + [{"name": "hero.facing", "type": "f32", "address": {"one": "0x18"}}]
+            more[0] = dict(more[0], address={"one": "0x30"})
+            more[1] = dict(more[1], readonly=False)
+            Fixture(tmp, table(fields=more)).load()
+            # Gone, another type, or read-only now: refused.
+            for broken in [fields[1:], [dict(fields[0], type="u32"), fields[1]],
+                           [dict(fields[0], readonly=True), fields[1]]]:
+                with self.assertRaises(gen_binding.BindingError, msg=broken):
+                    Fixture(tmp, table(fields=broken)).load()
 
     def test_table_rules(self):
         with tempfile.TemporaryDirectory() as tmp:

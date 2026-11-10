@@ -4,8 +4,8 @@
 -- The `openrac` global as a script mod for rac1 sees it (docs/port/MODS.md, section 11): put this
 -- file where your editor's Luau language server reads definitions (luau-lsp: --definitions).
 -- A hook point is named by its permanent id (rac1.player.turn_to_heading) or one of its aliases.
--- EXPERIMENTAL: the rac1.moby.* hook points and openrac.pvars come from the behaviour catalogue,
--- whose names may still change; their ids do not.
+-- The rac1.moby.* hook points come from the behaviour catalogue; their ids and signatures are stable,
+-- as every hook point's. EXPERIMENTAL: openrac.pvars, whose names follow the decompilation's structs.
 
 type HookPoint =
       "rac1.pad.process_report"
@@ -1510,7 +1510,7 @@ type Save_UpdateStateFn = () -> ()
 type msg_stringFn = (id: number) -> number
 -- rac1.vendor.open_menu (Vendor_OpenMenu) void(u32): Opens the vendor purchase menu, including the Gadgetron PDA remote vendor when moby is zero.
 type Vendor_OpenMenuFn = (moby: number) -> ()
--- rac1.moby.<class>.update (experimental): (moby: number) -> (), or () -> () where it gets no moby.
+-- rac1.moby.<class>.update: (moby: number) -> (), or () -> () where it gets no moby.
 type MobyUpdateFn = (moby: number) -> ()
 
 declare openrac: {

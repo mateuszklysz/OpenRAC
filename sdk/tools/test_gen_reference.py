@@ -87,7 +87,8 @@ class Reference(unittest.TestCase):
         # The real table names the catalogue: its updates are listed by the generator's ids.
         real_page = gen_reference.hooks_page(gen_reference.SDK / "bindings" / "rac1.json")
         self.assertIn("## Moby updates from the behaviour catalogue", real_page)
-        self.assertIn("**Experimental**", real_page)
+        self.assertNotIn("**Experimental**", real_page)  # stable: their ids and signatures are locked
+        self.assertIn("rac1.fields.lock", real_page)
         self.assertIn("| `rac1.moby.", real_page)
 
     def test_luau_types(self):

@@ -11,8 +11,8 @@ writes, from what the SDK ships, so that the reference never drifts from it:
     cpp-api.md       include/openrac/mod.hpp: the C++ layer's classes and their public members
     luau-api.md      types/<game>.d.luau: the `openrac` global a script mod sees
     hooks-<game>.md  bindings/<game>.json: the hook points (ids and aliases when the table has them),
-                     the fields exposed to scripts, and the behaviour catalogue when the table names
-                     one (experimental)
+                     the fields exposed to scripts, and the behaviour catalogue's hook points when
+                     the table names one
 
 Each page says it is generated. --check writes nothing and fails when a page is not what the sources
 give (CI: .github/workflows/sdk.yml). Stdlib only.
@@ -376,8 +376,9 @@ def hooks_page(table_file: Path) -> str:
         out.append("| " + " | ".join(row) + " |\n")
     fields = table.get("fields", [])
     if fields:
-        out.append("\n## Fields\n\n**Experimental**: these name the game's internals and follow the decompilation.\n"
-                   "In a script, `openrac.fields.<name>`.\n\n| Name | Type | Read-only | Discs | |\n|---|---|---|---|---|\n")
+        out.append("\n## Fields\n\nIn a script, `openrac.fields.<name>`. A field's name is OpenRAC's and its address the\n"
+                   "disc's: a field is never removed, never changes type and never becomes read-only\n"
+                   f"(`bindings/{game}.fields.lock`). On a disc it is not listed for, reading or writing it is an error.\n\n| Name | Type | Read-only | Discs | |\n|---|---|---|---|---|\n")
         bases = table.get("bases", {})
         for f in fields:
             if "address" in f:
@@ -395,9 +396,10 @@ def hooks_page(table_file: Path) -> str:
         merged = gen_binding.load(game, table_path=table_file)
         moby = [h for h in merged["hooks"] if h.get("origin") == "catalogue"]
         out.append("\n## Moby updates from the behaviour catalogue\n\n"
-                   "**Experimental**: the catalogue is generated from the decompilation and names its\n"
-                   "internals. One hook point per update function; a function several classes share is\n"
-                   f"one hook point, which a mod filters by the moby's class. {len(moby)} hook points.\n\n"
+                   "One hook point per update function; a function several classes share is one hook\n"
+                   "point, which a mod filters by the moby's class. Their ids and signatures are stable,\n"
+                   "as every hook point's; a name they had stays an alias. The classes listed may grow as\n"
+                   f"the catalogue learns more. {len(moby)} hook points.\n\n"
                    "| Id | Classes | Signature | Also named |\n|---|---|---|---|\n")
         for h in sorted(moby, key=lambda h: h["id"]):
             classes = ", ".join(str(c) for c in h.get("classes", []))

@@ -1,0 +1,10 @@
+# The fields rac1's scripts read by name (openrac.fields), by sdk/tools/gen_binding.py: name, type
+# and whether a script may write it. It only grows: a field is never removed, never changes type
+# and never becomes read-only (docs/port/MODS.md, section 11). Regenerated, never edited.
+bolts	i32	read-write
+hero.facing	f32	read-write
+hero.move_yaw	f32	read-write
+hero.position.x	f32	read-write
+hero.position.y	f32	read-write
+hero.position.z	f32	read-write
+hero.state	i32	read-only

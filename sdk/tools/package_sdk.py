@@ -31,8 +31,9 @@ ROOT = SDK.parent
 # modders' guides and the generated reference (gen_reference.py), beside MODS.md.
 PARTS = ["README.md", "VERSION", "include", "cmake", "template", "template-script", "examples", "catalogue",
          "types", "tests", "docs", "tools/package_mod.py"]
-# Each game's hook ids and their aliases, which package_mod.py checks a manifest's "hooks" against.
-PARTS += [f"bindings/{p.name}" for p in sorted((SDK / "bindings").glob("*.ids.lock"))]
+# Each game's hook ids and their aliases, which package_mod.py checks a manifest's "hooks" against, and
+# its fields: what a mod may count on staying (gen_binding.py).
+PARTS += [f"bindings/{p.name}" for p in sorted((SDK / "bindings").glob("*.lock"))]
 # The templates whose sdk.lock pins the SDK they come in.
 TEMPLATES = ("template", "template-script")
 # The files every mod repository shares (MODS.md, sections 10 and 11). template/ holds each one's
