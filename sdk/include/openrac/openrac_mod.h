@@ -1336,8 +1336,7 @@ typedef struct openrac_api {
 
     /* Returns a game function by its name in this disc's build ("func_001F9F90" on PAL,
      * "FUN_001f9dc8" on NTSC-U), as a host function to call with its signature; null when there is
-     * none. Experimental: the name follows the decompilation, and a rename there makes this return
-     * null; function_at, by the disc's address, does not. Since 1.0. */
+     * none. Experimental: names may change with the decompilation; function_at does not. Since 1.0. */
     void* (*function)(const char* name);
 
     /* Returns the function at a code address, in the level loaded now (a function pointer the game

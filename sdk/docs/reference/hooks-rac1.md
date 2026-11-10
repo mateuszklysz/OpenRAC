@@ -66,9 +66,9 @@ game address.
 
 ## Fields
 
-In a script, `openrac.fields.<name>`. A field's name is OpenRAC's and its address the
-disc's: a field is never removed, never changes type and never becomes read-only
-(`bindings/rac1.fields.lock`). On a disc it is not listed for, reading or writing it is an error.
+In a script, `openrac.fields.<name>`. A field is never removed, never changes type
+and never becomes read-only (`bindings/rac1.fields.lock`). Using one on a disc it is not
+listed for is an error.
 
 | Name | Type | Read-only | Discs | |
 |---|---|---|---|---|
@@ -82,10 +82,9 @@ disc's: a field is never removed, never changes type and never becomes read-only
 
 ## Moby updates from the behaviour catalogue
 
-One hook point per update function; a function several classes share is one hook
-point, which a mod filters by the moby's class. Their ids and signatures are stable,
-as every hook point's; a name they had stays an alias. The classes listed may grow as
-the catalogue learns more. 637 hook points.
+One hook point per update function. If several classes share it, check the moby's
+class in your hook. Stable like every hook point; the class lists may grow.
+637 hook points.
 
 | Id | Classes | Signature | Also named |
 |---|---|---|---|

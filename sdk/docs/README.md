@@ -50,17 +50,13 @@ never edited by hand:
 
 Stable, and kept working by every OpenRAC of the same interface major version:
 the C interface, the manifest, packaging, install from a link, the repository
-templates, the `openrac` script API, and every hook point: its **id**, its
-signature, and every name it has had (the moby updates of the behaviour
-catalogue too, [hooks](hooks.md#stable-ids)). Also stable: the fields exposed
-to scripts (`openrac.fields`), and game memory by the disc's own addresses
-(`memory`, `relocate_data`, `function_at`, ...), which no renaming in the
-decompilation moves.
+templates, the `openrac` script API, every hook point (id, signature and old
+names, [hooks](hooks.md#stable-ids)), `openrac.fields`, and game memory by
+address (`memory`, `function_at`, `relocate_data`, ...).
 
-**Experimental**: what is named after the decompilation's own names: a moby's
-pvars by name (`openrac.pvars`), a game function looked up by its name
-(`function(name)`), and the catalogue's function and struct names. They follow
-the decompilation and may change.
+**Experimental**: things that use the decompilation's names, which may change:
+`openrac.pvars`, `function(name)`, and the function and struct names in the
+behaviour catalogue.
 
 How OpenRAC is built inside will get guides of its own after the port's move to
 C++. The design notes are in

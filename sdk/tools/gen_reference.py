@@ -376,9 +376,9 @@ def hooks_page(table_file: Path) -> str:
         out.append("| " + " | ".join(row) + " |\n")
     fields = table.get("fields", [])
     if fields:
-        out.append("\n## Fields\n\nIn a script, `openrac.fields.<name>`. A field's name is OpenRAC's and its address the\n"
-                   "disc's: a field is never removed, never changes type and never becomes read-only\n"
-                   f"(`bindings/{game}.fields.lock`). On a disc it is not listed for, reading or writing it is an error.\n\n| Name | Type | Read-only | Discs | |\n|---|---|---|---|---|\n")
+        out.append("\n## Fields\n\nIn a script, `openrac.fields.<name>`. A field is never removed, never changes type\n"
+                   f"and never becomes read-only (`bindings/{game}.fields.lock`). Using one on a disc it is not\n"
+                   "listed for is an error.\n\n| Name | Type | Read-only | Discs | |\n|---|---|---|---|---|\n")
         bases = table.get("bases", {})
         for f in fields:
             if "address" in f:
@@ -396,10 +396,9 @@ def hooks_page(table_file: Path) -> str:
         merged = gen_binding.load(game, table_path=table_file)
         moby = [h for h in merged["hooks"] if h.get("origin") == "catalogue"]
         out.append("\n## Moby updates from the behaviour catalogue\n\n"
-                   "One hook point per update function; a function several classes share is one hook\n"
-                   "point, which a mod filters by the moby's class. Their ids and signatures are stable,\n"
-                   "as every hook point's; a name they had stays an alias. The classes listed may grow as\n"
-                   f"the catalogue learns more. {len(moby)} hook points.\n\n"
+                   "One hook point per update function. If several classes share it, check the moby's\n"
+                   "class in your hook. Stable like every hook point; the class lists may grow.\n"
+                   f"{len(moby)} hook points.\n\n"
                    "| Id | Classes | Signature | Also named |\n|---|---|---|---|\n")
         for h in sorted(moby, key=lambda h: h["id"]):
             classes = ", ".join(str(c) for c in h.get("classes", []))

@@ -84,6 +84,7 @@ class Fixture:
 
     def write_lock(self, b):
         self.lock.write_text(gen_binding.lock_text("t", b["hooks"]))
+        (self.dir / "t.signatures.lock").write_text(gen_binding.signatures_lock_text("t", b["hooks"]))
 
 
 class Binding(unittest.TestCase):
@@ -239,8 +240,12 @@ class Binding(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             f = Fixture(tmp, table(), CLASSES)
             f.write_lock(f.load())
-            self.assertIn("\ti32(i32)\n", f.lock.read_text())
-            self.assertIn("t.moby.crate.update\tone:L05:00200000\t", f.lock.read_text())
+            sigs = f.dir / "t.signatures.lock"
+            self.assertIn("t.player.add\ti32(i32)\n", sigs.read_text())
+            self.assertIn("t.moby.crate.update\tvoid(u32)\n", sigs.read_text())
+            # The ids lock keeps its three columns, as tools read it (id, anchor, aliases).
+            self.assertTrue(all(len(line.split("\t")) == 3 for line in f.lock.read_text().splitlines()
+                                if not line.startswith("#")))
             # i32 and u32 are one to the port's loader: the lock takes either.
             same = table([{"id": "t.player.add", "name": "Test_Add", "signature": "u32(u32)", "params": ["x"],
                            "symbols": {"one": "func_00100000", "two": "FUN_00100000"}}])
@@ -257,8 +262,8 @@ class Binding(unittest.TestCase):
             changed[0]["updates"][0].update(signature="void()", gets_moby=False)
             with self.assertRaises(gen_binding.BindingError):
                 Fixture(tmp, table(), changed).load()
-            # A lock of before the signatures (three columns) checks none.
-            f.lock.write_text("".join("\t".join(line.split("\t")[:3]) + "\n" for line in f.lock.read_text().splitlines()))
+            # Without a signatures lock (a release before it), none is checked.
+            sigs.unlink()
             Fixture(tmp, table(), changed).load()
 
     def test_fields_never_go(self):

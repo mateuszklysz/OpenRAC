@@ -82,10 +82,8 @@ their update functions and their per-class variables (pvars). A class's update
 is a hook point with the id `rac1.moby.<class>.update` (alias
 `Moby_<Class>_Update`), once OpenRAC has made it one. Several classes may share
 one update function: check the moby's class in your hook. These hook points are
-as stable as the others: the id and the signature never change, and a name the
-decompilation drops stays an alias (in C++ too, as a type alias). Only the
-pvars by name (`openrac.pvars`) are **experimental**: they are the names of the
-decompilation's structs and may change as it goes on.
+stable like the others. Only `openrac.pvars` is **experimental**: its names come
+from the decompilation and may change.
 
 ## Moving the hero yourself (interface 1.12)
 

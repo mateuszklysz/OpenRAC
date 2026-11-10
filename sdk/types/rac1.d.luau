@@ -4,8 +4,7 @@
 -- The `openrac` global as a script mod for rac1 sees it (docs/port/MODS.md, section 11): put this
 -- file where your editor's Luau language server reads definitions (luau-lsp: --definitions).
 -- A hook point is named by its permanent id (rac1.player.turn_to_heading) or one of its aliases.
--- The rac1.moby.* hook points come from the behaviour catalogue; their ids and signatures are stable,
--- as every hook point's. EXPERIMENTAL: openrac.pvars, whose names follow the decompilation's structs.
+-- The rac1.moby.* hook points are stable. EXPERIMENTAL: openrac.pvars (names may change).
 
 type HookPoint =
       "rac1.pad.process_report"

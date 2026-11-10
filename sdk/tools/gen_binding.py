@@ -14,8 +14,10 @@ reads sdk/bindings/<game>.json (every game's when none is named), with the behav
                                            (port/game/common/include/openrac/script_binding.h)
   sdk/include/openrac/games/<game>.hpp     the hook points as C++ types, for the SDK's C++ layer
   sdk/types/<game>.d.luau                  the `openrac` global's types, for an editor's autocomplete
-  sdk/bindings/<game>.ids.lock             every hook point's id, its anchor, its aliases and its
-                                           signature: it only grows (below)
+  sdk/bindings/<game>.ids.lock             every hook point's id, its anchor and its aliases: it only
+                                           grows (below)
+  sdk/bindings/<game>.signatures.lock      every hook point's id and its signature, which never
+                                           changes (below)
   sdk/bindings/<game>.fields.lock          every field's name, type and whether a script may write it
                                            (below)
   launcher/core/src/hook_ids.json          names to ids, for the launcher's shared-hook check
@@ -29,8 +31,9 @@ hook point is anchored to its function's place on the table's first disc (`pal:L
 which a rename of the function does not move. The lock keeps, for each id ever given, its anchor
 and every alias it has had: the generator reuses an anchor's id, keeps its old aliases, and fails
 when an id of the lock is no longer produced. So ids are never removed or reused, and a mod that
-names a hook point by an old name still binds after the decompilation renames it. The lock also
-keeps each id's signature, and the generator fails when it changes (i32 and u32 count as one, as the
+names a hook point by an old name still binds after the decompilation renames it. The signatures
+lock keeps each id's signature (a file of its own, so the ids lock's three columns stay as tools
+read them), and the generator fails when it changes (i32 and u32 count as one, as the
 port's loader counts them): a mod built against a hook point keeps calling it right. The C++ header
 keeps every earlier name of a hook point as an alias of its type, so a mod's source still builds.
 
@@ -147,13 +150,13 @@ def read_lock(path: Path) -> dict[str, tuple[str, set[str]]]:
 
 
 def lock_signatures(path: Path) -> dict[str, str]:
-    """id -> its signature, of the lock's fourth column (none in a lock written before it had one)."""
+    """id -> its signature, of a signatures lock (none when there is no such file yet)."""
     out = {}
     if path.is_file():
         for line in path.read_text().splitlines():
             cols = line.split("\t")
-            if line and not line.startswith("#") and len(cols) > 3 and cols[3]:
-                out[cols[0]] = cols[3]
+            if line and not line.startswith("#") and len(cols) >= 2 and cols[1]:
+                out[cols[0]] = cols[1]
     return out
 
 
@@ -166,11 +169,19 @@ def same_signature(a: str, b: str) -> bool:
 
 def lock_text(game: str, hooks: list[dict]) -> str:
     lines = [f"# The hook points' ids of {game}, by sdk/tools/gen_binding.py: id, anchor (the function's place",
-             "# on the first disc), every alias it has had and its signature. It only grows: an id is never",
-             "# removed or reused, an alias once given stays, and a signature never changes (docs/port/MODS.md,",
-             "# section 4). Regenerated, never edited."]
+             "# on the first disc) and every alias it has had. It only grows: an id is never removed or reused,",
+             "# and an alias once given stays (docs/port/MODS.md, section 4). Regenerated, never edited."]
     for h in sorted(hooks, key=lambda h: h["id"]):
-        lines.append(f"{h['id']}\t{h['anchor']}\t{','.join(sorted(h['aliases']))}\t{h['signature']}")
+        lines.append(f"{h['id']}\t{h['anchor']}\t{','.join(sorted(h['aliases']))}")
+    return "\n".join(lines) + "\n"
+
+
+def signatures_lock_text(game: str, hooks: list[dict]) -> str:
+    lines = [f"# The signatures of {game}'s hook points, by sdk/tools/gen_binding.py: id and signature. A hook",
+             "# point's signature never changes (i32 and u32 count as one); a new one is a new hook point",
+             "# (docs/port/MODS.md, section 4). Regenerated, never edited."]
+    for h in sorted(hooks, key=lambda h: h["id"]):
+        lines.append(f"{h['id']}\t{h['signature']}")
     return "\n".join(lines) + "\n"
 
 
@@ -376,7 +387,10 @@ def load(game: str, catalogue: Path | None = None, table_path: Path | None = Non
     for i, (a, _) in sorted(lock.items()):
         if i not in ids:
             raise BindingError(f"id {i} ({a}) is in the lock but no hook point has it: ids are never removed")
-    for i, sig in sorted((lock_signatures(lock_file) if locked else {}).items()):
+    signatures = lock_file.with_name(lock_file.name.replace(".ids.lock", ".signatures.lock"))
+    for i, sig in sorted((lock_signatures(signatures) if locked else {}).items()):
+        if i not in ids:
+            raise BindingError(f"id {i} is in the signatures lock but no hook point has it: ids are never removed")
         if not same_signature(sig, ids[i]["signature"]):
             raise BindingError(f"hook point {i}: its signature is {sig} in the lock, not {ids[i]['signature']}: "
                                "a hook point's signature never changes (make a new hook point)")
@@ -587,7 +601,7 @@ def earlier_names(h: dict, names: set[str]) -> list[str]:
     for more in h.get("copies", {}).values():
         symbols |= set(more)
     return [a for a in h["aliases"] if NAME.match(a) and not SYMBOL.match(a) and a not in symbols
-            and a not in names and a not in CPP_KEYWORDS and not a.startswith(("func_", "FUN_"))]
+            and a not in names and a not in CPP_KEYWORDS and a != "hooks" and not a.startswith(("func_", "FUN_"))]
 
 
 def cpp_header(b: dict) -> str:
@@ -664,8 +678,7 @@ def luau_types(b: dict) -> str:
            "-- file where your editor's Luau language server reads definitions (luau-lsp: --definitions).",
            f"-- A hook point is named by its permanent id ({example_id(b)}) or one of its aliases."]
     if any(h["origin"] == "catalogue" for h in b["hooks"]):
-        out += [f"-- The {g}.moby.* hook points come from the behaviour catalogue; their ids and signatures are stable,",
-                "-- as every hook point's. EXPERIMENTAL: openrac.pvars, whose names follow the decompilation's structs."]
+        out += [f"-- The {g}.moby.* hook points are stable. EXPERIMENTAL: openrac.pvars (names may change)."]
     out.append("")
     hooks = b["hooks"]
     if hooks:
@@ -791,6 +804,7 @@ def outputs(b: dict) -> dict[Path, str]:
         ROOT / "sdk" / "include" / "openrac" / "games" / f"{g}.hpp": cpp_header(b),
         ROOT / "sdk" / "types" / f"{g}.d.luau": luau_types(b),
         b["table"].with_suffix(".ids.lock"): lock_text(g, b["hooks"]),
+        b["table"].with_suffix(".signatures.lock"): signatures_lock_text(g, b["hooks"]),
     }
     if b["fields"]:
         out[b["table"].with_suffix(".fields.lock")] = fields_lock_text(g, b["fields"])
