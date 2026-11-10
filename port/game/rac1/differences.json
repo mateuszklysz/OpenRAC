@@ -10,7 +10,7 @@
       "original": "The game marks a moby drawn only when it is inside its 4:3 picture, and many mobys make their glows, sparkles and particles only while drawn.",
       "port": "In a picture wider than 4:3 the port draws the world out to the picture's sides, so mobys there count as drawn too and keep their effects. Off: the console's 4:3 test, and crates, bolts and other mobys near the sides of a wide picture lose their effects.",
       "setting": { "key": "fix_wide_moby_effects", "default": true },
-      "refs": ["commit 018d8387", "port/game/rac1/host/moby_view.h", "port/game/rac1/host/render_native.c"]
+      "refs": ["commit 6dc286f7", "port/game/rac1/host/moby_view.h", "port/game/rac1/host/render_native.c"]
     },
     {
       "id": "wide-nanotech-orbs",
@@ -20,7 +20,7 @@
       "original": "The glowing orb on a nanotech crate is a moby of its own, which draws itself only while its centre is inside the game's 4:3 view.",
       "port": "The orb's view test sees the wider picture, so nanotech crates at the sides of a wide picture keep their orb. Off: the orbs go out between the 4:3 edge and the picture's.",
       "setting": { "key": "fix_wide_nanotech_orbs", "default": true },
-      "refs": ["commit 96f08e81", "port/game/rac1/host/wide_view.c"]
+      "refs": ["commit 8b4c2d3f", "port/game/rac1/host/wide_view.c"]
     },
     {
       "id": "wide-air-traffic",
@@ -50,7 +50,7 @@
       "original": "Seas, lava and the sand sea (and the other layers the level's draw callbacks send) are culled against the game's 4:3 view.",
       "port": "Those callbacks cull against the wider picture, so their tiles reach its sides. Off: the console's 4:3 culling, and tiles near the sides of a wide picture are missing.",
       "setting": { "key": "fix_wide_liquids", "default": true },
-      "refs": ["commit 203ec63e", "port/game/rac1/host/wide_view.c"]
+      "refs": ["commit 6a718541", "port/game/rac1/host/wide_view.c"]
     },
     {
       "id": "full-moby-pool-scene",
@@ -78,7 +78,7 @@
       "discs": ["pal"],
       "original": "The PAL game runs at 50 Hz, with a 60 Hz mode in its Video options for televisions that show it; the mode also sets the game's time base.",
       "port": "The port keeps the PAL game in its own 60 Hz mode, as choosing 60 Hz in its menu would, and leaves the row out: a PC display has no 50 Hz television mode, and every disc runs on the same time base.",
-      "refs": ["commit 14e72695", "port/game/common/main.cpp", "port/game/common/options_menu.cpp"]
+      "refs": ["commit 95f85216", "port/game/common/program/vsync.cpp", "port/game/common/options_menu.cpp"]
     },
     {
       "id": "frames-between-ticks",
@@ -96,7 +96,7 @@
       "discs": ["pal", "ntsc"],
       "original": "A 4:3 picture.",
       "port": "The Picture setting makes it wider (16:10, 16:9, 21:9 and others): the vertical field of view stays the game's and more of the world shows at the sides. 4:3 by default.",
-      "refs": ["commit b946660f", "docs/port/SETTINGS.md (1. The settings)"]
+      "refs": ["commit 31078238", "docs/port/SETTINGS.md (1. The settings)"]
     },
     {
       "id": "background-play",
@@ -105,7 +105,7 @@
       "discs": ["pal", "ntsc"],
       "original": "A console game has the screen and the controller to itself.",
       "port": "The game keeps running, and a controller keeps playing it, while another window has the focus; on Windows a full-screen game stays up instead of minimising. The keyboard counts only while the game's window has the focus, and Mute in background silences it.",
-      "refs": ["commit 36442855", "port/platform/window.cpp"]
+      "refs": ["commit a518400f", "port/platform/window.cpp"]
     },
     {
       "id": "start-skips-scenes",
@@ -114,7 +114,7 @@
       "discs": ["pal", "ntsc"],
       "original": "Start alone skips a scene only on Veldin once it is beaten, or in a replay; elsewhere Start needs L1, L2, R1 and R2 held with it.",
       "port": "With the Skip cutscenes setting on (the default), Start alone skips an in-game scene: the port holds the four shoulder buttons for it, so the game's own skip ends the scene. Off, Start works as on a console.",
-      "refs": ["commit 0f17ce2e", "port/game/common/frontend.cpp"]
+      "refs": ["commit 30613c98", "port/game/common/frontend/input.cpp"]
     },
     {
       "id": "remembered-options",
@@ -123,7 +123,7 @@
       "discs": ["pal", "ntsc"],
       "original": "The language comes from the console's own setting, and the Sound page (playback mode, music and sound volume) resets at power off; loading a save takes the options stored in it.",
       "port": "The port keeps the language and the Sound page in its settings file and puts them back at every start. Loading a save keeps the player's options instead of the save's.",
-      "refs": ["commit 09248d29", "port/game/rac1/host/options.c"]
+      "refs": ["commit bca7de43", "port/game/rac1/host/options.c"]
     }
   ]
 }
