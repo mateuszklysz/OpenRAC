@@ -680,6 +680,23 @@ OPENRAC_MOD_EXPORT int openrac_mod_load(const openrac_api* api, openrac_mod* mod
         /* The host copies its strings, so the caller's stack storage can go away. */
         items[0].label = "Changed after registration";
     }
+    if (behaviour[0]
+        == 'k') { /* kerwan: a pack's files (pack_folder, "pack:" paths) and the language */
+        char folder[512];
+        char code[3];
+        if (api->api_minor < 14 || s_record == NULL) {
+            return 18;
+        }
+        s_record(9700 + (api->pack_folder(folder, sizeof folder) > 0));
+        s_record(9700 + api->pack_folder(folder, 2));
+        s_record(9710 + api->sound_load(mod, "pack:level_03/cutscenes/line.wav"));
+        s_record(9720 + -api->sound_load(mod, "pack:../escape.wav"));
+        s_record(9720 + -api->sound_load(mod, "pack:level_03/missing.wav"));
+        s_record(9720 + -api->sound_load(mod, "pack:"));
+        s_record(9740 + api->game_language(code, sizeof code));
+        s_record(code[0] * 256 + code[1]);
+        s_record(9750 + api->game_language(code, 2));
+    }
     if (behaviour[0] == 'h') { /* hoverboard */
         s_motion = 1;
         if (api->api_minor < 12 || s_record == NULL) {

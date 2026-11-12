@@ -1757,9 +1757,9 @@ typedef struct openrac_api {
         const float lo[3], const float hi[3], openrac_collision_triangle* out, int max
     );
 
-    /* A prop: a mesh of the mod's (`mesh_path`, a .glb inside the mod's folder, read as the meshes
-     * of an assets classes.json are) drawn in the level loaded, by the renderer each frame (OpenGL
-     * and Vulkan), at the pose prop_pose last gave it; not a moby of the game's: nothing collides
+    /* A prop: a mesh of the mod's (`mesh_path`, a .glb inside the mod's folder, or since 1.14
+     * "pack:<path>" inside pack_folder's, read as the meshes of an assets classes.json are) drawn
+     * in the level loaded, by the renderer each frame (OpenGL and Vulkan), at the pose prop_pose last gave it; not a moby of the game's: nothing collides
      * with it and the game never sees it. Hidden until it is first posed. At most
      * OPENRAC_PROPS_MAX for all mods; it goes with its level (prop_pose then answers
      * OPENRAC_HOOK_UNKNOWN, and the mod makes another). The first prop of a mesh the level loaded
@@ -1776,9 +1776,10 @@ typedef struct openrac_api {
     int (*prop_remove)(openrac_mod* mod, int id);
 
     /* A sound of the mod's: `path`, a .wav (PCM, 8, 16, 24 or 32 bits, or float; mono or stereo)
-     * or .ogg (Vorbis) inside the mod's folder, read whole. Returns its id (0 or more), or
-     * OPENRAC_HOOK_UNKNOWN for a path outside the folder, a file it cannot read, without a sound
-     * output, or past OPENRAC_SOUNDS_MAX. Kept until the program ends. Since 1.12. */
+     * or .ogg (Vorbis) inside the mod's folder, read whole ("pack:<path>": inside pack_folder's,
+     * since 1.14). Returns its id (0 or more), or OPENRAC_HOOK_UNKNOWN for a path outside the
+     * folder, a file it cannot read, without a sound output, or past OPENRAC_SOUNDS_MAX. Kept until
+     * the program ends. Since 1.12. */
     int (*sound_load)(openrac_mod* mod, const char* path);
     /* Plays a loaded sound, mixed with the game's at the game's sound volume (its effects' group:
      * the Options page's Sound volume, as the game lowers it in its menus): `volume` 0 to 1 (more
@@ -2072,6 +2073,18 @@ typedef struct openrac_api {
      * bytes, nonzero for each) names; mission_state_write sets them again. Returns OPENRAC_HOOK_OK,
      * or OPENRAC_HOOK_UNKNOWN outside a level or for a port without it. Since 1.14. */
     int (*mission_state_clear)(int level, const uint8_t* flags);
+
+    /* The folder of the edited levels' pack the game reads (the editor's pack, or the added
+     * destination being played), as text into `out` (`size` bytes, ending in a zero): its
+     * level_NN/ folders hold what OpenRAC Editor packed, such as cutscenes. Returns its length, or
+     * 0 when the game reads no pack or it does not fit. sound_load and prop_create take a file of
+     * it as "pack:level_NN/...". Since 1.14. */
+    int (*pack_folder)(char* out, uint32_t size);
+
+    /* The language the game shows its text in, as a code into `out` (at least 3 bytes): "en",
+     * "fr", "de", "es", "it", or "ja" on a Japanese disc. Returns its length, or 0 when `out` is
+     * too small. Since 1.14. */
+    int (*game_language)(char* out, uint32_t size);
 } openrac_api;
 
 /* ------------------------------------------------------------------------------------------ *

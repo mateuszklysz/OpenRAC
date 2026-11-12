@@ -126,6 +126,7 @@ void install(
                                   {"value": "play", "name": "Play"},
                                   {"value": "world", "name": "World"},
                                   {"value": "hoverboard", "name": "Hoverboard"},
+                                  {"value": "kerwan", "name": "Kerwan"},
                                   {"value": "callback_only", "name": "Callback only"}]},
                      {"key": "jump", "name": "Jump", "type": "keybind", "default": "Space"}]})"
     );
@@ -1534,6 +1535,61 @@ void only_a_mod_codes_link_opens(const fs::path& plugins) {
     mods::reset();
 }
 
+// Interface 1.14: a mod reads the edited levels' pack (pack_folder) and loads a file of it with a
+// "pack:" path, never one outside it, none with no pack; and the game's language as a code.
+const char* g_pack = nullptr;
+std::vector<std::string> g_pack_sounds;
+
+void a_mod_reads_the_pack(const fs::path& plugins, const fs::path& dir) {
+    write(plugins / "plugins.json", R"({"format": 1, "mods": [
+        {"id": "test-a", "enabled": true, "settings": {"behaviour": "kerwan"}}]})");
+    const fs::path pack = dir / "pack";
+    write(pack / "level_03" / "cutscenes" / "line.wav", "RIFF");
+    write(dir / "escape.wav", "RIFF");
+    static std::string pack_text;
+    pack_text = pack.string();
+    mods::Host h = host(plugins);
+    h.sound_load = [](const fs::path& file) {
+        g_pack_sounds.push_back(file.filename().string());
+        return 4;
+    };
+    h.pack_folder = [] {
+        return g_pack;
+    };
+    h.language = [] {
+        return 2;
+    };
+
+    // With a pack: its folder, its file, nothing outside it; German.
+    g_pack = pack_text.c_str();
+    g_records.clear();
+    CHECK(mods::load(h) == "test-a 1.0.0");
+    CHECK(
+        (g_records
+         == std::vector<int>{9701, 9700, 9710, 9721, 9721, 9721, 9742, 'd' * 256 + 'e', 9750})
+    );
+    CHECK((g_pack_sounds == std::vector<std::string>{"line.wav"}));
+    char folder[1024] = {};
+    const openrac_api& api = mods::api_for_tests();
+    CHECK(api.pack_folder(folder, sizeof folder) == static_cast<int>(pack_text.size()));
+    CHECK(pack_text == folder);
+    CHECK(api.pack_folder(nullptr, 10) == 0);
+    mods::reset();
+
+    // Without one (a game with no edited levels) and without a language (English).
+    g_pack = nullptr;
+    h.language = nullptr;
+    g_records.clear();
+    g_pack_sounds.clear();
+    CHECK(mods::load(h) == "test-a 1.0.0");
+    CHECK(
+        (g_records
+         == std::vector<int>{9700, 9700, 9709, 9721, 9721, 9721, 9742, 'e' * 256 + 'n', 9750})
+    );
+    CHECK(g_pack_sounds.empty());
+    mods::reset();
+}
+
 // Interface 1.12 on the test's game: the hero's pose set only by the mod holding the hook point the
 // game names for his update, the collision triangles as the game gives them, a prop of a .glb in the
 // mod's folder (none outside it, none missing) drawn at its pose and gone with its level, and a
@@ -1702,6 +1758,7 @@ int main() {
     play_reaches_the_game(plugins, dir);
     the_world_reaches_the_game(plugins, dir);
     motion_reaches_the_game(plugins, dir);
+    a_mod_reads_the_pack(plugins, dir);
     a_mod_for_1_5_still_loads(plugins);
     a_library_others_can_change_is_refused(plugins);
     std::error_code e;

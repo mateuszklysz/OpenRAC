@@ -127,6 +127,12 @@ struct Host {
     // test's), and the call says so.
     void (*joint_offsets)(std::uint32_t moby, const openrac_joint_offset* joints, int count) =
         nullptr;
+    // The edited levels' pack the game reads now (interface 1.14, openrac_api.pack_folder; it
+    // changes with the destination played), and the game's language (options_menu::language: 0
+    // English, 1 French, 2 German, 3 Spanish, 4 Italian). Null: none (a test's), and the calls say
+    // so: no pack, English.
+    const char* (*pack_folder)(void) = nullptr;
+    int (*language)(void) = nullptr;
 };
 
 // Loads the mods the list has on. Returns the session header's line: "lock-strafe 1.0.0", "none",
