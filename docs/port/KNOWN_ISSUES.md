@@ -43,6 +43,17 @@ the empty slots are hidden while that update runs and restored after it
 (rac1/host/scene_actors.c, the wrap in boot.c). The landing plays without the
 missing actors.
 
+**The ship leaving for another planet (2026-11-12):** a player crash on 1.0.2
+(PAL, Android) on Eudora (level 4), game mode 6, "access at game address
+0x438064C3", right after picking Pokitaru. The difficulty mod's enemies and
+drops filled the pool. On its first frame the flight update's state 3 makes
+Ratchet and Clank for the cockpit (CreateMoby classes 0 and 10) with no null
+check, then runs the moby transform (`func_0020ED48`) on them every frame.
+Now, for that first frame, the null moby reads as dead (state byte 0xFF) and
+low memory is restored after it. A crew moby that could not be made becomes a
+dead stand-in in the port's memory, and the log says "ship crew skipped". The
+ship leaves without that figure (rac1/host/scene_actors.c).
+
 **The bigger pool (2026-10-22):** `port/game/rac1/host/moby_pool.c`, on both
 discs. The pool size is data, not a fixed array:
 

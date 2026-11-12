@@ -310,9 +310,11 @@ static int hero(float position[3], float rotation[3], int32_t *state) {
 /* The flight's update (func_00230A90), once a frame of the transition's flight loop (space.c). */
 void func_00230A90(void) {
     flight_frames = 2;
-    /* Hide missing scene actors so the update does not use a null moby (scene_actors.c). */
+    /* Hide missing scene actors and crew so the update does not use a null moby (scene_actors.c). */
     rac1_scene_actors_pack();
+    rac1_ship_crew_begin();
     func_00230A90__game();
+    rac1_ship_crew_end();
     rac1_scene_actors_unpack();
 }
 

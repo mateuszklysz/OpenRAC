@@ -58,7 +58,7 @@
       "name": "Cutscenes with a full moby pool",
       "discs": ["pal", "ntsc"],
       "original": "When a cutscene starts while the level's 255 moby slots are full (on Gaspar the falling rocks' lava sparks can fill them as the Pilot's Helmet's scene starts), the scene's actor cannot be made and the game reads through the missing moby. On a PS2 that read lands in readable memory and the game most likely carries on unnoticed.",
-      "port": "On a PC the same read crashes the game, so the port skips that actor: the scene plays without it, and the log says \"scene actor skipped\". The port's bigger pool (More room for effects) makes this rare; the guard stays for a pool that still fills.",
+      "port": "On a PC the same read crashes the game, so the port skips that actor: the scene plays without it, and the log says \"scene actor skipped\". The same holds for Ratchet and Clank in the cockpit when the ship leaves for another planet (\"ship crew skipped\"). The port's bigger pool (More room for effects) makes this rare; the guard stays for a pool that still fills.",
       "refs": ["docs/port/KNOWN_ISSUES.md", "port/game/rac1/host/scene_actors.c"]
     },
     {

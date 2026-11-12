@@ -245,3 +245,73 @@ void func_00204FC0(RAC1_TYPE_func_00204FC0_params) {
         pack();
     }
 }
+
+/*
+ * The ship leaving for another planet (the flight update's state 3, after the planet select). On
+ * its first frame the update makes Ratchet and Clank for the ship (CreateMoby classes 0 and 10)
+ * and writes to them without a null check; every frame after it moves them and runs the moby
+ * transform (func_0020ED48) on them. With the pool full (Eudora with the difficulty mod) CreateMoby
+ * answers 0: the console writes into low memory and carries on, the port read a garbage class
+ * pointer there and crashed.
+ *
+ * So for that first frame the null moby reads as dead (its state byte at +0x20 is 0xFF, and the
+ * transform returns at once for a dead moby), and low memory is put back afterwards. A crew moby
+ * that could not be made is then a dead stand-in in the port's own memory, so later frames write
+ * there, never through 0. The ship leaves without that figure in the cockpit.
+ */
+#define SHIP RAC1_ADDR(0x0013E130u)
+enum {
+    SHIP_CREW_A = 0x10,  /* Ratchet in the cockpit */
+    SHIP_CREW_B = 0x14,  /* Clank */
+    SHIP_STATE_W = 0x20,
+    SHIP_TIMER = 0x24,   /* s16; the update adds 1 first, so the first frame starts at -1 */
+    SHIP_PATH = 0x30,
+    SHIP_LEAVING = 3,
+    MOBY_STATE = 0x20,
+    MOBY_DEAD = 0xFF,
+    LOW_BYTES = 0x100    /* one moby */
+};
+
+static struct {
+    int saved;
+    unsigned char low[LOW_BYTES];
+    gaddr stand_in;
+} g_crew;
+
+void rac1_ship_crew_begin(void) {
+    const gaddr ship = OPENRAC_DATA(SHIP);
+    if (GREF(int, ship + SHIP_STATE_W) != SHIP_LEAVING || GREF(int, ship + SHIP_PATH) < 0 ||
+        GREF(short, ship + SHIP_TIMER) != -1) {
+        return;
+    }
+    for (gaddr i = 0; i < LOW_BYTES; i++) {
+        g_crew.low[i] = GREF(unsigned char, i);
+    }
+    GREF(unsigned char, (gaddr)MOBY_STATE) = MOBY_DEAD;
+    g_crew.saved = 1;
+}
+
+void rac1_ship_crew_end(void) {
+    if (!g_crew.saved) {
+        return;
+    }
+    g_crew.saved = 0;
+    for (gaddr i = 0; i < LOW_BYTES; i++) {
+        GREF(unsigned char, i) = g_crew.low[i];
+    }
+    const gaddr ship = OPENRAC_DATA(SHIP);
+    for (gaddr at = SHIP_CREW_A; at <= SHIP_CREW_B; at += 4) {
+        if (GREF(gaddr, ship + at) != 0) {
+            continue;
+        }
+        if (g_crew.stand_in == 0) {
+            g_crew.stand_in = openrac_guest_static(LOW_BYTES);
+        }
+        GREF(unsigned char, g_crew.stand_in + MOBY_STATE) = MOBY_DEAD;
+        GREF(gaddr, ship + at) = g_crew.stand_in;
+        char line[96];
+        snprintf(line, sizeof line, "ship crew skipped: moby pool full (class %d)",
+                 at == SHIP_CREW_A ? 0 : 10);
+        openrac_game_warn(line);
+    }
+}

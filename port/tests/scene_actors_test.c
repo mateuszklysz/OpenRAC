@@ -24,6 +24,10 @@ gaddr func_0020D348(int a0) {
     ++creates;
     return created[next_create++];
 }
+gaddr openrac_guest_static(uint32_t size) {
+    (void)size;
+    return 0x1F0000;
+}
 void openrac_game_warn(const char* message) {
     ++warnings;
     snprintf(warning, sizeof warning, "%s", message);
@@ -174,5 +178,37 @@ int main(void) {
         && GREF(gaddr, slots + 4) == 0
     );
     CHECK(memcmp(low, ram, sizeof low) == 0);
+
+    /* The ship leaving with a full pool: on the first frame the null moby reads as dead, low
+     * memory is put back after it, and the missing crew gets a dead stand-in. */
+    const gaddr ship = 0x0013E130u;
+    GREF(int, ship + 0x20) = 3;
+    GREF(int, ship + 0x30) = 0;
+    GREF(short, ship + 0x24) = -1;
+    GREF(gaddr, ship + 0x10) = 0x12345678;
+    GREF(gaddr, ship + 0x14) = 0x12345678;
+    rac1_ship_crew_begin();
+    CHECK(GREF(signed char, 0x20) < 0);
+    /* The update: timer 0, CreateMoby gives Ratchet but not Clank, writes through 0. */
+    GREF(short, ship + 0x24) = 0;
+    GREF(gaddr, ship + 0x10) = MOBY_A;
+    GREF(gaddr, ship + 0x14) = 0;
+    GREF(int, 0x34) = 6;
+    rac1_ship_crew_end();
+    CHECK(memcmp(low, ram, sizeof low) == 0);
+    CHECK(GREF(gaddr, ship + 0x10) == MOBY_A && GREF(gaddr, ship + 0x14) == 0x1F0000);
+    CHECK(GREF(unsigned char, 0x1F0000 + 0x20) == 0xFF);
+    CHECK(warnings == 4 && strcmp(warning, "ship crew skipped: moby pool full (class 10)") == 0);
+
+    /* Later frames, or another state: nothing is touched. */
+    rac1_ship_crew_begin();
+    CHECK(memcmp(low, ram, sizeof low) == 0);
+    rac1_ship_crew_end();
+    GREF(short, ship + 0x24) = -1;
+    GREF(int, ship + 0x30) = -1;
+    rac1_ship_crew_begin();
+    CHECK(memcmp(low, ram, sizeof low) == 0);
+    rac1_ship_crew_end();
+    CHECK(warnings == 4);
     return 0;
 }

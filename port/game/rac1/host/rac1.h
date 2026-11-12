@@ -45,6 +45,10 @@ void rac1_wad_decompressed(gaddr to);
  * restore the list (unpack). */
 void rac1_scene_actors_pack(void);
 void rac1_scene_actors_unpack(void);
+/* scene_actors.c: around the flight update, Ratchet and Clank of a ship leaving for another
+ * planet when the moby pool is full (a dead stand-in instead of a null moby). */
+void rac1_ship_crew_begin(void);
+void rac1_ship_crew_end(void);
 
 /* boot.c: the level programs ParseBin loaded since the start. */
 uint32_t rac1_program_loads(void);
