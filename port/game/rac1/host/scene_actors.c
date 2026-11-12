@@ -255,9 +255,10 @@ void func_00204FC0(RAC1_TYPE_func_00204FC0_params) {
  * pointer there and crashed.
  *
  * So for that first frame the null moby reads as dead (its state byte at +0x20 is 0xFF, and the
- * transform returns at once for a dead moby), and low memory is put back afterwards. A crew moby
- * that could not be made is then a dead stand-in in the port's own memory, so later frames write
- * there, never through 0. The ship leaves without that figure in the cockpit.
+ * transform returns at once for a dead moby). After it, when both were made, only that byte is put
+ * back: nothing else changes. When one was not, all of low memory is put back (the frame wrote
+ * through 0), and the missing crew moby becomes a dead stand-in in the port's own memory, so later
+ * frames write there, never through 0. The ship leaves without that figure in the cockpit.
  */
 #define SHIP RAC1_ADDR(0x0013E130u)
 enum {
@@ -296,10 +297,15 @@ void rac1_ship_crew_end(void) {
         return;
     }
     g_crew.saved = 0;
+    const gaddr ship = OPENRAC_DATA(SHIP);
+    /* Both made: the frame wrote nothing through 0, so only our byte goes back. */
+    if (GREF(gaddr, ship + SHIP_CREW_A) != 0 && GREF(gaddr, ship + SHIP_CREW_B) != 0) {
+        GREF(unsigned char, (gaddr)MOBY_STATE) = g_crew.low[MOBY_STATE];
+        return;
+    }
     for (gaddr i = 0; i < LOW_BYTES; i++) {
         GREF(unsigned char, i) = g_crew.low[i];
     }
-    const gaddr ship = OPENRAC_DATA(SHIP);
     for (gaddr at = SHIP_CREW_A; at <= SHIP_CREW_B; at += 4) {
         if (GREF(gaddr, ship + at) != 0) {
             continue;

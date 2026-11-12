@@ -200,6 +200,19 @@ int main(void) {
     CHECK(GREF(unsigned char, 0x1F0000 + 0x20) == 0xFF);
     CHECK(warnings == 4 && strcmp(warning, "ship crew skipped: moby pool full (class 10)") == 0);
 
+    /* Both made: only the state byte goes back, the game's own low-memory writes stay. */
+    GREF(short, ship + 0x24) = -1;
+    rac1_ship_crew_begin();
+    GREF(gaddr, ship + 0x10) = MOBY_A;
+    GREF(gaddr, ship + 0x14) = MOBY_B;
+    GREF(unsigned char, 0x40) = 0x11;
+    rac1_ship_crew_end();
+    CHECK(GREF(unsigned char, 0x40) == 0x11 && GREF(unsigned char, 0x20) == low[0x20]);
+    CHECK(warnings == 4);
+    GREF(unsigned char, 0x40) = low[0x40];
+    CHECK(memcmp(low, ram, sizeof low) == 0);
+    GREF(short, ship + 0x24) = 0;
+
     /* Later frames, or another state: nothing is touched. */
     rac1_ship_crew_begin();
     CHECK(memcmp(low, ram, sizeof low) == 0);
