@@ -358,3 +358,97 @@ class PackDisc(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class PackCutscenes(unittest.TestCase):
+    """The level's cutscenes (OpenRAC Editor writes them beside the scene) go into the pack."""
+
+    def test_cutscenes_and_their_files_are_copied_and_broken_ones_left_out(self):
+        import json
+        import tempfile
+        from pathlib import Path
+        from pack import pack_cutscenes
+        with tempfile.TemporaryDirectory() as tmp:
+            scene_dir, out = Path(tmp) / "level_03", Path(tmp) / "packed" / "level_03"
+            cutscenes = scene_dir / "cutscenes"
+            (cutscenes / "audio").mkdir(parents=True)
+            (cutscenes / "hello.cutscene").write_text(json.dumps({"format": "openrac-cutscene", "version": 1}))
+            (cutscenes / "broken.cutscene").write_text("{not json")
+            (cutscenes / "other.cutscene").write_text(json.dumps({"format": "something-else"}))
+            (cutscenes / "list.cutscene").write_text("[]")
+            (cutscenes / "audio" / "line_en.wav").write_bytes(b"RIFF")
+            (cutscenes / "audio" / "line_en.wav.import").write_text("[remap]")
+            (cutscenes / ".hidden").write_text("x")
+            changes, problems = pack_cutscenes(scene_dir, out)
+            self.assertEqual(changes, ["cutscene hello"])
+            self.assertEqual(len(problems), 3, problems)
+            self.assertTrue(all(p.startswith("cutscene ") for p in problems))
+            copied = sorted(str(p.relative_to(out)) for p in out.rglob("*") if p.is_file())
+            self.assertEqual(copied, ["cutscenes/audio/line_en.wav", "cutscenes/hello.cutscene"])
+
+    def test_no_cutscenes_writes_nothing(self):
+        import tempfile
+        from pathlib import Path
+        from pack import pack_cutscenes
+        with tempfile.TemporaryDirectory() as tmp:
+            scene_dir, out = Path(tmp) / "level_03", Path(tmp) / "packed" / "level_03"
+            scene_dir.mkdir()
+            self.assertEqual(pack_cutscenes(scene_dir, out), ([], []))
+            (scene_dir / "cutscenes").mkdir()
+            (scene_dir / "cutscenes" / "audio.wav").write_bytes(b"RIFF")
+            # Files with no cutscene to play them are not carried.
+            self.assertEqual(pack_cutscenes(scene_dir, out), ([], []))
+            self.assertFalse(out.exists())
+
+    def test_a_link_out_of_the_folder_is_not_followed(self):
+        import json
+        import os
+        import tempfile
+        from pathlib import Path
+        from pack import pack_cutscenes
+        with tempfile.TemporaryDirectory() as tmp:
+            scene_dir, out = Path(tmp) / "level_03", Path(tmp) / "packed" / "level_03"
+            (scene_dir / "cutscenes").mkdir(parents=True)
+            (scene_dir / "cutscenes" / "a.cutscene").write_text(json.dumps({"format": "openrac-cutscene"}))
+            secret = Path(tmp) / "secret.txt"
+            secret.write_text("private")
+            os.symlink(secret, scene_dir / "cutscenes" / "secret.txt")
+            pack_cutscenes(scene_dir, out)
+            self.assertFalse((out / "cutscenes" / "secret.txt").exists())
+
+    def test_a_level_with_only_cutscenes_is_packed(self):
+        import json
+        import tempfile
+        from pathlib import Path
+        import disc
+        from pack import pack
+        from wadpack import compress
+        data = gameplay([{"x": 1.0}, {"x": 2.0}])
+        stored = compress(data)
+        sectors = -(-len(stored) // disc.SECTOR)
+        survey = {"levels": [{"id": 0, "ranges": {"gameplay_ntsc": {"lba": 100, "sectors": sectors},
+                                                  "gameplay_pal": {"lba": 200, "sectors": sectors}}}]}
+
+        class Disc:
+            version = disc.NTSC
+
+            def sectors(self, first, count):
+                return stored + bytes(count * disc.SECTOR - len(stored))
+        with tempfile.TemporaryDirectory() as tmp:
+            project, out = Path(tmp) / "levels", Path(tmp) / "packed"
+            level = project / "level_00/levels/level_00"
+            (level / "cutscenes").mkdir(parents=True)
+            # The cutscene's nodes in the scene, as the editor saves them, are not mobys.
+            nodes = ('\n[node name="Cutscenes" type="Node3D" parent="Game"]\n'
+                     '\n[node name="Intro" type="Cutscene" parent="Game/Cutscenes"]\n'
+                     'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 6, 7)\n'
+                     '\n[node name="Vendor" type="CutsceneActor" parent="Game/Cutscenes/Intro"]\n'
+                     'spawn_id = 149\n'
+                     '\n[node name="Timeline" type="AnimationPlayer" parent="Game/Cutscenes/Intro"]\n')
+            (level / "level_00.tscn").write_text(scene(data) + nodes)
+            (level / "cutscenes" / "intro.cutscene").write_text(json.dumps({"format": "openrac-cutscene"}))
+            self.assertEqual(pack(Disc(), survey, project, out), (1, 1))
+            self.assertTrue((out / "level_00/cutscenes/intro.cutscene").is_file())
+            self.assertIn("cutscene intro", (out / "changes.txt").read_text())
+            # Nothing else changed: no sector of the disc is replaced.
+            self.assertEqual(len((out / "patches.tsv").read_text().splitlines()), 1)

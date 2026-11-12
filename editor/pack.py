@@ -13,6 +13,8 @@ copy per video mode. Both native ports select the 60 Hz copy on their own disc
     <out>/patches.tsv                 first sector, sector count, file: one line per file
     <out>/changes.txt                 what was changed, in words
     <out>/packed.json                 the disc it was packed from (overrides.py stacks it for that disc only)
+    <out>/level_NN/cutscenes/         the level's cutscenes, as OpenRAC Editor wrote them beside its
+                                      scene, for the cutscene player mod (pack_cutscenes)
 
 The disc image is never written. The native port reads `patches.tsv` (its
 `--mods` option) and serves those sectors from the files instead of the disc.
@@ -534,6 +536,38 @@ def pack_collision(disc, info: dict, scene: Path, text: str, out: Path, patches:
     return changes + notes, problems, True
 
 
+def pack_cutscenes(scene_dir: Path, out_dir: Path) -> tuple[list[str], list[str]]:
+    """Copies the level's cutscenes (OpenRAC Editor writes them to <scene folder>/cutscenes/ on
+    save) with the files beside them (voices, music, meshes) to <out>/level_NN/cutscenes/, where
+    the cutscene player mod reads them. Returns (changes, problems) in words; a .cutscene that is
+    not one is left out."""
+    source = scene_dir / "cutscenes"
+    if not source.is_dir():
+        return [], []
+    changes, problems, files = [], [], []
+    for file in sorted(source.rglob("*")):
+        if file.is_symlink() or not file.is_file() or file.name.startswith(".") or file.suffix == ".import":
+            continue
+        if file.suffix == ".cutscene":
+            try:
+                if json.loads(file.read_text(encoding="utf-8")).get("format") != "openrac-cutscene":
+                    raise ValueError("no \"format\": \"openrac-cutscene\"")
+            except (OSError, ValueError, AttributeError) as error:
+                problems.append(f"cutscene {file.name}: {error}")
+                continue
+            changes.append(f"cutscene {file.stem}")
+        files.append(file)
+    if not changes:
+        return [], problems
+    import shutil
+    target = out_dir / "cutscenes"
+    for file in files:
+        copy = target / file.relative_to(source)
+        copy.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(file, copy)
+    return changes, problems
+
+
 def pack(disc, survey: dict, project: Path, out: Path) -> tuple[int, int]:
     """Writes OUT from the scenes of PROJECT, for DISC's version. Returns (levels packed, mobys changed)."""
     import scenery          # it reads the scene with this module's reader
@@ -622,6 +656,14 @@ def pack(disc, survey: dict, project: Path, out: Path) -> tuple[int, int]:
             scenery_changes.append(f"animated props: {animated_count} spinning visual instance(s)")
             total += animated_count
             if not changes and placements is None and not wrote and static_bake is None:
+                packed += 1
+        # Cutscenes: files the cutscene player mod reads from the pack, beside the level's.
+        cutscene_changes, cutscene_problems = pack_cutscenes(scene.parent, out / name)
+        scenery_problems += cutscene_problems
+        if cutscene_changes:
+            scenery_changes += cutscene_changes
+            total += len(cutscene_changes)
+            if not changes and placements is None and not wrote and static_bake is None and not animated_count:
                 packed += 1
         if wrote:
             packed += 0 if changes or placements is not None else 1
