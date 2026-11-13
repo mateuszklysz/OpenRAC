@@ -14,9 +14,9 @@ sphere's 290 vertices, texture coordinates and colours, the glow ring's 96 verti
 quads, the shimmer's 16 vertices and 4 quads); rc1/nanotech.gd draws them.
 
 Its sparks: eight points circle the ball, each about an axis of its own, and leave a trail
-of fading particles (particle texture 1, the one the trail's mode picks on the PS2: the
-byte at address 0, which the kernel holds). Each point also carries a bigger particle whose
-texture the PS2 picks from address 1 (0x80, past the level's table); that one is not drawn.
+of fading particles. The trail's particle texture is the one the level's particle type list
+gives type 62, mode 2 (spark_texture; Rilgar: 33). Each point also carries a bigger particle;
+that one is not drawn.
 """
 
 from formats import FormatError, Texture, overlay_sections, unpack
@@ -41,8 +41,9 @@ END = SHIMMER_INDICES + SHIMMER_QUADS * 8
 
 # Their effect textures (get_effect_texture): the sphere's and the shimmer's, and the ring's.
 BALL_TEXTURE, RING_TEXTURE = 21, 11
-# The sparks' trail particle texture (spawn_mode_controlled_alpha_fade_particle, mode 2).
-SPARK_TEXTURE = 1
+# The sparks' trail particle (spawn_mode_controlled_alpha_fade_particle): its particle type
+# (part_type62_textures) and the mode that picks its texture.
+SPARK_TYPE, SPARK_MODE = 62, 2
 # The sphere's radius in its table.
 BALL_RADIUS = 0.3
 
@@ -60,6 +61,21 @@ def effect_texture(level: Level, index: int) -> Texture | None:
     if len(pixels) < width * height or len(colours) < 1024:
         return None
     return Texture(width, height, pixels, colours)
+
+
+def spark_texture(level: Level) -> int | None:
+    """The sparks' particle texture: the level's particle type lists (core index word 0x6C: a
+    16-byte head, then each type's offset from the table's start to its texture bytes, one per
+    mode), which the game copies into the level program as part_typeNN_textures."""
+    table, = unpack("<i", level.index, 0x6C)
+    if not 0 < table < len(level.index):
+        return None
+    entry = table + 0x10 + 4 * SPARK_TYPE
+    if entry + 4 > len(level.index):
+        return None
+    offset, = unpack("<i", level.index, entry)
+    at = table + offset + SPARK_MODE
+    return level.index[at] if offset > 0 and at < len(level.index) else None
 
 
 def particle_texture(level: Level, index: int) -> Texture | None:

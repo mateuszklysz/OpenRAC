@@ -459,14 +459,14 @@ class LevelWriter:
         tables = effects.nanotech(self.level)
         if tables is None:
             return
-        out = self.dir / "effects"
-        out.mkdir(exist_ok=True)
+        spark = effects.spark_texture(self.level)
         pictures = {"ball": (f"fx_{effects.BALL_TEXTURE}.png", effects.effect_texture(self.level, effects.BALL_TEXTURE)),
                     "ring": (f"fx_{effects.RING_TEXTURE}.png", effects.effect_texture(self.level, effects.RING_TEXTURE)),
-                    "spark": (f"part_{effects.SPARK_TEXTURE}.png",
-                              effects.particle_texture(self.level, effects.SPARK_TEXTURE))}
+                    "spark": (f"part_{spark}.png", None if spark is None else effects.particle_texture(self.level, spark))}
         if any(texture is None for _, texture in pictures.values()):
             return
+        out = self.dir / "effects"
+        out.mkdir(exist_ok=True)
         for file, texture in pictures.values():
             (out / file).write_bytes(texture.png())
         tables["textures"] = {key: file for key, (file, _) in pictures.items()}
