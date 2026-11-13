@@ -425,6 +425,12 @@ int32_t rac1_world_moby_spawn(int32_t oclass) {
             GREF(uint16_t, m + MOBY_OCCLUSION) = 0x7F80u;
         }
         GREF(uint8_t, m + MOBY_DRAWN) = 1;
+        /* Some classes come out of CreateMoby left out of the moby loop (mode 0x2 not run, 0x4
+         * matrix kept, 0x40 animation not advanced: Clank's, class 10, which the game's scenes
+         * then pose and build themselves). A mod's moby is run as a figure is: its animation
+         * moves on and its matrix and sphere are built, so it is drawn where it stands (with no
+         * sphere the draw test took it as a point at the level's origin, and close views lost it). */
+        GREF(uint16_t, m + MOBY_MODE) = (uint16_t)(GREF(uint16_t, m + MOBY_MODE) & ~0x46u);
     }
     leave_level_context(entered);
     return m != 0 ? rac1_moby_slot(m) : -1;
