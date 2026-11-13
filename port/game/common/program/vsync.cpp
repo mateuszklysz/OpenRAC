@@ -32,6 +32,7 @@
 #include "openrac/game_host.h"
 #include "openrac/guest.h"
 #include "openrac/memory.h"
+#include "program/moby_states.h"
 #include "openrac/sound_engine.h"
 #include "program/program.h"
 #include "program/undrawn_ticks.h"
@@ -366,6 +367,7 @@ int vsync() {
     sample_state();
     crash_test();
     mods::frame();
+    moby_states::tick();
     // The level being played, once per change: the launcher reads this line for Discord's presence.
     static int shown_level = OPENRAC_OVERLAY_EXE;
     static int shown_bolts = -1;
@@ -418,7 +420,7 @@ int vsync() {
     // not a way to play, since the game's tick is its frame).
     static const bool& fps =
         stats::probe("OPENRAC_FPS", "the ticks per second over each 300 ticks, in the log");
-    static const bool uncapped = env::flag(env::Var::Uncapped);
+    static const bool uncapped = env::flag(env::Var::Uncapped) || moby_states::requested();
     static steady_clock::time_point fps_from = now;
     // OPENRAC_WATCH=ADDRESS:COUNT[:i|d|l|h],...: COUNT floats (or words, with i) from each ADDRESS,
     // each frame, in the log. d: words of an executable's global, at the loaded level's copy of it.

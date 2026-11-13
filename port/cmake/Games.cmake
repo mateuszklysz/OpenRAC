@@ -310,6 +310,11 @@ function(openrac_add_game config)
   else()
     add_executable(openrac-${id} "${OPENRAC_GAME_DIR}/common/main.cpp")
     set(targets openrac-${id})
+    # openrac-<id>-states: the same program without the window (no renderer, sound output or
+    # input), for tools that only need the game's state: the editor's moby start states
+    # (--moby-states, program/moby_states.h).
+    add_executable(openrac-${id}-states "${OPENRAC_GAME_DIR}/common/main.cpp")
+    list(APPEND targets openrac-${id}-states)
   endif()
   # The game fixes of this disc (cmake/Differences.cmake), which the game's host C reads through
   # openrac_game_fix: in every program, with a window or without.
@@ -345,7 +350,7 @@ function(openrac_add_game config)
       target_link_libraries(${target} PRIVATE winmm)
     endif()
     # The window: the renderer draws what the game holds in memory (game/common/frontend.h).
-    if(TARGET openrac_scene_renderer AND TARGET openrac_platform)
+    if(TARGET openrac_scene_renderer AND TARGET openrac_platform AND NOT target MATCHES "-states$")
       target_sources(${target} PRIVATE "${OPENRAC_GAME_DIR}/common/frontend.cpp"
                                        "${OPENRAC_GAME_DIR}/common/controls_store.cpp"
                                        "${OPENRAC_GAME_DIR}/common/debug_menu.cpp"

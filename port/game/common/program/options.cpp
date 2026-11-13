@@ -5,6 +5,7 @@
 // it prints, and where a player's data lives when no option says (the folders the launcher uses).
 
 #include "program/options.h"
+#include "program/moby_states.h"
 
 #include <cstdlib>
 #include <fstream>
@@ -31,7 +32,8 @@ namespace {
         "[--level N] [--skip-movies] [--unlock-all-weapons] [--unlock-all-gadgets] "
         "[--mods DIR] [--map] [--ship-map] [--destinations] "
         "[--check-levels] [--settings FILE] [--controls DIR] "
-        "[--plugins FILE] [--probes DIR] [--no-mods] [--debug-overlay] [--debug-dump FILE]",
+        "[--plugins FILE] [--probes DIR] [--no-mods] [--debug-overlay] [--debug-dump FILE] "
+        "[--moby-states FILE [--moby-states-ticks N]]",
         program_name(),
         openrac_game.game
     );
@@ -173,6 +175,8 @@ fs::path default_levels(const fs::path& data) {
 
 Options parse(int argc, char** argv) {
     Options o;
+    fs::path moby_states_out;
+    long moby_states_ticks = 300;
 
     for (int i = 1; i < argc; i++) {
         const std::string a = argv[i];
@@ -212,6 +216,10 @@ Options parse(int argc, char** argv) {
             o.frames = std::stol(value());
         } else if (a == "--level") {
             openrac_game_start_level = std::stoi(value());
+        } else if (a == "--moby-states") {
+            moby_states_out = value();
+        } else if (a == "--moby-states-ticks") {
+            moby_states_ticks = std::stol(value());
         } else if (a == "--skip-movies") {
             o.skip_movies = true;
         } else if (a == "--unlock-all-weapons") {
@@ -238,6 +246,24 @@ Options parse(int argc, char** argv) {
             usage(program_name() + ": " + openrac_game.title + ", native");
         } else {
             usage("unknown option " + a);
+        }
+    }
+
+    // --moby-states FILE (moby_states.h): straight into the --level, no movies, no card of the
+    // player's (an empty one in the temporary folder, which the game finds blank and asks nothing
+    // of), no mods.
+    if (!moby_states_out.empty()) {
+        if (openrac_game_start_level < 0) {
+            usage("--moby-states needs --level");
+        }
+        moby_states::request(moby_states_out, moby_states_ticks);
+        openrac_game_direct_start = 1;
+        o.skip_movies = true;
+        o.no_mods = true;
+        if (o.cards.empty()) {
+            std::error_code e;
+            o.cards = fs::temp_directory_path(e) / "openrac-moby-states-card";
+            fs::create_directories(o.cards, e);
         }
     }
 

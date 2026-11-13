@@ -1015,6 +1015,10 @@ uint32_t openrac_game_card_saves(void);
  * first level. For getting to a level directly, as the behaviour checker's level write does. */
 extern int openrac_game_start_level;
 
+/* Non-zero: a new game goes straight into openrac_game_start_level from the title, as
+ * OPENRAC_DIRECT does (--moby-states sets it). */
+extern int openrac_game_direct_start;
+
 int openrac_game_pad(int port, uint16_t* buttons, uint8_t analog[4]);
 
 /* The game's DualShock 2 motor values: small on (nonzero) or off, large speed 0..255. Sent by the

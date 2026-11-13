@@ -212,7 +212,8 @@ static void direct_start(unsigned frame) {
         return;
     }
     if (openrac_game_start_level < 0
-        || (openrac_game_map == NULL && openrac_env_string("OPENRAC_DIRECT") == NULL)) {
+        || (openrac_game_map == NULL && !openrac_game_direct_start
+            && openrac_env_string("OPENRAC_DIRECT") == NULL)) {
         done = 1;
         return;
     }

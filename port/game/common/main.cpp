@@ -234,6 +234,7 @@ void openrac_game_select_destination(int index) {
 int openrac_game_language = 1;
 int openrac_game_no_card = 0;
 int openrac_game_start_level = -1;
+int openrac_game_direct_start = 0;
 void (*openrac_game_on_frame)(unsigned frame) = nullptr;
 int (*openrac_game_bolts)(void) = nullptr;
 int (*openrac_game_skip_buttons)(void) = nullptr;
@@ -307,7 +308,9 @@ void open_session(int argc, char** argv) {
         log::warn("the log cannot be written in {}", g_options.data.string());
     }
     crash::configure(g_options.data / "crashes", program_name(), started);
+#ifdef OPENRAC_FRONTEND
     frontend::debug_overlay::set_picker_report_folder(g_options.data.string());
+#endif
     crash::set_moby_source(updating_moby);
     const char* level = log::level() <= log::Level::Debug     ? "debug"
                         : log::level() <= log::Level::Verbose ? "verbose"
