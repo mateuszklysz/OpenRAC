@@ -486,6 +486,17 @@ func decide_start() -> void:
 	elif rule.has("hidden_unless_pvar"):
 		decide_by_pvars(rule)
 
+	# A pvar word the class's code hides it by in a way the run does not count as hidden.
+	if rule.has("hidden_if_pvar") and not hidden_at_start and int(pvar_word(String(rule["hidden_if_pvar"]).hex_to_int())) != 0:
+		hidden_at_start = true
+		depends_on_game = true
+		may_change = true
+		start_reasons.append(String(rule.get("hidden_if_pvar_reason", "Hidden by its class's code (pvar %s)." % rule["hidden_if_pvar"])))
+
+	# Volumes the camera must be inside, or outside, for its code to draw it.
+	if rule.has("camera_volumes"):
+		decide_by_camera_volumes(rule["camera_volumes"])
+
 	if rule.has("progress"):
 		depends_on_game = true
 		may_change = true
@@ -627,6 +638,30 @@ func add_game_height_model() -> void:
 	copy.name = "GameHeightEffect"
 	copy.position = model.position + transform.affine_inverse() * at
 	add_child(copy)
+
+
+## The volumes its code checks the camera against (class_rules.json "camera_volumes": the pvar
+## offsets of two volume numbers each, -1 for none): drawn only inside a "show" one, or not
+## inside a "hide" one, so a cutscene's camera can bring it out or hide it.
+func decide_by_camera_volumes(volumes: Dictionary) -> void:
+	for kind in ["show", "hide"]:
+		if not volumes.has(kind):
+			continue
+
+		var at: int = String(volumes[kind]).hex_to_int()
+
+		# Its code goes by the first word: -1 there, the kind is not used.
+		if int(pvar_word(at)) == -1:
+			continue
+
+		var found: Array = [int(pvar_word(at)), int(pvar_word(at + 4))].filter(func(v: int) -> bool: return v != -1)
+
+		may_change = true
+		var listed: String = " or ".join(found.map(func(v: int) -> String: return str(v)))
+		start_reasons.append(("Drawn only while the camera is inside volume %s." if kind == "show"
+			else "Not drawn while the camera is inside volume %s.") % listed)
+		# The first kind set is the one its code goes by.
+		return
 
 
 ## A class whose code hides the moby unless one of some pvar words is set (amoeboids: state 12,

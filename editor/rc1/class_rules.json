@@ -1,5 +1,5 @@
 {
-  "about": "What a class's own code does to a placed moby when the level starts, which the level data alone does not show (rc1/moby.gd reads it). Each rule names the function it comes from. Offsets are byte offsets into the moby's pvars. \"game_hidden\": the game's run (moby_states.json) hides it, but not for the reason the editor shows; the text says why it is drawn anyway. \"drawn_by_code\": its model is never drawn, its class's code draws something else, the text says what; \"effect\" is what the editor draws for it (\"nanotech\", \"electric_gate\", or \"game_height\": the model where the game's run puts it), only in the states listed in \"effect_states\" when there is that list.",
+  "about": "What a class's own code does to a placed moby when the level starts, which the level data alone does not show (rc1/moby.gd reads it). Each rule names the function it comes from. Offsets are byte offsets into the moby's pvars. \"game_hidden\": the game's run (moby_states.json) hides it, but not for the reason the editor shows; the text says why it is drawn anyway. \"drawn_by_code\": its model is never drawn, its class's code draws something else, the text says what; \"effect\" is what the editor draws for it (\"nanotech\", \"electric_gate\", or \"game_height\": the model where the game's run puts it), only in the states listed in \"effect_states\" when there is that list. \"hidden_if_pvar\": hidden while that pvar word is set, which the run cannot see (\"hidden_if_pvar_reason\" says why); \"camera_volumes\": the pvar words of the volumes the camera must be inside (\"show\") or outside (\"hide\") for it to be drawn.",
   "classes": {
     "572": {
       "name": "large_amoeboid",
@@ -9,7 +9,7 @@
         "0x258"
       ],
       "trigger_volume_pvar": "0x25C",
-      "progress": "Seen hidden in the port while Ratchet is far from it, by code not traced yet."
+      "progress": "Far from the camera the run may leave it as it spawned: the game updates a moby only within its update distance of the camera."
     },
     "865": {
       "name": "medium_amoeboid",
@@ -41,7 +41,7 @@
     },
     "0": {
       "name": "ratchet",
-      "game_hidden": "The hero: the run without a player hides him, so the editor shows him."
+      "game_hidden": "The hero: the level's arrival scene hides him until it ends (space.c), so the editor shows him."
     },
     "831": {
       "name": "water",
@@ -52,35 +52,50 @@
       "name": "electric_gate",
       "drawn_by_code": "Its model is not drawn: while shut (state 1) its class's code draws five beams across it (draw_electric_gate_beams), which the editor draws too.",
       "effect": "electric_gate",
-      "effect_states": [1]
+      "effect_states": [
+        1
+      ]
     },
     "44": {
       "name": "sentrybot",
-      "game_hidden": "Its code hides it while Ratchet is far from it (seen in the port's run), so the editor shows it."
+      "source": "sentrybot_update (games/rac1/decomp/src/overlays/shared/sentrybot.c)",
+      "game_hidden": "Hidden in the run only far from the camera: the game updates a moby only within its update distance of the camera, and sentrybot_update shows it on every update outside a cutscene (it spawns hidden, and a cutscene hides it), so the editor shows it.",
+      "camera_volumes": {
+        "show": "0x2D0",
+        "hide": "0x2D8"
+      }
     },
     "577": {
       "name": "peckbot",
-      "game_hidden": "Its code hides it while Ratchet is far from it (seen in the port's run), so the editor shows it."
+      "source": "peckbot_update (games/rac1/decomp/src/overlays/l01_novalis/elevator_and_birdbot.c)",
+      "game_hidden": "Hidden in the run only far from the camera: the game updates a moby only within its update distance of the camera, and peckbot_update shows it on every update outside a cutscene (a cutscene, as the level's arrival, hides it), so the editor shows it."
     },
     "623": {
       "name": "extermibot",
-      "game_hidden": "Its code hides it while Ratchet is far from it (seen in the port's run), so the editor shows it."
+      "source": "extermibot_update (games/rac1/decomp/src/overlays/l05_rilgar/sharkigator_and_faucet.c), state 0",
+      "game_hidden": "Hidden in the run only far from the camera: the game updates a moby only within its update distance of the camera, and extermibot_update shows it again on its first update after a cutscene (the level's arrival hides it), so the editor shows it.",
+      "hidden_if_pvar": "0x2B4",
+      "hidden_if_pvar_reason": "Hidden until woken (pvar 0x2B4): its code puts it 20 below its place with a draw distance of 0, which the run does not count as hidden; a moby's command or Ratchet entering a volume wakes it (pvars 0x2B8, 0x2BC)."
     },
     "625": {
       "name": "extermitank",
-      "game_hidden": "Its code hides it while Ratchet is far from it (seen in the port's run), so the editor shows it."
+      "source": "extermitank_update (games/rac1/decomp/src/overlays/l05_rilgar/sharkigator_and_faucet.c)",
+      "game_hidden": "Hidden in the run only far from the camera, where the game does not update it; extermitank_update never hides it, so the editor shows it."
     },
     "886": {
       "name": "timed_activation_pads",
-      "game_hidden": "Its code hides it while Ratchet is far from it (seen in the port's run), so the editor shows it."
+      "source": "timed_activation_pads_update (games/rac1/decomp/src/overlays/shared/doors_and_bridges.c)",
+      "game_hidden": "Hidden in the run only far from the camera, where the game does not update it; timed_activation_pads_update never hides it, so the editor shows it."
     },
     "1201": {
       "name": "turret",
-      "game_hidden": "Its code hides it while Ratchet is far from it (seen in the port's run), so the editor shows it."
+      "source": "turret_update (games/rac1/decomp/src/overlays/l09_gaspar/asteroids_airship_debris.c)",
+      "game_hidden": "Hidden in the run only far from the camera, where the game does not update it; turret_update never hides it, so the editor shows it."
     },
     "1885": {
       "name": "spawner",
-      "game_hidden": "Its code hides it while Ratchet is far from it (seen in the port's run), so the editor shows it."
+      "source": "spawner_1885_update (games/rac1/decomp/src/versions/us/overlays/shared/spawner_and_chase_enemies/func_L09_0030BF88.c)",
+      "game_hidden": "Hidden in the run only far from the camera, where the game does not update it; spawner_1885_update never hides it, so the editor shows it."
     }
   }
 }
