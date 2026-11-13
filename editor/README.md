@@ -908,8 +908,9 @@ Approximations:
   (rings, force fields, barriers); the game may draw those translucent,
   glowing or not at all. A class's glow parts are drawn unlit in its glow
   colour and blended over the rest, as the game's glow pass draws them
-  (`rc1/lit_moby_glow.gdshader`); the chrome and glass passes and the
-  low-detail meshes are not extracted.
+  (`rc1/lit_moby_glow.gdshader`), and its chrome and glass faces are the
+  level's picture sphere-mapped and blended over it (`rc1/lit_metal.gdshader`);
+  the low-detail meshes are not extracted.
 - A placed moby plays its class's sequence 0, the one the game starts
   every moby on, looping; in the editor it follows the cutscene preview's
   time. What its update function plays later is not known to the editor.

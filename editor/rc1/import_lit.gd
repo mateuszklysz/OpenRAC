@@ -18,6 +18,9 @@ const LIT_MOBY: Shader = preload("res://rc1/lit_moby.gdshader")
 ## A moby class's glow faces, the next pass of a class with a glow colour.
 const LIT_MOBY_GLOW: Shader = preload("res://rc1/lit_moby_glow.gdshader")
 
+## A moby's metal faces, blended over it as the game's metal pass.
+const LIT_METAL: Shader = preload("res://rc1/lit_metal.gdshader")
+
 
 ## Lets every coloured surface under the imported scene use its vertex colours, and gives a tie or
 ## shrub class the game's lighting of each of its instances.
@@ -82,7 +85,7 @@ func class_glow(source: String):
 
 ## Gives each textured surface of a moby mesh the lit moby shader (one shader material per
 ## imported material, in made), and for a class with a glow colour the glow pass after it; the
-## metal (chrome, glass) surfaces keep theirs.
+## metal (chrome, glass) surfaces get the metal pass's shader.
 func light_moby(mesh: Mesh, bank: PackedVector4Array, glow, made: Dictionary) -> void:
 	# A mesh instance without a mesh has nothing to light.
 	if mesh == null:
@@ -91,8 +94,19 @@ func light_moby(mesh: Mesh, bank: PackedVector4Array, glow, made: Dictionary) ->
 	for i in mesh.get_surface_count():
 		var material := mesh.surface_get_material(i) as BaseMaterial3D
 
-		# Only a textured material that is not the metal pass.
-		if material == null or material.albedo_texture == null or material.resource_name.begins_with("metal_"):
+		# Only a textured material.
+		if material == null or material.albedo_texture == null:
+			continue
+
+		# The metal pass (chrome, glass): sphere-mapped and blended over the moby.
+		if material.resource_name.begins_with("metal_"):
+			if not made.has(material):
+				var shine := ShaderMaterial.new()
+				shine.shader = LIT_METAL
+				shine.set_shader_parameter("metal", material.albedo_texture)
+				made[material] = shine
+
+			mesh.surface_set_material(i, made[material])
 			continue
 
 		if not made.has(material):
