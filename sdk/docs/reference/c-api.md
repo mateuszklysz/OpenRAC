@@ -548,7 +548,7 @@ rotation, scale and the animation are read). Since 1.9.
 | Member | |
 |---|---|
 | `uint32_t size` | sizeof(openrac_moby), set by the mod. |
-| `int32_t slot` | Its slot in this game, its key (-1 for one the level did not place), its class. |
+| `int32_t slot` | Its slot in this game, its key (its record's place in the level's moby table, which an edited level may change; -1 for one the level did not place; its spawn id is moby_uid's), its class. |
 | `int32_t key` |  |
 | `int32_t oclass` |  |
 | `uint32_t flags` | OPENRAC_MOBY_* flags, and its state (the game's own byte, below 0x80 while it lives). |
@@ -977,7 +977,7 @@ sees them, and one built for 1.2 loads on a 1.2 port or newer.
 | `int (*save_slot)(int slot, openrac_save_info* out)` | Fills `out` (its size set) with what the memory card's save `slot` holds. Returns 1 for a save, 0 for an empty slot (or one the game would not load), -1 past the game's last slot. Since 1.8. |
 | `size_t (*save_read)(int slot, void* out, size_t size)` | The bytes of the memory card's save `slot`, for play_start: written to `out` when `size` is large enough. Returns their size, or 0 for no save there. Since 1.8. |
 | `int (*moby_list)(openrac_moby* out, int max)` | Fills `out` with the level's live mobys and its placed ones deleted (OPENRAC_MOBY_DEAD), at most `max` of them (each one's size set by the port), in slot order, whatever menu is up. Returns how many there are (more than `max`: the rest left out); 0 outside a level. Since 1.9. |
-| `int (*moby_slot)(int key)` | Returns the slot of the placed moby `key`, or -1 for none (killed, or no such record). Since 1.9. |
+| `int (*moby_slot)(int key)` | Returns the slot of the placed moby `key` (openrac_moby.key: its record's place in the level's table, not its spawn id, which moby_uid gives), or -1 for none (killed, or no such record). Since 1.9. |
 | `int (*moby_drive)(openrac_mod* mod, int slot, int on)` | Drives the moby in `slot` (`on` 1: its update no longer runs, the mod poses it) or lets it go (0). A drive ends with its level. Returns OPENRAC_HOOK_OK, or OPENRAC_HOOK_UNKNOWN for no moby there, or OPENRAC_HOOK_TAKEN when another mod drives it. Since 1.9. |
 | `int (*moby_pose)(openrac_mod* mod, int slot, const openrac_moby* pose)` | Puts the moby in `slot` in the pose `pose` gives (its position, rotation, scale when above 0, and animation, as figure_pose does). Returns OPENRAC_HOOK_OK, or OPENRAC_HOOK_UNKNOWN for no moby there. Since 1.9. |
 | `int (*moby_kill)(openrac_mod* mod, int slot)` | Deletes the moby in `slot` as the game deletes one (a placed one stays dead until its level loads again). Returns OPENRAC_HOOK_OK or OPENRAC_HOOK_UNKNOWN. Since 1.9. |

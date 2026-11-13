@@ -707,7 +707,8 @@ typedef struct openrac_pose {
 typedef struct openrac_moby {
     /* sizeof(openrac_moby), set by the mod. */
     uint32_t size;
-    /* Its slot in this game, its key (-1 for one the level did not place), its class. */
+    /* Its slot in this game, its key (its record's place in the level's moby table, which an edited
+     * level may change; -1 for one the level did not place; its spawn id is moby_uid's), its class. */
     int32_t slot;
     int32_t key;
     int32_t oclass;
@@ -1571,8 +1572,9 @@ typedef struct openrac_api {
      * outside a level. Since 1.9. */
     int (*moby_list)(openrac_moby* out, int max);
 
-    /* Returns the slot of the placed moby `key`, or -1 for none (killed, or no such record). Since
-     * 1.9. */
+    /* Returns the slot of the placed moby `key` (openrac_moby.key: its record's place in the level's
+     * table, not its spawn id, which moby_uid gives), or -1 for none (killed, or no such record).
+     * Since 1.9. */
     int (*moby_slot)(int key);
 
     /* Drives the moby in `slot` (`on` 1: its update no longer runs, the mod poses it) or lets it go
