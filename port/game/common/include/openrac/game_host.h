@@ -697,6 +697,9 @@ typedef struct openrac_game_play {
     int (*moby_sound_play)(gaddr moby, int sound, int loop);
     void (*moby_sound_stop)(gaddr moby, int voice);
     int (*music_group)(void);
+    /* A placed moby's spawn id (the record's uid), -1 for none (openrac_api.moby_uid). NULL for a
+     * game without it. */
+    int32_t (*moby_uid)(int32_t slot);
 } openrac_game_play;
 
 #define OPENRAC_GAME_CAMERA_END_EASED (-1)

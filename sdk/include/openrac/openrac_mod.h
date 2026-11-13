@@ -2188,6 +2188,11 @@ typedef struct openrac_api {
      * animation plays this way on a moby of any class. Shares moby_set_joints' list and limit for
      * the moby. Since 1.14. */
     int (*moby_set_joint_poses)(openrac_mod* mod, int slot, const openrac_joint_offset* joints, int count);
+
+    /* The spawn id of the placed moby in `slot`: the uid its level record carries, which the game
+     * saves kills and pickups by and which stays when the level is edited (a key is the record's
+     * place). -1 for none or a port without it. Since 1.14. */
+    int (*moby_uid)(int slot);
 } openrac_api;
 
 /* ------------------------------------------------------------------------------------------ *

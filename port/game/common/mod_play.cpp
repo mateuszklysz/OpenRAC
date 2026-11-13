@@ -480,6 +480,10 @@ int api_moby_list(openrac_moby* out, int max) {
     return n;
 }
 
+int api_moby_uid(int slot) {
+    return g_play != nullptr && g_play->moby_uid != nullptr ? g_play->moby_uid(slot) : -1;
+}
+
 int api_moby_slot(int key) {
     return g_play != nullptr && g_play->moby_slot != nullptr ? g_play->moby_slot(key) : -1;
 }
@@ -2190,6 +2194,7 @@ void fill_motion_api(openrac_api& api, const Host& host) {
     api.prop_animate = api_prop_animate;
     api.moby_joint_frame = api_moby_joint_frame;
     api.moby_set_joint_poses = api_moby_set_joint_poses;
+    api.moby_uid = api_moby_uid;
 }
 
 float camera_fov() {

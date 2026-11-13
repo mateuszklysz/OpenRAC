@@ -84,6 +84,7 @@ enum {
     MOBY_HIT = 0xA4,
     MOBY_OCLASS = 0xA6,
     MOBY_MISSION = 0xB0,
+    MOBY_UID = 0xB2, /* u16 save_id: the record's spawn id (uid) */
     MOBY_SIZE = 0x100,
     CLASS_TYPE = 0x46,
     HIT_SIZE = 0x40,
@@ -319,6 +320,15 @@ int32_t rac1_world_moby_key(gaddr moby) {
     }
     read_keys();
     return key_of[slot];
+}
+
+/* The spawn id (the record's uid, the game's save_id) of a placed moby of the level, -1 for none. */
+int32_t rac1_world_moby_uid(int32_t slot) {
+    if (!in_level() || slot < 0 || slot >= placed_count()) {
+        return -1;
+    }
+    const uint16_t uid = GREF(uint16_t, array_base() + (gaddr)slot * MOBY_SIZE + MOBY_UID);
+    return uid != 0xFFFFu ? uid : -1;
 }
 
 /* The mission a live moby of the level goes with (its byte at +0xB0), -1 for none. */
