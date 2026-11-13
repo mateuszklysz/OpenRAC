@@ -107,6 +107,13 @@ static var states_tried: Dictionary = {}
 ## The game's state of this moby when the level starts (moby_states.json), or empty.
 var game_state: Dictionary = {}
 
+## What the editor draws for a moby whose class's code draws it instead of its model
+## (class_rules.json "drawn_by_code" and "effect"), or empty.
+var code_effect: String = ""
+
+## The effect nodes rc1/moby.gd adds, display only (not saved: they have no owner).
+const EFFECT_NODES: PackedStringArray = ["NanotechEffect", "ElectricGateEffect", "GameHeightEffect"]
+
 # =============================================================================
 # METHODS
 # =============================================================================
@@ -409,10 +416,6 @@ func set_class_rule(text: String) -> bool:
 	out.store_string(JSON.stringify(file, "  ") + "\n")
 	out.close()
 	rules = classes
-	hidden_at_start = false
-	depends_on_game = false
-	may_change = false
-	start_reasons.clear()
 	decide_start()
 	show_start()
 	update_configuration_warnings()
@@ -422,6 +425,13 @@ func set_class_rule(text: String) -> bool:
 
 ## Works out the start state of a moby the level places.
 func decide_start() -> void:
+	hidden_at_start = false
+	depends_on_game = false
+	may_change = false
+	start_reasons.clear()
+	game_state = {}
+	code_effect = ""
+
 	if not has_meta("rc1_index"):
 		return
 
@@ -449,8 +459,21 @@ func decide_start() -> void:
 	# The game's own run, when there is one and it had this moby; the class rules only explain
 	# it. A moby added in the editor since (no record, or a name the packed level did not have)
 	# goes by the rules alone until the level is packed again.
-	if states != null and game_key(states) != null:
+	var by_game: bool = states != null and game_key(states) != null
+
+	if by_game:
 		decide_by_game(states, rule)
+	elif rule.has("drawn_by_code"):
+		hidden_at_start = true
+		start_reasons.append(String(rule["drawn_by_code"]))
+
+	# What its class's code draws instead of its model: while it is there, in the states listed.
+	if rule.has("drawn_by_code") and (not by_game or (not game_state.is_empty() and int(game_state["dead"]) == 0)):
+		var states_drawn: Array = rule.get("effect_states", [])
+
+		if states_drawn.is_empty() or game_state.is_empty() or states_drawn.has(float(game_state["state"])) \
+				or states_drawn.has(int(game_state["state"])):
+			code_effect = String(rule.get("effect", ""))
 
 		# A class whose code brings it out once Ratchet enters a volume.
 		if hidden_at_start and rule.has("trigger_volume_pvar"):
@@ -576,9 +599,34 @@ func decide_by_game(states: Dictionary, rule: Dictionary) -> void:
 		start_reasons.append("Dead %.0f s after the level starts (the game's run, moby_states.json)." % seconds)
 	elif int(game_state["hidden"]) != 0 and rule.has("game_hidden"):
 		start_reasons.append(String(rule["game_hidden"]))
+	elif int(game_state["hidden"]) != 0 and rule.has("drawn_by_code"):
+		hidden_at_start = true
+		start_reasons.append(String(rule["drawn_by_code"]))
 	elif int(game_state["hidden"]) != 0:
 		hidden_at_start = true
 		start_reasons.append("Not drawn %.0f s after the level starts (the game's run, moby_states.json)." % seconds)
+
+
+## A copy of the model where the game's run puts the moby (class_rules.json effect "game_height":
+## Rilgar's water, which its code raises or lowers), the moby itself left where its record has it.
+func add_game_height_model() -> void:
+	var model: Node3D = get_node_or_null("Model") as Node3D
+
+	if model == null:
+		return
+
+	# The game's place (its record's without a run), in the moby's own frame: the mobys' parent
+	# is the game's frame.
+	var at: Vector3 = position
+	var place: Variant = game_state.get("pos")
+
+	if place is Array and place.size() == 3:
+		at = Vector3(place[0], place[1], place[2])
+
+	var copy: Node3D = model.duplicate() as Node3D
+	copy.name = "GameHeightEffect"
+	copy.position = model.position + transform.affine_inverse() * at
+	add_child(copy)
 
 
 ## A class whose code hides the moby unless one of some pvar words is set (amoeboids: state 12,
@@ -617,11 +665,12 @@ func show_start() -> void:
 	if not has_meta("rc1_index"):
 		return
 
-	var effect: Node = get_node_or_null("NanotechEffect")
+	for called in EFFECT_NODES:
+		var effect: Node = get_node_or_null(NodePath(called))
 
-	if effect != null:
-		remove_child(effect)
-		effect.queue_free()
+		if effect != null:
+			remove_child(effect)
+			effect.queue_free()
 
 	var rule: Dictionary = class_rules().get(str(int(get_meta("rc1_class", -1))), {})
 	# A cutscene event at the preview's time wins over the start state.
@@ -633,11 +682,24 @@ func show_start() -> void:
 		var Nanotech: Script = load("res://rc1/nanotech.gd")
 		Nanotech.attach(self, directory, look)
 
+	# What the class's code draws instead of the model, whatever a cutscene does with the moby
+	# (the game's code draws it whether the moby is shown or not).
+	if code_effect == "electric_gate":
+		var ElectricGate: Script = load("res://rc1/electric_gate.gd")
+		ElectricGate.attach(self, scene_file_path.get_base_dir().get_base_dir().path_join("effects"))
+	elif code_effect == "game_height":
+		add_game_height_model()
+
 	var ghost: bool = ProjectSettings.get_setting(SHOW_HIDDEN, false)
+	var effects: Array[Node] = []
+
+	for called in EFFECT_NODES:
+		if has_node(NodePath(called)):
+			effects.append(get_node(NodePath(called)))
 
 	for node in find_children("*", "GeometryInstance3D", true, false):
-		# The effect is drawn whole in its look.
-		if node.get_parent() != null and node.get_parent().name == "NanotechEffect":
+		# An effect is drawn whole, in its look.
+		if effects.any(func(effect: Node) -> bool: return effect.is_ancestor_of(node)):
 			continue
 
 		var instance: RID = (node as GeometryInstance3D).get_instance()

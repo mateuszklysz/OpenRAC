@@ -2,7 +2,7 @@
 // Copyright (c) 2026 the OpenRAC contributors
 //
 // --moby-states FILE: the game loads the --level, runs its mobys' updates for a number of ticks
-// and writes how each placed moby is then (spawned or not, hidden, its state) to FILE as JSON, and
+// and writes how each placed moby is then (spawned or not, hidden, its state and place) to FILE as JSON, and
 // the program stops. The editor runs it on opening a level (editor/moby_states.py) to show the
 // mobys as the game starts them. The run is as fast as the machine allows: no frame pacing, no
 // movies, the game started straight in the level.

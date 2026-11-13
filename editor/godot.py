@@ -65,6 +65,7 @@ COLLISION_ALPHA = 0.55
 MIN_SCALE = 1e-4  # the smallest joint scale the editor's models get (LevelWriter.scale)
 PANORAMA = (2048, 1024)  # About one texel per pixel around the horizon.
 NANOTECH_CRATE = 501  # Ratchet & Clank's nanotech crate: its ball is drawn by code (effects.py)
+ELECTRIC_GATE = 838  # Rilgar's electric gate: its beams are drawn by code (effects.py)
 # project.godot's [rendering] buffer for instance shader parameters: each tie's and shrub's light
 # row and each moby's light (rc1/lit_object.gdshader, rc1/lit_moby.gdshader) take room in it.
 
@@ -474,6 +475,19 @@ class LevelWriter:
         tables["textures"] = {key: file for key, (file, _) in pictures.items()}
         (out / "nanotech.json").write_text(json.dumps(tables) + "\n")
 
+    def write_electric_gate(self) -> None:
+        """The electric gate's beams (effects.py) for rc1/electric_gate.gd: effects/electric_gate.json
+        and its effect texture, effects/fx_<n>.png. Nothing when the level's program has none."""
+        gate = effects.electric_gate(self.level)
+        texture = None if gate is None else effects.effect_texture(self.level, gate["texture"])
+        if texture is None:
+            return
+        out = self.dir / "effects"
+        out.mkdir(exist_ok=True)
+        gate["picture"] = f"fx_{gate['texture']}.png"
+        (out / gate["picture"]).write_bytes(texture.png())
+        (out / "electric_gate.json").write_text(json.dumps(gate) + "\n")
+
     def write_mobys(self, placements: list[dict], classes: dict[int, MobyClass | None]) -> None:
         """A scene per moby class the level loads, mobys/moby_<class>.tscn,
         and an instance of it per placed moby.
@@ -522,6 +536,8 @@ class LevelWriter:
             (self.dir / "moby_glow.json").write_text(json.dumps(glow) + "\n")
         if self.godot_scales and self.fmt.class_names and NANOTECH_CRATE in placed:
             self.write_nanotech()
+        if self.godot_scales and self.fmt.class_names and ELECTRIC_GATE in placed:
+            self.write_electric_gate()
         for p in placements:
             fields = {f"metadata__rc1_{k}": v for k, v in {"index": p["index"], **p["fields"]}.items()}
             fields.update(self.moby_extra.get(p["index"], {}))

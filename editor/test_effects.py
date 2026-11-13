@@ -56,5 +56,42 @@ class EffectTexture(unittest.TestCase):
         self.assertIsNone(effects.effect_texture(self.level(1), 1))
 
 
+def gate_program(outer_x: float = 0.0) -> bytes:
+    """A level 05 program of the NTSC disc's layout with only the electric gate's values in it."""
+    at = effects.GATE_ADDRESSES["ntsc"]
+    low, high = bytearray(0x100), bytearray(0x100)
+    struct.pack_into("<4I", low, at["colours"] - 0x161D00, 0x300000FF, 0x30000080, 0x200000FF, 0x20000080)
+    struct.pack_into("<i", low, at["texture"] - 0x161D00, 19)
+    struct.pack_into("<8f", high, at["uvs"] - 0x20B700, 0.5, 0, 0.5, 1, 0.5, 0, 0.5, 1)
+    for table, half in (("outer", 0.05), ("inner", 0.1)):
+        for i, (y, z) in enumerate(((-5, -half), (-5, half), (5, -half), (5, half))):
+            struct.pack_into("<4f", high, at[table] - 0x20B700 + 16 * i, outer_x, y, z, 1.0)
+    entry = 0x161D00
+    return (struct.pack("<4I", 0x161D00, len(low), 0, entry) + bytes(low)
+            + struct.pack("<4I", 0x20B700, len(high), 0, entry) + bytes(high))
+
+
+class ElectricGate(unittest.TestCase):
+    def level(self, program: bytes, version: str = "ntsc", number: int = 5) -> SimpleNamespace:
+        return SimpleNamespace(id=number, version=version, stored={"overlay": program})
+
+    def test_the_beams_are_read_by_the_discs_addresses(self):
+        gate = effects.electric_gate(self.level(gate_program()))
+        self.assertEqual(gate["texture"], 19)
+        self.assertEqual(gate["outer_colours"], [[255, 0, 0, 48], [128, 0, 0, 48]])
+        self.assertEqual(gate["inner_colours"], [[255, 0, 0, 32], [128, 0, 0, 32]])
+        self.assertEqual(gate["uvs"][1], [0.5, 1.0])
+        self.assertAlmostEqual(gate["inner"][3][2], 0.1)
+        self.assertEqual(gate["outer"][2][1], 5.0)
+
+    def test_another_level_or_disc_has_none(self):
+        self.assertIsNone(effects.electric_gate(self.level(gate_program(), number=4)))
+        self.assertIsNone(effects.electric_gate(self.level(gate_program(), version="jp")))
+        self.assertIsNone(effects.electric_gate(self.level(b"")))
+
+    def test_a_program_of_another_layout_has_none(self):
+        self.assertIsNone(effects.electric_gate(self.level(gate_program(outer_x=3.0))))
+
+
 if __name__ == "__main__":
     unittest.main()

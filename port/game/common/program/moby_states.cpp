@@ -3,6 +3,7 @@
 
 #include "program/moby_states.h"
 
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
@@ -28,6 +29,11 @@ constexpr std::uint32_t kPlaced = 0x4u;
 constexpr std::uint32_t kDead = 0x10u;
 constexpr std::uint32_t kHidden = 0x40u;
 
+// A coordinate as JSON can hold it (a dead moby's may be anything).
+float finite(float v) {
+    return std::isfinite(v) ? v : 0.0f;
+}
+
 void write(const std::vector<openrac_game_moby_state>& mobys) {
     std::ofstream out(g_out, std::ios::binary | std::ios::trunc);
     out << "{\"format\": 1, \"game\": \"" << openrac_game.id << "\", \"level\": "
@@ -40,7 +46,8 @@ void write(const std::vector<openrac_game_moby_state>& mobys) {
         }
         out << (first ? "\n" : ",\n") << "  {\"key\": " << m.key << ", \"class\": " << m.oclass
             << ", \"state\": " << m.state << ", \"hidden\": " << ((m.flags & kHidden) ? 1 : 0)
-            << ", \"dead\": " << ((m.flags & kDead) ? 1 : 0) << "}";
+            << ", \"dead\": " << ((m.flags & kDead) ? 1 : 0) << ", \"pos\": [" << finite(m.position[0]) << ", "
+            << finite(m.position[1]) << ", " << finite(m.position[2]) << "]}";
         first = false;
     }
     out << "\n]}\n";

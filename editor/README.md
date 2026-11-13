@@ -953,7 +953,12 @@ Approximations:
   edits the class's entry in `rc1/class_rules.json`. The nanotech
   crate's ball, which the game's code draws (`effects.py`,
   `rc1/nanotech.gd`), is drawn inside the crate, or alone with Preview
-  Look set to broken, with its sparks.
+  Look set to broken, with its sparks. Rilgar's electric gates hide
+  their model and draw five pulsing beams while shut
+  (`rc1/electric_gate.gd`, read from the level's program for the NTSC
+  and PAL discs), and its water patches are drawn as their model's
+  square at the height the game's run gives (`moby_states.json` keeps
+  each moby's place); the game's ripples are not drawn.
 - Moby animations run at the game's 60 Hz tick, as ReRAC infers it. Godot
   interpolates rotation keys spherically where the game lerps, and a joint
   channel that stays within 1e-5 of the bind pose (1e-4 for rotations) is

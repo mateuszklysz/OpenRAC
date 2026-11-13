@@ -1,5 +1,5 @@
 {
-  "about": "What a class's own code does to a placed moby when the level starts, which the level data alone does not show (rc1/moby.gd reads it). Each rule names the function it comes from. Offsets are byte offsets into the moby's pvars. \"game_hidden\": the game's run (moby_states.json) hides it, but not for the reason the editor shows; the text says why it is drawn anyway.",
+  "about": "What a class's own code does to a placed moby when the level starts, which the level data alone does not show (rc1/moby.gd reads it). Each rule names the function it comes from. Offsets are byte offsets into the moby's pvars. \"game_hidden\": the game's run (moby_states.json) hides it, but not for the reason the editor shows; the text says why it is drawn anyway. \"drawn_by_code\": its model is never drawn, its class's code draws something else, the text says what; \"effect\" is what the editor draws for it (\"nanotech\", \"electric_gate\", or \"game_height\": the model where the game's run puts it), only in the states listed in \"effect_states\" when there is that list.",
   "classes": {
     "572": {
       "name": "large_amoeboid",
@@ -45,11 +45,14 @@
     },
     "831": {
       "name": "water",
-      "game_hidden": "Its model is hidden; its class's code draws it instead, so the editor shows the model."
+      "drawn_by_code": "Its model is not drawn: its class's code draws a rippling water patch (render_water_grids) at the height the game's run gives, where the editor shows the model's square instead.",
+      "effect": "game_height"
     },
     "838": {
       "name": "electric_gate",
-      "game_hidden": "Its model is hidden; its class's code draws it instead, so the editor shows the model."
+      "drawn_by_code": "Its model is not drawn: while shut (state 1) its class's code draws five beams across it (draw_electric_gate_beams), which the editor draws too.",
+      "effect": "electric_gate",
+      "effect_states": [1]
     },
     "44": {
       "name": "sentrybot",

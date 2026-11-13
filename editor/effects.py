@@ -13,6 +13,12 @@ nanotech() reads those tables from the level's program, where they sit together 
 sphere's 290 vertices, texture coordinates and colours, the glow ring's 96 vertices and 32
 quads, the shimmer's 16 vertices and 4 quads); rc1/nanotech.gd draws them.
 
+Rilgar's electric gates (class 838) hide their model and draw five beams instead
+(draw_electric_gate_beams): each beam is two added quads, a thin outer one and a thicker inner
+one, 10 long across the gate at heights 1 to 5 in its frame, in effect texture 19, their
+colours pulsing between two reds over 64 frames, each beam a fifth of the way on.
+electric_gate() reads its tables and values from the level program by the disc's addresses.
+
 Its sparks: eight points circle the ball, each about an axis of its own, and leave a trail
 of fading particles. The trail's particle texture is the one the level's particle type list
 gives type 62, mode 2 (spark_texture; Rilgar: 33). Each point also carries a bigger particle;
@@ -140,3 +146,59 @@ def nanotech(level: Level) -> dict | None:
             "ring": {"vertices": vectors(RING, RING_VERTICES), "quads": quads(RING_INDICES, RING_QUADS)},
             "shimmer": {"vertices": vectors(SHIMMER, SHIMMER_VERTICES),
                         "quads": quads(SHIMMER_INDICES, SHIMMER_QUADS)}}
+
+
+# The electric gate's tables and values in level 05's program (names.tsv, names_ntsc.tsv), by
+# the disc's version: the quads' texture coordinates, outer and inner corners (4 quadwords
+# each), the colours (outer from, outer to, inner from, inner to) and the effect texture.
+GATE_ADDRESSES = {"ntsc": {"uvs": 0x0020B740, "outer": 0x0020B760, "inner": 0x0020B7A0,
+                           "colours": 0x00161D3C, "texture": 0x00161D98},
+                  "pal": {"uvs": 0x0020BA80, "outer": 0x0020BAA0, "inner": 0x0020BAE0,
+                          "colours": 0x00161DFC, "texture": 0x00161E58}}
+GATE_LEVEL = 5
+
+
+def program_reader(level: Level):
+    """A function reading N bytes at an address of the level's program, None outside its
+    sections; None when the level has no program."""
+    raw = level.stored.get("overlay")
+    if not raw:
+        return None
+    program = decoded(raw)
+    try:
+        sections = overlay_sections(program)["sections"]
+    except FormatError:
+        return None
+
+    def read(address: int, size: int) -> bytes | None:
+        for section in sections:
+            if section["address"] <= address and address + size <= section["address"] + section["bytes"]:
+                at = section["offset"] + address - section["address"]
+                return program[at:at + size]
+        return None
+    return read
+
+
+def electric_gate(level: Level) -> dict | None:
+    """The electric gate's beams (module doc), or None for a level or disc without them."""
+    addresses = GATE_ADDRESSES.get(level.version)
+    read = program_reader(level) if addresses is not None and level.id == GATE_LEVEL else None
+    if read is None:
+        return None
+    parts = {name: read(address, {"uvs": 32, "outer": 64, "inner": 64, "colours": 16, "texture": 4}[name])
+             for name, address in addresses.items()}
+    if any(part is None for part in parts.values()):
+        return None
+
+    def corners(data: bytes) -> list:
+        return [list(unpack("<3f", data, 16 * i)) for i in range(4)]
+
+    colours = [[c & 0xFF, c >> 8 & 0xFF, c >> 16 & 0xFF, c >> 24] for c in unpack("<4I", parts["colours"], 0)]
+    gate = {"uvs": [list(unpack("<2f", parts["uvs"], 8 * i)) for i in range(4)],
+            "outer": corners(parts["outer"]), "inner": corners(parts["inner"]),
+            "outer_colours": colours[0:2], "inner_colours": colours[2:4],
+            "texture": unpack("<i", parts["texture"], 0)[0]}
+    # A program that is not the one these addresses are for: its corners are no beam.
+    if any(abs(c[0]) > 1e-6 or not 0 < abs(c[1]) < 100 for c in gate["outer"] + gate["inner"]):
+        return None
+    return gate
