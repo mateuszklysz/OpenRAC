@@ -1,0 +1,31 @@
+{
+  "about": "What a class's own code does to a placed moby when the level starts, which the level data alone does not show (rc1/moby.gd reads it). Each rule names the function it comes from. Offsets are byte offsets into the moby's pvars.",
+  "classes": {
+    "572": {
+      "name": "large_amoeboid",
+      "source": "large_amoeboid_update (games/rac1/decomp/src/overlays/shared/water_pool_and_sand_mouse.c), state 0",
+      "hidden_unless_pvar": ["0x230", "0x258"],
+      "trigger_volume_pvar": "0x25C",
+      "progress": "Seen hidden in the port while Ratchet is far from it, by code not traced yet."
+    },
+    "865": {
+      "name": "medium_amoeboid",
+      "source": "large_amoeboid_update (shared with 572), state 0",
+      "hidden_unless_pvar": ["0x230", "0x258"],
+      "trigger_volume_pvar": "0x25C"
+    },
+    "866": {
+      "name": "small_amoeboid",
+      "source": "large_amoeboid_update (shared with 572), state 0",
+      "hidden_unless_pvar": ["0x230", "0x258"],
+      "trigger_volume_pvar": "0x25C"
+    },
+    "501": {
+      "name": "nanotech_crate",
+      "source": "crate_update, create_linked_class_0326_moby and draw_nanotech_ball (games/rac1/decomp/src/overlays/shared/nanotech_ball_and_suck_cannon.c)",
+      "effect": "nanotech",
+      "looks": ["whole", "broken"],
+      "progress": "Once Ratchet breaks it, its nanotech ball stays where it was until he picks it up, which he does only below full health."
+    }
+  }
+}

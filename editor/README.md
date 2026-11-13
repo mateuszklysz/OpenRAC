@@ -914,6 +914,18 @@ Approximations:
 - A placed moby plays its class's sequence 0, the one the game starts
   every moby on, looping; in the editor it follows the cutscene preview's
   time. What its update function plays later is not known to the editor.
+- A placed moby starts as the game starts it (`rc1/moby.gd`, Ratchet &
+  Clank): the Inspector's Start state says whether the game shows it and
+  why. It reads the moby's spawn flags (spawned only before, or only
+  after, a mission of the planet is done; gone once killed or picked up)
+  and its class's rule in `rc1/class_rules.json`, taken from the class's
+  code (an amoeboid hides itself unless its pvars say otherwise). A moby
+  the game hides is not drawn; the project setting
+  `openrac/editor/show_hidden_mobys` draws it faint. "Depends on the
+  game" marks what the player's save or progress decides. The nanotech
+  crate's ball, which the game's code draws (`effects.py`,
+  `rc1/nanotech.gd`), is drawn inside the crate, or alone with Preview
+  Look set to broken; its sparks are not.
 - Moby animations run at the game's 60 Hz tick, as ReRAC infers it. Godot
   interpolates rotation keys spherically where the game lerps, and a joint
   channel that stays within 1e-5 of the bind pose (1e-4 for rotations) is

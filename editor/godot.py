@@ -31,6 +31,7 @@ import struct
 from pathlib import Path
 
 from collision import Collision, collision_mesh, decode
+import effects
 import collision_scene
 from formats import FormatError, png, unpack
 from lighting import light_bank, light_shrub_instance, light_tie_instance
@@ -63,6 +64,7 @@ SCHEMA = PROJECT_FORMAT["schema"]
 COLLISION_ALPHA = 0.55
 MIN_SCALE = 1e-4  # the smallest joint scale the editor's models get (LevelWriter.scale)
 PANORAMA = (2048, 1024)  # About one texel per pixel around the horizon.
+NANOTECH_CRATE = 501  # Ratchet & Clank's nanotech crate: its ball is drawn by code (effects.py)
 # project.godot's [rendering] buffer for instance shader parameters: each tie's and shrub's light
 # row and each moby's light (rc1/lit_object.gdshader, rc1/lit_moby.gdshader) take room in it.
 
@@ -451,6 +453,22 @@ class LevelWriter:
         self.stats[f"{family}s"] = {"classes": len(classes), "instances": len(placements),
                                     "class_triangles": sum(m.triangles for m in classes.values())}
 
+    def write_nanotech(self) -> None:
+        """The nanotech ball's tables and effect textures (effects.py) for rc1/nanotech.gd:
+        effects/nanotech.json, effects/fx_<n>.png. Nothing when the level's program has none."""
+        tables = effects.nanotech(self.level)
+        if tables is None:
+            return
+        out = self.dir / "effects"
+        out.mkdir(exist_ok=True)
+        for index in (effects.BALL_TEXTURE, effects.RING_TEXTURE):
+            texture = effects.effect_texture(self.level, index)
+            if texture is None:
+                return
+            (out / f"fx_{index}.png").write_bytes(texture.png())
+        tables["textures"] = {"ball": f"fx_{effects.BALL_TEXTURE}.png", "ring": f"fx_{effects.RING_TEXTURE}.png"}
+        (out / "nanotech.json").write_text(json.dumps(tables) + "\n")
+
     def write_mobys(self, placements: list[dict], classes: dict[int, MobyClass | None]) -> None:
         """A scene per moby class the level loads, mobys/moby_<class>.tscn,
         and an instance of it per placed moby.
@@ -497,6 +515,8 @@ class LevelWriter:
             glow = {str(c): [m.glow_rgba & 0xFF, (m.glow_rgba >> 8) & 0xFF, (m.glow_rgba >> 16) & 0xFF]
                     for c, m in models.items() if m.glow_rgba}
             (self.dir / "moby_glow.json").write_text(json.dumps(glow) + "\n")
+        if self.godot_scales and self.fmt.class_names and NANOTECH_CRATE in placed:
+            self.write_nanotech()
         for p in placements:
             fields = {f"metadata__rc1_{k}": v for k, v in {"index": p["index"], **p["fields"]}.items()}
             fields.update(self.moby_extra.get(p["index"], {}))
