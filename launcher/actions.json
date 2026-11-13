@@ -234,7 +234,10 @@
         "args": [
           "--path",
           "assets/levels/rac1/pal/level_{level}",
-          "-e"
+          "-e",
+          "--",
+          "--openrac-data",
+          "{data}"
         ],
         "output": "assets/levels/rac1/pal/level_{level}",
         "cwd": ".",
@@ -998,7 +1001,10 @@
         "args": [
           "--path",
           "assets/levels/rac1/ntsc/level_{level}",
-          "-e"
+          "-e",
+          "--",
+          "--openrac-data",
+          "{data}"
         ],
         "output": "assets/levels/rac1/ntsc/level_{level}",
         "cwd": ".",
@@ -1635,7 +1641,10 @@
         "args": [
           "--path",
           "assets/levels/rac1/pal1/level_{level}",
-          "-e"
+          "-e",
+          "--",
+          "--openrac-data",
+          "{data}"
         ],
         "output": "assets/levels/rac1/pal1/level_{level}",
         "cwd": ".",
@@ -2154,7 +2163,10 @@
         "args": [
           "--path",
           "assets/levels/rac1/jp/level_{level}",
-          "-e"
+          "-e",
+          "--",
+          "--openrac-data",
+          "{data}"
         ],
         "output": "assets/levels/rac1/jp/level_{level}",
         "cwd": ".",

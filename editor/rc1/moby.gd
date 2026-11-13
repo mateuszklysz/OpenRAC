@@ -88,6 +88,9 @@ static var rules: Dictionary = {}
 ## Each level folder's moby_states.json: {"time": modified time, "mobys": {key: moby}}.
 static var level_states: Dictionary = {}
 
+## The level folders the states program was run for this session (run once each).
+static var states_tried: Dictionary = {}
+
 ## The game's state of this moby when the level starts (moby_states.json), or empty.
 var game_state: Dictionary = {}
 
@@ -301,6 +304,10 @@ func decide_start() -> void:
 func game_states() -> Variant:
 	var path: String = scene_file_path.get_base_dir().get_base_dir().path_join("moby_states.json")
 
+	if not FileAccess.file_exists(path) and not states_tried.has(path):
+		states_tried[path] = true
+		run_states(path)
+
 	if not FileAccess.file_exists(path):
 		return null
 
@@ -319,6 +326,45 @@ func game_states() -> Variant:
 		level_states[path] = known
 
 	return known
+
+
+## Runs the port's states program (moby_states.py does the same from a shell) for the level
+## whose moby_states.json is PATH, when the program, the game's data and the port's levels are
+## found: the data from the editor's command line (--openrac-data DIR after --, as the launcher
+## opens a level) or OPENRAC_DATA, the rest from the checkout the project sits in
+## (assets/levels/rac1/<version>/level_NN).
+static func run_states(path: String) -> void:
+	var folder: String = ProjectSettings.globalize_path(path.get_base_dir())
+	var stats: Variant = JSON.parse_string(FileAccess.get_file_as_string(folder.path_join("level.json")))
+
+	if not stats is Dictionary:
+		return
+
+	var version: String = String(stats.get("version", "ntsc"))
+	var root: String = ProjectSettings.globalize_path("res://").path_join("../../../../..").simplify_path()
+	var program: String = root.path_join("port/build/release/openrac-rac1-%s-states" % version)
+
+	if OS.get_name() == "Windows":
+		program += ".exe"
+
+	var data: String = OS.get_environment("OPENRAC_DATA")
+	var args: PackedStringArray = OS.get_cmdline_user_args()
+	var at: int = args.find("--openrac-data")
+
+	if at >= 0 and at + 1 < args.size():
+		data = args[at + 1]
+
+	var levels: String = root.path_join("assets/port/rac1").path_join(version)
+
+	if data == "" or not FileAccess.file_exists(program) or not DirAccess.dir_exists_absolute(levels):
+		return
+
+	var output: Array = []
+	var code: int = OS.execute(program, ["--data", data, "--levels", levels, "--level", str(int(stats["level"])),
+		"--moby-states", ProjectSettings.globalize_path(path)], output, true)
+
+	if code != 0:
+		push_warning("The moby states program failed for %s: %s" % [path, "".join(output).right(400)])
 
 
 ## The start state the game's run gave.

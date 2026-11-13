@@ -916,7 +916,13 @@ Approximations:
   time. What its update function plays later is not known to the editor.
 - A placed moby starts as the game starts it (`rc1/moby.gd`, Ratchet &
   Clank): the Inspector's Start state says whether the game shows it and
-  why. The game's own code decides it: `moby_states.py PROJECT --data
+  why. The game's own code decides it: on opening a level the editor
+  runs the port's states program once if the level has no
+  `moby_states.json` yet (it needs the build's
+  `port/build/release/openrac-rac1-<version>-states`, the port's levels
+  in `assets/port/rac1/<version>` and the game's data, which the
+  launcher passes as `-- --openrac-data DIR`). From a shell,
+  `moby_states.py PROJECT --data
   DIR --levels DIR` runs the port's states program
   (`openrac-rac1-ntsc-states`, under a second a level) and writes
   `moby_states.json` beside `level.json`: a moby missing from it is not
