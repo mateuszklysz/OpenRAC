@@ -436,7 +436,9 @@ class LevelWriter:
         rows = {p["index"]: row for row, p in enumerate(lit)}
         if lit:
             width = max(len(p["colours"]) for p in lit)
-            pixels = b"".join(bytes(v for c in p["colours"] for v in c).ljust(width * 4, b"\x80") for p in lit)
+            # RGBA lists here, RGBA words packed little-endian for the port (port.py): the same bytes.
+            pixels = b"".join(b"".join(struct.pack("<I", c) if isinstance(c, int) else bytes(c) for c in p["colours"])
+                              .ljust(width * 4, b"\x80") for p in lit)
             (self.dir / f"{family}s_light.png").write_bytes(png(width, len(lit), 6, pixels))
         for p in placements:
             fields = {f"metadata__rc1_{k}": v for k, v in p.items()
