@@ -463,6 +463,13 @@ void end_deferred(const Target& t) {
     }
 
     const VkExtent2D area = info.renderArea.extent;
+    if (t.depth != nullptr && t.depth == g->default_depth.get()) {
+        static unsigned n = 0;
+        if (++n % 240 == 0 || pass.used_depth || clear_depth || clear_stencil) {
+            static unsigned m = 0;
+            if (++m < 40) log::warn("DBGFB0DEPTH used {} clear {} {} area {}x{} samples {}", pass.used_depth, clear_depth, clear_stencil, area.width, area.height, int(t.samples));
+        }
+    }
 
     // An attachment no draw or clear of the pass touched keeps what it held, unread and unwritten
     // (attachment-untouched; it stays as let go as it was).
@@ -584,8 +591,24 @@ void end_deferred(const Target& t) {
     }
 }
 
-void begin_rendering(const Target& t, const Clear& clear) {
+void begin_rendering(const Target& t, const Clear& given) {
     end_rendering(PassEnd::Target);
+    Clear clear = given;
+
+    // DIAGNOSTIC (temporary): the default framebuffer's depth image cleared at every pass, or at
+    // its first pass only.
+    static const bool dbg_clear_all = std::getenv("OPENRAC_DBG_FB0_DEPTH_CLEAR") != nullptr;
+    static const bool dbg_clear_once = std::getenv("OPENRAC_DBG_FB0_DEPTH_CLEAR_ONCE") != nullptr;
+    static std::uint64_t dbg_cleared_serial = 0;
+    if (t.depth != nullptr && t.depth == g->default_depth.get()
+        && (dbg_clear_all || (dbg_clear_once && dbg_cleared_serial != t.depth->serial))) {
+        if (dbg_cleared_serial != t.depth->serial) {
+            log::warn("DBGFB0CLEAR depth image {}", t.depth->serial);
+        }
+        dbg_cleared_serial = t.depth->serial;
+        clear.depth = true;
+        clear.stencil = has_stencil(t.depth->format);
+    }
 
     // Choose operations at the pass's end; record directly if deferred setup fails.
     if (!begin_deferred(t, clear)) {
