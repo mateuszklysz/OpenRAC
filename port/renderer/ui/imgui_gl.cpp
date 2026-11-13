@@ -193,6 +193,14 @@ void render(const ImDrawData* data) {
             glScissor(static_cast<GLint>(x0), static_cast<GLint>(static_cast<float>(height) - y1),
                       static_cast<GLsizei>(x1 - x0), static_cast<GLsizei>(y1 - y0));
             glBindTexture(GL_TEXTURE_2D, static_cast<GLuint>(cmd.GetTexID()));
+            static const bool dbg_per_cmd = std::getenv("OPENRAC_DBG_IMGUI_PERCMD") != nullptr;
+            if (dbg_per_cmd) {
+                // DIAGNOSTIC (temporary): each command's indices uploaded alone, drawn from 0.
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(cmd.ElemCount) * sizeof(ImDrawIdx),
+                             list->IdxBuffer.Data + cmd.IdxOffset, GL_STREAM_DRAW);
+                glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(cmd.ElemCount), index_type, nullptr);
+                continue;
+            }
             glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(cmd.ElemCount), index_type,
                            reinterpret_cast<const void*>(static_cast<std::uintptr_t>(cmd.IdxOffset) * sizeof(ImDrawIdx)));
         }

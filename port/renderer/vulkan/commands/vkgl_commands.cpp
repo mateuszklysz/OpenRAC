@@ -367,6 +367,13 @@ void begin_direct(const Target& t, const Clear& clear) {
 // the barriers go into `main` now, and `main` points at a secondary buffer until end_rendering.
 // False when no secondary buffer can be had, and nothing is begun.
 bool begin_deferred(const Target& t, const Clear& clear) {
+    // DIAGNOSTIC (temporary): every pass, or the default framebuffer's, recorded directly.
+    static const bool dbg_direct = std::getenv("OPENRAC_DBG_DIRECT_PASSES") != nullptr;
+    static const bool dbg_direct_fb0 = std::getenv("OPENRAC_DBG_DIRECT_FB0") != nullptr;
+    if (dbg_direct
+        || (dbg_direct_fb0 && t.colour != nullptr && t.colour == g->default_colour.get())) {
+        return false;
+    }
     const VkCommandBuffer secondary = secondary_for(t);
 
     // No buffer to defer into: the pass is recorded directly.
@@ -429,7 +436,8 @@ void end_deferred(const Target& t) {
     // Only the rectangle the draws and clears touched is loaded and stored (pass-render-area); a
     // clear that came first and covers all of it makes the pass begin cleared instead of loading.
     // That clear is still in the pass's buffer, so the value the pass begins with is not seen.
-    if (pass.touched && render_opt::enabled(render_opt::Opt::PassRenderArea)) {
+    static const bool dbg_full_area = std::getenv("OPENRAC_DBG_FULL_AREA") != nullptr;
+    if (pass.touched && render_opt::enabled(render_opt::Opt::PassRenderArea) && !dbg_full_area) {
         info.renderArea =
             {{pass.x0, pass.y0},
              {static_cast<std::uint32_t>(pass.x1 - pass.x0),
