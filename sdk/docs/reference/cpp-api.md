@@ -360,6 +360,9 @@ One of the mod's pages of the game's own menus (Mod::ui_page): set what it shows
 | `bool moby_joint_position(int slot, int joint, float out[3]) const` | Since 1.14 (SDK 1.14.8): where joint `joint` of the moby in `slot` is, as last drawn. |
 | `int moby_sound_play(int slot, int sound, bool loop) const` | Since 1.14 (SDK 1.14.8): one of the moby's class's sounds on it; its voice, or -1. |
 | `void moby_sound_stop(int voice) const` | Since 1.14 (SDK 1.14.8): stops a voice moby_sound_play gave. |
+| `bool scene_air(const openrac_air* air) const` | Since 1.14 (SDK 1.14.8): the fog and background the picture is drawn with (nullptr: the game's again); false outside a level, for a value out of range or a port without it. |
+| `bool time_stretch(float stretch) const` | Since 1.14 (SDK 1.14.8): slow motion, each tick `stretch` (1 to 8) times as long; false for a value out of range or a port without it. |
+| `bool tie_hide(int tie, bool hidden) const` | Since 1.14 (SDK 1.14.8): hides the level's tie `tie` from the picture, or shows it again; false outside a level, for no such tie or a port without it. |
 | `bool moby_run(int slot, openrac_moby_run& out) const` | Since 1.9: how the game ran the level's mobys in the last tick, and the moby in `slot` (-1: none) in it, into `out`; false outside a level or for a port without it. |
 | `int moby_slot_of(gaddr moby) const` | Since 1.9: the slot of the moby at game address `moby` (a hook point's argument), -1 none. |
 | `bool play_overlay_pause(bool on) const` | Since 1.9: the world keeps running under the game's menus while `on`; false for a game without it. |

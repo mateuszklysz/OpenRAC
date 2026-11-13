@@ -2124,6 +2124,24 @@ public:
         }
     }
 
+    // Since 1.14 (SDK 1.14.8): the fog and background the picture is drawn with (nullptr: the
+    // game's again); false outside a level, for a value out of range or a port without it.
+    bool scene_air(const openrac_air* air) const {
+        return has_slot14(offsetof(openrac_api, scene_air)) && m_api->scene_air(m_handle, air) == OPENRAC_HOOK_OK;
+    }
+
+    // Since 1.14 (SDK 1.14.8): slow motion, each tick `stretch` (1 to 8) times as long; false for
+    // a value out of range or a port without it.
+    bool time_stretch(float stretch) const {
+        return has_slot14(offsetof(openrac_api, time_stretch)) && m_api->time_stretch(m_handle, stretch) == OPENRAC_HOOK_OK;
+    }
+
+    // Since 1.14 (SDK 1.14.8): hides the level's tie `tie` from the picture, or shows it again;
+    // false outside a level, for no such tie or a port without it.
+    bool tie_hide(int tie, bool hidden) const {
+        return has_slot14(offsetof(openrac_api, tie_hide)) && m_api->tie_hide(m_handle, tie, hidden ? 1 : 0) == OPENRAC_HOOK_OK;
+    }
+
     // Since 1.9: how the game ran the level's mobys in the last tick, and the moby in `slot` (-1:
     // none) in it, into `out`; false outside a level or for a port without it.
     bool moby_run(int slot, openrac_moby_run& out) const {

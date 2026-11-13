@@ -1777,7 +1777,8 @@ void a_scene_reaches_the_game(const fs::path& plugins) {
     CHECK(!mods::hud_hidden());
     mods::frame();
     CHECK((g_records == std::vector<int>{9801, 9800, 9811, 9811, 9810, 9820, 9831, 9830, 9840,
-                                         9841, 9841, 9850, 0x3100 + 3, 9851, 9865, 9869}));
+                                         9841, 9841, 9850, 0x3100 + 3, 9851, 9865, 9869, 9881, 9880,
+                                         9891, 9890, 9901, 9900, 9900}));
     CHECK(
         (g_cutscene_calls
          == std::vector<std::string>{
@@ -1790,10 +1791,18 @@ void a_scene_reaches_the_game(const fs::path& plugins) {
     );
     CHECK(mods::camera_fov() == 40.0f);
     CHECK(mods::hud_hidden());
-    // The level loaded again: the field of view and the hidden HUD went with it.
+    const auto air = mods::scene_air();
+    CHECK(air && air->fog_far == 50.0f && air->background[0] == 1.0f && air->weight == 1.0f);
+    CHECK(mods::time_stretch() == 2.0f);
+    CHECK((mods::hidden_ties() == std::vector<int>{3, 7}));
+    // The level loaded again: the field of view, the hidden HUD, the air, the slow motion and the
+    // hidden ties went with it.
     g_loads = 2;
     CHECK(mods::camera_fov() == 0.0f);
     CHECK(!mods::hud_hidden());
+    CHECK(!mods::scene_air());
+    CHECK(mods::time_stretch() == 1.0f);
+    CHECK(mods::hidden_ties().empty());
     // The mods go: the music back at full, the joints and the camera let go.
     g_cutscene_calls.clear();
     mods::reset();

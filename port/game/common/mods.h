@@ -16,6 +16,7 @@
 #include <filesystem>
 #include <string>
 #include <string_view>
+#include <optional>
 #include <vector>
 
 #include "openrac/game_host.h"
@@ -235,6 +236,18 @@ float camera_fov();
 
 // Whether a mod hides the game's own HUD this level load (openrac_api.hud_hide).
 bool hud_hidden();
+
+// The air a mod draws this level load with (openrac_api.scene_air), none for the game's own. From
+// any thread.
+std::optional<openrac_air> scene_air();
+
+// How many times as long a game tick lasts for the mods' slow motion this level load
+// (openrac_api.time_stretch), 1 for the game's speed. From any thread.
+float time_stretch();
+
+// The level's ties the mods hide from the picture this level load (openrac_api.tie_hide), sorted.
+// From any thread.
+std::vector<int> hidden_ties();
 
 // Play (interface 1.8, mod_play.h): the start or travel a mod asked for, done now, on the game's
 // thread after the frame's menus (frontend/frame.cpp, beside the developer menu's start); nothing

@@ -362,7 +362,13 @@ void set_camera(SceneFrame& frame) {
         scene.has_camera ? guard_camera(owner, state, camera, scene.frame) : std::nullopt;
     const bool has_camera = drawn.has_value();
     frame.has_camera = has_camera;
-    const auto background = scene.state.background_or(owner.level.background);
+    auto background = scene.state.background_or(owner.level.background);
+    // A mod's scene air (openrac_api.scene_air) over the game's background: in the picture only.
+    if (const auto air = mods::scene_air(); air && (air->flags & OPENRAC_AIR_BACKGROUND) != 0) {
+        for (int i = 0; i < 3; ++i) {
+            background[i] += (air->background[i] - background[i]) * air->weight;
+        }
+    }
     input.clear_colour = has_camera && (scene.draws & kLevelLayers) != 0
                              ? std::array<float, 4>{background[0], background[1], background[2], 1}
                              : std::array<float, 4>{0, 0, 0, 1};

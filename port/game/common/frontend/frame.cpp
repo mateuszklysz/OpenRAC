@@ -2068,9 +2068,23 @@ TickMobys pose_mobys(
 
 // Gives the scene this tick's fog and the lights as the game holds them.
 void light_scene(std::span<const std::uint8_t> ram, const host::GameState& state) {
-    g->scene.set_fog(
-        state.fog_colour, state.fog_near, state.fog_far, state.fog_near_f, state.fog_far_f
-    );
+    // A mod's scene air (openrac_api.scene_air) over the game's fog: in the picture only.
+    std::array<float, 3> fog_colour = state.fog_colour;
+    float fog_near = state.fog_near, fog_far = state.fog_far;
+    float fog_near_f = state.fog_near_f, fog_far_f = state.fog_far_f;
+    if (const auto air = mods::scene_air(); air && (air->flags & OPENRAC_AIR_FOG) != 0) {
+        const float w = air->weight;
+        const auto mix = [w](float a, float b) { return a + (b - a) * w; };
+        for (int i = 0; i < 3; ++i) {
+            fog_colour[i] = mix(fog_colour[i], air->fog_colour[i]);
+        }
+        // The game's depths are its units x 1024; F is 255 for none, 0 for all fog.
+        fog_near = mix(fog_near, air->fog_near * 1024.0f);
+        fog_far = mix(fog_far, air->fog_far * 1024.0f);
+        fog_near_f = mix(fog_near_f, 255.0f);
+        fog_far_f = mix(fog_far_f, 255.0f * (1.0f - air->fog_thickness));
+    }
+    g->scene.set_fog(fog_colour, fog_near, fog_far, fog_near_f, fog_far_f);
     // The light bank as the game holds it now (16 sets of 0x40 bytes; the executable's, each
     // level's copy elsewhere): the level loader fills it from the gameplay file, and the game changes
     // sets at run time (the page menus write set 14 for their frame mobys, fog zones the hero's).
@@ -2172,6 +2186,7 @@ void keep_tick(
                                   : std::array<std::vector<std::array<float, 12>>, 2>{};
         k.scenery = std::move(*mobys.scenery);
     }
+    k.scenery.mod_hidden_ties = mods::hidden_ties();
     k.hero_airborne =
         g->profile->hero_state() != 0
             ? scene::hero_airborne(

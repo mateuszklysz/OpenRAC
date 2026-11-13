@@ -162,6 +162,8 @@ checks api->api_minor before it uses anything newer than the minor it was built 
 | `OPENRAC_PROP_OPAQUE` | `0u` | openrac_prop_pose.blend: drawn as it is, blended at its alpha (the tint's alpha times the texture's), or added to what is behind it (its colour times its alpha). Since 1.12. |
 | `OPENRAC_PROP_ALPHA` | `1u` |  |
 | `OPENRAC_PROP_ADD` | `2u` |  |
+| `OPENRAC_AIR_FOG` | `0x1u` | the fog: fog_colour, fog_near, fog_far, fog_thickness |
+| `OPENRAC_AIR_BACKGROUND` | `0x2u` | the colour behind the world, where no sky covers |
 | `OPENRAC_JOINT_OFFSETS_MAX` | `128` | The most joints one hero_set_joints call turns. Since 1.12. |
 | `OPENRAC_SOUNDS_MAX` | `64` | The most sounds a mod loads (openrac_api.sound_load), and the most voices the mods play at once (openrac_api.sound_play). Since 1.12. |
 | `OPENRAC_SOUND_VOICES_MAX` | `16` |  |
@@ -717,6 +719,22 @@ Since 1.12.
 | `float rotation[4]` |  |
 | `float translation[3]` |  |
 
+## `openrac_air`
+
+The air a scene asks for (scene_air): laid over the game's by `weight`, in the picture only.
+Since 1.14.
+
+| Member | |
+|---|---|
+| `uint32_t size` | sizeof(openrac_air), set by the caller. |
+| `uint32_t flags` | OPENRAC_AIR_* bits. |
+| `float fog_colour[3]` | The fog's colour (0 to 1 each), where it starts and where it is thickest (the game's units from the camera), and how thick it is there (0 none, 1 the world hidden). |
+| `float fog_near` |  |
+| `float fog_far` |  |
+| `float fog_thickness` |  |
+| `float background[3]` | The colour behind the world (0 to 1 each). |
+| `float weight` | 0 the game's own, 1 these, between them a blend. |
+
 ## `openrac_camera`
 
 A camera (openrac_api.camera_view and camera_set), in the game's units and axes (z up): the
@@ -1072,3 +1090,6 @@ sees them, and one built for 1.2 loads on a 1.2 port or newer.
 | `int (*moby_joint_position)(int slot, int joint, float out[3])` | Where joint `joint` of the moby in `slot` is in the level now (the game's units), as last drawn: its pose with the mods' offsets, placed by the moby's matrix and scale. Returns OPENRAC_HOOK_OK, or OPENRAC_HOOK_UNKNOWN for no moby, no such joint or a port without it. Since 1.14. |
 | `int (*moby_sound_play)(openrac_mod* mod, int slot, int sound, int loop)` | hero_sound_play on any moby of the level: entry `sound` of its class's sound table, heard from where it is. Its voice (0 up), or -1. A looping one stops with moby_sound_stop, the level or the mod. Since 1.14. |
 | `void (*moby_sound_stop)(openrac_mod* mod, int voice)` | Stops a voice moby_sound_play gave, if it still plays on that moby. Since 1.14. |
+| `int (*scene_air)(openrac_mod* mod, const openrac_air* air)` | The fog and the colour behind the world the picture is drawn with (null: the game's again), by `air->weight` over the game's. The game's own fog, which its logic may read, stays. The last mod to set it is drawn; it goes with the level and with the mod. Returns OPENRAC_HOOK_OK, or OPENRAC_HOOK_UNKNOWN outside a level or for a value out of range. Since 1.14. |
+| `int (*time_stretch)(openrac_mod* mod, float stretch)` | Slow motion: each of the game's ticks lasts `stretch` times as long (1 to 8; 1 the game's speed). The game runs the same ticks, only slower, and the picture moves smoothly between them; its sound plays as it does then. The slowest mod's applies; it goes with the level and with the mod. Returns OPENRAC_HOOK_OK, or OPENRAC_HOOK_UNKNOWN for a value out of range. Since 1.14. |
+| `int (*tie_hide)(openrac_mod* mod, int tie, int hidden)` | Hides the level's tie (its scenery) `tie` (its index in the level, as the editor lists it) from the picture (1) or shows it again (0); the game's collision and logic keep it. Goes with the level and with the mod. Returns OPENRAC_HOOK_OK, or OPENRAC_HOOK_UNKNOWN outside a level or for a tie the level does not have. Since 1.14. |

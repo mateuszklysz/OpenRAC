@@ -211,9 +211,14 @@ void apply_writes() {
 // before the first).
 std::chrono::steady_clock::time_point g_tick_resumed{};
 
-// [debug tools] The game's tick length, stretched by the overlay's slow motion (debug_overlay.h).
+// The game's tick length, stretched by a mod's slow motion (time_stretch) and the overlay's
+// [debug tools] (debug_overlay.h).
 std::chrono::microseconds tick_period() {
     auto period = std::chrono::microseconds(1000000 / tick_rate());
+    // A mod's slow motion (openrac_api.time_stretch): the same ticks, each lasting longer.
+    if (const float stretch = mods::time_stretch(); stretch > 1.0f) {
+        period = std::chrono::microseconds(std::llround(static_cast<double>(period.count()) * stretch));
+    }
 #ifdef OPENRAC_FRONTEND
     if (g_window) {
         period = std::chrono::microseconds(

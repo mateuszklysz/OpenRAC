@@ -27,7 +27,7 @@
  * a mod that moves the hero (motion_frame: 9500s): his pose set, the collision triangles, a prop
  * and a sound (interface 1.12). With "cutscene" it uses what a scene needs (cutscene_frame:
  * 9800s): the camera's field of view, the HUD hidden, the music ducked, a moby's joints, a joint's
- * place and a moby's sound (SDK 1.14.8). It reports the interface it is
+ * place, a moby's sound, the scene's air, slow motion and a hidden tie (SDK 1.14.8). It reports the interface it is
  * built for
  * (OPENRAC_MOD_TARGET_MINOR): test-old is built for 1.5. */
 #include <stddef.h>
@@ -393,6 +393,7 @@ static void cutscene_frame(void) {
     openrac_joint_offset joint;
     float at[3] = {0.0f, 0.0f, 0.0f};
     int voice;
+    openrac_air air;
     if (s_frames != 1) {
         return;
     }
@@ -422,6 +423,22 @@ static void cutscene_frame(void) {
     s_record(9860 + voice);
     s_record(9870 + s_api->moby_sound_play(s_mod, 6, 12, 0));
     s_api->moby_sound_stop(s_mod, voice);
+    memset(&air, 0, sizeof air);
+    air.size = sizeof air;
+    air.flags = OPENRAC_AIR_FOG | OPENRAC_AIR_BACKGROUND;
+    air.fog_near = 10.0f;
+    air.fog_far = 5.0f; /* nearer than it starts: refused */
+    s_record(9880 + -s_api->scene_air(s_mod, &air));
+    air.fog_far = 50.0f;
+    air.fog_thickness = 0.5f;
+    air.background[0] = 1.0f;
+    air.weight = 1.0f;
+    s_record(9880 + -s_api->scene_air(s_mod, &air));
+    s_record(9890 + -s_api->time_stretch(s_mod, 9.0f));
+    s_record(9890 + -s_api->time_stretch(s_mod, 2.0f));
+    s_record(9900 + -s_api->tie_hide(s_mod, -1, 1));
+    s_record(9900 + -s_api->tie_hide(s_mod, 7, 1));
+    s_record(9900 + -s_api->tie_hide(s_mod, 3, 1));
 }
 
 static void on_frame(void* user) {

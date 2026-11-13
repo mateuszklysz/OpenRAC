@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <optional>
 #include <array>
 #include <cctype>
 #include <cmath>
@@ -1789,6 +1790,98 @@ void api_moby_sound_stop(openrac_mod* mod, int voice) {
     g_play->moby_sound_stop(moby, voice);
 }
 
+// The air a mod draws the picture with (scene_air): the last to set it, of a level load; slow motion
+// each mod asks for (time_stretch); the ties each mod hides (tie_hide). Behind g_air_lock: the
+// window's thread reads them.
+struct AirSet {
+    const openrac_mod* mod = nullptr;
+    std::uint32_t loads = 0;
+    openrac_air air{};
+};
+std::mutex g_air_lock;
+std::optional<AirSet> g_air;
+struct Stretch {
+    const openrac_mod* mod = nullptr;
+    std::uint32_t loads = 0;
+    float stretch = 1.0f;
+};
+std::vector<Stretch> g_stretches;
+struct TieHidden {
+    const openrac_mod* mod = nullptr;
+    std::uint32_t loads = 0;
+    int tie = 0;
+};
+std::vector<TieHidden> g_ties_hidden;
+
+int api_scene_air(openrac_mod* mod, const openrac_air* air) {
+    std::int32_t level = -1;
+    if (mod == nullptr || !in_level(phase_now(&level))) {
+        return OPENRAC_HOOK_UNKNOWN;
+    }
+    const std::lock_guard<std::mutex> lock(g_air_lock);
+    if (air == nullptr) {
+        if (g_air && g_air->mod == mod) {
+            g_air.reset();
+        }
+        return OPENRAC_HOOK_OK;
+    }
+    if (air->size < sizeof(openrac_air)) {
+        return OPENRAC_HOOK_UNKNOWN;
+    }
+    const auto unit = [](float v) { return std::isfinite(v) && v >= 0.0f && v <= 1.0f; };
+    bool ok = unit(air->weight) && unit(air->fog_thickness) && std::isfinite(air->fog_near)
+              && std::isfinite(air->fog_far) && air->fog_near >= 0.0f && air->fog_far > air->fog_near;
+    for (int i = 0; i < 3; ++i) {
+        ok = ok && unit(air->fog_colour[i]) && unit(air->background[i]);
+    }
+    if (!ok) {
+        return OPENRAC_HOOK_UNKNOWN;
+    }
+    g_air = AirSet{mod, loads_now(), *air};
+    return OPENRAC_HOOK_OK;
+}
+
+int api_time_stretch(openrac_mod* mod, float stretch) {
+    if (mod == nullptr || !std::isfinite(stretch) || stretch < 1.0f || stretch > 8.0f) {
+        return OPENRAC_HOOK_UNKNOWN;
+    }
+    const std::lock_guard<std::mutex> lock(g_air_lock);
+    const std::uint32_t loads = loads_now();
+    std::erase_if(g_stretches, [&](const Stretch& s) { return s.mod == mod || s.loads != loads; });
+    if (stretch > 1.0f) {
+        g_stretches.push_back({mod, loads, stretch});
+    }
+    return OPENRAC_HOOK_OK;
+}
+
+int api_tie_hide(openrac_mod* mod, int tie, int hidden) {
+    std::int32_t level = -1;
+    if (mod == nullptr || tie < 0 || tie > 0xFFFF || !in_level(phase_now(&level))) {
+        return OPENRAC_HOOK_UNKNOWN;
+    }
+    const std::lock_guard<std::mutex> lock(g_air_lock);
+    const std::uint32_t loads = loads_now();
+    std::erase_if(g_ties_hidden, [&](const TieHidden& h) {
+        return h.loads != loads || (h.mod == mod && h.tie == tie);
+    });
+    if (hidden != 0) {
+        g_ties_hidden.push_back({mod, loads, tie});
+    }
+    return OPENRAC_HOOK_OK;
+}
+
+// The air, slow motion and hidden ties of one mod (all: null) taken off.
+void drop_air(const openrac_mod* mod) {
+    {
+        const std::lock_guard<std::mutex> lock(g_air_lock);
+        if (g_air && (mod == nullptr || g_air->mod == mod)) {
+            g_air.reset();
+        }
+        std::erase_if(g_ties_hidden, [&](const TieHidden& h) { return mod == nullptr || h.mod == mod; });
+        std::erase_if(g_stretches, [&](const Stretch& s) { return mod == nullptr || s.mod == mod; });
+    }
+}
+
 // The looping hero sounds of one mod (all: null) stopped, those of this level load still playing.
 void stop_hero_voices(const openrac_mod* mod) {
     for (const HeroVoice& v : g_hero_voices) {
@@ -2048,6 +2141,9 @@ void fill_motion_api(openrac_api& api, const Host& host) {
     api.moby_joint_position = api_moby_joint_position;
     api.moby_sound_play = api_moby_sound_play;
     api.moby_sound_stop = api_moby_sound_stop;
+    api.scene_air = api_scene_air;
+    api.time_stretch = api_time_stretch;
+    api.tie_hide = api_tie_hide;
 }
 
 float camera_fov() {
@@ -2055,6 +2151,39 @@ float camera_fov() {
     return degrees > 0.0f && g_camera_fov_loads.load(std::memory_order_relaxed) == loads_now()
                ? degrees
                : 0.0f;
+}
+
+std::optional<openrac_air> scene_air() {
+    const std::lock_guard<std::mutex> lock(g_air_lock);
+    if (!g_air || g_air->loads != loads_now()) {
+        return std::nullopt;
+    }
+    return g_air->air;
+}
+
+float time_stretch() {
+    const std::lock_guard<std::mutex> lock(g_air_lock);
+    const std::uint32_t loads = loads_now();
+    float most = 1.0f;
+    for (const Stretch& s : g_stretches) {
+        if (s.loads == loads) {
+            most = std::max(most, s.stretch);
+        }
+    }
+    return most;
+}
+
+std::vector<int> hidden_ties() {
+    const std::lock_guard<std::mutex> lock(g_air_lock);
+    const std::uint32_t loads = loads_now();
+    std::vector<int> out;
+    for (const TieHidden& h : g_ties_hidden) {
+        if (h.loads == loads) {
+            out.push_back(h.tie);
+        }
+    }
+    std::sort(out.begin(), out.end());
+    return out;
 }
 
 bool hud_hidden() {
@@ -2195,6 +2324,7 @@ bool overlay_shows_level() {
 }
 
 void reset_play() {
+    drop_air(nullptr);
     {
         const std::lock_guard<std::mutex> lock(g_notice_lock);
         g_notice.clear();
@@ -2260,6 +2390,7 @@ void reset_play() {
 }
 
 void drop_figures(const openrac_mod* mod) {
+    drop_air(mod);
     for (Figure& f : g_figures) {
         if (f.mod == mod) {
             if (live(f)) {
