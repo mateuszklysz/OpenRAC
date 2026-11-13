@@ -13,8 +13,11 @@ extends Node3D
 ## cutscene's own actor is posed by its actor node instead. Display only.
 ##
 ## Start state: what the game does with a placed moby when the level starts, which its record
-## alone does not show: its spawn flags (spawned only before or only after a mission of the
-## planet is done) and its class's rule (rc1/class_rules.json: a class whose own code hides it,
+## alone does not show. The game's own code works it out: moby_states.py runs the level for a
+## few seconds and writes moby_states.json beside level.json (a moby missing from it is not
+## there, "hidden" one the game does not draw). Without that file, and for the reasons shown,
+## its spawn flags (spawned only before or only after a mission of the planet is done) and its
+## class's rule (rc1/class_rules.json: a class whose own code hides it,
 ## or which the game's code draws more of, as the nanotech crate's ball, rc1/nanotech.gd). The
 ## Inspector shows it read-only, with its reason. A moby the game keeps hidden is not drawn, or
 ## drawn faint with the project setting openrac/editor/show_hidden_mobys. Display only: nothing
@@ -81,6 +84,12 @@ var look: String = ""
 
 ## The class rules, read once.
 static var rules: Dictionary = {}
+
+## Each level folder's moby_states.json: {"time": modified time, "mobys": {key: moby}}.
+static var level_states: Dictionary = {}
+
+## The game's state of this moby when the level starts (moby_states.json), or empty.
+var game_state: Dictionary = {}
 
 # =============================================================================
 # METHODS
@@ -210,6 +219,9 @@ func _get(property: StringName) -> Variant:
 		if depends_on_game:
 			head += " (depends on the game)"
 
+		if not game_state.is_empty():
+			head += ", state %d" % int(game_state["state"])
+
 		return head + ("\n" + "\n".join(start_reasons) if not start_reasons.is_empty() else "")
 
 	if property == &"preview_look":
@@ -265,7 +277,12 @@ func decide_start() -> void:
 
 	var rule: Dictionary = class_rules().get(str(int(get_meta("rc1_class", -1))), {})
 
-	if rule.has("hidden_unless_pvar"):
+	var states: Variant = game_states()
+
+	# The game's own run, when there is one; the class rules only explain it.
+	if states != null:
+		decide_by_game(states, rule)
+	elif rule.has("hidden_unless_pvar"):
 		decide_by_pvars(rule)
 
 	if rule.has("progress"):
@@ -277,6 +294,49 @@ func decide_start() -> void:
 
 	looks = PackedStringArray(rule.get("looks", []))
 	look = looks[0] if not looks.is_empty() else ""
+
+
+## The level's moby states from the game's run (moby_states.json), read again when the file
+## changes, or null without one.
+func game_states() -> Variant:
+	var path: String = scene_file_path.get_base_dir().get_base_dir().path_join("moby_states.json")
+
+	if not FileAccess.file_exists(path):
+		return null
+
+	var time: int = FileAccess.get_modified_time(path)
+	var known: Dictionary = level_states.get(path, {})
+
+	if known.get("time", -1) != time:
+		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+		var mobys: Dictionary = {}
+
+		if parsed is Dictionary:
+			for moby in parsed.get("mobys", []):
+				mobys[int(moby["key"])] = moby
+
+		known = {"time": time, "mobys": mobys, "ticks": int(parsed.get("ticks", 0)) if parsed is Dictionary else 0}
+		level_states[path] = known
+
+	return known
+
+
+## The start state the game's run gave.
+func decide_by_game(states: Dictionary, rule: Dictionary) -> void:
+	var seconds: float = states["ticks"] / 60.0
+	game_state = states["mobys"].get(int(get_meta("rc1_index")), {})
+
+	if game_state.is_empty():
+		hidden_at_start = true
+		start_reasons.append("Not in the level %.0f s after it starts (the game's run, moby_states.json)." % seconds)
+	elif int(game_state["dead"]) != 0:
+		hidden_at_start = true
+		start_reasons.append("Dead %.0f s after the level starts (the game's run, moby_states.json)." % seconds)
+	elif int(game_state["hidden"]) != 0 and rule.has("game_hidden"):
+		start_reasons.append(String(rule["game_hidden"]))
+	elif int(game_state["hidden"]) != 0:
+		hidden_at_start = true
+		start_reasons.append("Not drawn %.0f s after the level starts (the game's run, moby_states.json)." % seconds)
 
 
 ## A class whose code hides the moby unless one of some pvar words is set (amoeboids: state 12,
