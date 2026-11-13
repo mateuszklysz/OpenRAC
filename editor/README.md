@@ -918,10 +918,14 @@ Approximations:
   Clank): the Inspector's Start state says whether the game shows it and
   why. The game's own code decides it: on opening a level the editor
   runs the port's states program once if the level has no
-  `moby_states.json` yet (it needs the build's
-  `port/build/release/openrac-rac1-<version>-states`, the port's levels
-  in `assets/port/rac1/<version>` and the game's data, which the
-  launcher passes as `-- --openrac-data DIR`). From a shell,
+  `moby_states.json` yet. It needs the program, the port's levels and
+  the game's data: the launcher passes them after `--` as
+  `--openrac-states FILE --openrac-levels DIR --openrac-data DIR`
+  (`tools/build_port.py` builds `openrac-rac1-<version>-states` beside
+  each game and an installed launcher carries it); without them the
+  editor looks for `port/build/release/openrac-rac1-<version>-states`
+  and `assets/port/rac1/<version>` in the checkout and the data in
+  `OPENRAC_DATA`. From a shell,
   `moby_states.py PROJECT --data
   DIR --levels DIR` runs the port's states program
   (`openrac-rac1-ntsc-states`, under a second a level) and writes

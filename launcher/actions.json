@@ -237,7 +237,11 @@
           "-e",
           "--",
           "--openrac-data",
-          "{data}"
+          "{data}",
+          "--openrac-levels",
+          "{root}/assets/port/rac1/pal",
+          "--openrac-states",
+          "{root}/port/build/release/openrac-rac1-pal-states"
         ],
         "output": "assets/levels/rac1/pal/level_{level}",
         "cwd": ".",
@@ -1004,7 +1008,11 @@
           "-e",
           "--",
           "--openrac-data",
-          "{data}"
+          "{data}",
+          "--openrac-levels",
+          "{root}/assets/port/rac1/ntsc",
+          "--openrac-states",
+          "{root}/port/build/release/openrac-rac1-ntsc-states"
         ],
         "output": "assets/levels/rac1/ntsc/level_{level}",
         "cwd": ".",
@@ -1644,7 +1652,11 @@
           "-e",
           "--",
           "--openrac-data",
-          "{data}"
+          "{data}",
+          "--openrac-levels",
+          "{root}/assets/port/rac1/pal1",
+          "--openrac-states",
+          "{root}/port/build/release/openrac-rac1-pal1-states"
         ],
         "output": "assets/levels/rac1/pal1/level_{level}",
         "cwd": ".",
@@ -2166,7 +2178,11 @@
           "-e",
           "--",
           "--openrac-data",
-          "{data}"
+          "{data}",
+          "--openrac-levels",
+          "{root}/assets/port/rac1/jp",
+          "--openrac-states",
+          "{root}/port/build/release/openrac-rac1-jp-states"
         ],
         "output": "assets/levels/rac1/jp/level_{level}",
         "cwd": ".",

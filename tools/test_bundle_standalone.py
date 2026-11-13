@@ -404,13 +404,17 @@ class Bundle(unittest.TestCase):
             (build / "openrac-rac1-ntsc.exe").write_bytes(b"ntsc")
             (build / "openrac-rac1-ntsc.pdb").write_bytes(b"")
             (build / "openrac-rac2-ntsc.exe").write_bytes(b"rac2")
+            # A states program is one file on every system, macOS too, and carried beside the games.
+            (build / "openrac-rac1-pal-states").write_bytes(b"states")
+            (build / "openrac-rac1-ntsc-states.exe").write_bytes(b"states")
             dest.mkdir()
             self.assertEqual(bundle.copy_games(build, dest),
-                             ["apps/openrac-rac1-pal", "openrac-rac1-ntsc.exe"])
+                             ["apps/openrac-rac1-pal", "openrac-rac1-ntsc.exe",
+                              "openrac-rac1-pal-states", "openrac-rac1-ntsc-states.exe"])
             self.assertEqual((dest / app / "Contents/MacOS/Ratchet & Clank").read_bytes(), b"pal")
             self.assertTrue((dest / app / "Contents/Info.plist").is_file())
             self.assertEqual(sorted(p.name for p in dest.iterdir()),
-                             ["apps", "openrac-rac1-ntsc.exe"])
+                             ["apps", "openrac-rac1-ntsc-states.exe", "openrac-rac1-ntsc.exe", "openrac-rac1-pal-states"])
 
     def test_windows_games_carry_the_cpp_runtime(self):
         with tempfile.TemporaryDirectory() as tmp:

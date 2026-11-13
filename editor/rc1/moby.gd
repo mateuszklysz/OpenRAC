@@ -504,31 +504,25 @@ func game_states() -> Variant:
 
 ## Runs the port's states program (moby_states.py does the same from a shell) for the level
 ## whose moby_states.json is PATH, when the program, the game's data and the port's levels are
-## found: the data from the editor's command line (--openrac-data DIR after --, as the launcher
-## opens a level) or OPENRAC_DATA, the rest from the checkout the project sits in
-## (assets/levels/rac1/<version>/level_NN).
+## found. The launcher names all three on the editor's command line, after -- (--openrac-data,
+## --openrac-levels, --openrac-states); without them the data comes from OPENRAC_DATA and the rest
+## from the checkout the project sits in (assets/levels/rac1/<version>/level_NN).
 static func run_states(path: String) -> void:
 	var folder: String = ProjectSettings.globalize_path(path.get_base_dir())
 	var stats: Variant = JSON.parse_string(FileAccess.get_file_as_string(folder.path_join("level.json")))
 
-	if not stats is Dictionary:
+	if not stats is Dictionary or not stats.has("level"):
 		return
 
 	var version: String = String(stats.get("version", "ntsc"))
 	var root: String = ProjectSettings.globalize_path("res://").path_join("../../../../..").simplify_path()
-	var program: String = root.path_join("port/build/release/openrac-rac1-%s-states" % version)
+	var data: String = user_arg("--openrac-data", OS.get_environment("OPENRAC_DATA"))
+	var levels: String = user_arg("--openrac-levels", root.path_join("assets/port/rac1").path_join(version))
+	var program: String = user_arg("--openrac-states",
+		root.path_join("port/build/release/openrac-rac1-%s-states" % version))
 
-	if OS.get_name() == "Windows":
+	if not FileAccess.file_exists(program) and FileAccess.file_exists(program + ".exe"):
 		program += ".exe"
-
-	var data: String = OS.get_environment("OPENRAC_DATA")
-	var args: PackedStringArray = OS.get_cmdline_user_args()
-	var at: int = args.find("--openrac-data")
-
-	if at >= 0 and at + 1 < args.size():
-		data = args[at + 1]
-
-	var levels: String = root.path_join("assets/port/rac1").path_join(version)
 
 	if data == "" or not FileAccess.file_exists(program) or not DirAccess.dir_exists_absolute(levels):
 		return
@@ -539,6 +533,13 @@ static func run_states(path: String) -> void:
 
 	if code != 0:
 		push_warning("The moby states program failed for %s: %s" % [path, "".join(output).right(400)])
+
+
+## The value after NAME on the editor's command line (after --), or FALLBACK.
+static func user_arg(name: String, fallback: String) -> String:
+	var args: PackedStringArray = OS.get_cmdline_user_args()
+	var at: int = args.find(name)
+	return args[at + 1] if at >= 0 and at + 1 < args.size() else fallback
 
 
 ## The start state the game's run gave.

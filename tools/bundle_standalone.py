@@ -95,6 +95,9 @@ GAMES = ("openrac-rac1-pal", "openrac-rac1-ntsc", "openrac-rac1-pal1", "openrac-
 # The tools carried beside them when the build has them: the enhanced lighting's probe baker
 # (tools/build_port.py --probe-baker), Embree built into it, including its interior inference stage.
 TOOLS = ("openrac-enhanced-baker",)
+# Each game's states program (a plain program on every system, no application bundle): the level
+# editor runs it to see how the game starts a level's mobys (editor/moby_states.py).
+STATES = tuple(f"{game}-states" for game in GAMES)
 # The games a Windows installer carries built without the disc, with a kit and Zig's Clang and lld
 # to build what is missing on the player's computer (tools/asm_part.py), as an APK does. Version -> port game.
 WINDOWS_PARTS = {"rac2/ntsc": "rac2-ntsc", "rac2/pal": "rac2-pal", "rac2/ntsc2": "rac2-ntsc2"}
@@ -307,6 +310,8 @@ def editor_file(rel: Path) -> bool:
     project format the editor and the launcher both read (project_format.json)."""
     if rel.as_posix() in ("project_format.json", "AUDIO_MODDING.md"):
         return True  # AUDIO_MODDING.md: the Audio tab's "How it works" opens it
+    if rel.parts[0] in ("rc1", "addons") and rel.suffix in (".gdshader", ".gdshaderinc", ".json"):
+        return True  # the projects' shaders and the moby class rules (rc1/class_rules.json)
     return not rel.name.startswith("test_") and rel.suffix in (".py", ".tsv", ".gd", ".cfg", "")
 
 
@@ -329,14 +334,14 @@ def copy_games(build: Path, dest: Path, extra: tuple[str, ...] = ()) -> list[str
     bundle named by its title in apps/openrac-<id>/ (port/cmake/MacApp.cmake), carried whole; the
     build folder's link to its program is not."""
     carried = []
-    for game in GAMES + extra + TOOLS:
+    for game in GAMES + extra + TOOLS + STATES:
         apps = build / "apps" / game
         if any(apps.glob("*.app")):
             shutil.copytree(apps, dest / "apps" / game, symlinks=True, dirs_exist_ok=True)
             carried.append(f"apps/{game}")
             continue
-        for path in sorted(build.glob(f"{game}*")):
-            if path.is_file() and path.suffix in ("", ".exe"):
+        for path in (build / game, build / f"{game}.exe"):
+            if path.is_file():
                 shutil.copy2(path, dest / path.name)
                 strip_debug(dest / path.name)
                 carried.append(path.name)
