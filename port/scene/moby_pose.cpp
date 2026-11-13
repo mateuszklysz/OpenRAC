@@ -5,6 +5,7 @@
 
 #include <cstring>
 #include <mutex>
+#include <unordered_map>
 #include <optional>
 
 namespace openrac::scene {
@@ -18,8 +19,8 @@ constexpr std::size_t kMaxJoints = 0x70;
 
 // set_extra_joint_modifiers: the moby and its modifiers.
 std::mutex g_extra_lock;
-std::uint32_t g_extra_moby = 0;
-std::vector<rac1::JointModifier> g_extra_mods;
+// Each moby's own joint modifiers of the port's (set_extra_joint_modifiers), by its address.
+std::unordered_map<std::uint32_t, std::vector<rac1::JointModifier>> g_extra_mods;
 
 std::uint32_t ram_address(std::uint32_t address, std::size_t size) {
     constexpr std::uint32_t uncached = 0x20000000u;
@@ -239,8 +240,9 @@ std::vector<rac1::JointMatrix> evaluate_moby(std::span<const std::uint8_t> ram, 
     }
     {
         const std::lock_guard<std::mutex> lock(g_extra_lock);
-        if (g_extra_moby != 0 && g_extra_moby == moby) {
-            mods.insert(mods.end(), g_extra_mods.begin(), g_extra_mods.end());
+        const auto extra = g_extra_mods.find(moby);
+        if (extra != g_extra_mods.end()) {
+            mods.insert(mods.end(), extra->second.begin(), extra->second.end());
         }
     }
     return rac1::evaluate_keys(anim, &*a, b ? &*b : nullptr, t, plain, mods, layers);
@@ -250,16 +252,22 @@ std::vector<rac1::JointMatrix> evaluate_moby(std::span<const std::uint8_t> ram, 
 
 void set_extra_joint_modifiers(std::uint32_t moby, std::vector<rac1::JointModifier> mods) {
     const std::lock_guard<std::mutex> lock(g_extra_lock);
-    g_extra_moby = mods.empty() ? 0 : moby;
-    g_extra_mods = std::move(mods);
+    if (moby == 0) {
+        g_extra_mods.clear();
+    } else if (mods.empty()) {
+        g_extra_mods.erase(moby);
+    } else {
+        g_extra_mods[moby] = std::move(mods);
+    }
 }
 
 std::vector<rac1::JointModifier> extra_joint_modifiers(std::uint32_t moby) {
     const std::lock_guard<std::mutex> lock(g_extra_lock);
-    if (moby == 0 || g_extra_moby != moby) {
+    const auto extra = g_extra_mods.find(moby);
+    if (moby == 0 || extra == g_extra_mods.end()) {
         return {};
     }
-    return g_extra_mods;
+    return extra->second;
 }
 
 }  // namespace openrac::scene

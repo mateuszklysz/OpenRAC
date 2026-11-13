@@ -353,6 +353,13 @@ One of the mod's pages of the game's own menus (Mod::ui_page): set what it shows
 | `std::uint32_t sim_digest(int level) const` | Since 1.14: what must agree for two games to share `level`; 0 when it is not loaded or the port does not say. |
 | `std::string plugins_folder() const` | Since 1.14: the folder the mods are in, <data>/plugins; "" when the port does not say. |
 | `std::string identity_key() const` | Since 1.14: a key that stays the same for this installation; "" when the port has none. |
+| `bool camera_fov(float degrees) const` | Since 1.14 (SDK 1.14.8): what a cutscene needs. The picture's vertical field of view in degrees while the mod holds the camera (0: the game's); false without the camera or the call. |
+| `bool hud_hide(bool hidden) const` | Since 1.14 (SDK 1.14.8): hides the game's own HUD (the mods' lines stay) or shows it again. |
+| `bool music_volume(float gain) const` | Since 1.14 (SDK 1.14.8): the game's music at `gain` (0 to 1), eased; 1 gives it back. |
+| `bool moby_set_joints(int slot, const std::vector<openrac_joint_offset>& joints) const` | Since 1.14 (SDK 1.14.8): hero_set_joints for the moby in `slot`; an empty list takes them off. |
+| `bool moby_joint_position(int slot, int joint, float out[3]) const` | Since 1.14 (SDK 1.14.8): where joint `joint` of the moby in `slot` is, as last drawn. |
+| `int moby_sound_play(int slot, int sound, bool loop) const` | Since 1.14 (SDK 1.14.8): one of the moby's class's sounds on it; its voice, or -1. |
+| `void moby_sound_stop(int voice) const` | Since 1.14 (SDK 1.14.8): stops a voice moby_sound_play gave. |
 | `bool moby_run(int slot, openrac_moby_run& out) const` | Since 1.9: how the game ran the level's mobys in the last tick, and the moby in `slot` (-1: none) in it, into `out`; false outside a level or for a port without it. |
 | `int moby_slot_of(gaddr moby) const` | Since 1.9: the slot of the moby at game address `moby` (a hook point's argument), -1 none. |
 | `bool play_overlay_pause(bool on) const` | Since 1.9: the world keeps running under the game's menus while `on`; false for a game without it. |

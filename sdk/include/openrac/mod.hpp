@@ -2077,6 +2077,53 @@ public:
         return says ? text : "";
     }
 
+    // Since 1.14 (SDK 1.14.8): what a cutscene needs. The picture's vertical field of view in
+    // degrees while the mod holds the camera (0: the game's); false without the camera or the call.
+    bool camera_fov(float degrees) const {
+        return has_slot14(offsetof(openrac_api, camera_fov))
+               && m_api->camera_fov(m_handle, degrees) == OPENRAC_HOOK_OK;
+    }
+
+    // Since 1.14 (SDK 1.14.8): hides the game's own HUD (the mods' lines stay) or shows it again.
+    bool hud_hide(bool hidden) const {
+        return has_slot14(offsetof(openrac_api, hud_hide))
+               && m_api->hud_hide(m_handle, hidden ? 1 : 0) == OPENRAC_HOOK_OK;
+    }
+
+    // Since 1.14 (SDK 1.14.8): the game's music at `gain` (0 to 1), eased; 1 gives it back.
+    bool music_volume(float gain) const {
+        return has_slot14(offsetof(openrac_api, music_volume))
+               && m_api->music_volume(m_handle, gain) == OPENRAC_HOOK_OK;
+    }
+
+    // Since 1.14 (SDK 1.14.8): hero_set_joints for the moby in `slot`; an empty list takes them off.
+    bool moby_set_joints(int slot, const std::vector<openrac_joint_offset>& joints) const {
+        return has_slot14(offsetof(openrac_api, moby_set_joints))
+               && m_api->moby_set_joints(m_handle, slot, joints.empty() ? nullptr : joints.data(),
+                                         static_cast<int>(joints.size()))
+                      == OPENRAC_HOOK_OK;
+    }
+
+    // Since 1.14 (SDK 1.14.8): where joint `joint` of the moby in `slot` is, as last drawn.
+    bool moby_joint_position(int slot, int joint, float out[3]) const {
+        return has_slot14(offsetof(openrac_api, moby_joint_position))
+               && m_api->moby_joint_position(slot, joint, out) == OPENRAC_HOOK_OK;
+    }
+
+    // Since 1.14 (SDK 1.14.8): one of the moby's class's sounds on it; its voice, or -1.
+    int moby_sound_play(int slot, int sound, bool loop) const {
+        return has_slot14(offsetof(openrac_api, moby_sound_play))
+                   ? m_api->moby_sound_play(m_handle, slot, sound, loop ? 1 : 0)
+                   : -1;
+    }
+
+    // Since 1.14 (SDK 1.14.8): stops a voice moby_sound_play gave.
+    void moby_sound_stop(int voice) const {
+        if (has_slot14(offsetof(openrac_api, moby_sound_stop))) {
+            m_api->moby_sound_stop(m_handle, voice);
+        }
+    }
+
     // Since 1.9: how the game ran the level's mobys in the last tick, and the moby in `slot` (-1:
     // none) in it, into `out`; false outside a level or for a port without it.
     bool moby_run(int slot, openrac_moby_run& out) const {

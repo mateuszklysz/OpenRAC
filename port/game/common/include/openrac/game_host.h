@@ -691,6 +691,12 @@ typedef struct openrac_game_play {
     int (*mission_state_clear)(int level, const uint8_t* flags);
     /* Whether the destination is playing its landing scene. NULL when unsupported. */
     int (*landing)(int level);
+    /* hero_sound_play and hero_sound_stop on any moby of the level (openrac_api.moby_sound_play,
+     * moby_sound_stop), and the volume group the game's music streams play in (openrac_api
+     * music_volume), -1 for none. NULL for a game without them. */
+    int (*moby_sound_play)(gaddr moby, int sound, int loop);
+    void (*moby_sound_stop)(gaddr moby, int voice);
+    int (*music_group)(void);
 } openrac_game_play;
 
 #define OPENRAC_GAME_CAMERA_END_EASED (-1)
@@ -916,6 +922,8 @@ typedef struct openrac_game_hud_text {
 /* The mods' HUD lines of this level load, up to `max` into `out`; returns how many there are. The
  * game draws them after its own HUD's elements. */
 int openrac_game_hud_texts(openrac_game_hud_text* out, int max);
+/* Whether a mod hides the game's own HUD now (openrac_api.hud_hide): 1, else 0. */
+int openrac_game_hud_hidden(void);
 
 /* How many times wider than the game's 4:3 the picture is (the player's aspect setting): its
  * horizontal tangent is the game's times this. 1 for a 4:3 picture, and without a window. */

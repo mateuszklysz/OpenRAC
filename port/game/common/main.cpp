@@ -420,7 +420,45 @@ void load_mods() {
         }
         scene::set_extra_joint_modifiers(moby, std::move(mods));
     };
+    // Ratchet & Clank's moby: its place at +0x10, its scale at +0x2C and its turn's rows at +0xC0;
+    // the pose's translations are in 1/1024 of the model's units.
+    if (std::string_view(openrac_game.game) == "rac1") {
+        host.joint_position = [](std::uint32_t moby, int joint, float* out) -> int {
+            const auto& memory = runtime::Memory::get();
+            const std::span<const std::uint8_t> ram(memory.base(), memory.ram_size());
+            if (moby == 0 || joint < 0 || moby > ram.size() || ram.size() - moby < 0x100) {
+                return 0;
+            }
+            const auto pose = scene::moby_pose_matrices(ram, moby);
+            if (static_cast<std::size_t>(joint) >= pose.size()) {
+                return 0;
+            }
+            const auto f32 = [&](std::uint32_t at) {
+                float v = 0.0f;
+                std::memcpy(&v, ram.data() + moby + at, 4);
+                return v;
+            };
+            const float scale = f32(0x2C);
+            const auto& t = pose[static_cast<std::size_t>(joint)][3];
+            for (int k = 0; k < 3; ++k) {
+                float v = f32(0x10 + 4u * static_cast<std::uint32_t>(k));
+                for (int r = 0; r < 3; ++r) {
+                    v += t[r] / 1024.0f * scale
+                         * f32(0xC0 + 0x10u * static_cast<std::uint32_t>(r)
+                               + 4u * static_cast<std::uint32_t>(k));
+                }
+                if (!std::isfinite(v)) {
+                    return 0;
+                }
+                out[k] = v;
+            }
+            return 1;
+        };
+    }
 #endif
+    host.music_gain = [](int group, float gain) {
+        openrac_sound_set_stream_gain(group, gain);
+    };
     host.capture_savestate_runtime = [](mods::SavestateRuntime* state) {
         if (state == nullptr) {
             return false;

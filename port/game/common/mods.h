@@ -133,6 +133,12 @@ struct Host {
     // so: no pack, English.
     const char* (*pack_folder)(void) = nullptr;
     int (*language)(void) = nullptr;
+    // What a cutscene needs (SDK 1.14.8): the game's streams of volume group `group` at `gain` (0
+    // to 1, eased; openrac_api.music_volume), and where joint `joint` of moby `moby` is in the
+    // level, as drawn (1, or 0 for none: openrac_api.moby_joint_position). Null: none (a test's),
+    // and the calls say so.
+    void (*music_gain)(int group, float gain) = nullptr;
+    int (*joint_position)(std::uint32_t moby, int joint, float* out) = nullptr;
 };
 
 // Loads the mods the list has on. Returns the session header's line: "lock-strafe 1.0.0", "none",
@@ -222,6 +228,13 @@ std::vector<HazeDraw> haze_drawn();
 // The lines of text the mods show in the game's HUD this level load (openrac_hud_text), every
 // mod's, in the order they set them. From any thread.
 std::vector<openrac_hud_text> hud_texts();
+
+// The vertical field of view a mod's camera asks for this level load, in degrees (openrac_api
+// camera_fov), 0 for the game's own. Read by the window's thread.
+float camera_fov();
+
+// Whether a mod hides the game's own HUD this level load (openrac_api.hud_hide).
+bool hud_hidden();
 
 // Play (interface 1.8, mod_play.h): the start or travel a mod asked for, done now, on the game's
 // thread after the frame's menus (frontend/frame.cpp, beside the developer menu's start); nothing

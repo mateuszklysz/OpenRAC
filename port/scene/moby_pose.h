@@ -63,9 +63,10 @@ std::vector<assets::rac1::JointMatrix> moby_pose_matrices(
 );
 
 /**
- * Joint modifiers of the port's own for one moby (a mod's, openrac_api.hero_set_joints), applied
- * after the moby's own list wherever its pose is evaluated (drawing, shadows, attachments).
- * Replaces the last set; an empty list or moby 0 clears it. Safe from any thread.
+ * Joint modifiers of the port's own for one moby (a mod's, openrac_api.hero_set_joints and
+ * moby_set_joints), applied after the moby's own list wherever its pose is evaluated (drawing,
+ * shadows, attachments). Replaces that moby's last set; an empty list clears it, moby 0 clears
+ * every moby's. Safe from any thread.
  */
 void set_extra_joint_modifiers(std::uint32_t moby, std::vector<assets::rac1::JointModifier> mods);
 

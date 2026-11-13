@@ -127,6 +127,7 @@ void install(
                                   {"value": "world", "name": "World"},
                                   {"value": "hoverboard", "name": "Hoverboard"},
                                   {"value": "kerwan", "name": "Kerwan"},
+                                  {"value": "cutscene", "name": "Cutscene"},
                                   {"value": "callback_only", "name": "Callback only"}]},
                      {"key": "jump", "name": "Jump", "type": "keybind", "default": "Space"}]})"
     );
@@ -1725,6 +1726,83 @@ void motion_reaches_the_game(const fs::path& plugins, const fs::path& dir) {
     CHECK((g_motion == std::vector<std::string>{"camera off"}));
 }
 
+// SDK 1.14.8, what a scene needs, on the test's game: the field of view only with the camera and
+// gone with it and the level, the HUD hidden for the level, the music ducked through the host and
+// given back when the mods go, joints on a moby of the level, a joint's place and a moby's sound.
+std::vector<std::string> g_cutscene_calls;
+
+void a_scene_reaches_the_game(const fs::path& plugins) {
+    write(plugins / "plugins.json", R"({"format": 1, "mods": [
+        {"id": "test-a", "enabled": true, "settings": {"behaviour": "cutscene"}}]})");
+    mods::Host h = host(plugins);
+    static openrac_game_play play = kPlay;
+    play.camera_set = [](const float eye[3], const float*) {
+        g_cutscene_calls.push_back(eye != nullptr ? "camera" : "camera off");
+        return 1;
+    };
+    play.moby_sound_play = [](gaddr moby, int sound, int loop) {
+        g_cutscene_calls.push_back(
+            "sound " + std::to_string(moby) + " " + std::to_string(sound) + " "
+            + std::to_string(loop)
+        );
+        return 5;
+    };
+    play.moby_sound_stop = [](gaddr moby, int voice) {
+        g_cutscene_calls.push_back("stop " + std::to_string(moby) + " " + std::to_string(voice));
+    };
+    play.music_group = [] { return 2; };
+    h.play = &play;
+    h.music_gain = [](int group, float gain) {
+        g_cutscene_calls.push_back(
+            "music " + std::to_string(group) + " " + std::to_string(static_cast<int>(gain * 100))
+        );
+    };
+    h.joint_offsets = [](std::uint32_t moby, const openrac_joint_offset* joints, int count) {
+        g_cutscene_calls.push_back(
+            "joints " + std::to_string(moby) + " " + std::to_string(count)
+            + (count > 0 ? " " + std::to_string(joints[0].joint) : std::string())
+        );
+    };
+    h.joint_position = [](std::uint32_t moby, int joint, float* out) {
+        out[0] = static_cast<float>(moby + static_cast<std::uint32_t>(joint));
+        out[1] = out[2] = 0.0f;
+        return 1;
+    };
+    g_phase = OPENRAC_GAME_PHASE_PLAYING;
+    g_loads = 1;
+    g_cutscene_calls.clear();
+    CHECK(mods::load(h) == "test-a 1.0.0");
+    g_records.clear();
+    CHECK(mods::camera_fov() == 0.0f);
+    CHECK(!mods::hud_hidden());
+    mods::frame();
+    CHECK((g_records == std::vector<int>{9801, 9800, 9811, 9811, 9810, 9820, 9831, 9830, 9840,
+                                         9841, 9841, 9850, 0x3100 + 3, 9851, 9865, 9869}));
+    CHECK(
+        (g_cutscene_calls
+         == std::vector<std::string>{
+             "camera",
+             "music 2 25",
+             "joints 12544 1 3",
+             "sound 12544 12 1",
+             "stop 12544 5"
+         })
+    );
+    CHECK(mods::camera_fov() == 40.0f);
+    CHECK(mods::hud_hidden());
+    // The level loaded again: the field of view and the hidden HUD went with it.
+    g_loads = 2;
+    CHECK(mods::camera_fov() == 0.0f);
+    CHECK(!mods::hud_hidden());
+    // The mods go: the music back at full, the joints and the camera let go.
+    g_cutscene_calls.clear();
+    mods::reset();
+    CHECK(
+        std::find(g_cutscene_calls.begin(), g_cutscene_calls.end(), "music 2 100") != g_cutscene_calls.end()
+    );
+    g_loads = 1;
+}
+
 int main() {
     const fs::path dir = fs::temp_directory_path() / ("openrac_mod_loader_test_" + std::to_string(std::rand()));
     fs::remove_all(dir);
@@ -1758,6 +1836,7 @@ int main() {
     play_reaches_the_game(plugins, dir);
     the_world_reaches_the_game(plugins, dir);
     motion_reaches_the_game(plugins, dir);
+    a_scene_reaches_the_game(plugins);
     a_mod_reads_the_pack(plugins, dir);
     a_mod_for_1_5_still_loads(plugins);
     a_library_others_can_change_is_refused(plugins);
