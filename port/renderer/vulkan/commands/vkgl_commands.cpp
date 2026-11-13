@@ -151,7 +151,9 @@ bool allocate_chunk(Chunk& c, VkDeviceSize size) {
 
 bool new_chunk(Frame& f, VkDeviceSize size) {
     Frame::UploadChunk c;
-    if (!allocate_chunk(c, std::max(size, kChunk))) {
+    // DIAGNOSTIC (temporary): 64 MB chunks, so a frame's uploads stay in one.
+    static const bool dbg_big = std::getenv("OPENRAC_DBG_RING_BIG") != nullptr;
+    if (!allocate_chunk(c, std::max(size, dbg_big ? VkDeviceSize{64u << 20} : kChunk))) {
         return false;
     }
     f.chunks.push_back(c);
@@ -655,8 +657,21 @@ void retire(ImagePtr image) {
 
 // ---- The frame's ring: vertices, indices, uniforms, texels on their way ----
 
+// DIAGNOSTIC (temporary): set around the overlay's draws; ring() then says where slices go.
+bool g_dbg_where = false;
+
 Slice ring(VkDeviceSize size) {
     Frame& f = frame();
+    if (g_dbg_where) {
+        static unsigned n = 0;
+        if (++n % 200 == 0) {
+            log::warn(
+                "DBGWHERE slice {} bytes: chunk {}/{} used {} of {} frame {}",
+                size, f.chunk_at, f.chunks.size(), f.chunk_used,
+                f.chunk_at < f.chunks.size() ? f.chunks[f.chunk_at].size : 0, g->frame
+            );
+        }
+    }
     const VkDeviceSize align = ring_alignment();
     // Leave room for alignment without wrapping either the request or its end offset.
     if (size > std::numeric_limits<VkDeviceSize>::max() - align) {
@@ -1510,3 +1525,9 @@ bool test_poison_discards(bool on) {
 }
 
 }  // namespace openrac::vkgl
+
+// DIAGNOSTIC (temporary): the overlay marks its draws for the DBGWHERE log.
+extern "C" void openrac_dbg_where(int on) {
+    static const bool enabled = std::getenv("OPENRAC_DBG_WHERE") != nullptr;
+    openrac::vkgl::detail::g_dbg_where = enabled && on != 0;
+}

@@ -1,3 +1,4 @@
+#include <vector>
 #include <cstdlib>
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (c) 2026 the OpenRAC contributors
@@ -15,6 +16,8 @@
 #include "renderer/gl/shader.h"
 
 namespace openrac::renderer::ui::imgui_gl {
+extern "C" void openrac_dbg_where(int on);
+
 namespace {
 
 using namespace openrac::gl;
@@ -164,6 +167,7 @@ void render(const ImDrawData* data) {
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, fw, fh, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
         glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
     }
+    openrac_dbg_where(1);
     set_state(data, width, height);
     const ImVec2 origin = data->DisplayPos;
     const ImVec2 scale = data->FramebufferScale;
@@ -193,6 +197,19 @@ void render(const ImDrawData* data) {
             glScissor(static_cast<GLint>(x0), static_cast<GLint>(static_cast<float>(height) - y1),
                       static_cast<GLsizei>(x1 - x0), static_cast<GLsizei>(y1 - y0));
             glBindTexture(GL_TEXTURE_2D, static_cast<GLuint>(cmd.GetTexID()));
+            static const bool dbg_arrays = std::getenv("OPENRAC_DBG_IMGUI_ARRAYS") != nullptr;
+            if (dbg_arrays) {
+                // DIAGNOSTIC (temporary): no index buffer; the command's vertices spelled out.
+                static std::vector<ImDrawVert> spelled;
+                spelled.clear();
+                for (unsigned i = 0; i < cmd.ElemCount; ++i) {
+                    spelled.push_back(list->VtxBuffer.Data[list->IdxBuffer.Data[cmd.IdxOffset + i]]);
+                }
+                glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(spelled.size() * sizeof(ImDrawVert)),
+                             spelled.data(), GL_STREAM_DRAW);
+                glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(spelled.size()));
+                continue;
+            }
             static const bool dbg_per_cmd = std::getenv("OPENRAC_DBG_IMGUI_PERCMD") != nullptr;
             if (dbg_per_cmd) {
                 // DIAGNOSTIC (temporary): each command's indices uploaded alone, drawn from 0.
@@ -208,6 +225,7 @@ void render(const ImDrawData* data) {
     glDisable(GL_SCISSOR_TEST);
     glDisable(GL_BLEND);
     glBindVertexArray(0);
+    openrac_dbg_where(0);
 }
 
 void shutdown() {
