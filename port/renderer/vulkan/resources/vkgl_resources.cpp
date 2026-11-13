@@ -1,3 +1,4 @@
+#include <cstdlib>
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (c) 2026 the OpenRAC contributors
 //
@@ -240,6 +241,12 @@ ImagePtr make_image(
     info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     VmaAllocationCreateInfo alloc{};
     alloc.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
+    // DIAGNOSTIC (temporary): own memory for multisampled images, or for every image.
+    static const bool dbg_msaa_own = std::getenv("OPENRAC_DBG_MSAA_DEDICATED") != nullptr;
+    static const bool dbg_all_own = std::getenv("OPENRAC_DBG_ALL_DEDICATED") != nullptr;
+    if (dbg_all_own || (dbg_msaa_own && samples != VK_SAMPLE_COUNT_1_BIT)) {
+        alloc.flags |= VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT;
+    }
     if (!check(
             vmaCreateImage(g->allocator, &info, &alloc, &image->image, &image->allocation, nullptr),
             "an image"

@@ -1,3 +1,5 @@
+#include <unordered_map>
+#include <cstdlib>
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (c) 2026 the OpenRAC contributors
 //
@@ -723,7 +725,48 @@ bool reserve_upload_ring(Frame& f) {
     return new_chunk(f, kChunk);
 }
 
+// DIAGNOSTIC (temporary): each ring copy's bytes, checked again once the GPU is done with them.
+struct DbgCopy {
+    const std::uint8_t* at;
+    std::uint64_t size;
+    std::uint64_t hash;
+};
+std::uint64_t dbg_hash(const std::uint8_t* p, std::uint64_t n) {
+    std::uint64_t h = 1469598103934665603ull;
+    for (std::uint64_t i = 0; i < n; ++i) {
+        h = (h ^ p[i]) * 1099511628211ull;
+    }
+    return h;
+}
+bool dbg_ring_check() {
+    static const bool on = std::getenv("OPENRAC_DBG_RINGCHECK") != nullptr;
+    return on;
+}
+std::unordered_map<const Frame*, std::vector<DbgCopy>>& dbg_copies() {
+    static std::unordered_map<const Frame*, std::vector<DbgCopy>> copies;
+    return copies;
+}
+
 void reset_upload_ring(Frame& f) {
+    if (dbg_ring_check()) {
+        auto& list = dbg_copies()[&f];
+        std::uint64_t bad = 0;
+        std::uint64_t bad_bytes = 0;
+        for (const DbgCopy& c : list) {
+            if (dbg_hash(c.at, c.size) != c.hash) {
+                if (bad < 8) {
+                    log::warn("DBGRING changed copy of {} bytes", c.size);
+                }
+                ++bad;
+                bad_bytes += c.size;
+            }
+        }
+        static std::uint64_t checks = 0;
+        if (bad != 0 || ++checks % 300 == 0) {
+            log::warn("DBGRING {} copies, {} changed ({} bytes)", list.size(), bad, bad_bytes);
+        }
+        list.clear();
+    }
     release_bulk_texture_staging(f);
     constexpr unsigned kIdleSlotReuses = 60;
     const bool trim = ring_trim_enabled();
@@ -753,6 +796,9 @@ Slice ring_copy(const void* data, VkDeviceSize size) {
     Slice s = ring(size);
     if (s.data != nullptr && data != nullptr && size > 0) {
         std::memcpy(s.data, data, static_cast<std::size_t>(size));
+        if (dbg_ring_check()) {
+            dbg_copies()[&frame()].push_back({s.data, size, dbg_hash(s.data, size)});
+        }
     }
     return s;
 }

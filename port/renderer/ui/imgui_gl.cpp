@@ -1,3 +1,4 @@
+#include <cstdlib>
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (c) 2026 the OpenRAC contributors
 //
@@ -146,6 +147,22 @@ void render(const ImDrawData* data) {
     const int height = static_cast<int>(data->DisplaySize.y * data->FramebufferScale.y);
     if (width <= 0 || height <= 0) {
         return;
+    }
+    // DIAGNOSTIC (temporary): env switches to find the MSAA x2 overlay damage on Adreno.
+    static const bool dbg_finish = std::getenv("OPENRAC_DBG_IMGUI_FINISH") != nullptr;
+    static const bool dbg_font_sub = std::getenv("OPENRAC_DBG_FONT_SUB") != nullptr;
+    if (dbg_finish) {
+        glFinish();
+    }
+    if (dbg_font_sub) {
+        unsigned char* pixels = nullptr;
+        int fw = 0;
+        int fh = 0;
+        ImGui::GetIO().Fonts->GetTexDataAsRGBA32(&pixels, &fw, &fh);
+        glBindTexture(GL_TEXTURE_2D, s->font);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, fw, fh, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
     }
     set_state(data, width, height);
     const ImVec2 origin = data->DisplayPos;
