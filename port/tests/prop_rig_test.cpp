@@ -42,7 +42,7 @@ void put(std::vector<unsigned char>& bytes, std::initializer_list<float> values)
     }
 }
 
-std::filesystem::path write_gltf() {
+std::filesystem::path write_gltf(bool broken = false) {
     std::vector<unsigned char> buffer;
     put(buffer, {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1});   // root: no bind offset
     put(buffer, {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -1, 1});  // child, bound one up
@@ -59,7 +59,7 @@ std::filesystem::path write_gltf() {
   {"buffer": 0, "byteOffset": 136, "byteLength": 32},
   {"buffer": 0, "byteOffset": 168, "byteLength": 36}],
  "accessors": [
-  {"bufferView": 0, "componentType": 5126, "count": 2, "type": "MAT4"},
+  {"bufferView": 0, "componentType": 5126, "count": )" + std::string(broken ? "9" : "2") + R"(, "type": "MAT4"},
   {"bufferView": 1, "componentType": 5126, "count": 2, "type": "SCALAR", "min": [0], "max": [1]},
   {"bufferView": 2, "componentType": 5126, "count": 2, "type": "VEC4"},
   {"bufferView": 3, "componentType": 5126, "count": 3, "type": "VEC3", "min": [0, 0, 0], "max": [1, 1, 0]}],
@@ -73,7 +73,7 @@ std::filesystem::path write_gltf() {
    "channels": [{"sampler": 0, "target": {"node": 2, "path": "rotation"}}]}],
  "scenes": [{"nodes": [0, 1]}]
 })";
-    const auto path = std::filesystem::temp_directory_path() / "openrac_prop_rig_test.gltf";
+    const auto path = std::filesystem::temp_directory_path() / (broken ? "openrac_prop_rig_broken.gltf" : "openrac_prop_rig_test.gltf");
     std::ofstream(path) << json;
     return path;
 }
@@ -110,5 +110,8 @@ int main() {
     const auto palette = scene::prop_rig_palette(*rig, 0, 0.5f, false);
     CHECK(palette.size() == 2 && near(renderer::transform_point(palette[0], point), point));
     CHECK(scene::prop_rig_palette(*rig, 1, 0.0f, false).empty());
+    // An accessor longer than its buffer: no rig, nothing read past it.
+    std::string broken_error;
+    CHECK(!scene::load_prop_rig(write_gltf(true), broken_error).has_value() && !broken_error.empty());
     return openrac::test::result();
 }

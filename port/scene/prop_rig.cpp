@@ -150,6 +150,12 @@ std::optional<PropRig> load_prop_rig(const std::filesystem::path& path, std::str
         error = std::format("cannot read the buffers of {}", name);
         return std::nullopt;
     }
+    // Accessors past their buffers, joints with no matrix: read nothing of a broken file.
+    if (cgltf_validate(data) != cgltf_result_success) {
+        cgltf_free(data);
+        error = std::format("{} is not valid glTF", name);
+        return std::nullopt;
+    }
     PropRig rig;
     rig.nodes.resize(data->nodes_count);
     for (cgltf_size n = 0; n < data->nodes_count; ++n) {
@@ -177,7 +183,7 @@ std::optional<PropRig> load_prop_rig(const std::filesystem::path& path, std::str
             joint.node = node_index(data, skin->joints[j]);
             joint.number = joint_number(skin->joints[j], static_cast<int>(j));
             joint.inverse_bind = renderer::identity();
-            if (skin->inverse_bind_matrices != nullptr) {
+            if (skin->inverse_bind_matrices != nullptr && j < skin->inverse_bind_matrices->count) {
                 cgltf_accessor_read_float(skin->inverse_bind_matrices, j, joint.inverse_bind.data(), 16);
             }
             if (joint.node >= 0) {
@@ -227,6 +233,9 @@ std::optional<PropRig> load_prop_rig(const std::filesystem::path& path, std::str
             }
             const cgltf_accessor* input = channel.sampler->input;
             const cgltf_accessor* output = channel.sampler->output;
+            if (input == nullptr || output == nullptr) {
+                continue;
+            }
             out.times.resize(input->count);
             for (cgltf_size k = 0; k < input->count; ++k) {
                 cgltf_accessor_read_float(input, k, &out.times[k], 1);

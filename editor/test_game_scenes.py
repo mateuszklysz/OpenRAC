@@ -1,5 +1,6 @@
 """game_scenes.py: the game's scenes as .cutscene files, from made-up chunks (no disc needed)."""
 
+import json
 import math
 import struct
 import unittest
@@ -91,6 +92,16 @@ class GameScenes(unittest.TestCase):
         self.assertEqual(len(doc["subtitles"]), 1)                               # once, not per chunk
         self.assertEqual(doc["subtitles"][0]["end"], 71)
         self.assertEqual(doc["sounds"], [{"t": 12, "file": {"en": "audio/game_scene_04_en.wav"}, "kind": "voice"}])
+        # A second Ratchet is a figure too; a camera record that is no place is left out.
+        twice = gs.parse_chunk(chunk(0, 90, [(0, hero), (0, hero)], []), 0)
+        twice["camera"][5]["eye"] = (float("nan"), 0.0, 0.0)
+        twice["camera"][6]["tan_half_fov"] = 0.0
+        doc2 = gs.to_cutscene([twice], 3, 1, {})
+        self.assertEqual([a["source"] for a in doc2["actors"]], [{"figure": "hero"}] * 2)
+        self.assertEqual(len({a["id"] for a in doc2["actors"]}), 2)
+        self.assertNotIn(5, [k["t"] for k in doc2["camera"]["keys"]])
+        self.assertNotIn("fov", doc2["camera"]["keys"][5])   # tick 6, after the one left out
+        json.dumps(doc2, allow_nan=False)
 
     def test_records(self):
         header = bytearray(0x2434)

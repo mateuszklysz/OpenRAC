@@ -424,6 +424,12 @@ std::optional<std::uint32_t> load_model(
         error = std::format("cannot read the buffers of {}", name);
         return std::nullopt;
     }
+    // Accessors past their buffers, joints with no matrix: read nothing of a broken file.
+    if (cgltf_validate(data) != cgltf_result_success) {
+        cgltf_free(data);
+        error = std::format("{} is not valid glTF", name);
+        return std::nullopt;
+    }
     const fs::path base = path.parent_path();
     Model model;
     model.name = path.filename().string();

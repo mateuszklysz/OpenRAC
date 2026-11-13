@@ -173,9 +173,12 @@ def to_cutscene(chunks: list[dict], level: int, k: int, speech: dict[str, str]) 
             t = i * NTSC_TICKS_PER_CHUNK + r
             if t > end or (r == len(chunk["camera"]) - 1 and i + 1 < len(chunks)):
                 continue    # a chunk's last record is the next one's first
+            if not all(math.isfinite(v) for v in (*rec["eye"], *rec["angles"])):
+                continue    # a record that is no place (JSON has no NaN): the key before holds
             key = {"t": t, "eye": [round(v, 4) for v in rec["eye"]],
-                   "rotation": camera_rotation(rec["angles"]),
-                   "fov": round(vertical_fov(rec["tan_half_fov"]), 3), "ease": "linear"}
+                   "rotation": camera_rotation(rec["angles"]), "ease": "linear"}
+            if math.isfinite(rec["tan_half_fov"]) and rec["tan_half_fov"] > 0:
+                key["fov"] = round(vertical_fov(rec["tan_half_fov"]), 3)
             if rec["cut"] and t > 0:
                 key["cut"] = True
             keys.append(key)
@@ -187,10 +190,14 @@ def to_cutscene(chunks: list[dict], level: int, k: int, speech: dict[str, str]) 
             if a >= len(chunk["actors"]):
                 continue
             for f, position in enumerate(chunk["actors"][a]["positions"]):
+                if not all(math.isfinite(v) for v in position):
+                    continue
                 track.append({"t": i * NTSC_TICKS_PER_CHUNK + f * 2, "position": [round(v, 4) for v in position]})
-        hero = first["class"] == HERO_CLASS and not seen_hero
+        # Every Ratchet a figure (a moby of the hero's class would run the hero's own update).
+        hero = first["class"] == HERO_CLASS
+        actor_id = ("hero_double" if not seen_hero else f"hero_double_{a}") if hero else f"actor_{a}_{first['class']}"
         seen_hero = seen_hero or hero
-        actor = {"id": "hero_double" if hero else f"actor_{a}_{first['class']}",
+        actor = {"id": actor_id,
                  "source": {"figure": "hero"} if hero else {"class": first["class"]},
                  "track": track[:1] if len({tuple(p["position"]) for p in track}) == 1 else track,
                  "end": "remove"}
@@ -244,7 +251,7 @@ def export_level(disc: Disc, level: int, out: Path, only: int | None = None) -> 
         doc = to_cutscene(chunks, level, k, speech)
         out.mkdir(parents=True, exist_ok=True)
         file = out / f"game_scene_{k:02}.cutscene"
-        file.write_text(json.dumps(doc, indent=1) + "\n", encoding="utf-8")
+        file.write_text(json.dumps(doc, indent=1, allow_nan=False) + "\n", encoding="utf-8")
         written.append(file)
     return written
 

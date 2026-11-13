@@ -432,6 +432,17 @@ class PackCutscenes(unittest.TestCase):
             figures = {"format": "openrac-cutscene", "length": 10,
                        "actors": [{"id": str(i), "source": {"figure": "hero"}} for i in range(9)]}
             self.assertEqual(len(check_cutscene(figures, source)[0]), 1)
+            # Written by hand, any shape: checked, never a crash.
+            shapes = {"format": "openrac-cutscene", "length": 10, "actors": 3, "sounds": {"t": 1},
+                      "events": None, "camera": [], "trigger": "volume"}
+            self.assertEqual(check_cutscene(shapes, source, 3, {7}, {500}), ([], []))
+            odd_shapes = {"format": "openrac-cutscene", "length": 10,
+                          "actors": [{"id": [1], "source": {"class": [500], "spawn_id": {}}, "layers": 4,
+                                      "ride": [{"actor": {}}], "look_at": True}],
+                          "sounds": [{"t": 1, "actor": [2], "file": "a\0b"}],
+                          "events": [{"do": "moby_kill", "spawn_id": [7]}]}
+            errors, warnings = check_cutscene(odd_shapes, source, 3, {7}, {500})
+            self.assertEqual(len(errors), 1, errors)   # the class [500] is no class the level loads
             # In the pack: an error leaves it out, a warning keeps it.
             scene_dir, out = Path(tmp) / "level_03", Path(tmp) / "packed" / "level_03"
             (scene_dir / "cutscenes").mkdir(parents=True)

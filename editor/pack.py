@@ -554,13 +554,24 @@ def check_cutscene(doc: dict, source: Path, level_id: int | None = None, spawn_i
     named from; SPAWN_IDS the level's mobys (None: not checked); CLASSES a set of the level's moby
     classes, or a function that gives it (called only when a cutscene spawns one)."""
     errors, warnings = [], []
+
+    def items(value) -> list:
+        """A list from the file, or none: a hand-written file may have anything there."""
+        return value if isinstance(value, list) else []
+
+    def part(value) -> dict:
+        return value if isinstance(value, dict) else {}
+
+    def name_of(value):
+        """An id, a class or a moby as a set can hold it (anything else names nothing)."""
+        return value if isinstance(value, (int, str)) and not isinstance(value, bool) else None
     if level_id is not None and isinstance(doc.get("level"), int) and doc["level"] != level_id:
         errors.append(f"it is for level {doc['level']}, not this level {level_id}")
     length = doc.get("length")
     if not isinstance(length, int) or isinstance(length, bool) or not 1 <= length <= CUTSCENE_MAX_TICKS:
         errors.append(f"its length {length!r} is not 1 to {CUTSCENE_MAX_TICKS} ticks")
-    actors = [a for a in doc.get("actors", []) if isinstance(a, dict)]
-    ids = [a.get("id") for a in actors]
+    actors = [a for a in items(doc.get("actors")) if isinstance(a, dict)]
+    ids = [name_of(a.get("id")) for a in actors]
     for actor_id in sorted({i for i in ids if ids.count(i) > 1}, key=str):
         errors.append(f"two actors are called {actor_id!r}")
     known = set(ids) | {"hero"}
@@ -568,8 +579,12 @@ def check_cutscene(doc: dict, source: Path, level_id: int | None = None, spawn_i
     def file_there(path, what: str) -> Path | None:
         if not isinstance(path, str) or not path:
             return None
-        found = (source / path).resolve()
-        if source.resolve() not in found.parents or not found.is_file():
+        try:
+            found = (source / path).resolve()
+            there = source.resolve() in found.parents and found.is_file()
+        except (OSError, ValueError):   # a NUL in it, a name too long
+            there = False
+        if not there:
             warnings.append(f"{what}: {path} is not beside it")
             return None
         return found
@@ -577,7 +592,7 @@ def check_cutscene(doc: dict, source: Path, level_id: int | None = None, spawn_i
     figures = props = 0
     for a in actors:
         name = a.get("id")
-        src = a.get("source", {}) if isinstance(a.get("source"), dict) else {}
+        src = part(a.get("source"))
         if "figure" in src:
             figures += 1
         if "prop" in src:
@@ -585,15 +600,15 @@ def check_cutscene(doc: dict, source: Path, level_id: int | None = None, spawn_i
             file_there(src["prop"], f"actor {name!r}'s mesh")
         if "class" in src:
             have = classes() if callable(classes) else classes
-            if have is not None and src["class"] not in have:
+            if have is not None and name_of(src["class"]) not in have:
                 errors.append(f"actor {name!r} is a moby of class {src['class']}, which this level does not load")
-        if "spawn_id" in src and spawn_ids is not None and src["spawn_id"] not in spawn_ids and "class" not in src:
+        if "spawn_id" in src and spawn_ids is not None and name_of(src["spawn_id"]) not in spawn_ids and "class" not in src:
             warnings.append(f"actor {name!r} is the moby {src['spawn_id']}, which is not in this level")
         joints = set()
-        for layer in a.get("layers", []):
+        for layer in items(a.get("layers")):
             if not isinstance(layer, dict):
                 continue
-            listed = [j for j in layer.get("joints", []) if isinstance(j, int)]
+            listed = [j for j in items(layer.get("joints")) if isinstance(j, int) and not isinstance(j, bool)]
             joints.update(listed)
             frames = file_there(layer.get("frames"), f"actor {name!r}'s layer {layer.get('name')!r}")
             if frames is not None and listed and frames.stat().st_size % (16 * len(listed)) != 0:
@@ -601,28 +616,27 @@ def check_cutscene(doc: dict, source: Path, level_id: int | None = None, spawn_i
                                 f"{len(listed)} turns a tick")
         if len(joints) > CUTSCENE_MAX_JOINTS:
             errors.append(f"actor {name!r} turns {len(joints)} joints, more than {CUTSCENE_MAX_JOINTS}")
-        for ride in a.get("ride", []):
-            if isinstance(ride, dict) and "actor" in ride and ride["actor"] not in known:
+        for ride in items(a.get("ride")):
+            if isinstance(ride, dict) and "actor" in ride and name_of(ride["actor"]) not in known:
                 warnings.append(f"actor {name!r} rides on {ride['actor']!r}, who is not an actor")
-        look = a.get("look_at")
-        for key in look if isinstance(look, list) else []:
+        for key in items(a.get("look_at")):
             target = key.get("target") if isinstance(key, dict) else None
-            if isinstance(target, dict) and "actor" in target and target["actor"] not in known:
+            if isinstance(target, dict) and "actor" in target and name_of(target["actor"]) not in known:
                 warnings.append(f"actor {name!r} looks at {target['actor']!r}, who is not an actor")
     if figures > CUTSCENE_MAX_FIGURES:
         errors.append(f"{figures} figures, more than the port's {CUTSCENE_MAX_FIGURES}")
     if props > CUTSCENE_MAX_PROPS:
         errors.append(f"{props} meshes, more than the port's {CUTSCENE_MAX_PROPS}")
-    for key in doc.get("camera", {}).get("keys", []) if isinstance(doc.get("camera"), dict) else []:
-        for part in ("eye", "look_at"):
-            point = key.get(part) if isinstance(key, dict) else None
-            if isinstance(point, dict) and "actor" in point and point["actor"] not in known:
-                warnings.append(f"the camera's {part} at tick {key.get('t')} is on {point['actor']!r}, who is not an actor")
+    for key in items(part(doc.get("camera")).get("keys")):
+        for end in ("eye", "look_at"):
+            point = key.get(end) if isinstance(key, dict) else None
+            if isinstance(point, dict) and "actor" in point and name_of(point["actor"]) not in known:
+                warnings.append(f"the camera's {end} at tick {key.get('t')} is on {point['actor']!r}, who is not an actor")
     sound_bytes = 0
-    for sound in doc.get("sounds", []):
+    for sound in items(doc.get("sounds")):
         if not isinstance(sound, dict):
             continue
-        if sound.get("actor") not in (None, "hero") and sound["actor"] not in known:
+        if sound.get("actor") not in (None, "hero") and name_of(sound["actor"]) not in known:
             warnings.append(f"a sound at tick {sound.get('t')} is on {sound['actor']!r}, who is not an actor")
         files = sound.get("file")
         for path in files.values() if isinstance(files, dict) else [files]:
@@ -630,12 +644,12 @@ def check_cutscene(doc: dict, source: Path, level_id: int | None = None, spawn_i
             sound_bytes += found.stat().st_size if found is not None else 0
     if sound_bytes > CUTSCENE_MAX_SOUND_BYTES:
         errors.append(f"its sounds are {sound_bytes >> 20} MiB, more than {CUTSCENE_MAX_SOUND_BYTES >> 20} MiB")
-    trigger = doc.get("trigger", {}) if isinstance(doc.get("trigger"), dict) else {}
-    if trigger.get("kind") in ("talk", "pickup") and spawn_ids is not None and trigger.get("spawn_id") not in spawn_ids:
+    trigger = part(doc.get("trigger"))
+    if trigger.get("kind") in ("talk", "pickup") and spawn_ids is not None and name_of(trigger.get("spawn_id")) not in spawn_ids:
         warnings.append(f"its {trigger['kind']} trigger is the moby {trigger.get('spawn_id')}, which is not in this level")
-    for event in doc.get("events", []):
+    for event in items(doc.get("events")):
         if (isinstance(event, dict) and event.get("do") in ("moby_hide", "moby_kill") and spawn_ids is not None
-                and event.get("spawn_id") not in spawn_ids):
+                and name_of(event.get("spawn_id")) not in spawn_ids):
             warnings.append(f"the {event['do']} at tick {event.get('t')} is the moby {event.get('spawn_id')}, "
                             "which is not in this level")
     return errors, warnings
