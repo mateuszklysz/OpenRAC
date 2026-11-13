@@ -74,6 +74,9 @@ class MobyClass:
     # with the level's chrome or glass map (texture keys METAL_CHROME / METAL_GLASS); its skins
     # are in metal.skins like the main mesh's. None for a class without metal packets.
     metal: Mesh | None = None
+    # The class's glow colour (header 0x40, RGBA, R low): non-zero gives its mobys mode 0x10, and
+    # the glow packets' vertices (light slot -2) are then drawn unlit in it, blended over the rest.
+    glow_rgba: int = 0
 
 
 def unpacks(data: bytes) -> list[tuple[int, int, int, bytes]]:
@@ -401,7 +404,9 @@ def moby_class(data: bytes, remap: bytes | list[int], name: str, sequences: list
     if bones is not None:
         mesh.skins = skins
         metal_mesh.skins = metal_skins
-    return MobyClass(scale, mesh, joint_count, skins, bones, metal_mesh if metal_mesh.triangles else None)
+    glow, = unpack("<I", header, 0x40)
+    return MobyClass(scale, mesh, joint_count, skins, bones, metal_mesh if metal_mesh.triangles else None,
+                     glow if fmt.moby_glow else 0)
 
 
 def bangles(data: bytes) -> list[tuple[int, int]]:

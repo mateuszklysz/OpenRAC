@@ -227,8 +227,8 @@ class LevelWriter:
         return gltf.material(name, f"{'../' * depth}textures/{name}.png", cutout=texture.cutout, clamp=clamp)
 
     def glb(self, path: str, meshes: list[Mesh], depth: int, light_uv2: bool = False) -> str:
-        """Write meshes, one node each, to path; return its res:// path. light_uv2: a tie's or
-        shrub's light slots go out as UV2.x too, for the editor's lit_object shader."""
+        """Write meshes, one node each, to path; return its res:// path. light_uv2: a tie's,
+        shrub's or moby's light slots go out as UV2.x too, for the editor's lit shaders."""
         gltf = Gltf()
         gltf.light_uv2 = light_uv2 and self.godot_scales
         for mesh in meshes:
@@ -247,7 +247,7 @@ class LevelWriter:
         """
         bones = moby.skeleton
         if bones is None:
-            return self.glb(path, [moby.mesh] + ([moby.metal] if moby.metal is not None else []), 1)
+            return self.glb(path, [moby.mesh] + ([moby.metal] if moby.metal is not None else []), 1, True)
         count = len(bones.joints)
         scaled = [j for j, joint in enumerate(bones.joints) if joint.post_scale]
         # Every node is a skin joint, so that Godot makes each one a bone;
@@ -255,6 +255,7 @@ class LevelWriter:
         slot = {j: count + i for i, j in enumerate(scaled)}
         skins = [tuple((slot.get(j, j), w) for j, w in pairs) for pairs in moby.mesh.skins]
         gltf = Gltf()
+        gltf.light_uv2 = self.godot_scales  # a glow packet's vertices: UV2.x -2 (rc1/lit_moby_glow.gdshader)
         mesh = gltf.mesh(replace(moby.mesh, skins=skins), {key: self.material(gltf, key, 1) for key in moby.mesh.faces})
         first = len(gltf.doc["nodes"])
         post = {j: first + slot[j] for j in scaled}
@@ -491,6 +492,11 @@ class LevelWriter:
             if class_id in placed:
                 scenes[class_id] = self.scene.resource("PackedScene", f"{self.res}/{path}", f"moby_{class_id}")
         self.scene.node("Mobys", "Game", "Node3D")
+        if self.godot_scales and (self.dir / "light_bank.json").is_file():
+            # The classes' glow colours (rc1/import_lit.gd gives a class with one its glow pass).
+            glow = {str(c): [m.glow_rgba & 0xFF, (m.glow_rgba >> 8) & 0xFF, (m.glow_rgba >> 16) & 0xFF]
+                    for c, m in models.items() if m.glow_rgba}
+            (self.dir / "moby_glow.json").write_text(json.dumps(glow) + "\n")
         for p in placements:
             fields = {f"metadata__rc1_{k}": v for k, v in {"index": p["index"], **p["fields"]}.items()}
             fields.update(self.moby_extra.get(p["index"], {}))
@@ -625,8 +631,8 @@ def write_marker(path: Path, class_id: int, label: str, model: tuple[str, float,
     elif name is not None or model is not None:
         about.append("No update function in this level")
     if model is not None:
-        # Lights the model as the game lights the moby, from its rc1_colour and rc1_light (moby_light.gd).
-        facts["script"] = scene.resource("Script", "res://rc1/moby_light.gd", "light")
+        # Lights the model as the game lights the moby, from its rc1_colour and rc1_light (moby.gd).
+        facts["script"] = scene.resource("Script", "res://rc1/moby.gd", "light")
     scene.node(f"Moby_{class_id}", kind="Node3D", metadata__rc1_class=class_id,
                editor_description="\n".join(about), **facts)
     if model is None:

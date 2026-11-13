@@ -898,7 +898,7 @@ Approximations:
   it at level load (one per light slot, in `ties_light.png` and
   `shrubs_light.png`, read by `rc1/lit_object.gdshader`), and each moby
   with the level's light sets and its own ambient and light word
-  (`rc1/lit_moby.gdshader`, `rc1/moby_light.gd`), as the game lights it
+  (`rc1/lit_moby.gdshader`, `rc1/moby.gd`), as the game lights it
   every frame. Godot's sun and ambient light do not reach these. A moby
   lit in floats, close to the game's bytes, not bit for bit; point lights
   are left out. A moved tie or shrub keeps the light of where it was.
@@ -906,8 +906,13 @@ Approximations:
 - Moby faces the game draws untextured get a flat grey texture, which is
   what the game binds for them. Some classes are made only of such faces
   (rings, force fields, barriers); the game may draw those translucent,
-  glowing or not at all. Glow parts are lit like the rest, and the chrome
-  and glass passes and the low-detail meshes are not extracted.
+  glowing or not at all. A class's glow parts are drawn unlit in its glow
+  colour and blended over the rest, as the game's glow pass draws them
+  (`rc1/lit_moby_glow.gdshader`); the chrome and glass passes and the
+  low-detail meshes are not extracted.
+- A placed moby plays its class's sequence 0, the one the game starts
+  every moby on, looping; in the editor it follows the cutscene preview's
+  time. What its update function plays later is not known to the editor.
 - Moby animations run at the game's 60 Hz tick, as ReRAC infers it. Godot
   interpolates rotation keys spherically where the game lerps, and a joint
   channel that stays within 1e-5 of the bind pose (1e-4 for rotations) is

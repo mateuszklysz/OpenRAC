@@ -15,6 +15,9 @@ const LIT_OBJECT: Shader = preload("res://rc1/lit_object.gdshader")
 ## The shader that lights a moby as the game does (its light sets and ambient).
 const LIT_MOBY: Shader = preload("res://rc1/lit_moby.gdshader")
 
+## A moby class's glow faces, the next pass of a class with a glow colour.
+const LIT_MOBY_GLOW: Shader = preload("res://rc1/lit_moby_glow.gdshader")
+
 
 ## Lets every coloured surface under the imported scene use its vertex colours, and gives a tie or
 ## shrub class the game's lighting of each of its instances.
@@ -37,9 +40,10 @@ func _post_import(scene: Node) -> Object:
 	if family == "mobys" and FileAccess.file_exists(bank_path):
 		var bank: PackedVector4Array = light_bank(bank_path)
 		var made: Dictionary = {}
+		var glow = class_glow(source)
 
 		for node in scene.find_children("*", "MeshInstance3D", true, false):
-			light_moby((node as MeshInstance3D).mesh, bank, made)
+			light_moby((node as MeshInstance3D).mesh, bank, glow, made)
 
 	return scene
 
@@ -56,9 +60,30 @@ func light_bank(path: String) -> PackedVector4Array:
 	return rows
 
 
+## The glow colour (/ 128) of the class of the moby model at source (moby_<class>.glb), from the
+## level's moby_glow.json, or null for a class without one.
+func class_glow(source: String):
+	var path: String = source.get_base_dir().get_base_dir().path_join("moby_glow.json")
+
+	# A level written before the glow colours has none.
+	if not FileAccess.file_exists(path):
+		return null
+
+	var colours = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var class_id: String = source.get_file().get_basename().trim_prefix("moby_")
+
+	# Only a class with a glow colour of its own.
+	if colours == null or not colours.has(class_id):
+		return null
+
+	var rgb: Array = colours[class_id]
+	return Vector3(rgb[0], rgb[1], rgb[2]) / 128.0
+
+
 ## Gives each textured surface of a moby mesh the lit moby shader (one shader material per
-## imported material, in made); the metal (chrome, glass) surfaces keep theirs.
-func light_moby(mesh: Mesh, bank: PackedVector4Array, made: Dictionary) -> void:
+## imported material, in made), and for a class with a glow colour the glow pass after it; the
+## metal (chrome, glass) surfaces keep theirs.
+func light_moby(mesh: Mesh, bank: PackedVector4Array, glow, made: Dictionary) -> void:
 	# A mesh instance without a mesh has nothing to light.
 	if mesh == null:
 		return
@@ -79,6 +104,15 @@ func light_moby(mesh: Mesh, bank: PackedVector4Array, made: Dictionary) -> void:
 			shader.set_shader_parameter("cutout", material.transparency == BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR)
 			shader.set_shader_parameter("coloured", material.vertex_color_use_as_albedo)
 			shader.set_shader_parameter("bank", bank)
+
+			# The glow faces: the same parameters, in the glow pass's shader.
+			if glow != null:
+				shader.set_shader_parameter("has_glow", true)
+				shader.set_shader_parameter("glow_colour", glow)
+				var glow_pass := shader.duplicate() as ShaderMaterial
+				glow_pass.shader = LIT_MOBY_GLOW
+				shader.next_pass = glow_pass
+
 			made[material] = shader
 
 		mesh.surface_set_material(i, made[material])
