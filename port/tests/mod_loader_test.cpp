@@ -1702,6 +1702,7 @@ void motion_reaches_the_game(const fs::path& plugins, const fs::path& dir) {
         drawn.size() == 1 && drawn[0].matrix[0] == 2.0f && drawn[0].matrix[5] == 2.0f
         && drawn[0].matrix[12] == 1.0f && drawn[0].matrix[13] == 2.0f && drawn[0].matrix[14] == 3.0f
     );
+    CHECK(drawn.size() == 1 && drawn[0].animation == 2 && drawn[0].seconds == 1.5f && drawn[0].loop);
     // The heat haze, drawn while its level is.
     const std::vector<mods::HazeDraw> haze = mods::haze_drawn();
     CHECK(haze.size() == 2 && haze[0].position[0] == 4.0f && haze[0].radius == 1.0f);
@@ -1763,9 +1764,10 @@ void a_scene_reaches_the_game(const fs::path& plugins) {
             + (count > 0 ? " " + std::to_string(joints[0].joint) : std::string())
         );
     };
-    h.joint_position = [](std::uint32_t moby, int joint, float* out) {
-        out[0] = static_cast<float>(moby + static_cast<std::uint32_t>(joint));
-        out[1] = out[2] = 0.0f;
+    h.joint_frame = [](std::uint32_t moby, int joint, float* out) {
+        std::fill(out, out + 12, 0.0f);
+        out[0] = out[4] = out[8] = 1.0f;
+        out[9] = static_cast<float>(moby + static_cast<std::uint32_t>(joint));
         return 1;
     };
     g_phase = OPENRAC_GAME_PHASE_PLAYING;
@@ -1777,7 +1779,7 @@ void a_scene_reaches_the_game(const fs::path& plugins) {
     CHECK(!mods::hud_hidden());
     mods::frame();
     CHECK((g_records == std::vector<int>{9801, 9800, 9811, 9811, 9810, 9820, 9831, 9830, 9840,
-                                         9841, 9841, 9850, 0x3100 + 3, 9851, 9865, 9869, 9881, 9880,
+                                         9841, 9841, 9850, 0x3100 + 3, 9851, 9850, 1, 9865, 9869, 9881, 9880,
                                          9891, 9890, 9901, 9900, 9900}));
     CHECK(
         (g_cutscene_calls

@@ -423,7 +423,7 @@ void load_mods() {
     // Ratchet & Clank's moby: its place at +0x10, its scale at +0x2C and its turn's rows at +0xC0;
     // the pose's translations are in 1/1024 of the model's units.
     if (std::string_view(openrac_game.game) == "rac1") {
-        host.joint_position = [](std::uint32_t moby, int joint, float* out) -> int {
+        host.joint_frame = [](std::uint32_t moby, int joint, float* out) -> int {
             const auto& memory = runtime::Memory::get();
             const std::span<const std::uint8_t> ram(memory.base(), memory.ram_size());
             if (moby == 0 || joint < 0 || moby > ram.size() || ram.size() - moby < 0x100) {
@@ -439,18 +439,22 @@ void load_mods() {
                 return v;
             };
             const float scale = f32(0x2C);
-            const auto& t = pose[static_cast<std::size_t>(joint)][3];
-            for (int k = 0; k < 3; ++k) {
-                float v = f32(0x10 + 4u * static_cast<std::uint32_t>(k));
-                for (int r = 0; r < 3; ++r) {
-                    v += t[r] / 1024.0f * scale
-                         * f32(0xC0 + 0x10u * static_cast<std::uint32_t>(r)
-                               + 4u * static_cast<std::uint32_t>(k));
+            const auto& f = pose[static_cast<std::size_t>(joint)];
+            // The axes (no place, no 1/1024), then the place; each a sum of the moby's turn's rows.
+            for (int a = 0; a < 4; ++a) {
+                const float unit = a < 3 ? scale : scale / 1024.0f;
+                for (int k = 0; k < 3; ++k) {
+                    float v = a < 3 ? 0.0f : f32(0x10 + 4u * static_cast<std::uint32_t>(k));
+                    for (int r = 0; r < 3; ++r) {
+                        v += f[static_cast<std::size_t>(a)][r] * unit
+                             * f32(0xC0 + 0x10u * static_cast<std::uint32_t>(r)
+                                   + 4u * static_cast<std::uint32_t>(k));
+                    }
+                    if (!std::isfinite(v)) {
+                        return 0;
+                    }
+                    out[3 * a + k] = v;
                 }
-                if (!std::isfinite(v)) {
-                    return 0;
-                }
-                out[k] = v;
             }
             return 1;
         };

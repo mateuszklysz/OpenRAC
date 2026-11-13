@@ -1956,11 +1956,29 @@ TickMobys pose_mobys(
             instance.moby_light = {0.0f, 0.0f, 0.0f, 1.0f};
             instance.occlusion = scene::Pvs::always;
             instance.blend = props[i].blend;
+            // A skinned prop in its animation (prop_animate): its palette after the mobys' poses.
+            int prop_joints = 0;
+            if (props[i].animation >= 0) {
+                const auto rig =
+                    std::find_if(g->prop_rigs.begin(), g->prop_rigs.end(), [&](const auto& r) {
+                        return r.first == props[i].mesh;
+                    });
+                if (rig != g->prop_rigs.end()) {
+                    const auto pose = scene::prop_rig_palette(
+                        rig->second, props[i].animation, props[i].seconds, props[i].loop
+                    );
+                    if (!pose.empty()) {
+                        instance.palette = static_cast<int>(palette.size());
+                        palette.insert(palette.end(), pose.begin(), pose.end());
+                        prop_joints = static_cast<int>(pose.size());
+                    }
+                }
+            }
             if (instance.blend != 0) {
                 // A glow or a spark: drawn with the mobys' blended groups, no shadow.
                 live.push_back(instance);
                 live_addresses.push_back(0xFFFFFF00u + static_cast<std::uint32_t>(props[i].id));
-                live_joints.push_back(0);
+                live_joints.push_back(prop_joints);
                 continue;
             }
             // A prop casts the hero's kind of shadow (a board under his feet goes with his): in the
@@ -2008,7 +2026,7 @@ TickMobys pose_mobys(
             }
             live.push_back(instance);
             live_addresses.push_back(0xFFFFFF00u + static_cast<std::uint32_t>(props[i].id));
-            live_joints.push_back(0);
+            live_joints.push_back(prop_joints);
         }
     }
     // The poses: each a pure function of the game's memory, evaluated in parallel (the costliest

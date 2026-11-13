@@ -2142,6 +2142,20 @@ public:
         return has_slot14(offsetof(openrac_api, tie_hide)) && m_api->tie_hide(m_handle, tie, hidden ? 1 : 0) == OPENRAC_HOOK_OK;
     }
 
+    // Since 1.14 (SDK 1.14.8): plays animation `animation` of a skinned prop's .glb at `seconds`
+    // (-1: the mesh as stored); false for a prop not the mod's or a port without it.
+    bool prop_animate(int prop, int animation, float seconds, bool loop) const {
+        return has_slot14(offsetof(openrac_api, prop_animate))
+               && m_api->prop_animate(m_handle, prop, animation, seconds, loop ? 1 : 0) == OPENRAC_HOOK_OK;
+    }
+
+    // Since 1.14 (SDK 1.14.8): a moby's joint's axes and place in the level, as last drawn, into
+    // `out` (x, y, z axes, then the place); false for no such joint or a port without it.
+    bool moby_joint_frame(int slot, int joint, float (&out)[12]) const {
+        return has_slot14(offsetof(openrac_api, moby_joint_frame))
+               && m_api->moby_joint_frame(slot, joint, out) == OPENRAC_HOOK_OK;
+    }
+
     // Since 1.9: how the game ran the level's mobys in the last tick, and the moby in `slot` (-1:
     // none) in it, into `out`; false outside a level or for a port without it.
     bool moby_run(int slot, openrac_moby_run& out) const {

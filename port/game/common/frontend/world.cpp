@@ -256,6 +256,7 @@ void use_level(int number) {
     lighting::use_scene_lighting(g->scene);
     g->level = scene::LevelData();
     g->prop_models.clear();
+    g->prop_rigs.clear();
     g->picker.clear();
     std::string error;
     const LevelSources sources = level_sources(wanted);
@@ -321,6 +322,9 @@ void use_level(int number) {
         std::string why;
         if (const auto model = scene::load_model(mesh, g->level, why)) {
             g->prop_models.emplace_back(mesh, *model);
+            if (auto rig = scene::load_prop_rig(mesh, why)) {
+                g->prop_rigs.emplace_back(mesh, std::move(*rig));
+            }
         } else {
             log::warn("mods: prop mesh {}: {}", mesh.string(), why);
         }

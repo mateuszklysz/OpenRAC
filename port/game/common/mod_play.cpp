@@ -1221,6 +1221,9 @@ struct Prop {
     std::array<float, 16> matrix{};
     std::array<float, 4> tint{1.0f, 1.0f, 1.0f, 1.0f};
     int blend = 0;
+    int animation = -1;  // prop_animate's: its .glb's animation, the time into it, looped
+    float seconds = 0.0f;
+    bool loop = false;
 };
 
 // A sound a mod loaded: whose, and the host's id of it.
@@ -1329,7 +1332,7 @@ std::vector<std::pair<const openrac_mod*, std::uint32_t>> g_hud_hidden;
 // Each mod's gain on the game's music (music_volume): the quietest applies.
 std::vector<std::pair<const openrac_mod*, float>> g_music_gains;
 void (*g_music_gain)(int, float) = nullptr;
-int (*g_joint_position)(std::uint32_t, int, float*) = nullptr;
+int (*g_joint_frame)(std::uint32_t, int, float*) = nullptr;
 
 void apply_music_gain() {
     if (g_music_gain == nullptr || g_play == nullptr || g_play->music_group == nullptr) {
@@ -1414,12 +1417,21 @@ int api_moby_set_joints(openrac_mod* mod, int slot, const openrac_joint_offset* 
     return set_joint_set(mod, moby, joints, count);
 }
 
-int api_moby_joint_position(int slot, int joint, float out[3]) {
+int api_moby_joint_frame(int slot, int joint, float out[12]) {
     const gaddr moby = moby_address(slot);
-    if (out == nullptr || moby == 0 || joint < 0 || g_joint_position == nullptr) {
+    if (out == nullptr || moby == 0 || joint < 0 || g_joint_frame == nullptr) {
         return OPENRAC_HOOK_UNKNOWN;
     }
-    return g_joint_position(moby, joint, out) != 0 ? OPENRAC_HOOK_OK : OPENRAC_HOOK_UNKNOWN;
+    return g_joint_frame(moby, joint, out) != 0 ? OPENRAC_HOOK_OK : OPENRAC_HOOK_UNKNOWN;
+}
+
+int api_moby_joint_position(int slot, int joint, float out[3]) {
+    float frame[12];
+    if (out == nullptr || api_moby_joint_frame(slot, joint, frame) != OPENRAC_HOOK_OK) {
+        return OPENRAC_HOOK_UNKNOWN;
+    }
+    std::copy(frame + 9, frame + 12, out);
+    return OPENRAC_HOOK_OK;
 }
 
 void release_camera_fov() {
@@ -1575,6 +1587,21 @@ int api_prop_pose(openrac_mod* mod, int id, const openrac_prop_pose* pose) {
         p->blend = 0;
     }
     p->posed = true;
+    return OPENRAC_HOOK_OK;
+}
+
+int api_prop_animate(openrac_mod* mod, int id, int animation, float seconds, int loop) {
+    if (!std::isfinite(seconds)) {
+        return OPENRAC_HOOK_UNKNOWN;
+    }
+    const std::lock_guard<std::mutex> lock(g_props_lock);
+    Prop* p = own_prop(mod, id);
+    if (p == nullptr) {
+        return OPENRAC_HOOK_UNKNOWN;
+    }
+    p->animation = std::max(animation, -1);
+    p->seconds = seconds;
+    p->loop = loop != 0;
     return OPENRAC_HOOK_OK;
 }
 
@@ -2111,7 +2138,7 @@ void fill_motion_api(openrac_api& api, const Host& host) {
     g_sound_stop = host.sound_stop;
     g_joint_offsets = host.joint_offsets;
     g_music_gain = host.music_gain;
-    g_joint_position = host.joint_position;
+    g_joint_frame = host.joint_frame;
     api.hero_set_pose = api_hero_set_pose;
     api.hero_set_joints = api_hero_set_joints;
     api.collision_triangles = api_collision_triangles;
@@ -2144,6 +2171,8 @@ void fill_motion_api(openrac_api& api, const Host& host) {
     api.scene_air = api_scene_air;
     api.time_stretch = api_time_stretch;
     api.tie_hide = api_tie_hide;
+    api.prop_animate = api_prop_animate;
+    api.moby_joint_frame = api_moby_joint_frame;
 }
 
 float camera_fov() {
@@ -2228,7 +2257,9 @@ std::vector<PropDraw> props_drawn() {
     for (std::size_t i = 0; i < g_props.size(); ++i) {
         const Prop& p = g_props[i];
         if (p.mod != nullptr && p.posed && !p.hidden && p.loads == loads) {
-            out.push_back({static_cast<int>(i), p.mesh, p.matrix, p.tint, p.blend});
+            out.push_back(
+                {static_cast<int>(i), p.mesh, p.matrix, p.tint, p.blend, p.animation, p.seconds, p.loop}
+            );
         }
     }
     return out;

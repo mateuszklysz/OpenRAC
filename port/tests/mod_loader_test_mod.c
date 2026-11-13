@@ -320,6 +320,7 @@ static void motion_frame(void) {
         s_record(9540 + -s_api->prop_create(s_mod, "missing.glb"));
         s_record(9550 + -s_api->prop_pose(s_mod, s_prop, &where));
         s_record(9550 + -s_api->prop_pose(s_mod, s_prop + 1, &where));
+        s_api->prop_animate(s_mod, s_prop, 2, 1.5f, 1);
         sound = s_api->sound_load(s_mod, "beep.wav");
         s_record(9560 + sound);
         s_record(9560 + -s_api->sound_load(s_mod, "missing.wav"));
@@ -392,6 +393,7 @@ static void cutscene_frame(void) {
     openrac_camera cam;
     openrac_joint_offset joint;
     float at[3] = {0.0f, 0.0f, 0.0f};
+    float frame[12] = {0.0f};
     int voice;
     openrac_air air;
     if (s_frames != 1) {
@@ -419,6 +421,8 @@ static void cutscene_frame(void) {
     s_record(9850 + -s_api->moby_joint_position(1, 3, at));
     s_record((int)at[0]);
     s_record(9850 + -s_api->moby_joint_position(6, 3, at));
+    s_record(9850 + -s_api->moby_joint_frame(1, 3, frame));
+    s_record((int)frame[0]);
     voice = s_api->moby_sound_play(s_mod, 1, 12, 1);
     s_record(9860 + voice);
     s_record(9870 + s_api->moby_sound_play(s_mod, 6, 12, 0));

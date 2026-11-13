@@ -363,6 +363,8 @@ One of the mod's pages of the game's own menus (Mod::ui_page): set what it shows
 | `bool scene_air(const openrac_air* air) const` | Since 1.14 (SDK 1.14.8): the fog and background the picture is drawn with (nullptr: the game's again); false outside a level, for a value out of range or a port without it. |
 | `bool time_stretch(float stretch) const` | Since 1.14 (SDK 1.14.8): slow motion, each tick `stretch` (1 to 8) times as long; false for a value out of range or a port without it. |
 | `bool tie_hide(int tie, bool hidden) const` | Since 1.14 (SDK 1.14.8): hides the level's tie `tie` from the picture, or shows it again; false outside a level, for no such tie or a port without it. |
+| `bool prop_animate(int prop, int animation, float seconds, bool loop) const` | Since 1.14 (SDK 1.14.8): plays animation `animation` of a skinned prop's .glb at `seconds` (-1: the mesh as stored); false for a prop not the mod's or a port without it. |
+| `bool moby_joint_frame(int slot, int joint, float (&out)[12]) const` | Since 1.14 (SDK 1.14.8): a moby's joint's axes and place in the level, as last drawn, into `out` (x, y, z axes, then the place); false for no such joint or a port without it. |
 | `bool moby_run(int slot, openrac_moby_run& out) const` | Since 1.9: how the game ran the level's mobys in the last tick, and the moby in `slot` (-1: none) in it, into `out`; false outside a level or for a port without it. |
 | `int moby_slot_of(gaddr moby) const` | Since 1.9: the slot of the moby at game address `moby` (a hook point's argument), -1 none. |
 | `bool play_overlay_pause(bool on) const` | Since 1.9: the world keeps running under the game's menus while `on`; false for a game without it. |

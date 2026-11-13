@@ -135,11 +135,11 @@ struct Host {
     const char* (*pack_folder)(void) = nullptr;
     int (*language)(void) = nullptr;
     // What a cutscene needs (SDK 1.14.8): the game's streams of volume group `group` at `gain` (0
-    // to 1, eased; openrac_api.music_volume), and where joint `joint` of moby `moby` is in the
-    // level, as drawn (1, or 0 for none: openrac_api.moby_joint_position). Null: none (a test's),
-    // and the calls say so.
+    // to 1, eased; openrac_api.music_volume), and joint `joint` of moby `moby` in the level, as
+    // drawn: its x, y, z axes and its place, 12 floats (1, or 0 for none:
+    // openrac_api.moby_joint_frame). Null: none (a test's), and the calls say so.
     void (*music_gain)(int group, float gain) = nullptr;
-    int (*joint_position)(std::uint32_t moby, int joint, float* out) = nullptr;
+    int (*joint_frame)(std::uint32_t moby, int joint, float* out) = nullptr;
 };
 
 // Loads the mods the list has on. Returns the session header's line: "lock-strafe 1.0.0", "none",
@@ -203,6 +203,11 @@ struct PropDraw {
     std::array<float, 16> matrix{};
     std::array<float, 4> tint{1.0f, 1.0f, 1.0f, 1.0f};
     int blend = 0;  // OPENRAC_PROP_OPAQUE, _ALPHA or _ADD
+    // Its .glb's animation to draw it in (-1: the mesh as stored), the time into it, looped
+    // (openrac_api.prop_animate).
+    int animation = -1;
+    float seconds = 0.0f;
+    bool loop = false;
 };
 
 // The props shown in the level now (posed, not hidden, of this level load). From any thread.

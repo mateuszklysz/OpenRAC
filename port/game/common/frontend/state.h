@@ -41,6 +41,7 @@
 #include "renderer/haze.h"
 #include "renderer/renderer.h"
 #include "renderer/shadows.h"
+#include "scene/prop_rig.h"
 #include "scene/level.h"
 #include "scene/level_renderer.h"
 #include "scene/moby_shadow.h"
@@ -248,6 +249,8 @@ struct State {
     // The mods' prop meshes read with the level (interface 1.12, mods::prop_meshes): each one's
     // model in `level`.
     std::vector<std::pair<std::filesystem::path, std::uint32_t>> prop_models;
+    // The skinned ones' skeletons and animations (openrac_api.prop_animate).
+    std::vector<std::pair<std::filesystem::path, scene::PropRig>> prop_rigs;
     scene::ObjectPicker picker;
     scene::LevelScene scene;
     DebugCamera debug_camera;  // Only the scene/render owner updates inspection poses.
