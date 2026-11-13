@@ -9,11 +9,13 @@ uniform vec3 up_axis = vec3(0.0, 1.0, 0.0);
 uniform float bob_amplitude = 0.06;
 uniform float bob_speed = 2.0943951;  // 0.0349 a frame at 60 frames a second
 uniform float phase = 0.0;
+// The time in seconds: the cutscene preview's, else the editor's own (rc1/nanotech.gd).
+uniform float seconds = 0.0;
 
 varying vec4 colour;
 
 void vertex() {
-	float bob = sin(TIME * bob_speed + phase);
+	float bob = sin(seconds * bob_speed + phase);
 	vec3 at = centre + up_axis * (0.5 + bob_amplitude * bob);
 	vec3 forward = normalize(CAMERA_POSITION_WORLD - at);
 	vec3 side = normalize(cross(forward, up_axis));

@@ -11,8 +11,12 @@ The nanotech crate (class 501) makes a nanotech ball (class 806) when it starts
 
 nanotech() reads those tables from the level's program, where they sit together (the
 sphere's 290 vertices, texture coordinates and colours, the glow ring's 96 vertices and 32
-quads, the shimmer's 16 vertices and 4 quads); rc1/nanotech.gd draws them. Its sparks (eight
-particles) are not drawn.
+quads, the shimmer's 16 vertices and 4 quads); rc1/nanotech.gd draws them.
+
+Its sparks: eight points circle the ball, each about an axis of its own, and leave a trail
+of fading particles (particle texture 1, the one the trail's mode picks on the PS2: the
+byte at address 0, which the kernel holds). Each point also carries a bigger particle whose
+texture the PS2 picks from address 1 (0x80, past the level's table); that one is not drawn.
 """
 
 from formats import FormatError, Texture, overlay_sections, unpack
@@ -37,6 +41,8 @@ END = SHIMMER_INDICES + SHIMMER_QUADS * 8
 
 # Their effect textures (get_effect_texture): the sphere's and the shimmer's, and the ring's.
 BALL_TEXTURE, RING_TEXTURE = 21, 11
+# The sparks' trail particle texture (spawn_mode_controlled_alpha_fade_particle, mode 2).
+SPARK_TEXTURE = 1
 # The sphere's radius in its table.
 BALL_RADIUS = 0.3
 
@@ -54,6 +60,21 @@ def effect_texture(level: Level, index: int) -> Texture | None:
     if len(pixels) < width * height or len(colours) < 1024:
         return None
     return Texture(width, height, pixels, colours)
+
+
+def particle_texture(level: Level, index: int) -> Texture | None:
+    """Particle texture INDEX (parse_particle_textures' table: palette offset, 0, texel offset,
+    side of a square texture, into the particle texture data), or None when there is none such."""
+    count, at = unpack("<2i", level.index, 0x50)
+    base, = unpack("<i", level.index, 0x64)
+    if not 0 <= index < count:
+        return None
+    palette, _, texels, side = unpack("<4i", level.index, at + 16 * index)
+    pixels = level.core[base + texels:base + texels + side * side]
+    colours = level.core[base + palette:base + palette + 1024]
+    if len(pixels) < side * side or len(colours) < 1024:
+        return None
+    return Texture(side, side, pixels, colours)
 
 
 def find_ball(program: bytes, sections: list[dict]) -> int | None:

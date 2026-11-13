@@ -461,12 +461,15 @@ class LevelWriter:
             return
         out = self.dir / "effects"
         out.mkdir(exist_ok=True)
-        for index in (effects.BALL_TEXTURE, effects.RING_TEXTURE):
-            texture = effects.effect_texture(self.level, index)
-            if texture is None:
-                return
-            (out / f"fx_{index}.png").write_bytes(texture.png())
-        tables["textures"] = {"ball": f"fx_{effects.BALL_TEXTURE}.png", "ring": f"fx_{effects.RING_TEXTURE}.png"}
+        pictures = {"ball": (f"fx_{effects.BALL_TEXTURE}.png", effects.effect_texture(self.level, effects.BALL_TEXTURE)),
+                    "ring": (f"fx_{effects.RING_TEXTURE}.png", effects.effect_texture(self.level, effects.RING_TEXTURE)),
+                    "spark": (f"part_{effects.SPARK_TEXTURE}.png",
+                              effects.particle_texture(self.level, effects.SPARK_TEXTURE))}
+        if any(texture is None for _, texture in pictures.values()):
+            return
+        for file, texture in pictures.values():
+            (out / file).write_bytes(texture.png())
+        tables["textures"] = {key: file for key, (file, _) in pictures.items()}
         (out / "nanotech.json").write_text(json.dumps(tables) + "\n")
 
     def write_mobys(self, placements: list[dict], classes: dict[int, MobyClass | None]) -> None:
