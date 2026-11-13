@@ -138,6 +138,11 @@ bool allocate_chunk(Chunk& c, VkDeviceSize size) {
         VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT;
     alloc.requiredFlags =
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+    // DIAGNOSTIC (temporary): the ring in host-cached memory.
+    if (std::getenv("OPENRAC_DBG_RING_CACHED") != nullptr) {
+        alloc.requiredFlags |= VK_MEMORY_PROPERTY_HOST_CACHED_BIT;
+        alloc.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT;
+    }
     VmaAllocationInfo got{};
     if (!check(
             vmaCreateBuffer(g->allocator, &info, &alloc, &c.buffer, &c.allocation, &got),
@@ -1011,6 +1016,18 @@ void begin_buffers() {
     g->upload_used = false;
     f.secondary_at = 0;
 
+    // DIAGNOSTIC (temporary): host writes made visible to every later read, at the start.
+    static const bool dbg_host = std::getenv("OPENRAC_DBG_HOST_BARRIER") != nullptr;
+    if (dbg_host) {
+        VkMemoryBarrier b{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
+        b.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT | VK_ACCESS_MEMORY_WRITE_BIT;
+        b.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT | VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT
+                          | VK_ACCESS_INDEX_READ_BIT | VK_ACCESS_UNIFORM_READ_BIT
+                          | VK_ACCESS_SHADER_READ_BIT;
+        vkCmdPipelineBarrier(f.main, VK_PIPELINE_STAGE_HOST_BIT | VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+                             VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 1, &b, 0, nullptr, 0, nullptr);
+    }
+
     // A command buffer begun afresh holds no dynamic state and no binds.
     g->recorded.forget();
 }
@@ -1298,7 +1315,9 @@ Target target_of(GLuint name) {
     Target t;
     if (name == 0) {
         t.colour = g->default_colour.get();
-        t.depth = g->default_depth.get();
+        // DIAGNOSTIC (temporary): the default framebuffer without its depth image.
+        static const bool dbg_nodepth = std::getenv("OPENRAC_DBG_FB0_NODEPTH") != nullptr;
+        t.depth = dbg_nodepth ? nullptr : g->default_depth.get();
     } else if (Framebuffer* fb = g->framebuffers.find(name)) {
         t.colour = image_of(fb->colour_texture, fb->colour_renderbuffer);
         t.depth = image_of(fb->depth_texture, fb->depth_renderbuffer);
@@ -1530,4 +1549,15 @@ bool test_poison_discards(bool on) {
 extern "C" void openrac_dbg_where(int on) {
     static const bool enabled = std::getenv("OPENRAC_DBG_WHERE") != nullptr;
     openrac::vkgl::detail::g_dbg_where = enabled && on != 0;
+}
+
+// DIAGNOSTIC (temporary): ends the pass and waits for all earlier work, every stage and access.
+extern "C" void openrac_dbg_full_barrier() {
+    using namespace openrac::vkgl::detail;
+    end_rendering(PassEnd::Barrier);
+    VkMemoryBarrier b{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
+    b.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT | VK_ACCESS_MEMORY_WRITE_BIT;
+    b.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT | VK_ACCESS_MEMORY_WRITE_BIT;
+    vkCmdPipelineBarrier(frame().main, VK_PIPELINE_STAGE_HOST_BIT | VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+                         VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 1, &b, 0, nullptr, 0, nullptr);
 }

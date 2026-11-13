@@ -17,6 +17,7 @@
 
 namespace openrac::renderer::ui::imgui_gl {
 extern "C" void openrac_dbg_where(int on);
+extern "C" void openrac_dbg_full_barrier();
 
 namespace {
 
@@ -156,6 +157,10 @@ void render(const ImDrawData* data) {
     static const bool dbg_font_sub = std::getenv("OPENRAC_DBG_FONT_SUB") != nullptr;
     if (dbg_finish) {
         glFinish();
+    }
+    static const bool dbg_barrier = std::getenv("OPENRAC_DBG_OVERLAY_BARRIER") != nullptr;
+    if (dbg_barrier) {
+        openrac_dbg_full_barrier();
     }
     if (dbg_font_sub) {
         unsigned char* pixels = nullptr;
