@@ -120,7 +120,14 @@ class PlayerActions(unittest.TestCase):
     def test_mods_work_in_the_data_folder(self):
         extract, pack = self.pal["editor-extract"], self.pal["editor-pack"]
         self.assertEqual(extract["args"][-3:], ["{data}/levels/pal", "--split", "--anywhere"])
-        self.assertEqual(pack["args"][-3:], ["{data}/levels/pal", "{data}/packed/pal", "--anywhere"])
+        self.assertEqual(pack["args"][3:5], ["{data}/levels/pal", "{data}/packed/pal"])
+        self.assertEqual(pack["args"][-1], "--anywhere")
+        # The packed levels' moby start states: the copy's states program, the port's levels in the data folder.
+        self.assertEqual(pack["args"][pack["args"].index("--levels") + 1], "{data}/port/pal")
+        self.assertEqual(pack["args"][pack["args"].index("--states") + 1],
+                         "{root}/port/build/release/openrac-rac1-pal-states")
+        opened = self.pal["editor-open"]["args"]
+        self.assertEqual(opened[opened.index("--openrac-levels") + 1], "{data}/port/pal")
         self.assertEqual(pack["artifact"], "{data}/levels/pal/level_00/project.godot")
         self.assertEqual(self.pal["editor-open"]["artifact"], "{data}/levels/pal/level_{level}/project.godot")
         self.assertIn("{data}/levels/pal/level_{level}", self.pal["editor-open"]["args"])

@@ -267,7 +267,13 @@
           "pack",
           "{disc}",
           "assets/levels/rac1/pal",
-          "assets/packed/rac1/pal"
+          "assets/packed/rac1/pal",
+          "--states",
+          "{root}/port/build/release/openrac-rac1-pal-states",
+          "--data",
+          "{data}",
+          "--levels",
+          "{root}/assets/port/rac1/pal"
         ],
         "output": "assets/packed/rac1/pal",
         "cwd": ".",
@@ -1038,7 +1044,13 @@
           "pack",
           "{disc}",
           "assets/levels/rac1/ntsc",
-          "assets/packed/rac1/ntsc"
+          "assets/packed/rac1/ntsc",
+          "--states",
+          "{root}/port/build/release/openrac-rac1-ntsc-states",
+          "--data",
+          "{data}",
+          "--levels",
+          "{root}/assets/port/rac1/ntsc"
         ],
         "output": "assets/packed/rac1/ntsc",
         "cwd": ".",

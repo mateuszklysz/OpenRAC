@@ -251,7 +251,8 @@ Options parse(int argc, char** argv) {
 
     // --moby-states FILE (moby_states.h): straight into the --level, no movies, no card of the
     // player's (an empty one in the temporary folder, which the game finds blank and asks nothing
-    // of), no mods.
+    // of), none of the player's native mods (a mod list that is not there), and no mods folder but
+    // the packed levels --mods names (editor/moby_states.py after_pack).
     if (!moby_states_out.empty()) {
         if (openrac_game_start_level < 0) {
             usage("--moby-states needs --level");
@@ -259,12 +260,14 @@ Options parse(int argc, char** argv) {
         moby_states::request(moby_states_out, moby_states_ticks);
         openrac_game_direct_start = 1;
         o.skip_movies = true;
-        o.no_mods = true;
+        o.no_mods = o.no_mods || o.mods.empty();
+        std::error_code e;
+        const fs::path temp = fs::temp_directory_path(e) / "openrac-moby-states-card";
         if (o.cards.empty()) {
-            std::error_code e;
-            o.cards = fs::temp_directory_path(e) / "openrac-moby-states-card";
+            o.cards = temp;
             fs::create_directories(o.cards, e);
         }
+        o.plugins = temp / "no-plugins.json";
     }
 
     if (o.data.empty()) {

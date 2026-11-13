@@ -602,6 +602,11 @@ def main() -> None:
     packing.add_argument("out", type=Path, help="where the packed levels go (under assets/ or build/)")
     packing.add_argument("--anywhere", action="store_true",
                          help="OUT may be outside this repository (the installed launcher's data folder)")
+    packing.add_argument("--states", type=Path, metavar="FILE",
+                         help="the port's states program: the packed levels' moby start states are worked "
+                              "out again for the editor (moby_states.py), with --data and --levels")
+    packing.add_argument("--data", type=Path, help="the port's game data, for --states")
+    packing.add_argument("--levels", type=Path, help="the port's levels, for --states")
     dump = commands.add_parser("raw")
     dump.add_argument("iso", type=Path)
     dump.add_argument("out", type=Path)
@@ -671,10 +676,11 @@ def main() -> None:
                 # Build beside the published pack. An unsupported Godot edit must not leave a
                 # half pack behind or replace the last good one: pack.py records such edits in
                 # changes.txt so authors can see exactly what needs attention.
-                result = {}
+                result, moby_names = {}, {}
 
                 def build_pack(directory: Path) -> None:
-                    levels, mobys = pack(disc, survey, args.project, directory)
+                    moby_names.clear()
+                    levels, mobys = pack(disc, survey, args.project, directory, moby_names)
                     report = (directory / "changes.txt").read_text()
                     incomplete = [line.strip() for line in report.splitlines()
                                   if line.lstrip().startswith("not packed:")]
@@ -687,6 +693,13 @@ def main() -> None:
                 dest = publish(dest, build_pack, args.anywhere, replace=True)
                 print(result["report"], end="")
                 print(f"Packed {result['levels']} level(s), {result['mobys']} moby edit(s): {dest}")
+                program = args.states if args.states is None or args.states.is_file() else args.states.with_suffix(".exe")
+                if program is not None and program.is_file() and args.data and args.levels:
+                    import moby_states
+                    for line in moby_states.after_pack(program, args.data, args.levels, dest, args.project, moby_names):
+                        print(line)
+                elif program is not None:
+                    print(f"moby start states not worked out: no states program at {args.states}, or no --data and --levels")
                 say_output(dest)
             else:
                 dest = publish(args.out, lambda out: raw(disc, survey, args.level[0], out))

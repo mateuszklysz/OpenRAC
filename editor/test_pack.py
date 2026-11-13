@@ -188,6 +188,19 @@ class AddAndDelete(unittest.TestCase):
         self.assertEqual(self.pvar(out, 1)[0], 0)                               # block 1's is the first: stays
         self.assertEqual(len(out), len(self.data))                              # nothing grew: all in place
 
+    def test_the_packed_table_names_its_nodes(self):
+        # moby_states.py after_pack: each packed moby's node, in the packed table's order.
+        names = []
+        text = scene(self.data, lambda i, node: [] if i == 1 else node) + (
+            '\n[node name="Crate" parent="Game/Mobys" instance=ExtResource("moby_500")]\n')
+        pack_level(0, self.data, text, None, names)
+        self.assertEqual(names[1:], ["Moby_0002", "Crate"])
+        self.assertEqual(len(names), 3)
+        unchanged = []
+        pack_level(0, self.data, scene(self.data), None, unchanged)
+        self.assertEqual(len(unchanged), 3)
+        self.assertTrue(unchanged[2].endswith("_0002"))
+
     def test_a_link_to_a_deleted_moby_becomes_none(self):
         out, _, _ = pack_level(0, self.data, scene(self.data, lambda i, node: [] if i == 2 else node))
         self.assertEqual(self.pvar(out, 0)[0], -1)

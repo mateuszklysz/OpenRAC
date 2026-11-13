@@ -446,8 +446,10 @@ func decide_start() -> void:
 
 	var states: Variant = game_states()
 
-	# The game's own run, when there is one; the class rules only explain it.
-	if states != null:
+	# The game's own run, when there is one and it had this moby; the class rules only explain
+	# it. A moby added in the editor since (no record, or a name the packed level did not have)
+	# goes by the rules alone until the level is packed again.
+	if states != null and game_key(states) != null:
 		decide_by_game(states, rule)
 
 		# A class whose code brings it out once Ratchet enters a volume.
@@ -491,12 +493,20 @@ func game_states() -> Variant:
 	if known.get("time", -1) != time:
 		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
 		var mobys: Dictionary = {}
+		var packed: bool = parsed is Dictionary and bool(parsed.get("packed", false))
 
+		# From the disc's level a moby is its record (rc1_index); from a packed one, its node's
+		# name, as the packed table's order is not the scene's (moby_states.py after_pack).
 		if parsed is Dictionary:
 			for moby in parsed.get("mobys", []):
-				mobys[int(moby["key"])] = moby
+				if not packed:
+					mobys[int(moby["key"])] = moby
+				elif moby.get("name") is String:
+					mobys[String(moby["name"])] = moby
 
-		known = {"time": time, "mobys": mobys, "ticks": int(parsed.get("ticks", 0)) if parsed is Dictionary else 0}
+		known = {"time": time, "mobys": mobys, "packed": packed,
+			"names": PackedStringArray(parsed.get("names", [])) if packed else PackedStringArray(),
+			"ticks": int(parsed.get("ticks", 0)) if parsed is Dictionary else 0}
 		level_states[path] = known
 
 	return known
@@ -514,7 +524,7 @@ static func run_states(path: String) -> void:
 	if not stats is Dictionary or not stats.has("level"):
 		return
 
-	var version: String = String(stats.get("version", "ntsc"))
+	var version: String = String(stats.get("version", "pal"))
 	var root: String = ProjectSettings.globalize_path("res://").path_join("../../../../..").simplify_path()
 	var data: String = user_arg("--openrac-data", OS.get_environment("OPENRAC_DATA"))
 	var levels: String = user_arg("--openrac-levels", root.path_join("assets/port/rac1").path_join(version))
@@ -542,10 +552,21 @@ static func user_arg(name: String, fallback: String) -> String:
 	return args[at + 1] if at >= 0 and at + 1 < args.size() else fallback
 
 
+## What the game's run calls this moby: its node's name from a packed level, else its record;
+## null when the run had no such moby.
+func game_key(states: Dictionary) -> Variant:
+	if states["packed"]:
+		return String(name) if states["names"].has(String(name)) else null
+
+	# Godot's copy of a moby keeps its record's index but not its name (Moby_NNNN), as pack.py tells them apart.
+	var index: int = int(get_meta("rc1_index", -1))
+	return index if index >= 0 and String(name).ends_with("_%04d" % index) else null
+
+
 ## The start state the game's run gave.
 func decide_by_game(states: Dictionary, rule: Dictionary) -> void:
 	var seconds: float = states["ticks"] / 60.0
-	game_state = states["mobys"].get(int(get_meta("rc1_index")), {})
+	game_state = states["mobys"].get(game_key(states), {})
 
 	if game_state.is_empty():
 		hidden_at_start = true

@@ -931,8 +931,12 @@ Approximations:
   (`openrac-rac1-ntsc-states`, under a second a level) and writes
   `moby_states.json` beside `level.json`: a moby missing from it is not
   there, one marked hidden is not drawn (unless its class rule's
-  `game_hidden` says why the editor draws it anyway). Point `--levels`
-  at a custom map's packed levels to work out its mobys. The reasons
+  `game_hidden` says why the editor draws it anyway). Packing with
+  `extract.py pack ... --states FILE --data DIR --levels DIR` (as the
+  launcher packs) works the packed levels' mobys out again from the
+  packed level, by node name, since adding or deleting mobys moves
+  the others in the table; a moby added since goes by its rules alone
+  until the next pack. The reasons
   shown come from the moby's spawn flags (spawned only before, or only
   after, a mission of the planet is done; gone once killed or picked up)
   and its class's rule in `rc1/class_rules.json`, taken from the class's

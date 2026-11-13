@@ -247,8 +247,8 @@ def apply(node: dict, record: dict, original: dict | None, whole: bool, problems
     return edits
 
 
-def pack_level(level_id: int, gameplay: bytes, scene: str,
-               available_classes: set[int] | None = None) -> tuple[bytes, list[str], list[str]]:
+def pack_level(level_id: int, gameplay: bytes, scene: str, available_classes: set[int] | None = None,
+               node_names: list[str] | None = None) -> tuple[bytes, list[str], list[str]]:
     """The gameplay file with the scene's edits, what changed, and what could not be packed.
 
     A moby the scene has once keeps its place in the table. A node with the index of another
@@ -257,7 +257,8 @@ def pack_level(level_id: int, gameplay: bytes, scene: str,
     class, with a spawn number of its own and a copy of that moby's pvar block (and of the
     fixups, links and shared records that name it), and joins its group. A moby with no node
     left is deleted: the table closes up, and the groups and the pvars' moby links, which name
-    mobys by their place in the table, follow."""
+    mobys by their place in the table, follow. NODE_NAMES, when given, gets each packed moby's node
+    name, in the table's order."""
     originals = moby_instances(gameplay)
     raw = gp.records(gameplay)
     nodes = scene_mobys(scene)
@@ -369,7 +370,10 @@ def pack_level(level_id: int, gameplay: bytes, scene: str,
         for index, record in kept.items():
             out[start + 0x10 + index * SIZE:start + 0x10 + (index + 1) * SIZE] = record
         # The gameplay data (pvars, links, volumes, paths, cameras...): gamedata.py.
-        return gamedata.pack_level(gameplay, bytes(out), scene, {owner[i]["name"]: i for i in kept}, changes, problems)
+        numbering = {owner[i]["name"]: i for i in kept}
+        if node_names is not None:
+            node_names[:] = sorted(numbering, key=numbering.get)
+        return gamedata.pack_level(gameplay, bytes(out), scene, numbering, changes, problems)
 
     # The table again: the mobys that stay, in their order, then the new ones.
     if len(kept) + len(added) > 0x8000:
@@ -460,6 +464,8 @@ def pack_level(level_id: int, gameplay: bytes, scene: str,
             sections[pointer] = new
     numbering = {owner[old]["name"]: new for old, new in place.items()}
     numbering.update({name: len(kept) + k for k, name in enumerate(added_names)})
+    if node_names is not None:
+        node_names[:] = sorted(numbering, key=numbering.get)
     return gamedata.pack_level(gameplay, gp.replace(gameplay, sections), scene, numbering, changes, problems)
 
 
@@ -703,8 +709,11 @@ def pack_cutscenes(scene_dir: Path, out_dir: Path, level_id: int | None = None, 
     return changes, problems
 
 
-def pack(disc, survey: dict, project: Path, out: Path) -> tuple[int, int]:
-    """Writes OUT from the scenes of PROJECT, for DISC's version. Returns (levels packed, mobys changed)."""
+def pack(disc, survey: dict, project: Path, out: Path,
+         moby_names: dict[int, tuple[Path, list[str]]] | None = None) -> tuple[int, int]:
+    """Writes OUT from the scenes of PROJECT, for DISC's version. Returns (levels packed, mobys changed).
+    MOBY_NAMES, when given, gets each level whose mobys were packed: its scene's folder and its
+    mobys' node names in the packed table's order (moby_states.py works out their start states)."""
     import scenery          # it reads the scene with this module's reader
     patches, virtual, report, packed, total = [], [], [], 0, 0
     headers: dict[int, bytearray] = {}
@@ -756,7 +765,8 @@ def pack(disc, survey: dict, project: Path, out: Path) -> tuple[int, int]:
             target_level = load_level(disc, info)
             available_classes = {struct.unpack_from("<i", entry, 4)[0]
                                  for entry in target_level.table(0x18, 32)}
-        edited, changes, problems = pack_level(info["id"], gameplay, text, available_classes)
+        names: list[str] = []
+        edited, changes, problems = pack_level(info["id"], gameplay, text, available_classes, names)
         if edited != gameplay and len(edited) > EXPANDED_RAM_BYTES:
             raise FormatError(f"level {info['id']:02}: decoded gameplay data is {len(edited)} bytes; it cannot "
                               "fit in the 256 MiB expanded guest RAM arena", code="level-too-big")
@@ -864,6 +874,8 @@ def pack(disc, survey: dict, project: Path, out: Path) -> tuple[int, int]:
             report.append(f"  gameplay stream expanded to {len(stream)} bytes in virtual sectors")
         packed += 1
         total += len(changes)
+        if moby_names is not None:
+            moby_names[info["id"]] = (scene.parent, names)
     out.mkdir(parents=True, exist_ok=True)
     for level, header in sorted(headers.items()):
         info = survey["levels"][level]
