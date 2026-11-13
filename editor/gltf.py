@@ -26,6 +26,8 @@ def face_normal(a, b, c) -> tuple[float, float, float]:
 
 
 class Gltf:
+    light_uv2 = False  # write a tie or shrub vertex's light slot as TEXCOORD_1 too (the editor's glbs)
+
     def __init__(self):
         self.buffer = bytearray()
         self.doc = {"asset": {"version": "2.0", "generator": "OpenRAC editor"},
@@ -128,6 +130,8 @@ class Gltf:
                     attributes["COLOR_0"] = self.floats([mesh.colours[v] for v in used])
                 if mesh.light_slots is not None:
                     attributes["_LIGHT_SLOT"] = self.floats([(mesh.light_slots[v],) for v in used])
+                    if self.light_uv2:
+                        attributes["TEXCOORD_1"] = self.floats([(mesh.light_slots[v], 0.0) for v in used])
                 primitives.append({"attributes": attributes, "indices": self.indices([local[v] for v in corners]),
                                    "material": materials[key], "mode": 4})
                 continue
@@ -139,6 +143,8 @@ class Gltf:
                 attributes["COLOR_0"] = self.floats([mesh.colours[v] for v in corners])
             if mesh.light_slots is not None:
                 attributes["_LIGHT_SLOT"] = self.floats([(mesh.light_slots[v],) for v in corners])
+                if self.light_uv2:
+                    attributes["TEXCOORD_1"] = self.floats([(mesh.light_slots[v], 0.0) for v in corners])
             primitives.append({"attributes": attributes, "material": materials[key], "mode": 4})
         self.doc["meshes"].append({"name": mesh.name, "primitives": primitives})
         return len(self.doc["meshes"]) - 1

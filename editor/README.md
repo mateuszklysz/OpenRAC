@@ -893,9 +893,15 @@ Extracted:
 
 Approximations:
 
-- Normals are flat, and Godot lights the scene. The game's own lighting,
-  baked into vertex colours, is not decoded yet. Mobys use their stored
-  vertex normals; the game lights them at run time.
+- Lit as the game lights the level (Ratchet & Clank): the terrain with
+  its vertex colours, each tie and shrub with the colours the game gives
+  it at level load (one per light slot, in `ties_light.png` and
+  `shrubs_light.png`, read by `rc1/lit_object.gdshader`), and each moby
+  with the level's light sets and its own ambient and light word
+  (`rc1/lit_moby.gdshader`, `rc1/moby_light.gd`), as the game lights it
+  every frame. Godot's sun and ambient light do not reach these. A moby
+  lit in floats, close to the game's bytes, not bit for bit; point lights
+  are left out. A moved tie or shrub keeps the light of where it was.
 - Alpha-tested textures become cutouts.
 - Moby faces the game draws untextured get a flat grey texture, which is
   what the game binds for them. Some classes are made only of such faces

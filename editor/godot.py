@@ -33,7 +33,7 @@ from pathlib import Path
 from collision import Collision, collision_mesh, decode
 import collision_scene
 from formats import FormatError, png, unpack
-from lighting import light_bank
+from lighting import light_bank, light_shrub_instance, light_tie_instance
 import gamedata
 import games
 from gltf import Gltf
@@ -42,10 +42,10 @@ from mesh import Mesh
 from moby_class import GREY, METAL_CHROME, METAL_GLASS, UNTEXTURED, MobyClass, moby_classes
 import moby_collision_scene
 from mobys import LEVEL_NAMES, moby_logic, node_name, moby_class_names, moby_instances
-from shrubs import shrub_classes, shrub_instances
+from shrubs import shrub_class_normals, shrub_classes, shrub_instances
 from sky import level_sky, panorama
 from terrain import terrain
-from ties import tie_classes, tie_instances
+from ties import tie_classes, tie_instances, tie_slot_normals
 
 SCRIPTS = Path(__file__).parent / "rc1"
 # The Collision dock, an editor plugin (addons/openrac_collision/plugin.gd): editor tooling only.
@@ -63,6 +63,8 @@ SCHEMA = PROJECT_FORMAT["schema"]
 COLLISION_ALPHA = 0.55
 MIN_SCALE = 1e-4  # the smallest joint scale the editor's models get (LevelWriter.scale)
 PANORAMA = (2048, 1024)  # About one texel per pixel around the horizon.
+# project.godot's [rendering] buffer for instance shader parameters: each tie's and shrub's light
+# row and each moby's light (rc1/lit_object.gdshader, rc1/lit_moby.gdshader) take room in it.
 
 PROJECT = """config_version=5
 
@@ -85,6 +87,10 @@ texture={{
 "detect_3d/compress_to": 0,
 "mipmaps/generate": true
 }}
+
+[rendering]
+
+limits/global_shader_variables/buffer_size=1048576
 
 [editor_plugins]
 
@@ -220,9 +226,11 @@ class LevelWriter:
         self.textures[name] = texture
         return gltf.material(name, f"{'../' * depth}textures/{name}.png", cutout=texture.cutout, clamp=clamp)
 
-    def glb(self, path: str, meshes: list[Mesh], depth: int) -> str:
-        """Write meshes, one node each, to path; return its res:// path."""
+    def glb(self, path: str, meshes: list[Mesh], depth: int, light_uv2: bool = False) -> str:
+        """Write meshes, one node each, to path; return its res:// path. light_uv2: a tie's or
+        shrub's light slots go out as UV2.x too, for the editor's lit_object shader."""
         gltf = Gltf()
+        gltf.light_uv2 = light_uv2 and self.godot_scales
         for mesh in meshes:
             materials = {key: self.material(gltf, key, depth) for key in mesh.faces}
             gltf.node(mesh.name, gltf.mesh(mesh, materials))
@@ -320,9 +328,24 @@ class LevelWriter:
         self.write_terrain(terrain(level.block(unpack("<I", level.index, 0x08)[0]), lod, lights, problems)
                            + chunk_terrain(level, lod, lights, problems), lod)
         ties = tie_classes(level)
-        self.write_objects("tie", ties, tie_instances(level.instances, ties, fmt, problems))
+        tie_placements = tie_instances(level.instances, ties, fmt, problems)
         shrubs = shrub_classes(level)
-        self.write_objects("shrub", shrubs, shrub_instances(level.instances, shrubs, fmt, problems))
+        shrub_placements = shrub_instances(level.instances, shrubs, fmt, problems)
+        if lights is not None:
+            # Ties and shrubs lit as the game lights them at level load (as the port's writer does):
+            # each instance's 64 (tie) or 24 (shrub) colours, one per light slot of its class.
+            tie_normals = tie_slot_normals(level) if fmt.lighting else None
+            for p in tie_placements if tie_normals is not None else ():
+                p["colours"] = light_tie_instance(tie_normals[p["class_id"]], p["matrix"], p["ambient"],
+                                                  p["directional_lights"], lights[0])
+            if self.godot_scales:
+                self.write_light_bank(lights[0])
+            shrub_normals = shrub_class_normals(level)
+            for p in shrub_placements:
+                p["colours"] = light_shrub_instance(shrub_normals[p["class_id"]], p["matrix"], p["colour"],
+                                                    p["directional_lights"], lights[0])
+        self.write_objects("tie", ties, tie_placements)
+        self.write_objects("shrub", shrubs, shrub_placements)
         if fmt.packable:  # the gameplay data, packed back by pack.py (gamedata.py)
             self.moby_extra = gamedata.moby_metadata(level.gameplay)
         self.write_mobys(moby_instances(level.gameplay, fmt), moby_classes(level))
@@ -364,6 +387,22 @@ class LevelWriter:
         self.scene.node("Collision", "Game/Collision", index=0, surface_material_override__0=material)
         self.scene.editable.append("Game/Collision")
 
+    def write_light_bank(self, bank) -> None:
+        """light_bank.json: the level's 16 directional light sets as floats (colour A, direction A,
+        colour B, direction B; directions in Godot's axes), which rc1/import_lit.gd gives the
+        mobys' lit_moby shader."""
+        def floats(words):
+            return [struct.unpack("<f", struct.pack("<I", w))[0] for w in words]
+
+        sets = [[floats(colour_a), self.godot_axes(floats(dir_a)), floats(colour_b), self.godot_axes(floats(dir_b))]
+                for colour_a, dir_a, colour_b, dir_b in bank]
+        (self.dir / "light_bank.json").write_text(json.dumps({"sets": sets}) + "\n")
+
+    @staticmethod
+    def godot_axes(v: list[float]) -> list[float]:
+        """A game (x, y, z, w) vector in Godot's axes (GAME_TO_GODOT)."""
+        return [v[0], v[2], -v[1], v[3]]
+
     def write_terrain(self, fragments: list[Mesh], lod: int) -> None:
         if self.godot_scales:
             # The game multiplies a texel by the vertex colour as stored (0x80 = 1.0, up to 2.0);
@@ -383,10 +422,19 @@ class LevelWriter:
     def write_objects(self, family: str, classes: dict[int, Mesh], placements: list[dict]) -> None:
         """One GLB per class, and one instance of it per placement."""
         group, title = f"{family.capitalize()}s", family.capitalize()
-        scenes = {class_id: self.scene.resource("PackedScene", self.glb(f"{family}s/{family}_{class_id}.glb", [mesh], 1),
+        scenes = {class_id: self.scene.resource("PackedScene",
+                                                self.glb(f"{family}s/{family}_{class_id}.glb", [mesh], 1, True),
                                                 f"{family}_{class_id}")
                   for class_id, mesh in classes.items()}
         self.scene.node(group, "Game", "Node3D")
+        # The instances' lit colours, one row each, a column per light slot (the glb's UV2.x):
+        # rc1/import_lit.gd gives the class a shader that reads its instance's row.
+        lit = [p for p in placements if p.get("colours")]
+        rows = {p["index"]: row for row, p in enumerate(lit)}
+        if lit:
+            width = max(len(p["colours"]) for p in lit)
+            pixels = b"".join(bytes(v for c in p["colours"] for v in c).ljust(width * 4, b"\x80") for p in lit)
+            (self.dir / f"{family}s_light.png").write_bytes(png(width, len(lit), 6, pixels))
         for p in placements:
             fields = {f"metadata__rc1_{k}": v for k, v in p.items()
                       if k not in ("class_id", "matrix", "stored_w", "ambient", "colours")}
@@ -394,6 +442,9 @@ class LevelWriter:
                 fields["metadata__rc1_matrix_w"] = p["stored_w"]
             self.scene.node(f"{title}_{p['index']:04}", f"Game/{group}", instance=scenes[p["class_id"]],
                             transform=transform(p["matrix"]), **fields)
+            if p["index"] in rows:
+                self.scene.node(classes[p["class_id"]].name, f"Game/{group}/{title}_{p['index']:04}",
+                                **{"instance_shader_parameters/light_row": rows[p["index"]]})
             self.place(classes[p["class_id"]], p["matrix"])
         self.stats["meshes"] += len({p["class_id"] for p in placements})
         self.stats[f"{family}s"] = {"classes": len(classes), "instances": len(placements),
@@ -573,6 +624,9 @@ def write_marker(path: Path, class_id: int, label: str, model: tuple[str, float,
             about.append(("C: " if logic["decompiled"] else "Still assembly, in ") + logic["file"])
     elif name is not None or model is not None:
         about.append("No update function in this level")
+    if model is not None:
+        # Lights the model as the game lights the moby, from its rc1_colour and rc1_light (moby_light.gd).
+        facts["script"] = scene.resource("Script", "res://rc1/moby_light.gd", "light")
     scene.node(f"Moby_{class_id}", kind="Node3D", metadata__rc1_class=class_id,
                editor_description="\n".join(about), **facts)
     if model is None:
