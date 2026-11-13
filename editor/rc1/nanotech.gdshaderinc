@@ -22,15 +22,23 @@ void vertex() {
 	vec3 up = cross(side, forward);
 	vec3 world = at + VERTEX.x * forward + VERTEX.y * side + VERTEX.z * up;
 	POSITION = PROJECTION_MATRIX * VIEW_MATRIX * vec4(world, 1.0);
-	colour = vec4(pow(COLOR.rgb * 255.0 / 128.0, vec3(2.2)), COLOR.a * 255.0 / 128.0);
+	colour = vec4(COLOR.rgb * 255.0 / 128.0, COLOR.a * 255.0 / 128.0);
 #ifdef RING
 	// (pulse * 64 + 128) / 128, pulse = bob / amplitude.
 	colour.a *= (bob * 64.0 + 128.0) / 128.0;
 #endif
+	colour.rgb = pow(colour.rgb, vec3(2.2));
 }
 
 void fragment() {
 	vec4 texel = texture(picture, UV);
+#ifdef RING
+	// The GS adds in display colour, with alpha up to 1.5: the alpha share is not linearized
+	// (else the glow is far fainter than on the PS2), only the hue, and it is kept in ALBEDO.
+	ALBEDO = texel.rgb * colour.rgb * texel.a * colour.a;
+	ALPHA = 1.0;
+#else
 	ALBEDO = texel.rgb * colour.rgb;
 	ALPHA = clamp(texel.a * colour.a, 0.0, 1.0);
+#endif
 }
