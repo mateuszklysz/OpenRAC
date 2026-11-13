@@ -934,8 +934,15 @@ Approximations:
   and its class's rule in `rc1/class_rules.json`, taken from the class's
   code (an amoeboid hides itself unless its pvars say otherwise). A moby
   the game hides is not drawn; the project setting
-  `openrac/editor/show_hidden_mobys` draws it faint. "Depends on the
-  game" marks what the player's save or progress decides. The nanotech
+  `openrac/editor/show_hidden_mobys` draws it faint (it applies at
+  once). "Depends on the game" marks what the player's save or
+  progress decides; one that a mission or a volume can change carries
+  a warning in the scene tree. In a cutscene, the moby's Inspector
+  buttons "Show/Hide in the cutscene from now" add a hide or show
+  event at the preview's time, which the preview follows and the game
+  plays whatever the player did before; exporting a cutscene lists
+  such mobys the camera sees without one. The Inspector's Class Rule
+  edits the class's entry in `rc1/class_rules.json`. The nanotech
   crate's ball, which the game's code draws (`effects.py`,
   `rc1/nanotech.gd`), is drawn inside the crate, or alone with Preview
   Look set to broken, with its sparks.

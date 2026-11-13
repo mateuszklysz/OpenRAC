@@ -75,6 +75,19 @@ var hidden_at_start: bool = false
 ## Whether that depends on the player's progress or on what happens in the level.
 var depends_on_game: bool = false
 
+## Whether what the player did before may change it while a cutscene plays (a mission, a
+## volume Ratchet enters): the scene tree warns, so the cutscene can show or hide it outright.
+var may_change: bool = false
+
+## What the cutscene preview's hide and show events make of it at the preview's time: -1 none
+## (the start state), 0 shown, 1 hidden.
+var scene_hidden: int = -1
+
+## Each spawn id's hide and show events of the cutscene ([seconds, hidden], by time), and the
+## frame they were read on: read again every SEARCH_EVERY frames, once for every moby.
+static var scene_events: Dictionary = {}
+static var events_frame: int = -SEARCH_EVERY
+
 ## Why, one line per reason.
 var start_reasons: PackedStringArray = []
 
@@ -110,15 +123,22 @@ func _ready() -> void:
 
 	find_clip()
 
-	# A class without sequence 0 stays as it is.
-	if clip == &"":
+	if not Engine.is_editor_hint():
+		if clip != &"":
+			player.play(clip)
+
 		set_process(false)
 		return
 
-	if Engine.is_editor_hint():
+	# Show hidden mobys, changed in Project Settings, shows at once.
+	if has_meta("rc1_index"):
+		ProjectSettings.settings_changed.connect(show_start)
+
+	if clip != &"":
 		show_at(0.0)
-	else:
-		player.play(clip)
+
+	# Nothing to follow: no clip, and no spawn id a cutscene's event could name.
+	if clip == &"" and int(get_meta("rc1_spawn_id", -1)) < 0:
 		set_process(false)
 
 
@@ -138,7 +158,61 @@ func _process(_delta: float) -> void:
 		if cutscene == null:
 			return
 
-	show_at(cutscene.get_timeline_position())
+	var seconds: float = cutscene.get_timeline_position()
+
+	if clip != &"":
+		show_at(seconds)
+
+	follow_events(seconds)
+
+
+## Hides or shows the moby as the cutscene's events for its spawn id say at SECONDS.
+func follow_events(seconds: float) -> void:
+	var frame: int = Engine.get_process_frames()
+
+	if frame - events_frame >= SEARCH_EVERY or frame < events_frame:
+		events_frame = frame
+		scene_events = read_events(cutscene)
+
+	var now: int = -1
+
+	for event in scene_events.get(int(get_meta("rc1_spawn_id", -1)), []):
+		if event[0] > seconds:
+			break
+
+		now = 1 if event[1] else 0
+
+	if now != scene_hidden:
+		scene_hidden = now
+		show_start()
+
+
+## The cutscene's hide, show and kill events of level mobys, by spawn id (see scene_events).
+static func read_events(scene: Node) -> Dictionary:
+	var found: Dictionary = {}
+
+	for event in scene.find_children("*", "CutsceneEvent", true, false):
+		var action: int = int(event.get("action"))
+
+		# 0 hide, 1 show, 2 kill (CutsceneEvent::Action).
+		if action > 2:
+			continue
+
+		var list: Array = found.get_or_add(int(event.get("spawn_id")), [])
+		list.append([float(event.get("start")), action != 1])
+
+	for list in found.values():
+		list.sort_custom(func(a, b): return a[0] < b[0])
+
+	return found
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	if not may_change:
+		return []
+
+	return ["What the player did before decides whether it shows: " + "; ".join(start_reasons)
+		+ " Give the cutscene a Show or Hide event for spawn id %d to be sure." % int(get_meta("rc1_spawn_id", -1))]
 
 
 ## Sets the moby's ambient and light word on every mesh of its model.
@@ -208,6 +282,17 @@ func _get_property_list() -> Array[Dictionary]:
 			"usage": PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_READ_ONLY},
 	]
 
+	# One click: a cutscene event that shows or hides it from the preview's time on.
+	if int(get_meta("rc1_spawn_id", -1)) >= 0:
+		properties.append({"name": "scene_show", "type": TYPE_CALLABLE, "hint": PROPERTY_HINT_TOOL_BUTTON,
+			"hint_string": "Show in the cutscene from now,GuiVisibilityVisible", "usage": PROPERTY_USAGE_EDITOR})
+		properties.append({"name": "scene_hide", "type": TYPE_CALLABLE, "hint": PROPERTY_HINT_TOOL_BUTTON,
+			"hint_string": "Hide in the cutscene from now,GuiVisibilityHidden", "usage": PROPERTY_USAGE_EDITOR})
+
+	# The class's rule, edited here for every moby of the class (class_rules.json).
+	properties.append({"name": "class_rule", "type": TYPE_STRING, "hint": PROPERTY_HINT_EXPRESSION,
+		"usage": PROPERTY_USAGE_EDITOR})
+
 	if not looks.is_empty():
 		properties.append({"name": "preview_look", "type": TYPE_STRING, "hint": PROPERTY_HINT_ENUM,
 			"hint_string": ",".join(looks), "usage": PROPERTY_USAGE_EDITOR})
@@ -222,18 +307,34 @@ func _get(property: StringName) -> Variant:
 		if depends_on_game:
 			head += " (depends on the game)"
 
+
 		if not game_state.is_empty():
 			head += ", state %d" % int(game_state["state"])
+		if scene_hidden != -1:
+			head += "; the cutscene %s it now" % ("hides" if scene_hidden == 1 else "shows")
 
 		return head + ("\n" + "\n".join(start_reasons) if not start_reasons.is_empty() else "")
 
 	if property == &"preview_look":
 		return look
 
+	if property == &"scene_show":
+		return add_scene_event.bind(1)
+
+	if property == &"scene_hide":
+		return add_scene_event.bind(0)
+
+	if property == &"class_rule":
+		var rule: Dictionary = class_rules().get(str(int(get_meta("rc1_class", -1))), {})
+		return JSON.stringify(rule, "  ") if not rule.is_empty() else ""
+
 	return null
 
 
 func _set(property: StringName, value: Variant) -> bool:
+	if property == &"class_rule":
+		return set_class_rule(String(value))
+
 	if property != &"preview_look" or not String(value) in looks:
 		return false
 
@@ -258,6 +359,67 @@ static func class_rules() -> Dictionary:
 	return rules
 
 
+## Adds a CutsceneEvent to the edited scene's cutscene that hides (ACTION 0) or shows (1) this
+## moby from the preview's time on, so the game does the same whatever the player did before.
+func add_scene_event(action: int) -> void:
+	var scene: Node = find_cutscene()
+
+	if scene == null:
+		push_warning("There is no cutscene in this scene to add the event to.")
+		return
+
+	var event: Node = ClassDB.instantiate("CutsceneEvent")
+	event.set("action", action)
+	event.set("spawn_id", int(get_meta("rc1_spawn_id")))
+	event.set("start", scene.get_timeline_position())
+	event.name = "%s%s" % ["Show" if action == 1 else "Hide", name]
+	scene.add_child(event, true)
+	event.owner = get_tree().edited_scene_root
+	events_frame = -SEARCH_EVERY
+	var editor: Object = Engine.get_singleton("EditorInterface")
+	editor.mark_scene_as_unsaved()
+	editor.edit_node(event)
+
+
+## Saves TEXT (JSON, empty for none) as the rule of this moby's class in class_rules.json and
+## works out the start state again. Other mobys of the class take it when the scene is reopened.
+func set_class_rule(text: String) -> bool:
+	var rule: Variant = JSON.parse_string(text) if text.strip_edges() != "" else {}
+
+	if not rule is Dictionary:
+		push_warning("The class rule is not a JSON object; nothing was saved.")
+		return false
+
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(RULES_PATH)) if FileAccess.file_exists(RULES_PATH) else {}
+	var file: Dictionary = parsed if parsed is Dictionary else {}
+	var classes: Dictionary = file.get_or_add("classes", {})
+	var key: String = str(int(get_meta("rc1_class", -1)))
+
+	if rule.is_empty():
+		classes.erase(key)
+	else:
+		classes[key] = rule
+
+	var out := FileAccess.open(RULES_PATH, FileAccess.WRITE)
+
+	if out == null:
+		push_warning("Cannot write " + RULES_PATH)
+		return false
+
+	out.store_string(JSON.stringify(file, "  ") + "\n")
+	out.close()
+	rules = classes
+	hidden_at_start = false
+	depends_on_game = false
+	may_change = false
+	start_reasons.clear()
+	decide_start()
+	show_start()
+	update_configuration_warnings()
+	notify_property_list_changed()
+	return true
+
+
 ## Works out the start state of a moby the level places.
 func decide_start() -> void:
 	if not has_meta("rc1_index"):
@@ -269,9 +431,11 @@ func decide_start() -> void:
 	if flags & (SPAWN_BEFORE | SPAWN_AFTER) == SPAWN_AFTER:
 		hidden_at_start = true
 		depends_on_game = true
+		may_change = true
 		start_reasons.append("Spawned only once mission %d of this planet is done (spawn flags %d): not in a new game." % [mission, flags])
 	elif flags & (SPAWN_BEFORE | SPAWN_AFTER) == SPAWN_BEFORE:
 		depends_on_game = true
+		may_change = true
 		start_reasons.append("Gone once mission %d of this planet is done (spawn flags %d)." % [mission, flags])
 
 	if flags & SPAWN_ONCE or flags & (SPAWN_SAVED | SPAWN_ONCE) == SPAWN_SAVED:
@@ -285,11 +449,21 @@ func decide_start() -> void:
 	# The game's own run, when there is one; the class rules only explain it.
 	if states != null:
 		decide_by_game(states, rule)
+
+		# A class whose code brings it out once Ratchet enters a volume.
+		if hidden_at_start and rule.has("trigger_volume_pvar"):
+			var volume: int = int(pvar_word(String(rule["trigger_volume_pvar"]).hex_to_int()))
+
+			if volume != -1:
+				depends_on_game = true
+				may_change = true
+				start_reasons.append("Shown once Ratchet enters volume %d." % volume)
 	elif rule.has("hidden_unless_pvar"):
 		decide_by_pvars(rule)
 
 	if rule.has("progress"):
 		depends_on_game = true
+		may_change = true
 		start_reasons.append(String(rule["progress"]))
 
 	if rule.has("source"):
@@ -404,6 +578,7 @@ func decide_by_pvars(rule: Dictionary) -> void:
 		start_reasons.append("Hidden by its class's code, and nothing in its data brings it out.")
 	else:
 		depends_on_game = true
+		may_change = true
 		start_reasons.append("Hidden until Ratchet enters volume %d." % volume)
 
 
@@ -414,8 +589,8 @@ func pvar_word(offset: int) -> Variant:
 	return words[at] if at < words.size() else 0
 
 
-## Draws the moby as it starts: hidden (or faint), in its look, with the code-drawn effect of
-## its class.
+## Draws the moby as it starts, or as the cutscene's events have it at the preview's time:
+## hidden (or faint), in its look, with the code-drawn effect of its class.
 func show_start() -> void:
 	if not has_meta("rc1_index"):
 		return
@@ -427,9 +602,11 @@ func show_start() -> void:
 		effect.queue_free()
 
 	var rule: Dictionary = class_rules().get(str(int(get_meta("rc1_class", -1))), {})
-	var gone: bool = hidden_at_start or look == "broken"
+	# A cutscene event at the preview's time wins over the start state.
+	var hidden: bool = scene_hidden == 1 or (scene_hidden == -1 and hidden_at_start)
+	var gone: bool = hidden or look == "broken"
 
-	if rule.get("effect", "") == "nanotech" and not hidden_at_start:
+	if rule.get("effect", "") == "nanotech" and not hidden:
 		var directory: String = scene_file_path.get_base_dir().get_base_dir().path_join("effects")
 		var Nanotech: Script = load("res://rc1/nanotech.gd")
 		Nanotech.attach(self, directory, look)
