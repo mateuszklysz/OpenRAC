@@ -4,6 +4,9 @@ import json
 import math
 import struct
 import unittest
+from unittest import mock
+
+import moby_anim
 
 import game_scenes as gs
 
@@ -102,6 +105,38 @@ class GameScenes(unittest.TestCase):
         self.assertNotIn(5, [k["t"] for k in doc2["camera"]["keys"]])
         self.assertNotIn("fov", doc2["camera"]["keys"][5])   # tick 6, after the one left out
         json.dumps(doc2, allow_nan=False)
+
+    def test_poses(self):
+        # Two chunks of a two-joint actor: a key every 30 Hz frame, the last of the first chunk the
+        # second's first, and a loop key past the end that is no frame.
+        def keys(sequence, base, joints, rest):
+            chunk_index = sequence[0]
+            times = [float(t) for t in range(0, 97, 2)] + [97.0]
+            values = []
+            for t in times:
+                tick = chunk_index * gs.NTSC_TICKS_PER_CHUNK + t
+                key = {}
+                for j in range(joints):
+                    key[(j, "rotation")] = (0.0, 0.0, 0.0, 1.0)
+                    key[(j, "translation")] = (tick / 1024 if j else 0.5, 0.0, -1.0)
+                    key[(j, "scale")] = (1.0, 1.0, 1.0)
+                    key[(j, "post_scale")] = (2.0, 1.0, 1.0)
+                values.append(key)
+            return times, values, None
+        chunks = [{"end_tick": 150, "actors": [{"sequence": bytes([i])}]} for i in range(2)]
+        with mock.patch.object(moby_anim, "keys", keys):
+            data = gs.actor_poses(chunks, 0, 2, [])
+        record = gs.POSE_RECORD.size
+        self.assertEqual(len(data), (150 // 2 + 1) * 2 * record)
+        def field(frame, joint):
+            return gs.POSE_RECORD.unpack_from(data, (frame * 2 + joint) * record)
+        self.assertEqual(field(0, 0)[:7], (0, 0, 0, 32767, 512, 0, -1024))
+        self.assertEqual(field(0, 0)[7:], (8192, 4096, 4096))   # scale times post_scale
+        self.assertEqual(field(48, 1)[4], 96)                    # tick 96, from the second chunk
+        self.assertEqual(field(75, 1)[4], 150)                   # the last frame, at the end
+        doc = gs.to_cutscene([gs.parse_chunk(chunk(0, 90, [(10, [(1.0, 2.0, 3.0)] * 46)], []), 0)], 3, 0, {},
+                             {0: ("poses/game_scene_00_0.bin", 2)})
+        self.assertEqual(doc["actors"][0]["pose"], {"frames": "poses/game_scene_00_0.bin", "joints": 2})
 
     def test_records(self):
         header = bytearray(0x2434)

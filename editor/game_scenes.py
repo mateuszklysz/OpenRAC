@@ -9,10 +9,9 @@ tangent of half the field of view), its actors (a moby class, a position per 30 
 joint frames of its own animation) and its subtitles in five languages.
 
 What a .cutscene keeps: the camera key per tick (cuts as cuts, the field of view), each actor's
-class and place per frame, the subtitles, the speech as WAV per language. Not kept: the actors'
-joint animation (the scene's own frames, which the cutscene player has no call for) and their
-turns, which are in those frames. The actors are made from their class and stand in its first
-animation.
+class and place per frame and its own animation (every joint per 30 Hz frame, in poses/ beside
+the file: the scene's frames, so the actors move and turn as in the game), the subtitles, the
+speech as WAV per language.
 
     python3 editor/game_scenes.py DISC.iso --level 3 --out DIR [--scene K]
 """
@@ -105,7 +104,8 @@ def parse_chunk(data: bytes, index: int) -> dict:
         klass, _, _, track = unpack("<iiii", data, at)
         frames = data[at + 0x10 + 0x10]
         positions = [unpack("<3f", data, track + f * 16) for f in range(frames)]
-        actors.append({"class": klass, "positions": positions})
+        # Its own animation: a moby sequence at +0x10, its frame offsets relative to itself.
+        actors.append({"class": klass, "positions": positions, "sequence": data[at + 0x10:]})
     subtitles = []
     if subtitles_at >= SUBTITLE_MIN_OFFSET:
         at = subtitles_at
@@ -158,14 +158,56 @@ def speech_wav(disc: Disc, sector: int) -> bytes | None:
     return audio.wav_file(1, rate, audio.decode_adpcm(disc.read(sector * SECTOR + 0x30, size)))
 
 
+POSE_RECORD = struct.Struct("<4h3h3H")  # a joint's turn, place and scale in one pose frame
+
+
+def actor_poses(chunks: list[dict], a: int, joint_count: int, rest: list) -> bytes | None:
+    """Actor A's own animation over the whole scene as a pose file: one frame per 30 Hz frame
+    (tick 2f), for each joint its turn from its parent (x, y, z, w as glTF has it, s16 / 32768),
+    its place in its parent (s16, model units x 1024) and its scale (u16 / 4096). None if a
+    chunk's sequence does not decode."""
+    import moby_anim
+    end = chunks[0]["end_tick"]
+    frames: dict[int, dict] = {}
+    for i, chunk in enumerate(chunks):
+        if a >= len(chunk["actors"]):
+            continue
+        try:
+            times, values, _ = moby_anim.keys(chunk["actors"][a]["sequence"], 0, joint_count, rest)
+        except Exception:
+            return None
+        for t, key in zip(times, values):
+            tick = i * NTSC_TICKS_PER_CHUNK + round(t)
+            # A chunk's last frame is the next one's first; the sequence's loop key is no frame.
+            if t >= NTSC_TICKS_PER_CHUNK and i + 1 < len(chunks):
+                continue
+            if tick <= end and tick % 2 == 0:
+                frames.setdefault(tick // 2, key)
+    if not frames:
+        return None
+    out = bytearray()
+    last = frames[min(frames)]
+    for f in range(end // 2 + 1):
+        key = last = frames.get(f, last)
+        for j in range(joint_count):
+            q = key[(j, "rotation")]
+            t = key[(j, "translation")]
+            sc = [a_ * b_ for a_, b_ in zip(key[(j, "scale")], key[(j, "post_scale")])]
+            out += POSE_RECORD.pack(*(max(-32767, min(32767, round(v * 32767))) for v in q),
+                                    *(max(-32768, min(32767, round(v * 1024))) for v in t),
+                                    *(max(0, min(65535, round(v * 4096))) for v in sc))
+    return bytes(out)
+
+
 def vertical_fov(tan_half_fov: float) -> float:
     """The format's vertical field of view in degrees from the game's horizontal half tangent."""
     return math.degrees(2 * math.atan(tan_half_fov / GAME_ASPECT))
 
 
-def to_cutscene(chunks: list[dict], level: int, k: int, speech: dict[str, str]) -> dict:
+def to_cutscene(chunks: list[dict], level: int, k: int, speech: dict[str, str],
+                poses: dict[int, tuple[str, int]] | None = None) -> dict:
     """A .cutscene of the game's scene K of LEVEL from its parsed chunks; SPEECH: its WAV per
-    language, beside it."""
+    language, beside it; POSES: actor number to its pose file beside it and joint count."""
     end = chunks[0]["end_tick"]
     keys = []
     for i, chunk in enumerate(chunks):
@@ -201,6 +243,8 @@ def to_cutscene(chunks: list[dict], level: int, k: int, speech: dict[str, str]) 
                  "source": {"figure": "hero"} if hero else {"class": first["class"]},
                  "track": track[:1] if len({tuple(p["position"]) for p in track}) == 1 else track,
                  "end": "remove"}
+        if poses and a in poses:
+            actor["pose"] = {"frames": poses[a][0], "joints": poses[a][1]}
         actors.append(actor)
     subtitles = []
     for chunk in chunks:
@@ -224,12 +268,34 @@ def to_cutscene(chunks: list[dict], level: int, k: int, speech: dict[str, str]) 
     }
 
 
+def class_skeletons(disc: Disc, header_info: dict) -> dict[int, tuple[int, list] | None]:
+    """Each moby class of the level: its joint count and rest places (what its sequences need),
+    or None for a class without joints."""
+    import moby_anim
+    from level import load_level
+    lvl = load_level(disc, header_info)
+    out = {}
+    for entry in lvl.table(0x18, 32):
+        start, class_id = unpack("<ii", entry)
+        if not start:
+            continue
+        try:
+            blob = lvl.block(start)
+            joints = blob[8]
+            matrices, common = unpack("<2i", blob, 0x14)
+            out[class_id] = (joints, moby_anim.bind_pose(blob, joints, matrices, common)[1]) if joints and matrices and common else None
+        except FormatError:
+            out[class_id] = None
+    return out
+
+
 def export_level(disc: Disc, level: int, out: Path, only: int | None = None) -> list[Path]:
     """Writes the level's scenes to OUT/game_scene_KK.cutscene, their speech to OUT/audio/."""
     toc = disc.read(disc.version.toc_lba * SECTOR, disc.version.toc_size)
     header_info = disc.level_header(toc, level)
     header = disc.read(header_info["header_lba"] * SECTOR, 0x2434)
     written = []
+    skeletons: dict[int, tuple[int, list] | None] | None = None
     for k, record in enumerate(scene_records(header)):
         if only is not None and k != only:
             continue
@@ -248,7 +314,18 @@ def export_level(disc: Disc, level: int, out: Path, only: int | None = None) -> 
             (out / "audio").mkdir(parents=True, exist_ok=True)
             (out / path).write_bytes(wav_bytes)
             speech[language] = path
-        doc = to_cutscene(chunks, level, k, speech)
+        if skeletons is None:
+            skeletons = class_skeletons(disc, header_info)
+        poses = {}
+        for a, actor in enumerate(chunks[0]["actors"]):
+            bones = skeletons.get(actor["class"])
+            data = actor_poses(chunks, a, *bones) if bones else None
+            if data is not None:
+                path = f"poses/game_scene_{k:02}_{a}.bin"
+                (out / "poses").mkdir(parents=True, exist_ok=True)
+                (out / path).write_bytes(data)
+                poses[a] = (path, bones[0])
+        doc = to_cutscene(chunks, level, k, speech, poses)
         out.mkdir(parents=True, exist_ok=True)
         file = out / f"game_scene_{k:02}.cutscene"
         file.write_text(json.dumps(doc, indent=1, allow_nan=False) + "\n", encoding="utf-8")

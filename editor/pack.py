@@ -616,6 +616,14 @@ def check_cutscene(doc: dict, source: Path, level_id: int | None = None, spawn_i
                                 f"{len(listed)} turns a tick")
         if len(joints) > CUTSCENE_MAX_JOINTS:
             errors.append(f"actor {name!r} turns {len(joints)} joints, more than {CUTSCENE_MAX_JOINTS}")
+        pose = a.get("pose")
+        if isinstance(pose, dict):
+            count = pose.get("joints")
+            frames = file_there(pose.get("frames"), f"actor {name!r}'s pose")
+            if not isinstance(count, int) or isinstance(count, bool) or count <= 0:
+                warnings.append(f"actor {name!r}'s pose has no joint count")
+            elif frames is not None and frames.stat().st_size % (20 * count) != 0:
+                warnings.append(f"actor {name!r}'s pose: its frames are not {count} joints a frame")
         for ride in items(a.get("ride")):
             if isinstance(ride, dict) and "actor" in ride and name_of(ride["actor"]) not in known:
                 warnings.append(f"actor {name!r} rides on {ride['actor']!r}, who is not an actor")
