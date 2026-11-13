@@ -908,7 +908,10 @@ void the_world_reaches_the_game(const fs::path& plugins, const fs::path& dir) {
     write(plugins / "plugins.json", R"({"format": 1, "mods": [
         {"id": "test-a", "enabled": true, "settings": {"behaviour": "world"}}]})");
     mods::Host h = host(plugins);
-    h.play = &kPlay;
+    // Slot 1's record carries spawn id 1006 (moby_uid, SDK 1.14.9).
+    static openrac_game_play play = kPlay;
+    play.moby_uid = [](std::int32_t slot) { return slot == 1 ? 1006 : -1; };
+    h.play = &play;
     h.cards = dir / "cards";
     g_phase = OPENRAC_GAME_PHASE_PLAYING;
     g_loads = 1;
@@ -924,7 +927,8 @@ void the_world_reaches_the_game(const fs::path& plugins, const fs::path& dir) {
         (g_records
          == std::vector<int>{
              // The list: 3 mobys, keys 1, 2 (0 and 1 +1) and none, flags placed+updates / updates;
-             // a list of 2 still counts 3; the slot of key 1; no slot for key 7.
+             // a list of 2 still counts 3; the slot of key 1; no slot for key 7; slot 1's spawn
+             // id, none for slot 5.
              8000 + 3,
              8011,
              8025,
@@ -935,6 +939,7 @@ void the_world_reaches_the_game(const fs::path& plugins, const fs::path& dir) {
              8033,
              8041,
              8050,
+             8057,
              // Drive slot 0 on and off, slot 1 on; a dead slot refused; slot 1 shown driven.
              8060,
              8060,

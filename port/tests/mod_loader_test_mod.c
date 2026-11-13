@@ -233,6 +233,7 @@ static void world_frame(void) {
         s_record(8030 + s_api->moby_list(list, 2));
         s_record(8040 + s_api->moby_slot(1));
         s_record(8050 + s_api->moby_slot(7) + 1);
+        s_record(8055 + (s_api->moby_uid(1) == 1006) + (s_api->moby_uid(5) == -1));
         s_record(8060 + -s_api->moby_drive(s_mod, 0, 1));
         s_record(8060 + -s_api->moby_drive(s_mod, 0, 0));
         s_record(8060 + -s_api->moby_drive(s_mod, 1, 1));
