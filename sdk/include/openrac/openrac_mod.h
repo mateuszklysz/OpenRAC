@@ -2180,6 +2180,14 @@ typedef struct openrac_api {
      * OPENRAC_HOOK_OK, or OPENRAC_HOOK_UNKNOWN for no moby, no such joint or a port without it.
      * Since 1.14. */
     int (*moby_joint_frame)(int slot, int joint, float out[12]);
+
+    /* moby_set_joints that sets each listed joint's pose instead of turning it: its `rotation` is
+     * its turn from its parent as the game's keys keep it (the rows of its matrix are its axes in
+     * its parent's: glTF's quaternion with x, y, z negated) and its `translation` its place in its
+     * parent (in the model's units), in place of its animation's, with no scale. A scene's own
+     * animation plays this way on a moby of any class. Shares moby_set_joints' list and limit for
+     * the moby. Since 1.14. */
+    int (*moby_set_joint_poses)(openrac_mod* mod, int slot, const openrac_joint_offset* joints, int count);
 } openrac_api;
 
 /* ------------------------------------------------------------------------------------------ *

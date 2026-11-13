@@ -62,6 +62,10 @@ struct DeveloperMenu {
 };
 
 // What the loader needs of the program.
+// The flag on a joint offset's number that sets the joint's pose (openrac_api.moby_set_joint_poses)
+// rather than composing with it.
+constexpr std::uint32_t kJointPoseSet = 0x80000000u;
+
 struct Host {
     std::string game;             // "rac1"
     std::string version;          // "pal"
@@ -124,8 +128,9 @@ struct Host {
     int (*sound_set)(std::uint32_t voice, float volume, float pitch) = nullptr;
     void (*sound_stop)(std::uint32_t voice) = nullptr;
     // The hero's joints turned by a mod (interface 1.12, openrac_api.hero_set_joints): the offsets
-    // put on moby `moby`'s pose wherever it is evaluated (count 0: taken off). Null: no drawing (a
-    // test's), and the call says so.
+    // put on moby `moby`'s pose wherever it is evaluated (count 0: taken off). A joint number
+    // with kJointPoseSet (moby_set_joint_poses) sets that joint's turn and place instead of
+    // composing with them. Null: no drawing (a test's), and the call says so.
     void (*joint_offsets)(std::uint32_t moby, const openrac_joint_offset* joints, int count) =
         nullptr;
     // The edited levels' pack the game reads now (interface 1.14, openrac_api.pack_folder; it

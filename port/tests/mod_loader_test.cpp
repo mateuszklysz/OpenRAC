@@ -1779,13 +1779,15 @@ void a_scene_reaches_the_game(const fs::path& plugins) {
     CHECK(!mods::hud_hidden());
     mods::frame();
     CHECK((g_records == std::vector<int>{9801, 9800, 9811, 9811, 9810, 9820, 9831, 9830, 9840,
-                                         9841, 9841, 9850, 0x3100 + 3, 9851, 9850, 1, 9865, 9869, 9881, 9880,
+                                         9841, 9841, 9840, 9841, 9840, 9850, 0x3100 + 3, 9851, 9850, 1, 9865, 9869, 9881, 9880,
                                          9891, 9890, 9901, 9900, 9900}));
     CHECK(
         (g_cutscene_calls
          == std::vector<std::string>{
              "camera",
              "music 2 25",
+             "joints 12544 1 3",
+             "joints 12544 1 2147483652",
              "joints 12544 1 3",
              "sound 12544 12 1",
              "stop 12544 5"

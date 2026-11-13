@@ -1417,6 +1417,22 @@ int api_moby_set_joints(openrac_mod* mod, int slot, const openrac_joint_offset* 
     return set_joint_set(mod, moby, joints, count);
 }
 
+// moby_set_joints with each joint's pose set, not composed: its number carries kJointPoseSet, which
+// the host's joint_offsets reads (mods.h).
+int api_moby_set_joint_poses(openrac_mod* mod, int slot, const openrac_joint_offset* joints, int count) {
+    if (count < 0 || count > OPENRAC_JOINT_OFFSETS_MAX || (count > 0 && joints == nullptr)) {
+        return OPENRAC_HOOK_UNKNOWN;
+    }
+    std::vector<openrac_joint_offset> set(joints, joints + count);
+    for (openrac_joint_offset& j : set) {
+        if (j.joint >= kJointPoseSet) {
+            return OPENRAC_HOOK_UNKNOWN;
+        }
+        j.joint |= kJointPoseSet;
+    }
+    return api_moby_set_joints(mod, slot, set.data(), count);
+}
+
 int api_moby_joint_frame(int slot, int joint, float out[12]) {
     const gaddr moby = moby_address(slot);
     if (out == nullptr || moby == 0 || joint < 0 || g_joint_frame == nullptr) {
@@ -2173,6 +2189,7 @@ void fill_motion_api(openrac_api& api, const Host& host) {
     api.tie_hide = api_tie_hide;
     api.prop_animate = api_prop_animate;
     api.moby_joint_frame = api_moby_joint_frame;
+    api.moby_set_joint_poses = api_moby_set_joint_poses;
 }
 
 float camera_fov() {

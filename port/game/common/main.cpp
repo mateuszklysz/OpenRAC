@@ -407,8 +407,14 @@ void load_mods() {
         mods.reserve(static_cast<std::size_t>(count));
         for (int i = 0; i < count; ++i) {
             assets::rac1::JointModifier m;
-            m.joint = static_cast<std::uint8_t>(std::min<std::uint32_t>(joints[i].joint, 0xFF));
-            m.mode = 0;  // composed with the pose: q * rotation, translation added
+            const bool set = (joints[i].joint & mods::kJointPoseSet) != 0;
+            m.joint = static_cast<std::uint8_t>(
+                std::min<std::uint32_t>(joints[i].joint & ~mods::kJointPoseSet, 0xFF)
+            );
+            // Composed with the pose (q * rotation, translation added), or the pose set: the game's
+            // blend toward the modifier, at weight 1.
+            m.mode = set ? 1 : 0;
+            m.weight = set ? 1.0f : 0.0f;
             for (int k = 0; k < 4; ++k) {
                 m.quat[k] = joints[i].rotation[k];
             }

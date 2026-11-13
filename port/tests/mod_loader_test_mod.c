@@ -418,6 +418,12 @@ static void cutscene_frame(void) {
     s_record(9840 + -s_api->moby_set_joints(s_mod, 1, &joint, 1));
     s_record(9840 + -s_api->moby_set_joints(s_mod, 6, &joint, 1));
     s_record(9840 + -s_api->moby_set_joints(s_mod, 1, &joint, OPENRAC_JOINT_OFFSETS_MAX + 1));
+    joint.joint = 4;
+    s_record(9840 + -s_api->moby_set_joint_poses(s_mod, 1, &joint, 1));
+    joint.joint = 0x80000004u;
+    s_record(9840 + -s_api->moby_set_joint_poses(s_mod, 1, &joint, 1));
+    joint.joint = 3;
+    s_record(9840 + -s_api->moby_set_joints(s_mod, 1, &joint, 1));
     s_record(9850 + -s_api->moby_joint_position(1, 3, at));
     s_record((int)at[0]);
     s_record(9850 + -s_api->moby_joint_position(6, 3, at));
