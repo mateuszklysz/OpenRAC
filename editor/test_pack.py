@@ -372,7 +372,7 @@ class PackCutscenes(unittest.TestCase):
             scene_dir, out = Path(tmp) / "level_03", Path(tmp) / "packed" / "level_03"
             cutscenes = scene_dir / "cutscenes"
             (cutscenes / "audio").mkdir(parents=True)
-            (cutscenes / "hello.cutscene").write_text(json.dumps({"format": "openrac-cutscene", "version": 1}))
+            (cutscenes / "hello.cutscene").write_text(json.dumps({"format": "openrac-cutscene", "version": 1, "length": 60}))
             (cutscenes / "broken.cutscene").write_text("{not json")
             (cutscenes / "other.cutscene").write_text(json.dumps({"format": "something-else"}))
             (cutscenes / "list.cutscene").write_text("[]")
@@ -385,6 +385,63 @@ class PackCutscenes(unittest.TestCase):
             self.assertTrue(all(p.startswith("cutscene ") for p in problems))
             copied = sorted(str(p.relative_to(out)) for p in out.rglob("*") if p.is_file())
             self.assertEqual(copied, ["cutscenes/audio/line_en.wav", "cutscenes/hello.cutscene"])
+
+    def test_checks_before_packing(self):
+        import json
+        import tempfile
+        from pathlib import Path
+        from pack import check_cutscene, pack_cutscenes
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp)
+            (source / "audio").mkdir()
+            (source / "audio" / "hi_en.wav").write_bytes(b"RIFF")
+            (source / "layers").mkdir()
+            (source / "layers" / "wave.bin").write_bytes(bytes(16 * 2 * 3))
+            good = {"format": "openrac-cutscene", "level": 3, "length": 120,
+                    "trigger": {"kind": "talk", "spawn_id": 7},
+                    "actors": [{"id": "vendor", "source": {"spawn_id": 7}},
+                               {"id": "guard", "source": {"class": 500},
+                                "layers": [{"name": "wave", "joints": [52, 53], "frames": "layers/wave.bin"}]}],
+                    "camera": {"keys": [{"t": 0, "eye": {"actor": "vendor"}}]},
+                    "sounds": [{"t": 0, "file": {"en": "audio/hi_en.wav"}, "actor": "vendor"}],
+                    "events": [{"t": 5, "do": "moby_hide", "spawn_id": 7}]}
+            asked = []
+            self.assertEqual(check_cutscene(good, source, 3, {7}, lambda: asked.append(1) or {500}), ([], []))
+            self.assertEqual(asked, [1])  # the classes only when one is spawned
+            bad = json.loads(json.dumps(good))
+            bad["level"] = 4
+            bad["length"] = 0
+            bad["actors"][1]["source"] = {"class": 501}
+            bad["actors"].append({"id": "vendor", "source": {"figure": "hero"}})
+            errors, _ = check_cutscene(bad, source, 3, {7}, {500})
+            self.assertEqual(len(errors), 4, errors)
+            odd = json.loads(json.dumps(good))
+            odd["trigger"]["spawn_id"] = 8
+            odd["actors"][0]["source"] = {"spawn_id": 9}
+            odd["actors"][1]["layers"][0]["joints"] = [52, 53, 54, 55]
+            odd["actors"][1]["ride"] = [{"t": 0, "actor": "ship"}]
+            odd["camera"]["keys"][0]["eye"]["actor"] = "nobody"
+            odd["sounds"][0]["file"] = {"en": "audio/hi_en.wav", "fr": "audio/hi_fr.wav"}
+            odd["sounds"].append({"t": 1, "file": "../outside.wav"})
+            odd["events"][0]["spawn_id"] = 99
+            errors, warnings = check_cutscene(odd, source, 3, {7}, {500})
+            self.assertEqual(errors, [])
+            self.assertEqual(len(warnings), 8, warnings)
+            # Not checked against what is not known.
+            self.assertEqual(check_cutscene(odd | {"trigger": {}}, source, None, None, None)[0], [])
+            figures = {"format": "openrac-cutscene", "length": 10,
+                       "actors": [{"id": str(i), "source": {"figure": "hero"}} for i in range(9)]}
+            self.assertEqual(len(check_cutscene(figures, source)[0]), 1)
+            # In the pack: an error leaves it out, a warning keeps it.
+            scene_dir, out = Path(tmp) / "level_03", Path(tmp) / "packed" / "level_03"
+            (scene_dir / "cutscenes").mkdir(parents=True)
+            (scene_dir / "cutscenes" / "fine.cutscene").write_text(json.dumps(good | {"actors": [], "camera": {}, "sounds": []}))
+            (scene_dir / "cutscenes" / "wrong.cutscene").write_text(json.dumps(good | {"level": 5}))
+            changes, problems = pack_cutscenes(scene_dir, out, 3, {7}, {500})
+            self.assertEqual(changes, ["cutscene fine"])
+            self.assertTrue(any(p.startswith("cutscene wrong: it is for level 5") and p.endswith("left out")
+                                for p in problems), problems)
+            self.assertFalse((out / "cutscenes" / "wrong.cutscene").exists())
 
     def test_no_cutscenes_writes_nothing(self):
         import tempfile
@@ -409,7 +466,7 @@ class PackCutscenes(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             scene_dir, out = Path(tmp) / "level_03", Path(tmp) / "packed" / "level_03"
             (scene_dir / "cutscenes").mkdir(parents=True)
-            (scene_dir / "cutscenes" / "a.cutscene").write_text(json.dumps({"format": "openrac-cutscene"}))
+            (scene_dir / "cutscenes" / "a.cutscene").write_text(json.dumps({"format": "openrac-cutscene", "length": 60}))
             secret = Path(tmp) / "secret.txt"
             secret.write_text("private")
             os.symlink(secret, scene_dir / "cutscenes" / "secret.txt")
@@ -446,7 +503,7 @@ class PackCutscenes(unittest.TestCase):
                      'spawn_id = 149\n'
                      '\n[node name="Timeline" type="AnimationPlayer" parent="Game/Cutscenes/Intro"]\n')
             (level / "level_00.tscn").write_text(scene(data) + nodes)
-            (level / "cutscenes" / "intro.cutscene").write_text(json.dumps({"format": "openrac-cutscene"}))
+            (level / "cutscenes" / "intro.cutscene").write_text(json.dumps({"format": "openrac-cutscene", "length": 60}))
             self.assertEqual(pack(Disc(), survey, project, out), (1, 1))
             self.assertTrue((out / "level_00/cutscenes/intro.cutscene").is_file())
             self.assertIn("cutscene intro", (out / "changes.txt").read_text())
