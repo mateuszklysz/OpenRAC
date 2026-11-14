@@ -592,9 +592,33 @@ func game_key(states: Dictionary) -> Variant:
 	if states["packed"]:
 		return String(name) if states["names"].has(String(name)) else null
 
-	# Godot's copy of a moby keeps its record's index but not its name (Moby_NNNN), as pack.py tells them apart.
 	var index: int = int(get_meta("rc1_index", -1))
-	return index if index >= 0 and String(name).ends_with("_%04d" % index) else null
+	return index if index >= 0 and owns_record(index) else null
+
+
+## Whether this node is the moby of record INDEX, as pack.py (pack_level) decides: Godot's copy of
+## a moby keeps its index, so of the Mobys' nodes with it the first named after it (_NNNN) is the
+## moby, else the first one.
+func owns_record(index: int) -> bool:
+	var suffix: String = "_%04d" % index
+	var parent: Node = get_parent()
+
+	if parent == null:
+		return true
+
+	var first: Node = null
+
+	for sibling in parent.get_children():
+		if int(sibling.get_meta("rc1_index", -1)) != index:
+			continue
+
+		if String(sibling.name).ends_with(suffix):
+			return sibling == self
+
+		if first == null:
+			first = sibling
+
+	return first == self
 
 
 ## The start state the game's run gave.

@@ -927,16 +927,18 @@ Approximations:
   and `assets/port/rac1/<version>` in the checkout and the data in
   `OPENRAC_DATA`. From a shell,
   `moby_states.py PROJECT --data
-  DIR --levels DIR` runs the port's states program
-  (`openrac-rac1-ntsc-states`, under a second a level) and writes
+  DIR --levels DIR` runs the same program (under a second a level)
+  and writes
   `moby_states.json` beside `level.json`: a moby missing from it is not
   there, one marked hidden is not drawn (unless its class rule's
   `game_hidden` says why the editor draws it anyway). Packing with
   `extract.py pack ... --states FILE --data DIR --levels DIR` (as the
   launcher packs) works the packed levels' mobys out again from the
   packed level, by node name, since adding or deleting mobys moves
-  the others in the table; a moby added since goes by its rules alone
-  until the next pack. The reasons
+  the others in the table; a moby added or renamed since goes by its
+  rules alone until the next pack. Of Godot's copies of a moby, the
+  one still named after its record (`_NNNN`) is that moby, as pack
+  takes it. The reasons
   shown come from the moby's spawn flags (spawned only before, or only
   after, a mission of the planet is done; gone once killed or picked up)
   and its class's rule in `rc1/class_rules.json`, taken from the class's
@@ -956,8 +958,9 @@ Approximations:
   Look set to broken, with its sparks. Rilgar's electric gates hide
   their model and draw five pulsing beams while shut
   (`rc1/electric_gate.gd`, read from the level's program for the NTSC
-  and PAL discs), and its water patches are drawn as their model's
-  square at the height the game's run gives (`moby_states.json` keeps
+  and PAL discs; on PAL v1 and Japanese ones no beams are drawn yet),
+  and its water patches are drawn as their model's square at the
+  height the game's run gives (`moby_states.json` keeps
   each moby's place); the game's ripples are not drawn.
 - Moby animations run at the game's 60 Hz tick, as ReRAC infers it. Godot
   interpolates rotation keys spherically where the game lerps, and a joint
