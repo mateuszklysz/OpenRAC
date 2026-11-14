@@ -179,6 +179,17 @@ class AddAndDelete(unittest.TestCase):
         new = moby_instances(out)[3]
         self.assertEqual((new["class_id"], new["matrix"][12:15], new["fields"]["spawn_id"]), (500, [4.0, 5.0, 6.0], 3))
 
+    def test_a_skin_or_a_behaviour_is_not_a_value(self):
+        text = scene(self.data, lambda i, node: node + ['metadata/rc1_behaviour = "spin"',
+                                                        "metadata/rc1_behaviour_speed = 90",
+                                                        'metadata/rc1_skin = "res://library/skins/a/model.glb"']
+                     if i == 1 else node)
+        text += ('\n[node name="Crate" parent="Game/Mobys" instance=ExtResource("moby_500")]\n'
+                 "transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 5, 6)\n"
+                 'metadata/rc1_behaviour = "bob"\n')
+        out, changes, problems = pack_level(0, self.data, text)
+        self.assertEqual((changes, problems), (["Crate: added, after moby 0"], []))
+
     def test_a_deleted_moby_closes_the_table_and_what_names_mobys_follows(self):
         out, changes, problems = pack_level(0, self.data, scene(self.data, lambda i, node: [] if i == 1 else node))
         self.assertEqual((changes, problems), (["BoltCrate_0001: deleted"], []))

@@ -230,7 +230,10 @@ def apply(node: dict, record: dict, original: dict | None, whole: bool, problems
     # Godot may save inherited class metadata on every instance. These facts describe
     # the class; they are not editable gameplay fields and must not become false edits.
     descriptive = ("index", "class", "class_name", "source", "update", "foreign_level", "foreign_class_scale")
-    meta = {k: v for k, v in node["meta"].items() if k not in descriptive and not gamedata.owns(k)}
+    # Skins and behaviours are packed beside the placements (skins.py, behaviours.py).
+    beside = ("skin", "behaviour")
+    meta = {k: v for k, v in node["meta"].items()
+            if k not in descriptive and not k.startswith(beside) and not gamedata.owns(k)}
     if original is None or not same_fields(meta, original["fields"]):
         for key in ALWAYS:
             if key in meta:
