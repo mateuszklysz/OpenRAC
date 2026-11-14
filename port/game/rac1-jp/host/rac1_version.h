@@ -102,6 +102,24 @@ static inline unsigned rac1_moby_vtbl_address(int level) {
 #define RAC1_ADDR_0x00203E78u 0x00204D98u
 #define RAC1_ADDR_0x001B3C80u 0x001B3A80u
 
+/* Imported moby classes' tables (rac1/host/foreign_class.c): the level's camera, rail, volume and
+ * path globals in level 0's program (release_names.json: only toad_paths moves). */
+#define RAC1_ADDR_L00_0x0015F050u 0x0015F050u
+#define RAC1_ADDR_L00_0x0015F054u 0x0015F054u
+#define RAC1_ADDR_L00_0x0015F7ECu 0x0015F7ECu
+#define RAC1_ADDR_L00_0x0015F7F0u 0x0015F7F0u
+#define RAC1_ADDR_L00_0x001601A4u 0x001601A4u
+#define RAC1_ADDR_L00_0x001601A8u 0x001601A8u
+#define RAC1_ADDR_L00_0x001601ACu 0x001601ACu
+#define RAC1_ADDR_L00_0x001601B0u 0x001601B0u
+#define RAC1_ADDR_L00_0x001601B4u 0x001601B4u
+#define RAC1_ADDR_L00_0x001601B8u 0x001601B8u
+#define RAC1_ADDR_L00_0x001601BCu 0x001601BCu
+#define RAC1_ADDR_L00_0x001601C0u 0x001601C0u
+#define RAC1_ADDR_L00_0x001601C4u 0x001601C4u
+#define RAC1_ADDR_L00_0x001601C8u 0x001601C8u
+#define RAC1_ADDR_L00_0x001B0830u 0x001B0630u
+
 /* ---- generated below ---- */
 
 /* Addresses: games/rac1's, this version's (RAC1_LADDR: in level NN's program). */

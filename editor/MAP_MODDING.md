@@ -94,14 +94,26 @@ class's size (`rc1_foreign_class_scale`); its Inspector's **Imported class**
 section says where its logic runs from. Pack copies its
 class's data from that level's core into `classes/<class>.bin`, lists it in
 `classes.tsv`, and places the moby with a copy of the first moby of that class
-in its level: its values and its pvars, with its links to other mobys cleared
-(`editor/foreign_classes.py`). The port registers the class when the level
-loads, draws it with its level's model, and runs its update in its own level's
-program: its level's data is swapped in for the call, and its code is read from
-a copy (`port/game/rac1/host/foreign_class.c`). No mod is needed, and any
-level's class can come into any other. Limits: logic that needs its level's
-paths, cameras or other mobys does not find them here (Kerwan's robot dog
-removes itself, Big Al and the statue work); each such moby costs about half a
+in its level: its values and its pvars (`editor/foreign_classes.py`). What that
+moby needs in its level comes with it:
+
+- **Its level's tables**: the zones (cuboids, spheres, cylinders, clip
+  volumes), paths, rails and cameras its pvars name by number, moved and turned
+  as the moby was, in `worlds.bin`. A guard that waits for the hero in a zone
+  of its level waits in that zone, moved to where you placed it.
+- **The mobys its links name** there (Qwark's lift, a plasmabot's hatch), placed
+  beside it as they stood there; a class this level lacks comes too.
+- **The classes its update can make** that this level lacks (a turret's shots),
+  from `editor/rac1_spawns.tsv` (`editor/spawns.py` writes it from the game's
+  code).
+
+The port registers the class when the level loads, draws it with its level's
+model, and runs its update in its own level's program: its level's data is
+swapped in for the call, its tables put in place of this level's, and its code
+is read from a copy (`port/game/rac1/host/foreign_class.c`). No mod is needed,
+and any level's class can come into any other. Limits: a place its code or its
+pvars hold as numbers (not by a table) stays where it was in its level; its
+sounds and texts are this level's; each such moby costs about half a
 millisecond a frame on a desktop.
 
 **Behaviour** (at the top of a moby's Inspector) gives a moby a simple movement

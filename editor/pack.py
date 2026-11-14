@@ -253,7 +253,8 @@ def apply(node: dict, record: dict, original: dict | None, whole: bool, problems
 def pack_level(level_id: int, gameplay: bytes, scene: str, available_classes: set[int] | None = None,
                node_names: list[str] | None = None,
                spawn_ids: dict[str, int] | None = None,
-               foreign: dict | None = None) -> tuple[bytes, list[str], list[str]]:
+               foreign: dict | None = None,
+               foreign_placed: list | None = None) -> tuple[bytes, list[str], list[str]]:
     """The gameplay file with the scene's edits, what changed, and what could not be packed.
 
     A moby the scene has once keeps its place in the table. A node with the index of another
@@ -264,7 +265,8 @@ def pack_level(level_id: int, gameplay: bytes, scene: str, available_classes: se
     left is deleted: the table closes up, and the groups and the pvars' moby links, which name
     mobys by their place in the table, follow. A moby of a class FOREIGN has (class -> its
     foreign_classes.Donor, a moby of it in its own level) takes after that moby, in no group.
-    NODE_NAMES, when given, gets each packed moby's node name, in the table's order; SPAWN_IDS each packed moby's spawn id, by its node's name."""
+    NODE_NAMES, when given, gets each packed moby's node name, in the table's order; SPAWN_IDS each packed moby's spawn id, by its node's name.
+    FOREIGN_PLACED, when given, gets each moby of a class FOREIGN has: (its record, its Donor)."""
     originals = moby_instances(gameplay)
     raw = gp.records(gameplay)
     nodes = scene_mobys(scene)
@@ -287,6 +289,8 @@ def pack_level(level_id: int, gameplay: bytes, scene: str, available_classes: se
     kept: dict[int, bytes] = {}
     added: list[tuple[dict, int | None]] = []          # the new moby's fields, the moby it takes after
     added_names: list[str] = []                         # their nodes' names
+    brought: list[tuple[dict, object]] = []             # mobys an imported moby brings along
+    instances: list[list[tuple[dict, object]]] = []     # each imported moby and what it brings
     reclassed: dict[int, dict] = {}                     # kept mobys whose class changed: their fields
     for node in nodes:
         index = index_of(node)
@@ -328,7 +332,8 @@ def pack_level(level_id: int, gameplay: bytes, scene: str, available_classes: se
                 problems.append(f"{node['name']}: added in Godot with no class scene; not packed")
                 continue
             if model is None and foreign and node["class_id"] in foreign:
-                donor = foreign[node["class_id"]]
+                group = foreign[node["class_id"]]
+                donor = group[0]
                 record = dict(donor.record, group=-1)
                 apply(node, record, None, False, problems)
                 # The editor draws it at its class's size (rc1_foreign_class_scale): the game
@@ -338,7 +343,22 @@ def pack_level(level_id: int, gameplay: bytes, scene: str, available_classes: se
                     record["scale"] /= class_scale
                 added.append((record, donor))
                 added_names.append(node["name"])
-                changes.append(f"{node['name']}: added, class {node['class_id']} from level {donor.level:02}")
+                # The mobys its links name in its level come with it, moved as it was.
+                copies = [(record, donor)]
+                import foreign_classes
+                move = foreign_classes.Move.between(donor.record, record)
+                for member in group[1:]:
+                    extra = dict(member.record, group=-1)
+                    extra["x"], extra["y"], extra["z"] = move.point(member.record["x"], member.record["y"],
+                                                                    member.record["z"])
+                    extra["rz"] = math.remainder(member.record["rz"] + move.turn, math.tau)
+                    brought.append((extra, member))
+                    copies.append((extra, member))
+                instances.append(copies)
+                if foreign_placed is not None:
+                    foreign_placed.append(copies)
+                changes.append(f"{node['name']}: added, class {node['class_id']} from level {donor.level:02}"
+                               + (f", with {len(group) - 1} moby(s) it names there" if len(group) > 1 else ""))
                 continue
             if model is None:
                 record = dict.fromkeys(FIELDS, 0)
@@ -372,6 +392,7 @@ def pack_level(level_id: int, gameplay: bytes, scene: str, available_classes: se
             problems.append(f"{node['name']}: {e}; not packed")
             if index is not None and owner[index] is node:
                 kept[index] = raw[index]
+    added += brought                                    # after the nodes' own (added_names)
     deleted = sorted(set(range(len(originals))) - set(kept))
     names = moby_class_names()
     for index in deleted:
@@ -434,6 +455,7 @@ def pack_level(level_id: int, gameplay: bytes, scene: str, available_classes: se
             record["pvar_index"] = -1
         table[place[old]] = RECORD.pack(*(record[f] for f in FIELDS))
     without_save_id = 0
+    placed_at: dict[int, int] = {}
     for record, model in added:
         if free_spawn_ids:
             record["spawn_id"] = free_spawn_ids.pop(0)
@@ -475,6 +497,7 @@ def pack_level(level_id: int, gameplay: bytes, scene: str, available_classes: se
         group = record["group"]
         if 0 <= group < len(group_lists):
             group_lists[group] = (group_lists[group] or []) + [len(table)]
+        placed_at[id(record)] = len(table)
         table.append(RECORD.pack(*(record[f] for f in FIELDS)))
     if without_save_id:
         changes.append(f"{without_save_id} added mobys have no free RAC1 spawn ID; made non-persistent "
@@ -487,6 +510,17 @@ def pack_level(level_id: int, gameplay: bytes, scene: str, available_classes: se
         moby, = struct.unpack_from("<i", data, at)
         if 0 <= moby < len(originals):
             struct.pack_into("<i", data, at, place.get(moby, -1))
+    # An imported moby's links name the mobys it brought along (foreign_classes.linked).
+    for copies in instances:
+        by_index = {member.index: record for record, member in copies}
+        for record, member in copies:
+            if record["pvar_index"] < 0:
+                continue
+            base = pvars[record["pvar_index"]][0]
+            for where, named in member.linked:
+                target = by_index.get(named)
+                if target is not None and id(target) in placed_at and base + where + 4 <= len(data):
+                    struct.pack_into("<i", data, base + where, placed_at[id(target)])
 
     imported = any(not isinstance(model, (int, type(None))) for _, model in added)
     sections = {gp.MOBYS: gp.write_records(gameplay, table)}
@@ -832,17 +866,55 @@ def pack(disc, survey: dict, project: Path, out: Path,
                 if found is None:
                     raise ValueError(f"class {class_id}: level {there:02} places no moby of it to copy")
                 blobs[class_id] = (there, foreign_classes.class_blob(source_level, class_id))
-                donors[class_id] = found
+                donors[class_id] = [found]
             except (ValueError, FormatError) as error:
                 foreign_problems.append(f"imported {error}; its mobys are not packed")
+        # What each one's links name in its level comes with it: a class this level has runs as
+        # its own, one it lacks is imported from that level too (none the scene imports elsewhere).
+        own = available_classes if available_classes is not None else \
+            {struct.unpack_from("<i", entry, 4)[0] for entry in load_level(disc, info).table(0x18, 32)} \
+            if donors else set()
+        for class_id, group in list(donors.items()):
+            there = group[0].level
+            source_gameplay, source_level = sources[there]
+            for member in foreign_classes.linked(there, source_gameplay, group[0])[1:]:
+                cid = member.class_id
+                if cid not in own and cid not in blobs:
+                    if wanted.get(cid, there) != there:
+                        continue
+                    try:
+                        blobs[cid] = (there, foreign_classes.class_blob(source_level, cid))
+                    except ValueError:
+                        continue
+                if cid in blobs and blobs[cid][0] != there:
+                    continue
+                group.append(member)
+        # And the classes its update can make that this level lacks (spawns.py: a turret's shots).
+        import spawns
+        made = spawns.table()
+        for class_id, group in list(donors.items()):
+            there = group[0].level
+            _, source_level = sources[there]
+            for member_class in sorted({member.class_id for member in group}):
+                for cid in sorted(spawns.made_by(member_class, there, made)):
+                    if cid in own or cid in blobs or wanted.get(cid, there) != there:
+                        continue
+                    try:
+                        blobs[cid] = (there, foreign_classes.class_blob(source_level, cid))
+                    except ValueError:
+                        pass
         names: list[str] = []
         moby_spawn_ids: dict[str, int] = {}
+        placed: list = []
         edited, changes, problems = pack_level(info["id"], gameplay, text, available_classes, names, moby_spawn_ids,
-                                               donors)
+                                               donors, placed)
         problems += foreign_problems
         changes += foreign_classes.write(out / name, blobs) if donors else []
         if not donors:
             foreign_classes.write(out / name, {})
+        # Each imported moby's own level's tables, moved to where it stands (foreign_classes.world).
+        changes += foreign_classes.write_worlds(
+            out / name, [(copies, sources[copies[0][1].level][0]) for copies in placed])
         if edited != gameplay and len(edited) > EXPANDED_RAM_BYTES:
             raise FormatError(f"level {info['id']:02}: decoded gameplay data is {len(edited)} bytes; it cannot "
                               "fit in the 256 MiB expanded guest RAM arena", code="level-too-big")

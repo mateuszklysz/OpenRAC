@@ -34,6 +34,10 @@
 /* foreign_class.c: the moby classes this level imports from other levels' programs (its
  * classes.tsv), read as its program loads; the stand-in update of one (0: not imported). */
 void rac1_foreign_classes_load(int level);
+/* The imported classes' tables of their own levels, after the level's loader (foreign_class.c). */
+void rac1_foreign_worlds_load(void);
+int rac1_foreign_host_world_enter(gaddr moby);
+void rac1_foreign_host_world_leave(int world);
 gaddr rac1_foreign_class_update(int oclass);
 
 /* boot.c: a new game straight in `level` from the title, as --level N with OPENRAC_DIRECT. */

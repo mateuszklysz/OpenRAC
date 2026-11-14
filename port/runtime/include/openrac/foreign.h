@@ -18,6 +18,13 @@ extern "C" {
  * foreign program keeps its own data between calls. enter returns 0, or -1 (no such program). */
 int openrac_guest_foreign_enter(int from, int loaded);
 void openrac_guest_foreign_leave(void);
+/* In the foreign program entered last, a word of its data set to `value` for the call (a table
+ * of its own level in place of the loaded level's): leave carries none of it back. */
+void openrac_guest_foreign_set(gaddr address, uint32_t value);
+/* An engine table that goes in and out whole for a call, as it is (no address in it to move):
+ * `size` bytes at `address` in level `level`'s program, and their places in the others (rac1: the
+ * moby grid, which a foreign moby's move or deletion updates). */
+void openrac_guest_foreign_carry_whole(int level, gaddr address, uint32_t size);
 /* A word of level `level`'s program as the disc has it (0 outside it). */
 uint32_t openrac_guest_level_word(int level, gaddr address);
 /* Drops the foreign programs' state (a new level load). */

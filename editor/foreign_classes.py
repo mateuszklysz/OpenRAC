@@ -10,9 +10,11 @@ the call (port/game/rac1/host/foreign_class.c). Pack writes, beside the level's 
     <out>/level_NN/classes/<class>.bin   the class's data from its level's core
 
 and places the moby with a copy of the first moby of that class in its own level: its fields and its
-pvar block (its moby links in it name no moby here: -1). Rac1 only, on any of its discs. Any
-level's class can come into any other: only its level's data is swapped in for the call, and every
-level's data ends below every level's program end.
+pvar block. The mobys its links name there come with it (linked), as does each class its update
+can make that the level lacks (spawns.py), and its level's tables, moved to where it stands, go
+to worlds.bin (world, write_worlds). Rac1 only, on any of its discs. Any level's class can come
+into any other: only its level's data is swapped in for the call, and every level's data ends
+below every level's program end.
 """
 
 from dataclasses import dataclass, field
@@ -29,7 +31,7 @@ DISCS = ("ntsc", "pal", "pal1", "jp")   # the port runs them on each (rac1_versi
 
 @dataclass
 class Donor:
-    """The first moby of a class in its own level: what a copy of it here takes."""
+    """A moby in its own level: what a copy of it here takes."""
     level: int
     class_id: int
     record: dict
@@ -37,6 +39,8 @@ class Donor:
     pointers: list[int] = field(default_factory=list)   # pointer fixups in the block (offsets)
     links: list[int] = field(default_factory=list)      # moby links in the block (offsets)
     shared: list[tuple[int, bytes]] = field(default_factory=list)   # (offset in the block, its shared data)
+    index: int = -1                                      # its place in its level's table
+    linked: list[tuple[int, int]] = field(default_factory=list)     # (offset, the moby it names there)
 
 
 def wanted(text: str) -> tuple[dict[int, int], list[str]]:
@@ -63,10 +67,13 @@ def wanted(text: str) -> tuple[dict[int, int], list[str]]:
 def donor(level: int, gameplay: bytes, class_id: int) -> Donor | None:
     """The first moby of CLASS_ID in LEVEL's gameplay file, or None."""
     first = next((m for m in moby_instances(gameplay) if m["class_id"] == class_id), None)
-    if first is None:
-        return None
-    record = dict(zip(FIELDS, RECORD.unpack(gp.records(gameplay)[first["index"]])))
-    out = Donor(level, class_id, record)
+    return None if first is None else donor_at(level, gameplay, first["index"])
+
+
+def donor_at(level: int, gameplay: bytes, index: int) -> Donor:
+    """The moby at INDEX in LEVEL's gameplay file."""
+    record = dict(zip(FIELDS, RECORD.unpack(gp.records(gameplay)[index])))
+    out = Donor(level, record["class_id"], record, index=index)
     source = record["pvar_index"]
     links, pointers = gp.fixups(gameplay, gp.LINKS), gp.fixups(gameplay, gp.POINTERS)
     used = [m["fields"]["pvar_index"] for m in moby_instances(gameplay)] + [p for p, _ in links + pointers]
@@ -79,6 +86,9 @@ def donor(level: int, gameplay: bytes, class_id: int) -> Donor | None:
         out.pointers = [where for pvar, where in pointers if pvar == source]
         for where in out.links:
             if where + 4 <= len(block):
+                named, = struct.unpack_from("<i", block, where)
+                if named >= 0:
+                    out.linked.append((where, named))
                 struct.pack_into("<i", block, where, -1)
         out.pvar = bytes(block)
         # Its shared data (a part of the file's blob that its block points at): each piece runs to
@@ -89,6 +99,23 @@ def donor(level: int, gameplay: bytes, class_id: int) -> Donor | None:
             if pvar == source and 0 <= into < len(blob):
                 end = next(s for s in starts if s > into)
                 out.shared.append((where, bytes(blob[into:end])))
+    return out
+
+
+LINKED_MAX = 24   # the mobys a moby brings along with it, at most
+
+
+def linked(level: int, gameplay: bytes, first: Donor) -> list[Donor]:
+    """FIRST and the mobys its moby links name in its level, and theirs, ..., FIRST first (at most
+    LINKED_MAX more): what it needs to run as it does there (Qwark's lift, a turret's hatch)."""
+    out, seen, count = [first], {first.index: first}, len(gp.records(gameplay))
+    i = 0
+    while i < len(out):
+        for _, named in out[i].linked:
+            if named not in seen and 0 <= named < count and len(out) <= LINKED_MAX:
+                seen[named] = donor_at(level, gameplay, named)
+                out.append(seen[named])
+        i += 1
     return out
 
 
@@ -128,3 +155,187 @@ def write(out: Path, blobs: dict[int, tuple[int, bytes]]) -> list[str]:
         lines.append(f"{class_id}\t{level}")
     (out / "classes.tsv").write_text("\n".join(lines) + "\n")
     return [f"class {c}: imported from level {lvl:02}" for c, (lvl, _) in sorted(blobs.items())]
+
+
+# Its own level's tables (worlds.bin): what the port puts in place of this level's for its update
+# (port/game/rac1/host/foreign_class.c, k_world_globals: these are their numbers there).
+CAMERAS, CAMERA_COUNT, RAILS, RAIL_COUNT = 0, 1, 2, 3
+CLIPS, CLIP_COUNT, CUBOIDS, CUBOID_COUNT = 4, 5, 6, 7
+SPHERES, SPHERE_COUNT, CYLINDERS, CYLINDER_COUNT = 8, 9, 10, 11
+PATH_COUNT, PATH_DATA, PATHS = 12, 13, 14
+# The volumes: their global, header word, size in memory, size in the file (a clip volume is read
+# 0x90 bytes at a time, 0x80 apart: its radius at +0x80 is the next one's first word).
+SHAPES = ((CLIPS, 0x6C, 0x90, 0x80), (CUBOIDS, 0x60, 0x80, 0x80), (SPHERES, 0x64, 0x80, 0x80),
+          (CYLINDERS, 0x68, 0x80, 0x80))
+
+
+@dataclass
+class Move:
+    """Where a moby of its own level now stands: turned by `turn` radians about z, then moved."""
+    turn: float
+    dx: float
+    dy: float
+    dz: float
+
+    @staticmethod
+    def between(there: dict, here: dict) -> "Move":
+        """From the moby THERE (a record of its own level) to HERE (its record in this level)."""
+        import math
+        turn = here["rz"] - there["rz"]
+        c, s = math.cos(turn), math.sin(turn)
+        x, y = there["x"] * c - there["y"] * s, there["x"] * s + there["y"] * c
+        return Move(turn, here["x"] - x, here["y"] - y, here["z"] - there["z"])
+
+    def vector(self, x: float, y: float, z: float) -> tuple[float, float, float]:
+        import math
+        c, s = math.cos(self.turn), math.sin(self.turn)
+        return x * c - y * s, x * s + y * c, z
+
+    def point(self, x: float, y: float, z: float) -> tuple[float, float, float]:
+        x, y, z = self.vector(x, y, z)
+        return x + self.dx, y + self.dy, z + self.dz
+
+
+def moved_shape(entry: bytes, move: Move) -> bytes:
+    """A volume (its axes at +0, its place at +0x30, the axes' inverse at +0x40, its angles at
+    +0x70) where MOVE puts it: the axes turned, the inverse turned with them."""
+    import math
+    out = bytearray(entry)
+    f = list(struct.unpack_from("<32f", entry, 0))
+    for row in range(3):
+        f[row * 4:row * 4 + 3] = move.vector(*f[row * 4:row * 4 + 3])
+    f[12:15] = move.point(*f[12:15])
+    c, s = math.cos(move.turn), math.sin(move.turn)
+    b0, b1 = f[16:19], f[20:23]
+    f[16:19] = [c * u - s * v for u, v in zip(b0, b1)]
+    f[20:23] = [s * u + c * v for u, v in zip(b0, b1)]
+    f[30] += move.turn
+    struct.pack_into("<32f", out, 0, *f)
+    return bytes(out)
+
+
+def moved_paths(blob: bytes, offsets: list[int], move: Move) -> bytes:
+    """Path data (each path: its point count, then 16-byte points from +0x10) with MOVE's points."""
+    out = bytearray(blob)
+    for at in sorted(set(offsets)):
+        if not 0 <= at <= len(out) - 16:
+            continue
+        count, = struct.unpack_from("<i", out, at)
+        for i in range(max(0, min(count, (len(out) - at - 16) // 16))):
+            where = at + 16 + i * 16
+            struct.pack_into("<3f", out, where, *move.point(*struct.unpack_from("<3f", out, where)))
+    return bytes(out)
+
+
+def world(gameplay: bytes, move: Move) -> tuple[list[int], list[tuple[int, int, int, int]], bytes]:
+    """LEVEL's tables (its gameplay file) as its loader lays them out, moved by MOVE: the offsets
+    of the pointers in them, the globals to set ({global, index, value, value is an offset}), the
+    data."""
+    data, relocs, sets = bytearray(), [], []
+    head = struct.unpack_from(f"<{gp.SECTIONS}i", gameplay, 0)
+
+    def word(pointer: int) -> int:
+        return head[pointer // 4]
+
+    def put(piece: bytes) -> int:
+        data.extend(bytes(-len(data) % 16))
+        at = len(data)
+        data.extend(piece)
+        return at
+
+    def table(global_: int, at: int | None, count: int) -> None:
+        sets.append((global_, 0, 0 if at is None else at, 0 if at is None else 1))
+        sets.append((global_ + 1, 0, count, 0))
+
+    for global_, pointer, size, step in SHAPES:
+        q = word(pointer)
+        count = struct.unpack_from("<i", gameplay, q)[0] if q > 0 else 0
+        pieces = [moved_shape(gameplay[q + 0x10 + i * step:q + 0x10 + i * step + size].ljust(size, b"\0"), move)
+                  for i in range(count)]
+        table(global_, put(b"".join(pieces)) if pieces else None, count)
+    # Cameras: {pos, class, angles, its pvar block}.
+    q = word(0x8)
+    count = struct.unpack_from("<i", gameplay, q)[0] if q > 0 else 0
+    if count:
+        pvar_start, _ = gp.extent(gameplay, gp.DATA)
+        table_at = word(gp.TABLE)
+        cameras, blocks = bytearray(), []
+        for i in range(count):
+            kind, x, y, z, rx, ry, rz, pvar = struct.unpack_from("<i3f3fi", gameplay, q + 0x10 + i * 0x20)
+            x, y, z = move.point(x, y, z)
+            cameras += struct.pack("<3fi3fi", x, y, z, kind, rx, ry, rz + move.turn, 0)
+            block = None
+            if pvar >= 0 and table_at > 0 and pvar_start > 0:
+                at, size = struct.unpack_from("<ii", gameplay, table_at + pvar * 8)
+                block = bytes(gameplay[pvar_start + at:pvar_start + at + size])
+            blocks.append(block)
+        base = put(bytes(cameras))
+        for i, block in enumerate(blocks):
+            if block is not None:
+                struct.pack_into("<i", data, base + i * 0x20 + 0x1C, put(block))
+                relocs.append(base + i * 0x20 + 0x1C)
+        table(CAMERAS, base, count)
+    else:
+        table(CAMERAS, None, 0)
+    # Paths: their data, then each path's address in toad_paths.
+    q = word(0x70)
+    if q > 0:
+        count, source, size = struct.unpack_from("<3i", gameplay, q)
+        offsets = list(struct.unpack_from(f"<{count}i", gameplay, q + 0x10))
+        base = put(moved_paths(gameplay[q + source:q + source + size], offsets, move))
+        sets.append((PATH_COUNT, 0, count, 0))
+        sets.append((PATH_DATA, 0, base, 1))
+        sets += [(PATHS, i, base + off, 1) for i, off in enumerate(offsets)]
+    else:
+        sets += [(PATH_COUNT, 0, 0, 0), (PATH_DATA, 0, 0, 0)]
+    # Rails: {its sphere, its path, its kind}, their paths' data after them.
+    q = word(0x74)
+    if q > 0:
+        count, source, size = struct.unpack_from("<3i", gameplay, q)
+        offsets = list(struct.unpack_from(f"<{count}i", gameplay, q + 0x10 + count * 0x20)) if count > 0 else []
+        paths = put(moved_paths(gameplay[q + source:q + source + size], offsets, move))
+        rails = bytearray()
+        for i in range(max(count, 0)):
+            x, y, z, radius = struct.unpack_from("<4f", gameplay, q + 0x10 + i * 0x20)
+            kind, = struct.unpack_from("<i", gameplay, q + 0x20 + i * 0x20)
+            rails += struct.pack("<4fIi8x", *move.point(x, y, z), radius, paths + offsets[i], kind)
+        base = put(bytes(rails))
+        relocs += [base + i * 0x20 + 0x10 for i in range(max(count, 0))]
+        table(RAILS, base, max(count, 0))
+    else:
+        table(RAILS, None, 0)
+    return relocs, sets, bytes(data)
+
+
+def write_worlds(out: Path, placed: list[tuple[list[tuple[dict, Donor]], bytes]]) -> list[str]:
+    """worlds.bin in OUT (the packed level's folder): for each imported moby (its record here and
+    its Donor, then the same for each moby it brought along; its level's gameplay file), its
+    level's tables moved to where it stands, and the mobys that use them.
+
+        "ORWD", 1, worlds, bindings
+        worlds   {at, size, relocs, sets}: at `at`, its relocs (u32 offsets in its data of words
+                 its address is added to), its sets {global, index, value, value is an offset},
+                 its data (`size` bytes)
+        bindings {class, world, x, y}: the moby of that class packed at that x and y"""
+    path = out / "worlds.bin"
+    if not placed:
+        if path.exists():
+            path.unlink()
+        return []
+    heads, bindings, sections = [], [], []
+    at = 16 + 16 * len(placed) + 16 * sum(len(copies) for copies, _ in placed)
+    total = 0
+    for w, (copies, gameplay) in enumerate(placed):
+        record, model = copies[0]
+        relocs, sets, data = world(gameplay, Move.between(model.record, record))
+        section = (struct.pack(f"<{len(relocs)}I", *relocs)
+                   + b"".join(struct.pack("<IIII", g, i, v & 0xFFFFFFFF, p) for g, i, v, p in sets) + data)
+        heads.append(struct.pack("<4I", at, len(data), len(relocs), len(sets)))
+        bindings += [struct.pack("<iI2f", r["class_id"], w, r["x"], r["y"]) for r, _ in copies]
+        sections.append(section)
+        at += len(section)
+        total += len(data)
+    out.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(b"ORWD" + struct.pack("<III", 1, len(placed), len(bindings))
+                     + b"".join(heads) + b"".join(bindings) + b"".join(sections))
+    return [f"{len(placed)} imported moby(s): their own levels' tables, {total >> 10} KB"]

@@ -215,8 +215,8 @@ func show_selected() -> void:
 		"Static scenery under Game/StaticAssets: its look, no logic. Drag it into the 3D view to place it where you drop it.")
 	own_button.disabled = not refusal.is_empty()
 	own_button.tooltip_text = (refusal if not refusal.is_empty() else
-		"Its own class and logic, run from its level's program. Pack, then play. Logic that needs its level's "
-		+ "paths or cameras may not work, and each costs about half a millisecond a frame.")
+		"Its own class and logic, run from its level's program, with its level's paths, zones and the "
+		+ "mobys it needs. Pack, then play. Each costs about half a millisecond a frame.")
 	as_button.disabled = not can_add_as(asset)
 	as_button.tooltip_text = ("Pick a class of this level: the game runs that class's logic and draws this model, animated."
 		if can_add_as(asset) else "Only for a moby this level does not have, in a level with mobys.")

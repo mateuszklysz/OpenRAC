@@ -1108,9 +1108,38 @@ std::uint32_t exe_word(gaddr at) {
     return w;
 }
 
+// The program a pair map's copies are read from when it is not the one in memory (level_pair_map:
+// an imported class's level paired with the level of another, both from the disc).
+thread_local std::uint32_t (*g_pair_copies_reader)(gaddr at) = nullptr;
+
 std::uint32_t game_word(gaddr at) {
-    return code_word(at);
+    return g_pair_copies_reader != nullptr ? g_pair_copies_reader(at) : code_word(at);
 }
+
+// While it lives, a pair map's copies are read from LEVEL's own program (from the disc) when that
+// level is not the one in memory, so a map of an imported class's level pairs its own code.
+std::uint32_t level_copy_word(gaddr at);
+thread_local int g_pair_copies_level = -1;
+
+struct CopiesFrom {
+    std::uint32_t (*was)(gaddr);
+    int was_level;
+
+    explicit CopiesFrom(int level) : was(g_pair_copies_reader), was_level(g_pair_copies_level) {
+        if (level != OPENRAC_OVERLAY_EXE && level != current_overlay()) {
+            g_pair_copies_level = level;
+            g_pair_copies_reader = level_copy_word;
+        }
+    }
+
+    ~CopiesFrom() {
+        g_pair_copies_reader = was;
+        g_pair_copies_level = was_level;
+    }
+
+    CopiesFrom(const CopiesFrom&) = delete;
+    CopiesFrom& operator=(const CopiesFrom&) = delete;
+};
 
 // Pairs the address operands of a function's executable code and its copy: known register values
 // (lui, then addiu or ori), loads and stores through them or through $gp. The two codes are the
@@ -1535,6 +1564,7 @@ LevelMap& level_map(int overlay) {
         copies[entry.fn].push_back(address);
     }
     std::map<gaddr, std::int32_t> pairs;
+    const CopiesFrom reading(overlay);
     pair_programs(exe_reader, 0, exe, std::move(copies), openrac_relocate_low, openrac_relocate_high, true,
                   map.code, pairs);
     map.data.assign(pairs.begin(), pairs.end());
@@ -1585,6 +1615,17 @@ std::uint32_t level_reader(int level, gaddr at) {
     return 0;
 }
 
+std::uint32_t level_copy_word(gaddr at) {
+    for (const Chunk& c : level_program(g_pair_copies_level)) {
+        if (at >= c.base && at + 4 <= c.base + c.bytes.size()) {
+            std::uint32_t w;
+            std::memcpy(&w, c.bytes.data() + (at - c.base), 4);
+            return w;
+        }
+    }
+    return code_word(at);
+}
+
 LevelMap& level_pair_map(int from, int loaded) {
     const auto key = std::make_pair(from, loaded);
     auto found = g_level_pair_maps.find(key);
@@ -1613,6 +1654,7 @@ LevelMap& level_pair_map(int from, int loaded) {
         copies[entry.fn].push_back(address);
     }
     std::map<gaddr, std::int32_t> pairs;
+    const CopiesFrom reading(loaded);
     pair_programs(
         level_reader,
         from,
@@ -1970,16 +2012,12 @@ static gaddr data_in_copy(int from, gaddr canon, uint32_t size, gaddr self, gadd
             return exe_word(at);
         }
         if (overlay == from) {
-            std::uint32_t w;
-            std::memcpy(&w, G(at), 4);
-            return w;
+            return code_word(at);
         }
         return level_reader(from, at);
     };
     const auto self_word = [&](gaddr at) {
-        std::uint32_t w;
-        std::memcpy(&w, G(at), 4);
-        return w;
+        return code_word(at);
     };
     // addiu, ori, and the loads and stores (lb .. sw, lwc1, swc1, ld, sd, lq, sq) that take %lo.
     const auto completes = [](std::uint32_t op) {
@@ -2044,16 +2082,12 @@ static gaddr code_in_copy_at(int from, int overlay, gaddr canon, uint32_t size, 
     // Where the copy at canon forms target: a lui and the addiu or ori that completes it.
     const auto canon_word = [&](gaddr at) -> std::uint32_t {
         if (overlay == from) {
-            std::uint32_t w;
-            std::memcpy(&w, G(at), 4);
-            return w;
+            return code_word(at);
         }
         return level_reader(from, at);
     };
     const auto self_word = [&](gaddr at) {
-        std::uint32_t w;
-        std::memcpy(&w, G(at), 4);
-        return w;
+        return code_word(at);
     };
     const auto formed = [](std::uint32_t hi, std::uint32_t lo) -> gaddr {
         const std::uint32_t upper = (hi & 0xFFFFu) << 16;
@@ -2169,9 +2203,7 @@ static gaddr call_in_copy(int from, gaddr canon, uint32_t size, gaddr self, gadd
             return exe_word(at);
         }
         if (overlay == from) {
-            std::uint32_t w;
-            std::memcpy(&w, G(at), 4);
-            return w;
+            return code_word(at);
         }
         return level_reader(from, at);
     };
@@ -2179,8 +2211,7 @@ static gaddr call_in_copy(int from, gaddr canon, uint32_t size, gaddr self, gadd
     for (std::uint32_t i = 0; i * 4 < size; ++i) {
         const std::uint32_t w = canon_word(canon + i * 4);
         if ((w >> 26) == 3 && ((w & 0x03FFFFFFu) << 2) == (target & 0x0FFFFFFFu)) {
-            std::uint32_t mine;
-            std::memcpy(&mine, G(self + i * 4), 4);
+            const std::uint32_t mine = code_word(self + i * 4);
             if ((mine >> 26) == 3) {
                 result = (self & 0xF0000000u) | ((mine & 0x03FFFFFFu) << 2);
             }
@@ -2224,8 +2255,7 @@ static gaddr hook_in_copy(
         if ((w >> 26) != 3 || ((w & 0x03FFFFFFu) << 2) != (stub & 0x0FFFFFFFu)) {
             continue;
         }
-        std::uint32_t mine;
-        std::memcpy(&mine, G(self + i * 4), 4);
+        const std::uint32_t mine = code_word(self + i * 4);
         const gaddr target = (mine >> 26) == 3 ? (self & 0xF0000000u) | ((mine & 0x03FFFFFFu) << 2) : fallback;
         if (seen == 0) {
             first = target;
@@ -2277,8 +2307,7 @@ static gaddr relocate_level_code(int from, gaddr address) {
         for (const auto& [place, entry] : level->second) {
             bool same = size >= 8;
             for (std::uint32_t off = 0; same && off < size; off += 4) {
-                std::uint32_t w;
-                std::memcpy(&w, G(place + off), 4);
+                const std::uint32_t w = code_word(place + off);
                 same = without_addresses(w) == without_addresses(level_reader(from, address + off));
             }
             if (same) {
@@ -2395,6 +2424,10 @@ struct ForeignProgram {
     gaddr data_high = 0;
     std::vector<std::uint8_t> image;                  // its memory between calls
     std::map<int, std::vector<ForeignBlock>> blocks;  // by the loaded level
+    // Each block's first word's place among the words carried (ForeignFrame::entered).
+    std::map<int, std::vector<std::size_t>> first_words;
+    // The engine's tables carried whole, as they are (openrac_guest_foreign_carry_whole).
+    std::map<int, std::vector<ForeignBlock>> whole;
     // Reused from call to call (a call each frame for each moby of the class): the buffers of a
     // frame, and each loaded level's globals as last carried in and what they became.
     std::vector<std::uint8_t> spare_saved;
@@ -2412,6 +2445,14 @@ struct ForeignFrame {
 
 std::map<int, ForeignProgram> g_foreign;
 std::vector<ForeignFrame> g_foreign_frames;
+
+struct WholeTable {
+    int level;  // the program its address is in
+    gaddr address;
+    std::uint32_t size;
+};
+
+std::vector<WholeTable> g_foreign_whole;
 
 ForeignProgram* foreign_program(int from) {
     auto found = g_foreign.find(from);
@@ -2446,6 +2487,18 @@ ForeignProgram* foreign_program(int from) {
     return &p;
 }
 
+// A word carried from one program to the other: an address in a program, the other's place for it.
+std::uint32_t foreign_moved(const LevelMap& map, std::uint32_t value) {
+    if (value < g_level_low || value >= g_level_high) {
+        return value;
+    }
+    auto code = map.code.find(value);
+    if (code != map.code.end()) {
+        return code->second;
+    }
+    return relocate_by(map, value);
+}
+
 // The engine's globals as runs of addresses with one offset between the programs: each paired
 // address and up to 0x100 bytes after it (as relocate_by moves them), until the next pair.
 const std::vector<ForeignBlock>& foreign_blocks(ForeignProgram& p, int from, int loaded) {
@@ -2455,6 +2508,29 @@ const std::vector<ForeignBlock>& foreign_blocks(ForeignProgram& p, int from, int
     }
     std::vector<ForeignBlock>& out = p.blocks[loaded];
     const auto& pairs = level_pair_map(from, loaded).data;
+    const LevelMap& back = level_pair_map(loaded, from);
+    std::vector<ForeignBlock>& whole = p.whole[loaded];
+    for (const WholeTable& t : g_foreign_whole) {
+        // An executable's address goes where each level's program puts it, as its code is moved.
+        const auto in = [&t](int level) {
+            return t.level == level ? t.address
+                   : t.level == OPENRAC_OVERLAY_EXE
+                       ? relocate_by(level_map(level), t.address)
+                       : relocate_by(level_pair_map(t.level, level), t.address);
+        };
+        const gaddr mine = in(from), theirs = in(loaded);
+        if (mine >= p.low && mine + t.size <= p.data_high) {
+            whole.push_back({mine, theirs, t.size});
+        }
+    }
+    const auto in_whole = [&whole](gaddr at) {
+        for (const ForeignBlock& b : whole) {
+            if (at >= b.from && at < b.from + b.size) {
+                return true;
+            }
+        }
+        return false;
+    };
     for (std::size_t i = 0; i < pairs.size(); ++i) {
         const gaddr at = pairs[i].first & ~3u;
         if (at < p.low || at >= p.data_high) {
@@ -2468,15 +2544,33 @@ const std::vector<ForeignBlock>& foreign_blocks(ForeignProgram& p, int from, int
             continue;
         }
         const gaddr there = at + static_cast<gaddr>(pairs[i].second);
-        if (!out.empty() && out.back().from + out.back().size == at
-            && out.back().loaded + out.back().size == there) {
-            out.back().size += end - at;
-        } else {
-            out.push_back({at, there, end - at});
+        for (gaddr word = at; word < end; word += 4) {
+            // A word after the paired one whose value on the disc is not the loaded program's
+            // there (moved to this one's places) is a datum of this level's own that only lies
+            // there, not the engine's (Gemlik's turret's fire interval after a global): it stays.
+            if (in_whole(word)) {
+                continue;
+            }
+            if (word != at) {
+                const std::uint32_t mine = level_reader(from, word);
+                const std::uint32_t theirs = level_reader(loaded, word - at + there);
+                if (mine != theirs && mine != foreign_moved(back, theirs)) {
+                    continue;
+                }
+            }
+            const gaddr place = word - at + there;
+            if (!out.empty() && out.back().from + out.back().size == word
+                && out.back().loaded + out.back().size == place) {
+                out.back().size += 4;
+            } else {
+                out.push_back({word, place, 4});
+            }
         }
     }
     std::uint64_t bytes = 0;
+    std::vector<std::size_t>& first = p.first_words[loaded];
     for (const ForeignBlock& b : out) {
+        first.push_back(static_cast<std::size_t>(bytes / 4));
         bytes += b.size;
     }
     info(
@@ -2487,18 +2581,6 @@ const std::vector<ForeignBlock>& foreign_blocks(ForeignProgram& p, int from, int
         bytes
     );
     return out;
-}
-
-// A word carried from one program to the other: an address in a program, the other's place for it.
-std::uint32_t foreign_moved(const LevelMap& map, std::uint32_t value) {
-    if (value < g_level_low || value >= g_level_high) {
-        return value;
-    }
-    auto code = map.code.find(value);
-    if (code != map.code.end()) {
-        return code->second;
-    }
-    return relocate_by(map, value);
 }
 
 }  // namespace
@@ -2571,6 +2653,13 @@ int openrac_guest_foreign_enter(int from, int loaded) {
             f.entered.push_back(w);
         }
     }
+    for (const ForeignBlock& b : p->whole[loaded]) {
+        if (b.loaded >= p->low && b.loaded + b.size <= p->data_high) {
+            std::memcpy(G(b.from), f.saved.data() + (b.loaded - p->low), b.size);
+        } else {
+            std::memmove(G(b.from), G(b.loaded), b.size);
+        }
+    }
     g_overlay = from;
     return 0;
 }
@@ -2603,14 +2692,69 @@ void openrac_guest_foreign_leave(void) {
             }
         }
     }
+    for (const ForeignBlock& b : p.whole[f.loaded]) {
+        if (b.loaded >= p.low && b.loaded + b.size <= p.data_high) {
+            std::memcpy(f.saved.data() + (b.loaded - p.low), G(b.from), b.size);
+        }
+    }
     std::memcpy(p.image.data(), G(p.low), f.saved.size());
     std::memcpy(G(p.low), f.saved.data(), f.saved.size());
+    for (const ForeignBlock& b : p.whole[f.loaded]) {
+        if (!(b.loaded >= p.low && b.loaded + b.size <= p.data_high)) {
+            std::memmove(G(b.loaded), p.image.data() + (b.from - p.low), b.size);
+        }
+    }
     g_foreign_code_low = f.code_low;
     g_foreign_code_high = f.code_high;
     g_foreign_code = f.code;
     p.spare_saved.swap(f.saved);
     p.spare_entered.swap(f.entered);
     g_overlay = f.loaded;
+}
+
+void openrac_guest_foreign_carry_whole(int level, gaddr address, uint32_t size) {
+    for (const WholeTable& t : g_foreign_whole) {
+        if (t.level == level && t.address == address) {
+            return;
+        }
+    }
+    g_foreign_whole.push_back({level, address, size});
+    for (auto& [from, p] : g_foreign) {
+        p.blocks.clear();  // built again with it
+        p.first_words.clear();
+        p.whole.clear();
+        p.carried.clear();
+    }
+}
+
+void openrac_guest_foreign_set(gaddr address, uint32_t value) {
+    if (g_foreign_frames.empty() || (address & 3u) != 0) {
+        return;
+    }
+    ForeignFrame& f = g_foreign_frames.back();
+    ForeignProgram& p = g_foreign[f.from];
+    if (address < p.low || address + 4 > p.data_high) {
+        return;
+    }
+    std::memcpy(G(address), &value, 4);
+    // A carried word: what it was carried in as becomes this, so leave carries none of it back.
+    const std::vector<ForeignBlock>& blocks = p.blocks[f.loaded];
+    const std::vector<std::size_t>& first = p.first_words[f.loaded];
+    auto after =
+        std::upper_bound(blocks.begin(), blocks.end(), address, [](gaddr a, const ForeignBlock& b) {
+            return a < b.from;
+        });
+    if (after == blocks.begin()) {
+        return;
+    }
+    const std::size_t i = static_cast<std::size_t>(after - blocks.begin()) - 1;
+    if (address >= blocks[i].from + blocks[i].size) {
+        return;
+    }
+    const std::size_t n = first[i] + (address - blocks[i].from) / 4;
+    if (n < f.entered.size()) {
+        f.entered[n] = value;
+    }
 }
 
 uint32_t openrac_guest_level_word(int level, gaddr address) {

@@ -347,6 +347,24 @@ static inline unsigned rac1_moby_vtbl_address(int level) {
 #define func_L00_00242120 game_FUN_L00_00241788
 #define func_L00_00242120__game game_FUN_L00_00241788__game
 
+/* Imported moby classes' tables (rac1/host/foreign_class.c): the level's camera, rail, volume and
+ * path globals in level 0's program (the level loader's stores in this version's C (gen/prep load_level_gameplay.c)). */
+#define RAC1_ADDR_L00_0x0015F050u 0x0015EF50u
+#define RAC1_ADDR_L00_0x0015F054u 0x0015EF54u
+#define RAC1_ADDR_L00_0x0015F7ECu 0x0015F70Cu
+#define RAC1_ADDR_L00_0x0015F7F0u 0x0015F710u
+#define RAC1_ADDR_L00_0x001601A4u 0x001600E4u
+#define RAC1_ADDR_L00_0x001601A8u 0x001600E8u
+#define RAC1_ADDR_L00_0x001601ACu 0x001600ECu
+#define RAC1_ADDR_L00_0x001601B0u 0x001600F0u
+#define RAC1_ADDR_L00_0x001601B4u 0x001600F4u
+#define RAC1_ADDR_L00_0x001601B8u 0x001600F8u
+#define RAC1_ADDR_L00_0x001601BCu 0x001600FCu
+#define RAC1_ADDR_L00_0x001601C0u 0x00160100u
+#define RAC1_ADDR_L00_0x001601C4u 0x00160104u
+#define RAC1_ADDR_L00_0x001601C8u 0x00160108u
+#define RAC1_ADDR_L00_0x001B0830u 0x001B04B0u
+
 /* ---- generated below ---- */
 
 /* Functions: games/rac1's name, this version's. */
