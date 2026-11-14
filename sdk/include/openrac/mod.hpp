@@ -746,6 +746,47 @@ public:
         }
     }
 
+    // Since 1.15: whether the port lets the mod set its own settings
+    // (set_setting) and tells it of the launcher's changes (on_settings).
+    bool has_settings_set() const {
+      return m_api->api_minor >= 15 &&
+             m_api->size >= offsetof(openrac_api, on_settings) + sizeof(void *);
+    }
+
+    // Since 1.15: sets the manifest's setting `key` to `value` for this run and
+    // in the launcher's list of mods: bool for "bool"; an integer type for
+    // "int"; float or double for "float"; a string for "choice", "string" and
+    // "keybind". Returns false when the port refuses it (a key the manifest
+    // does not declare, a setting of another type, a value out of its limits)
+    // or has no such call.
+    template <class T> bool set_setting(const char *key, const T &value) const {
+      if (!has_settings_set()) {
+        return false;
+      }
+
+      // One branch per kind of setting, as setting<T>.
+      if constexpr (std::is_same_v<T, bool>) {
+        return m_api->setting_set_bool(m_handle, key, value ? 1 : 0) ==
+               OPENRAC_HOOK_OK;
+      } else if constexpr (std::is_integral_v<T>) {
+        return m_api->setting_set_int(m_handle, key,
+                                      static_cast<std::int64_t>(value)) ==
+               OPENRAC_HOOK_OK;
+      } else if constexpr (std::is_floating_point_v<T>) {
+        return m_api->setting_set_float(m_handle, key,
+                                        static_cast<double>(value)) ==
+               OPENRAC_HOOK_OK;
+      } else if constexpr (std::is_convertible_v<const T &, std::string_view>) {
+        const std::string text{std::string_view(value)};
+        return m_api->setting_set_string(m_handle, key, text.c_str()) ==
+               OPENRAC_HOOK_OK;
+      } else {
+        static_assert(
+            sizeof(T) == 0,
+            "set_setting<T>: bool, an integer, a floating type or a string");
+      }
+    }
+
     // Takes the hook point (a type of openrac/games/<game>.hpp) for `callable`, called as
     // callable(original, args...). Throws openrac::Error when the port has no such hook point, a
     // different signature, or the mod already took it. Only during load.
@@ -802,6 +843,25 @@ public:
         if (m_api->on_frame(m_handle, &detail::frame_thunk, &stored) != 0) {
             throw Error("on_frame: refused (only during load)");
         }
+    }
+
+    // Since 1.15: calls `callable()` after the tick in which the launcher
+    // changed the mod's settings while the game runs; setting<T>() answers the
+    // new values then. Throws openrac::Error when refused or the port has no
+    // such call. Only during load.
+    template <class F> void on_settings(F &&callable) {
+      if (!has_settings_set()) {
+        throw Error("on_settings: requires interface 1.15");
+      }
+
+      // As in on_frame, the port holds the address of the stored callable.
+      auto &stored = m_frames.emplace_back(std::forward<F>(callable));
+
+      // The port refuses a callback once load is over.
+      if (m_api->on_settings(m_handle, &detail::frame_thunk, &stored) !=
+          OPENRAC_HOOK_OK) {
+        throw Error("on_settings: refused (only during load)");
+      }
     }
 
     // Calls `callable(tick)` after vertical-blank handlers. Snapshot calls are valid only here.
@@ -2077,26 +2137,26 @@ public:
         return says ? text : "";
     }
 
-    // Since 1.14 (SDK 1.14.8): what a cutscene needs. The picture's vertical field of view in
+    // Since 1.15 (SDK 1.15.1): what a cutscene needs. The picture's vertical field of view in
     // degrees while the mod holds the camera (0: the game's); false without the camera or the call.
     bool camera_fov(float degrees) const {
         return has_slot14(offsetof(openrac_api, camera_fov))
                && m_api->camera_fov(m_handle, degrees) == OPENRAC_HOOK_OK;
     }
 
-    // Since 1.14 (SDK 1.14.8): hides the game's own HUD (the mods' lines stay) or shows it again.
+    // Since 1.15 (SDK 1.15.1): hides the game's own HUD (the mods' lines stay) or shows it again.
     bool hud_hide(bool hidden) const {
         return has_slot14(offsetof(openrac_api, hud_hide))
                && m_api->hud_hide(m_handle, hidden ? 1 : 0) == OPENRAC_HOOK_OK;
     }
 
-    // Since 1.14 (SDK 1.14.8): the game's music at `gain` (0 to 1), eased; 1 gives it back.
+    // Since 1.15 (SDK 1.15.1): the game's music at `gain` (0 to 1), eased; 1 gives it back.
     bool music_volume(float gain) const {
         return has_slot14(offsetof(openrac_api, music_volume))
                && m_api->music_volume(m_handle, gain) == OPENRAC_HOOK_OK;
     }
 
-    // Since 1.14 (SDK 1.14.8): hero_set_joints for the moby in `slot`; an empty list takes them off.
+    // Since 1.15 (SDK 1.15.1): hero_set_joints for the moby in `slot`; an empty list takes them off.
     bool moby_set_joints(int slot, const std::vector<openrac_joint_offset>& joints) const {
         return has_slot14(offsetof(openrac_api, moby_set_joints))
                && m_api->moby_set_joints(m_handle, slot, joints.empty() ? nullptr : joints.data(),
@@ -2104,59 +2164,59 @@ public:
                       == OPENRAC_HOOK_OK;
     }
 
-    // Since 1.14 (SDK 1.14.8): where joint `joint` of the moby in `slot` is, as last drawn.
+    // Since 1.15 (SDK 1.15.1): where joint `joint` of the moby in `slot` is, as last drawn.
     bool moby_joint_position(int slot, int joint, float out[3]) const {
         return has_slot14(offsetof(openrac_api, moby_joint_position))
                && m_api->moby_joint_position(slot, joint, out) == OPENRAC_HOOK_OK;
     }
 
-    // Since 1.14 (SDK 1.14.8): one of the moby's class's sounds on it; its voice, or -1.
+    // Since 1.15 (SDK 1.15.1): one of the moby's class's sounds on it; its voice, or -1.
     int moby_sound_play(int slot, int sound, bool loop) const {
         return has_slot14(offsetof(openrac_api, moby_sound_play))
                    ? m_api->moby_sound_play(m_handle, slot, sound, loop ? 1 : 0)
                    : -1;
     }
 
-    // Since 1.14 (SDK 1.14.8): stops a voice moby_sound_play gave.
+    // Since 1.15 (SDK 1.15.1): stops a voice moby_sound_play gave.
     void moby_sound_stop(int voice) const {
         if (has_slot14(offsetof(openrac_api, moby_sound_stop))) {
             m_api->moby_sound_stop(m_handle, voice);
         }
     }
 
-    // Since 1.14 (SDK 1.14.8): the fog and background the picture is drawn with (nullptr: the
+    // Since 1.15 (SDK 1.15.1): the fog and background the picture is drawn with (nullptr: the
     // game's again); false outside a level, for a value out of range or a port without it.
     bool scene_air(const openrac_air* air) const {
         return has_slot14(offsetof(openrac_api, scene_air)) && m_api->scene_air(m_handle, air) == OPENRAC_HOOK_OK;
     }
 
-    // Since 1.14 (SDK 1.14.8): slow motion, each tick `stretch` (1 to 8) times as long; false for
+    // Since 1.15 (SDK 1.15.1): slow motion, each tick `stretch` (1 to 8) times as long; false for
     // a value out of range or a port without it.
     bool time_stretch(float stretch) const {
         return has_slot14(offsetof(openrac_api, time_stretch)) && m_api->time_stretch(m_handle, stretch) == OPENRAC_HOOK_OK;
     }
 
-    // Since 1.14 (SDK 1.14.8): hides the level's tie `tie` from the picture, or shows it again;
+    // Since 1.15 (SDK 1.15.1): hides the level's tie `tie` from the picture, or shows it again;
     // false outside a level, for no such tie or a port without it.
     bool tie_hide(int tie, bool hidden) const {
         return has_slot14(offsetof(openrac_api, tie_hide)) && m_api->tie_hide(m_handle, tie, hidden ? 1 : 0) == OPENRAC_HOOK_OK;
     }
 
-    // Since 1.14 (SDK 1.14.8): plays animation `animation` of a skinned prop's .glb at `seconds`
+    // Since 1.15 (SDK 1.15.1): plays animation `animation` of a skinned prop's .glb at `seconds`
     // (-1: the mesh as stored); false for a prop not the mod's or a port without it.
     bool prop_animate(int prop, int animation, float seconds, bool loop) const {
         return has_slot14(offsetof(openrac_api, prop_animate))
                && m_api->prop_animate(m_handle, prop, animation, seconds, loop ? 1 : 0) == OPENRAC_HOOK_OK;
     }
 
-    // Since 1.14 (SDK 1.14.8): a moby's joint's axes and place in the level, as last drawn, into
+    // Since 1.15 (SDK 1.15.1): a moby's joint's axes and place in the level, as last drawn, into
     // `out` (x, y, z axes, then the place); false for no such joint or a port without it.
     bool moby_joint_frame(int slot, int joint, float (&out)[12]) const {
         return has_slot14(offsetof(openrac_api, moby_joint_frame))
                && m_api->moby_joint_frame(slot, joint, out) == OPENRAC_HOOK_OK;
     }
 
-    // Since 1.14 (SDK 1.14.9): the spawn id of the placed moby in `slot` (its record's uid, which
+    // Since 1.15 (SDK 1.15.1): the spawn id of the placed moby in `slot` (its record's uid, which
     // stays when the level is edited; a key is the record's place), -1 for none or a port without it.
     int moby_uid(int slot) const {
         return has_slot14(offsetof(openrac_api, moby_uid)) && m_api->moby_uid != nullptr ? m_api->moby_uid(slot) : -1;

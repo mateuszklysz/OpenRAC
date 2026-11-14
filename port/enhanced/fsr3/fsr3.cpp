@@ -11,8 +11,9 @@
 #include "enhanced/fsr3/fsr3_internal.h"
 #include "enhanced/fsr3/temporal_math.h"
 #include "fsr3_shaders.h"
-#include "renderer/gl.h"
-#include "renderer/render_opt.h"
+#include "renderer/gl/gl.h"
+#include "renderer/settings/render_opt.h"
+#include "renderer/vulkan/vkgl.h"
 #include "scene/level_renderer.h"
 
 #include <FidelityFX/host/ffx_fsr3upscaler.h>
@@ -199,6 +200,11 @@ bool Fsr3::State::configure(
             || !opaque.create(size[0], size[1], GL_RGBA8, 0, error)) {
             return false;
         }
+        // The reactive mask fetches exact texels. Water can also use this snapshot with bilinear
+        // refraction, matching the filter on its standalone colour snapshot.
+        glBindTexture(GL_TEXTURE_2D, opaque.texture());
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
 
     // The final colour target alone needs storage usage; the original renderer's images remain ordinary attachments.
@@ -290,6 +296,10 @@ void Fsr3::State::attach_frame(TemporalFrame frame, std::array<int, 2> size) {
     display = frame.target;
     has_opaque = false;
     finish_colour = std::move(frame.finish_colour);
+    // World textures keep the display's detail while the world is drawn smaller; resolve() ends it.
+    if (size[0] < display.width) {
+        vkgl::set_texture_lod_bias(std::log2(static_cast<float>(size[0]) / display.width));
+    }
     frame.target.framebuffer = world.id();
     frame.target.width = size[0];
     frame.target.height = size[1];
@@ -299,6 +309,7 @@ void Fsr3::State::attach_frame(TemporalFrame frame, std::array<int, 2> size) {
     frame.input.on_before_particles = [this](const auto& target) {
         capture_opaque(target);
     };
+    frame.input.pre_particle_colour_texture = opaque.texture();
     frame.input.on_resolve_world = [this](auto& target) {
         resolve(target);
     };
@@ -318,6 +329,7 @@ bool Fsr3::begin(
     TemporalFrame frame, renderer::TemporalQuality quality, float sharpness, std::string& error
 ) {
     State& state = *m_state;
+    vkgl::set_texture_lod_bias(0.0f);
 
     // Motion blur with temporal upscaling off: its motion is drawn, no upscaler runs.
     const bool blur_only = quality == renderer::TemporalQuality::Off && frame.motion_blur

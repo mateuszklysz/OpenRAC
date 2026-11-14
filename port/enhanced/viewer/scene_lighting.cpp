@@ -15,7 +15,7 @@
 #include "enhanced/renderer/reflection_material.h"
 #include "enhanced/renderer/water.h"
 #include "enhanced_viewer_shaders.h"
-#include "renderer/gl.h"
+#include "renderer/gl/gl.h"
 #include "scene/level_renderer.h"
 
 namespace openrac::lighting {
@@ -106,6 +106,11 @@ void SceneLighting::bind_surface_layer(const renderer::Shader& shader, int layer
         m_fur.bind(shader);
     }
     m_fur.bind_shell(shader, layer);
+}
+
+void SceneLighting::bind_moby_model(const renderer::Shader& shader, std::uint32_t model) const {
+    m_wetness.bind_model(shader, model);
+    m_fur.bind_model(shader, model, m_default_fur);
 }
 
 std::string SceneLighting::motion_fragment(std::string source) const {
@@ -205,7 +210,9 @@ void SceneLighting::bind_surface_material(
         }
         if (response) {
             // Inherited values reset the preceding material's overrides within the same shader run.
-            m_fur.bind_material(shader, response->fur_override ? response->fur : m_default_fur);
+            if (m_fur.hero_model(model)) {
+                m_fur.bind_material(shader, response->fur_override ? response->fur : m_default_fur);
+            }
             m_wetness.bind_material(
                 shader, response->wetness_override ? response->wetness : m_default_wetness
             );
@@ -475,7 +482,8 @@ void SceneLighting::bind_early(
 bool SceneLighting::early_matches(
     const renderer::FrameInput& input, const renderer::RenderState& state
 ) const {
-    return m_early_lighting.matches(input, state);
+    // The coverage view draws with its own shaders (coverage_view).
+    return !coverage_view() && m_early_lighting.matches(input, state);
 }
 
 std::span<const unsigned> SceneLighting::early_buffers(

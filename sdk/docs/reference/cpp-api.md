@@ -187,9 +187,12 @@ One of the mod's pages of the game's own menus (Mod::ui_page): set what it shows
 | `void error(const std::string& text) const` |  |
 | `void fail(const std::string& reason) const` | Says why the mod refuses to load, for status.json and the launcher. Only during load; throwing an openrac::Error from load does the same. |
 | `template <class T> T setting(const char* key) const` | Returns a setting of the manifest's, as T: bool for "bool"; an integer type for "int"; float or double for "float"; std::string for "choice" and "string". A key the manifest does not declare, or of another type, gives 0, 0.0, false or "". |
+| `bool has_settings_set() const` | Since 1.15: whether the port lets the mod set its own settings (set_setting) and tells it of the launcher's changes (on_settings). |
+| `template <class T> bool set_setting(const char *key, const T &value) const` | Since 1.15: sets the manifest's setting `key` to `value` for this run and in the launcher's list of mods: bool for "bool"; an integer type for "int"; float or double for "float"; a string for "choice", "string" and "keybind". Returns false when the port refuses it (a key the manifest does not declare, a setting of another type, a value out of its limits) or has no such call. |
 | `template <class HookPoint, class F> void hook(F&& callable)` | Takes the hook point (a type of openrac/games/<game>.hpp) for `callable`, called as callable(original, args...). Throws openrac::Error when the port has no such hook point, a different signature, or the mod already took it. Only during load. |
 | `template <class HookPoint> typename HookPoint::fn original() const` | Returns what a hook point this mod took goes on to (as the callable's `original`), for calling it from elsewhere in the mod (another hook, a callback); nullptr before the hook is taken. |
 | `template <class F> void on_frame(F&& callable)` | Calls `callable()` after each game tick, in load order. Throws openrac::Error when refused. Only during load. |
+| `template <class F> void on_settings(F &&callable)` | Since 1.15: calls `callable()` after the tick in which the launcher changed the mod's settings while the game runs; setting<T>() answers the new values then. Throws openrac::Error when refused or the port has no such call. Only during load. |
 | `template <class F> void on_tick_boundary(F&& callable)` | Calls `callable(tick)` after vertical-blank handlers. Snapshot calls are valid only here. Since 1.6; only during load. |
 | `bool has_savestates() const` | Since 1.6: returns whether the port offers tick-boundary and warm-snapshot calls. |
 | `std::size_t savestate_size() const` | The exact size of this build's warm, same-process snapshot. Since 1.6. |
@@ -353,19 +356,19 @@ One of the mod's pages of the game's own menus (Mod::ui_page): set what it shows
 | `std::uint32_t sim_digest(int level) const` | Since 1.14: what must agree for two games to share `level`; 0 when it is not loaded or the port does not say. |
 | `std::string plugins_folder() const` | Since 1.14: the folder the mods are in, <data>/plugins; "" when the port does not say. |
 | `std::string identity_key() const` | Since 1.14: a key that stays the same for this installation; "" when the port has none. |
-| `bool camera_fov(float degrees) const` | Since 1.14 (SDK 1.14.8): what a cutscene needs. The picture's vertical field of view in degrees while the mod holds the camera (0: the game's); false without the camera or the call. |
-| `bool hud_hide(bool hidden) const` | Since 1.14 (SDK 1.14.8): hides the game's own HUD (the mods' lines stay) or shows it again. |
-| `bool music_volume(float gain) const` | Since 1.14 (SDK 1.14.8): the game's music at `gain` (0 to 1), eased; 1 gives it back. |
-| `bool moby_set_joints(int slot, const std::vector<openrac_joint_offset>& joints) const` | Since 1.14 (SDK 1.14.8): hero_set_joints for the moby in `slot`; an empty list takes them off. |
-| `bool moby_joint_position(int slot, int joint, float out[3]) const` | Since 1.14 (SDK 1.14.8): where joint `joint` of the moby in `slot` is, as last drawn. |
-| `int moby_sound_play(int slot, int sound, bool loop) const` | Since 1.14 (SDK 1.14.8): one of the moby's class's sounds on it; its voice, or -1. |
-| `void moby_sound_stop(int voice) const` | Since 1.14 (SDK 1.14.8): stops a voice moby_sound_play gave. |
-| `bool scene_air(const openrac_air* air) const` | Since 1.14 (SDK 1.14.8): the fog and background the picture is drawn with (nullptr: the game's again); false outside a level, for a value out of range or a port without it. |
-| `bool time_stretch(float stretch) const` | Since 1.14 (SDK 1.14.8): slow motion, each tick `stretch` (1 to 8) times as long; false for a value out of range or a port without it. |
-| `bool tie_hide(int tie, bool hidden) const` | Since 1.14 (SDK 1.14.8): hides the level's tie `tie` from the picture, or shows it again; false outside a level, for no such tie or a port without it. |
-| `bool prop_animate(int prop, int animation, float seconds, bool loop) const` | Since 1.14 (SDK 1.14.8): plays animation `animation` of a skinned prop's .glb at `seconds` (-1: the mesh as stored); false for a prop not the mod's or a port without it. |
-| `bool moby_joint_frame(int slot, int joint, float (&out)[12]) const` | Since 1.14 (SDK 1.14.8): a moby's joint's axes and place in the level, as last drawn, into `out` (x, y, z axes, then the place); false for no such joint or a port without it. |
-| `int moby_uid(int slot) const` | Since 1.14 (SDK 1.14.9): the spawn id of the placed moby in `slot` (its record's uid, which stays when the level is edited; a key is the record's place), -1 for none or a port without it. |
+| `bool camera_fov(float degrees) const` | Since 1.15 (SDK 1.15.1): what a cutscene needs. The picture's vertical field of view in degrees while the mod holds the camera (0: the game's); false without the camera or the call. |
+| `bool hud_hide(bool hidden) const` | Since 1.15 (SDK 1.15.1): hides the game's own HUD (the mods' lines stay) or shows it again. |
+| `bool music_volume(float gain) const` | Since 1.15 (SDK 1.15.1): the game's music at `gain` (0 to 1), eased; 1 gives it back. |
+| `bool moby_set_joints(int slot, const std::vector<openrac_joint_offset>& joints) const` | Since 1.15 (SDK 1.15.1): hero_set_joints for the moby in `slot`; an empty list takes them off. |
+| `bool moby_joint_position(int slot, int joint, float out[3]) const` | Since 1.15 (SDK 1.15.1): where joint `joint` of the moby in `slot` is, as last drawn. |
+| `int moby_sound_play(int slot, int sound, bool loop) const` | Since 1.15 (SDK 1.15.1): one of the moby's class's sounds on it; its voice, or -1. |
+| `void moby_sound_stop(int voice) const` | Since 1.15 (SDK 1.15.1): stops a voice moby_sound_play gave. |
+| `bool scene_air(const openrac_air* air) const` | Since 1.15 (SDK 1.15.1): the fog and background the picture is drawn with (nullptr: the game's again); false outside a level, for a value out of range or a port without it. |
+| `bool time_stretch(float stretch) const` | Since 1.15 (SDK 1.15.1): slow motion, each tick `stretch` (1 to 8) times as long; false for a value out of range or a port without it. |
+| `bool tie_hide(int tie, bool hidden) const` | Since 1.15 (SDK 1.15.1): hides the level's tie `tie` from the picture, or shows it again; false outside a level, for no such tie or a port without it. |
+| `bool prop_animate(int prop, int animation, float seconds, bool loop) const` | Since 1.15 (SDK 1.15.1): plays animation `animation` of a skinned prop's .glb at `seconds` (-1: the mesh as stored); false for a prop not the mod's or a port without it. |
+| `bool moby_joint_frame(int slot, int joint, float (&out)[12]) const` | Since 1.15 (SDK 1.15.1): a moby's joint's axes and place in the level, as last drawn, into `out` (x, y, z axes, then the place); false for no such joint or a port without it. |
+| `int moby_uid(int slot) const` | Since 1.15 (SDK 1.15.1): the spawn id of the placed moby in `slot` (its record's uid, which stays when the level is edited; a key is the record's place), -1 for none or a port without it. |
 | `bool moby_run(int slot, openrac_moby_run& out) const` | Since 1.9: how the game ran the level's mobys in the last tick, and the moby in `slot` (-1: none) in it, into `out`; false outside a level or for a port without it. |
 | `int moby_slot_of(gaddr moby) const` | Since 1.9: the slot of the moby at game address `moby` (a hook point's argument), -1 none. |
 | `bool play_overlay_pause(bool on) const` | Since 1.9: the world keeps running under the game's menus while `on`; false for a game without it. |

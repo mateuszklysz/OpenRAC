@@ -66,9 +66,11 @@ extern "C" {
  * between players' games, a hero placed, held and revived, shots with more to
  * say, the level's mobys with their mission, a picture drawn over the game,
  * camera scripts and metal detector digs seen, the data packs applied, the
- * clipboard and a link, and which world a game's disc belongs to.
+ * clipboard and a link, and which world a game's disc belongs to, 1.15 a mod's
+ * own settings changed from the game (written into the launcher's list of mods)
+ * and told when the launcher changes them while the game runs.
  */
-#define OPENRAC_MOD_API_MINOR 14
+#define OPENRAC_MOD_API_MINOR 15
 
 /* The interface a mod is built for, what its openrac_mod_query reports: its manifest's "api" minor,
  * which the SDK's openrac_add_mod passes in, else this header's. A mod for 1.1 built with a newer
@@ -970,12 +972,12 @@ typedef struct openrac_joint_offset {
     float translation[3];
 } openrac_joint_offset;
 
-/* scene_air flags: what of the air a mod sets. Since 1.14. */
+/* scene_air flags: what of the air a mod sets. Since 1.15. */
 #define OPENRAC_AIR_FOG 0x1u        /* the fog: fog_colour, fog_near, fog_far, fog_thickness */
 #define OPENRAC_AIR_BACKGROUND 0x2u /* the colour behind the world, where no sky covers */
 
 /* The air a scene asks for (scene_air): laid over the game's by `weight`, in the picture only.
- * Since 1.14. */
+ * Since 1.15. */
 typedef struct openrac_air {
     /* sizeof(openrac_air), set by the caller. */
     uint32_t size;
@@ -1782,7 +1784,7 @@ typedef struct openrac_api {
         const float lo[3], const float hi[3], openrac_collision_triangle* out, int max
     );
 
-    /* A prop: a mesh of the mod's (`mesh_path`, a .glb inside the mod's folder, or since 1.14
+    /* A prop: a mesh of the mod's (`mesh_path`, a .glb inside the mod's folder, or since 1.15
      * "pack:<path>" inside pack_folder's, read as the meshes of an assets classes.json are) drawn
      * in the level loaded, by the renderer each frame (OpenGL and Vulkan), at the pose prop_pose last gave it; not a moby of the game's: nothing collides
      * with it and the game never sees it. Hidden until it is first posed. At most
@@ -1802,7 +1804,7 @@ typedef struct openrac_api {
 
     /* A sound of the mod's: `path`, a .wav (PCM, 8, 16, 24 or 32 bits, or float; mono or stereo)
      * or .ogg (Vorbis) inside the mod's folder, read whole ("pack:<path>": inside pack_folder's,
-     * since 1.14). Returns its id (0 or more), or OPENRAC_HOOK_UNKNOWN for a path outside the
+     * since 1.15). Returns its id (0 or more), or OPENRAC_HOOK_UNKNOWN for a path outside the
      * folder, a file it cannot read, without a sound output, or past OPENRAC_SOUNDS_MAX. Kept until
      * the program ends. Since 1.12. */
     int (*sound_load)(openrac_mod* mod, const char* path);
@@ -2099,88 +2101,115 @@ typedef struct openrac_api {
      * or OPENRAC_HOOK_UNKNOWN outside a level or for a port without it. Since 1.14. */
     int (*mission_state_clear)(int level, const uint8_t* flags);
 
+    /* Set the mod's setting `key` (its manifest's) to `value`, as an options
+     * page of the mod's own would: the setting_* calls answer it from now on,
+     * and it is written into the launcher's list of mods (plugins.json), so the
+     * launcher shows it and the next start has it. The value is checked as the
+     * launcher checks the list: the setting's type (setting_set_bool for
+     * "bool", _int for "int", _float for "float", _string for "choice",
+     * "string" and "keybind"), its range, its choices, its length and its
+     * binds. Returns OPENRAC_HOOK_OK, or OPENRAC_HOOK_UNKNOWN for a key the
+     * manifest does not declare, a setting of another type or a value it
+     * refuses. A list that cannot be written (purist mode, none, a disk that
+     * refuses) keeps the value for this run, and the log says why. Since 1.15.
+     */
+    int (*setting_set_bool)(openrac_mod *mod, const char *key, int value);
+    int (*setting_set_int)(openrac_mod *mod, const char *key, int64_t value);
+    int (*setting_set_float)(openrac_mod *mod, const char *key, double value);
+    int (*setting_set_string)(openrac_mod *mod, const char *key,
+                              const char *value);
+
+    /* Calls `fn(user)` after the tick in which the mod's settings changed from
+     * outside the game: the launcher's list of mods written while the game
+     * runs, which the port looks at about once a second. The setting_* calls
+     * answer the new values from then on. A mod's own setting_set_* calls are
+     * not told. Returns OPENRAC_HOOK_OK, or OPENRAC_HOOK_TOO_LATE for no fn or
+     * after openrac_mod_load. Since 1.15. */
+    int (*on_settings)(openrac_mod *mod, openrac_frame_fn fn, void *user);
+
+    /* Added in SDK 1.15.1, for the editor's packs and cutscenes: check api->size before calling
+     * them. */
+
     /* The folder of the edited levels' pack the game reads (the editor's pack, or the added
      * destination being played), as text into `out` (`size` bytes, ending in a zero): its
      * level_NN/ folders hold what OpenRAC Editor packed, such as cutscenes. Returns its length, or
      * 0 when the game reads no pack or it does not fit. sound_load and prop_create take a file of
-     * it as "pack:level_NN/...". Since 1.14. */
+     * it as "pack:level_NN/...". Since 1.15. */
     int (*pack_folder)(char* out, uint32_t size);
 
     /* The language the game shows its text in, as a code into `out` (at least 3 bytes): "en",
      * "fr", "de", "es", "it", or "ja" on a Japanese disc. Returns its length, or 0 when `out` is
-     * too small. Since 1.14. */
+     * too small. Since 1.15. */
     int (*game_language)(char* out, uint32_t size);
-
-    /* What a cutscene needs (SDK 1.14.8; check api->size before calling them). */
 
     /* The picture's vertical field of view, in degrees (1 to 150), while the mod holds the camera
      * (camera_set): drawn only, the game's own view tests and logic keep the game's. 0 gives the
      * game's back; so does letting the camera go. Returns OPENRAC_HOOK_OK, or OPENRAC_HOOK_UNKNOWN
-     * when the mod does not hold the camera or the value is out of range. Since 1.14. */
+     * when the mod does not hold the camera or the value is out of range. Since 1.15. */
     int (*camera_fov)(openrac_mod* mod, float degrees);
 
     /* Hides the game's own HUD (1) or shows it again (0); the mods' hud_text lines stay. Goes
      * with the level and with the mod. Returns OPENRAC_HOOK_OK, or OPENRAC_HOOK_UNKNOWN for a port
-     * without it. Since 1.14. */
+     * without it. Since 1.15. */
     int (*hud_hide)(openrac_mod* mod, int hidden);
 
     /* The game's music at `gain` (0 silent to 1 as the game plays it), eased over a tenth of a
      * second so it makes no click: a scene ducks it and gives it back with 1. The quietest of the
      * mods' gains applies; it goes with the level and with the mod. Returns OPENRAC_HOOK_OK, or OPENRAC_HOOK_UNKNOWN
-     * for a value out of range or a port without it. Since 1.14. */
+     * for a value out of range or a port without it. Since 1.15. */
     int (*music_volume)(openrac_mod* mod, float gain);
 
     /* hero_set_joints for any moby of the level, by its slot (moby_list): the `count` offsets
      * replace the mod's last ones for that moby. Drawn, as the hero's are; a moby that reads its
      * own joints (an item it holds) sees them too. They go with the level. Returns
      * OPENRAC_HOOK_OK, or OPENRAC_HOOK_UNKNOWN outside a level, for a slot with no moby, or past
-     * OPENRAC_JOINT_OFFSETS_MAX for the moby. Since 1.14. */
+     * OPENRAC_JOINT_OFFSETS_MAX for the moby. Since 1.15. */
     int (*moby_set_joints)(openrac_mod* mod, int slot, const openrac_joint_offset* joints, int count);
 
     /* Where joint `joint` of the moby in `slot` is in the level now (the game's units), as last
      * drawn: its pose with the mods' offsets, placed by the moby's matrix and scale. Returns
      * OPENRAC_HOOK_OK, or OPENRAC_HOOK_UNKNOWN for no moby, no such joint or a port without it.
-     * Since 1.14. */
+     * Since 1.15. */
     int (*moby_joint_position)(int slot, int joint, float out[3]);
 
     /* hero_sound_play on any moby of the level: entry `sound` of its class's sound table, heard
      * from where it is. Its voice (0 up), or -1. A looping one stops with moby_sound_stop, the
-     * level or the mod. Since 1.14. */
+     * level or the mod. Since 1.15. */
     int (*moby_sound_play)(openrac_mod* mod, int slot, int sound, int loop);
-    /* Stops a voice moby_sound_play gave, if it still plays on that moby. Since 1.14. */
+    /* Stops a voice moby_sound_play gave, if it still plays on that moby. Since 1.15. */
     void (*moby_sound_stop)(openrac_mod* mod, int voice);
 
     /* The fog and the colour behind the world the picture is drawn with (null: the game's again),
      * by `air->weight` over the game's. The game's own fog, which its logic may read, stays. The
      * last mod to set it is drawn; it goes with the level and with the mod. Returns
      * OPENRAC_HOOK_OK, or OPENRAC_HOOK_UNKNOWN outside a level or for a value out of range.
-     * Since 1.14. */
+     * Since 1.15. */
     int (*scene_air)(openrac_mod* mod, const openrac_air* air);
 
     /* Slow motion: each of the game's ticks lasts `stretch` times as long (1 to 8; 1 the game's
      * speed). The game runs the same ticks, only slower, and the picture moves smoothly between
      * them; its sound plays as it does then. The slowest mod's applies; it goes with the level and
      * with the mod. Returns OPENRAC_HOOK_OK, or OPENRAC_HOOK_UNKNOWN for a value out of range.
-     * Since 1.14. */
+     * Since 1.15. */
     int (*time_stretch)(openrac_mod* mod, float stretch);
 
     /* Hides the level's tie (its scenery) `tie` (its index in the level, as the editor lists it)
      * from the picture (1) or shows it again (0); the game's collision and logic keep it. Goes
      * with the level and with the mod. Returns OPENRAC_HOOK_OK, or OPENRAC_HOOK_UNKNOWN outside a
-     * level or for a tie the level does not have. Since 1.14. */
+     * level or for a tie the level does not have. Since 1.15. */
     int (*tie_hide)(openrac_mod* mod, int tie, int hidden);
 
     /* Plays animation `animation` (its index in the prop's .glb, 0 up) of a skinned prop at
      * `seconds` into it, looped when `loop` is 1, else held at its end; -1 draws the mesh as it is
      * stored again. Drawn only. Returns OPENRAC_HOOK_OK, or OPENRAC_HOOK_UNKNOWN for a prop that is
      * not the mod's or a time that is not a number. A .glb with no such animation or no skin is
-     * drawn as it is stored. Since 1.14. */
+     * drawn as it is stored. Since 1.15. */
     int (*prop_animate)(openrac_mod* mod, int prop, int animation, float seconds, int loop);
 
     /* moby_joint_position with the joint's axes: `out` gets its x, y and z axes in the level (each
      * as long as the joint and the moby's scale make it), then its place, as last drawn. Returns
      * OPENRAC_HOOK_OK, or OPENRAC_HOOK_UNKNOWN for no moby, no such joint or a port without it.
-     * Since 1.14. */
+     * Since 1.15. */
     int (*moby_joint_frame)(int slot, int joint, float out[12]);
 
     /* moby_set_joints that sets each listed joint's pose instead of turning it: its `rotation` is
@@ -2188,12 +2217,12 @@ typedef struct openrac_api {
      * its parent's: glTF's quaternion with x, y, z negated) and its `translation` its place in its
      * parent (in the model's units), in place of its animation's, with no scale. A scene's own
      * animation plays this way on a moby of any class. Shares moby_set_joints' list and limit for
-     * the moby. Since 1.14. */
+     * the moby. Since 1.15. */
     int (*moby_set_joint_poses)(openrac_mod* mod, int slot, const openrac_joint_offset* joints, int count);
 
     /* The spawn id of the placed moby in `slot`: the uid its level record carries, which the game
      * saves kills and pickups by and which stays when the level is edited (a key is the record's
-     * place). -1 for none or a port without it. Since 1.14. */
+     * place). -1 for none or a port without it. Since 1.15. */
     int (*moby_uid)(int slot);
 } openrac_api;
 

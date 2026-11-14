@@ -28,9 +28,10 @@
 #include "game/common/frontend/pacing.h"
 #include "game/common/frontend/scene_frame_internal.h"
 #include "openrac/game_host.h"
-#include "renderer/direct.h"
-#include "renderer/gl.h"
-#include "renderer/precise_depth.h"
+#include "renderer/direct/direct.h"
+#include "renderer/gl/gl.h"
+#include "renderer/gl/precise_depth.h"
+#include "renderer/settings/render_opt.h"
 #if defined(OPENRAC_VULKAN)
 #include "renderer/vulkan/vkgl.h"
 #endif
@@ -202,6 +203,10 @@ void set_lighting(SceneFrame& frame) {
     }
     owner.scene.set_point_emitters(std::move(emitters));
     input.texture_filter = enhanced ? graphics.texture_filter : renderer::TextureFilter::Normal;
+    // The lossy render shortcuts follow the setting; High (and the base game) draws in full.
+    renderer::render_opt::set_effects_detail(
+        enhanced ? graphics.effects_detail : renderer::render_opt::EffectsDetail::High
+    );
     if (auto* lighting = owner.scene.level_lighting()) {
         lighting->set_material_overrides(enhanced);
     }
@@ -213,6 +218,8 @@ void set_lighting(SceneFrame& frame) {
         graphics.sweep_translucent_unlit,
         graphics.sweep_translucent_full
     );
+    owner.scene.set_sweep_moby_blended_off(graphics.sweep_moby_blended_off);
+    owner.scene.set_sweep_one_triangle(graphics.sweep_one_triangle);
     owner.scene.set_gameplay_rim(
         enhanced && graphics.rim_light, graphics.rim_light_strength, graphics.rim_light_falloff
     );
@@ -228,6 +235,7 @@ void set_lighting(SceneFrame& frame) {
     owner.scene.set_medial_axis_debug(graphics.medial_axis_debug);
     owner.scene.set_environment_probe_debug(graphics.environment_probe_debug);
     input.shadow_quality = graphics.shadow_quality;
+    input.shadow_filter = graphics.shadow_filter;
     input.volumetric_quality = graphics.volumetric_quality;
     input.sun_pixel_shadow = enhanced && graphics.enhanced_shadows
                              && owner.scene.sun_shadow_enabled() && scene.has_camera
