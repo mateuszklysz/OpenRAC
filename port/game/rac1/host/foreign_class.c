@@ -186,6 +186,33 @@ void rac1_foreign_host_world_leave(int w) {
     }
 }
 
+/* Inside an imported class's update (foreign_run): InitMobyInstance's class check below. */
+static int s_foreign_depth;
+
+void func_0020D440__game(gaddr moby, int oclass);
+
+/* InitMobyInstance (libraries.tsv, wrap). An imported class's update can make a class this level
+ * does not have (one its code takes from a table, as Qwark's starfighter takes its parts): its
+ * slot is 0xFF, past the class tables' 224 entries. The game's own path for a class with no data
+ * (no update, no record: a dead moby) is taken instead, by those two entries reading 0 for the
+ * call. Any other call is the game's, unchanged. */
+void func_0020D440(gaddr moby, int oclass) {
+    const gaddr slots = OPENRAC_DATA(RAC1_ADDR(0x001B3E40u));
+    if (s_foreign_depth == 0 || oclass < 0 || oclass >= 0x800
+        || GREF(uint8_t, slots + (gaddr)oclass) != 0xFF) {
+        func_0020D440__game(moby, oclass);
+        return;
+    }
+    const gaddr record = OPENRAC_DATA(RAC1_ADDR(0x001B3580u)) + 0xFFu * 4u;
+    const gaddr update = OPENRAC_DATA(RAC1_ADDR(0x001B3900u)) + 0xFFu * 4u;
+    const uint32_t was_record = GREF(uint32_t, record), was_update = GREF(uint32_t, update);
+    GREF(uint32_t, record) = 0;
+    GREF(uint32_t, update) = 0;
+    func_0020D440__game(moby, oclass);
+    GREF(uint32_t, record) = was_record;
+    GREF(uint32_t, update) = was_update;
+}
+
 static void foreign_run(int k, gaddr moby) {
     Foreign* f = &s_foreign[k];
     const int loaded = openrac_game_loaded_overlay();
@@ -226,7 +253,9 @@ static void foreign_run(int k, gaddr moby) {
     if (world >= 0) {
         world_enter(world);
     }
+    ++s_foreign_depth;
     openrac_guest_call_a0(f->update, moby);
+    --s_foreign_depth;
     openrac_guest_foreign_leave();
     openrac_game_restore_overlay(loaded);
 }

@@ -1100,3 +1100,4 @@ FUN_L00_0029a6b0	vendor	Vendor_OpenMenu	hook	opens the vendor purchase menu, inc
 
 FUN_L00_00239810	hud	draw_health_hud_panel	wrap	optional connected health background sized for 4/5/8 orbs; off preserves PS2 layout (host/hud_panels.c)	int (unsigned int)
 FUN_L00_00241788	world	print_moby_class_sizes	wrap	after a level registers its moby classes: the classes it imports from other levels' programs register too (rac1/host/foreign_class.c); PAL func_L00_00242120	void (unsigned int, int)
+FUN_0020c5f0	game	InitMobyInstance	wrap	a moby's defaults, set by CreateMoby: in an imported class's call (another level's program), a class this level does not have takes the game's own path for a class with no data, a dead moby, instead of reading past the class tables (rac1/host/foreign_class.c); PAL func_0020D440	void (gaddr, int)

@@ -118,6 +118,8 @@ static inline unsigned rac1_moby_vtbl_address(int level) {
  * word at +8 at +0x48 of the transfer state (PAL +0x46). */
 #define func_00204FC0 game_FUN_00204790
 #define func_0020D348 game_FUN_0020c4f8
+#define func_0020D440 game_FUN_0020c5f0
+#define func_0020D440__game game_FUN_0020c5f0__game
 #define func_00118D80 game_FlushCache
 #define RAC1_TYPE_func_00204FC0_params void
 #define RAC1_TRANSFER_PAD08 0x48
