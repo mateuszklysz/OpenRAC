@@ -2358,6 +2358,12 @@ int loaded_count() {
     return static_cast<int>(g_loaded.size());
 }
 
+bool loaded(std::string_view id) {
+    return std::any_of(g_loaded.begin(), g_loaded.end(), [&](const auto& mod) {
+        return mod != nullptr && mod->id == id;
+    });
+}
+
 const openrac_api& api_for_tests() {
     return g_api;
 }

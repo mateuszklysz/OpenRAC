@@ -180,6 +180,8 @@ void queue_developer_menu_action(openrac_mod* mod, std::uint32_t action);
 
 // How many mods are loaded.
 int loaded_count();
+// Whether the mod `id` is loaded (on, and its load went through).
+bool loaded(std::string_view id);
 // The table the mods are given, for the tests' direct calls.
 const openrac_api& api_for_tests();
 

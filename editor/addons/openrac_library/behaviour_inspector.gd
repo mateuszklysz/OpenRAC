@@ -2,7 +2,7 @@
 extends EditorInspectorPlugin
 ## The Behaviour section in the Inspector of a moby under Game/Mobys: a preset (spin, bob, patrol,
 ## orbit, face the hero, follow the hero) and its numbers, kept as rc1_behaviour metadata, which
-## editor/behaviours.py packs and the behaviour presets mod plays. Undoable.
+## editor/behaviours.py packs and the editor-runtime mod plays. Undoable.
 
 ## Each preset's numbers, their defaults and steps (editor/behaviours.py PRESETS), and a hint.
 const PRESETS: Dictionary = {
@@ -43,7 +43,7 @@ func section(node: Node3D) -> Control:
 	var box := VBoxContainer.new()
 	var title := Label.new()
 	title.text = "Behaviour"
-	title.tooltip_text = ("A simple movement the behaviour presets mod plays in the game, from where the moby is placed. "
+	title.tooltip_text = ("A simple movement the editor-runtime mod plays in the game, from where the moby is placed. "
 		+ "Its own logic stops while it moves. Pack, then play with the mod on.")
 	title.mouse_filter = Control.MOUSE_FILTER_PASS
 	box.add_child(title)

@@ -14,7 +14,7 @@ copy per video mode. Both native ports select the 60 Hz copy on their own disc
     <out>/changes.txt                 what was changed, in words
     <out>/packed.json                 the disc it was packed from (overrides.py stacks it for that disc only)
     <out>/level_NN/cutscenes/         the level's cutscenes, as OpenRAC Editor wrote them beside its
-                                      scene, for the cutscene player mod (pack_cutscenes)
+                                      scene, for the editor-runtime mod (pack_cutscenes)
 
 The disc image is never written. The native port reads `patches.tsv` (its
 `--mods` option) and serves those sectors from the files instead of the disc.
@@ -680,7 +680,7 @@ def pack_cutscenes(scene_dir: Path, out_dir: Path, level_id: int | None = None, 
                    classes=None) -> tuple[list[str], list[str]]:
     """Copies the level's cutscenes (OpenRAC Editor writes them to <scene folder>/cutscenes/ on
     save) with the files beside them (voices, music, meshes, layers' frames) to
-    <out>/level_NN/cutscenes/, where the cutscene player mod reads them. Each is checked first
+    <out>/level_NN/cutscenes/, where the editor-runtime mod reads them. Each is checked first
     (check_cutscene). Returns (changes, problems) in words; a .cutscene that is not one, or has an
     error, is left out."""
     source = scene_dir / "cutscenes"
@@ -818,7 +818,7 @@ def pack(disc, survey: dict, project: Path, out: Path,
         if skin_changes and not changes and placements is None and not wrote and static_bake is None \
                 and not animated_count:
             packed += 1
-        # Behaviours: mobys the behaviour presets mod moves (behaviours.py), beside the placements.
+        # Behaviours: mobys the editor-runtime mod moves (behaviours.py), beside the placements.
         import behaviours
         behaviour_changes, behaviour_problems = behaviours.write_behaviours(text, out / name, moby_spawn_ids)
         scenery_changes += behaviour_changes
@@ -826,7 +826,7 @@ def pack(disc, survey: dict, project: Path, out: Path,
         if behaviour_changes and not changes and placements is None and not wrote and static_bake is None \
                 and not animated_count and not skin_changes:
             packed += 1
-        # Cutscenes: files the cutscene player mod reads from the pack, beside the level's.
+        # Cutscenes: files the editor-runtime mod reads from the pack, beside the level's.
         level_classes = []
 
         def classes_loaded() -> set:
