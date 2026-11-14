@@ -2,8 +2,9 @@
 extends EditorDock
 ## The Assets dock: the mobys, ties and shrubs of every level of every disc read (library.gd), to
 ## drag onto the level or add in front of the 3D view's camera (plugin.gd places them). Each
-## shows what it does here: green for a class the level has (the game's own, with its logic),
-## white for the rest (its look only, as static scenery, for now).
+## shows what it does here: green for a class the level has (the game's own, with its logic), blue
+## for another level's moby that can come with its own logic, white for the rest (its look only, as
+## static scenery, or on a class's logic).
 
 const Library = preload("library.gd")
 const AssetList = preload("asset_list.gd")
@@ -13,9 +14,14 @@ const SHOW_ALL: int = 0
 const SHOW_HERE: int = 1
 const SHOW_THIS_GAME: int = 2
 const SHOW_OTHER_GAMES: int = 3
+const SHOW_IMPORTS: int = 4
 
 ## The names of assets this level has (placed with the game's logic).
 const FULL_COLOUR: Color = Color(0.55, 0.9, 0.55)
+## Another level's moby that can come with its own logic (library.gd import_refusal()).
+const IMPORT_COLOUR: Color = Color(0.55, 0.78, 1.0)
+## The rest: its look only.
+const LOOK_COLOUR: Color = Color(0.92, 0.92, 0.92)
 
 ## Previews made at most this many at once, the rest as the list is scrolled to.
 const PREVIEWS_PER_FRAME: int = 2
@@ -51,6 +57,8 @@ var report: Label
 var add_button: Button
 var as_button: Button
 var own_button: Button
+var refresh_button: Button
+var details: RichTextLabel
 var classes_menu: PopupMenu
 
 
@@ -69,24 +77,34 @@ func _init() -> void:
 	search.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	search.text_changed.connect(func(_text: String) -> void: refill())
 	row.add_child(search)
-	var refresh := Button.new()
-	refresh.text = "Refresh"
-	refresh.tooltip_text = "Look for levels again (after reading another disc)."
-	refresh.pressed.connect(rescan)
-	row.add_child(refresh)
+	refresh_button = Button.new()
+	refresh_button.tooltip_text = "Look for levels again (after reading another disc)."
+	refresh_button.flat = true
+	refresh_button.pressed.connect(rescan)
+	row.add_child(refresh_button)
 
 	filter = OptionButton.new()
 	filter.add_item("Everything", SHOW_ALL)
 	filter.add_item("In this level (with the game's logic)", SHOW_HERE)
+	filter.add_item("From other levels, with their own logic", SHOW_IMPORTS)
 	filter.add_item("This game", SHOW_THIS_GAME)
 	filter.add_item("Other games", SHOW_OTHER_GAMES)
 	filter.item_selected.connect(func(_index: int) -> void: refill())
 	box.add_child(filter)
-	var legend := Label.new()
-	legend.text = "Green: this level has it (the game's logic). White: its look only, for now."
-	legend.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	legend.custom_minimum_size = Vector2(160, 0)
-	legend.add_theme_color_override("font_color", FULL_COLOUR.darkened(0.1))
+
+	# What each colour means, one line each.
+	var legend := VBoxContainer.new()
+	legend.add_theme_constant_override("separation", 0)
+	for entry in [[FULL_COLOUR, "This level has it: the game's own, with its logic."],
+			[IMPORT_COLOUR, "Another level's: can come with its own logic."],
+			[LOOK_COLOUR, "Its look only (static scenery), or on a class's logic."]]:
+		var line := Label.new()
+		line.text = "\u25A0 " + entry[1]
+		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		line.custom_minimum_size = Vector2(160, 0)
+		line.add_theme_color_override("font_color", entry[0])
+		line.add_theme_font_size_override("font_size", 12)
+		legend.add_child(line)
 	box.add_child(legend)
 
 	var split := VSplitContainer.new()
@@ -96,7 +114,6 @@ func _init() -> void:
 	tree.hide_root = true
 	tree.custom_minimum_size = Vector2(0, 120)
 	tree.item_selected.connect(refill)
-	tree.item_collapsed.connect(func(_item: TreeItem) -> void: pass)
 	split.add_child(tree)
 
 	list = AssetList.new()
@@ -109,51 +126,100 @@ func _init() -> void:
 	list.fixed_column_width = 96
 	list.fixed_icon_size = Vector2i(80, 80)
 	list.item_activated.connect(func(index: int) -> void: add(index))
-	list.item_selected.connect(func(index: int) -> void:
-		add_button.disabled = false
-		as_button.disabled = not can_add_as(asset_at(index))
-		own_button.disabled = not can_import(asset_at(index)))
+	list.item_selected.connect(func(_index: int) -> void: show_selected())
 	split.add_child(list)
 
-	add_button = Button.new()
-	add_button.text = "Add in front of the camera"
-	add_button.tooltip_text = "Or drag it into the 3D view or onto the Scene dock. Double-click adds too."
-	add_button.disabled = true
-	add_button.pressed.connect(func() -> void:
-		var selected: PackedInt32Array = list.get_selected_items()
-		if not selected.is_empty():
-			add(selected[0]))
-	box.add_child(add_button)
+	# The selected asset: what it is and what each way of adding it does.
+	details = RichTextLabel.new()
+	details.bbcode_enabled = true
+	details.fit_content = true
+	details.scroll_active = false
+	details.selection_enabled = true
+	details.custom_minimum_size = Vector2(160, 0)
+	box.add_child(details)
 
-	as_button = Button.new()
-	as_button.text = "Add on a class's logic..."
-	as_button.tooltip_text = ("A moby from another level or game, animated, that behaves as a class of this level: "
-		+ "pick the class. The game runs that class's logic and draws this model.")
-	as_button.disabled = true
-	as_button.pressed.connect(show_classes)
-	box.add_child(as_button)
-	own_button = Button.new()
-	own_button.text = "Add with its own logic"
-	own_button.tooltip_text = ("A moby of another level of this disc, with its own class and logic: the game runs it in "
-		+ "its own level's program (Ratchet & Clank, NTSC, for now). One whose logic needs its level's paths "
-		+ "or cameras may not work; each costs about a millisecond a frame.")
-	own_button.disabled = true
-	own_button.pressed.connect(func() -> void:
-		var selected: PackedInt32Array = list.get_selected_items()
-		if not selected.is_empty():
-			plugin.add_foreign(asset_at(selected[0])))
-	box.add_child(own_button)
+	var buttons := VBoxContainer.new()
+	buttons.add_theme_constant_override("separation", 2)
+	box.add_child(buttons)
+	add_button = action_button(buttons, "Add in front of the camera",
+		func() -> void: with_selected(func(asset: Dictionary) -> void: plugin.add_in_view(asset)))
+	own_button = action_button(buttons, "Add with its own logic",
+		func() -> void: with_selected(func(asset: Dictionary) -> void: plugin.add_foreign(asset)))
+	as_button = action_button(buttons, "Add on a class's logic...", show_classes)
 	classes_menu = PopupMenu.new()
 	classes_menu.id_pressed.connect(func(id: int) -> void:
-		var selected: PackedInt32Array = list.get_selected_items()
-		if not selected.is_empty():
-			plugin.add_as(asset_at(selected[0]), id))
+		with_selected(func(asset: Dictionary) -> void: plugin.add_as(asset, id)))
 	add_child(classes_menu)
 
 	report = Label.new()
 	report.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	report.custom_minimum_size = Vector2(160, 0)
 	box.add_child(report)
+	show_selected()
+
+
+## A button of the actions under the list, full width, its text left.
+func action_button(parent: Control, text: String, pressed: Callable) -> Button:
+	var button := Button.new()
+	button.text = text
+	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	button.disabled = true
+	button.pressed.connect(pressed)
+	parent.add_child(button)
+	return button
+
+
+## Calls DO with the list's selected asset, if any.
+func with_selected(action: Callable) -> void:
+	var selected: PackedInt32Array = list.get_selected_items()
+
+	if not selected.is_empty() and not asset_at(selected[0]).is_empty():
+		action.call(asset_at(selected[0]))
+
+
+## The editor's icons, once the dock is in the editor (none at _init).
+func _notification(what: int) -> void:
+	if what != NOTIFICATION_THEME_CHANGED or refresh_button == null:
+		return
+
+	refresh_button.icon = get_theme_icon("Reload", "EditorIcons")
+	add_button.icon = get_theme_icon("Add", "EditorIcons")
+	own_button.icon = get_theme_icon("Script", "EditorIcons")
+	as_button.icon = get_theme_icon("Skeleton3D", "EditorIcons")
+
+
+## Shows what the selected asset is and which ways of adding it work here, and why not the others.
+func show_selected() -> void:
+	var selected: PackedInt32Array = list.get_selected_items() if list != null else PackedInt32Array()
+	var asset: Dictionary = asset_at(selected[0]) if not selected.is_empty() else {}
+
+	if asset.is_empty():
+		details.text = "[color=#%s]Pick an asset to see what it becomes here.[/color]" % LOOK_COLOUR.darkened(0.3).to_html(false)
+		for button in [add_button, own_button, as_button]:
+			button.disabled = true
+			button.tooltip_text = "Pick an asset first."
+		return
+
+	var status: String = Library.status(asset, here)
+	var refusal: String = Library.import_refusal(asset, here)
+	var colour: Color = FULL_COLOUR if status == Library.FULL else (IMPORT_COLOUR if refusal.is_empty() else LOOK_COLOUR)
+	var level_name: String = String(asset["level_name"])
+	details.text = "[b][color=#%s]%s[/color][/b]  class %d\n%s %s, level %02d%s" % [colour.to_html(false),
+		asset["name"], int(asset["class"]), asset["game"], asset["disc"], int(asset["level"]),
+		"" if level_name.is_empty() else " (%s)" % level_name]
+
+	add_button.disabled = here.is_empty()
+	add_button.text = "Add in front of the camera" + (" (with its logic)" if status == Library.FULL else " (look only)")
+	add_button.tooltip_text = ("Open a level scene first." if here.is_empty() else
+		"The game's own %s of this level, with its logic." % asset["kind"].trim_suffix("s") if status == Library.FULL else
+		"Static scenery under Game/StaticAssets: its look, no logic. Drag it into the 3D view to place it where you drop it.")
+	own_button.disabled = not refusal.is_empty()
+	own_button.tooltip_text = (refusal if not refusal.is_empty() else
+		"Its own class and logic, run from its level's program. Pack, then play. Logic that needs its level's "
+		+ "paths or cameras may not work, and each costs about a millisecond a frame.")
+	as_button.disabled = not can_add_as(asset)
+	as_button.tooltip_text = ("Pick a class of this level: the game runs that class's logic and draws this model, animated."
+		if can_add_as(asset) else "Only for a moby this level does not have, in a level with mobys.")
 
 
 func _ready() -> void:
@@ -179,8 +245,14 @@ func set_here(level: Dictionary) -> void:
 	refill()
 
 
-func show_report(text: String) -> void:
+## Says how the last action went: in the warning colour when it did not work.
+func show_report(text: String, failed: bool = false) -> void:
 	report.text = text
+
+	if failed:
+		report.add_theme_color_override("font_color", EditorInterface.get_editor_theme().get_color("warning_color", "Editor"))
+	else:
+		report.remove_theme_color_override("font_color")
 
 
 # =============================================================================
@@ -258,8 +330,7 @@ func refill() -> void:
 	list.clear()
 	shown.clear()
 	preview_queue.clear()
-	add_button.disabled = true
-	as_button.disabled = true
+	show_selected()
 	var selected: TreeItem = tree.get_selected()
 	var scope: Dictionary = selected.get_metadata(0) if selected != null else {}
 	var words: String = search.text.strip_edges().to_lower()
@@ -297,6 +368,9 @@ func refill() -> void:
 			SHOW_HERE:
 				if status != Library.FULL:
 					continue
+			SHOW_IMPORTS:
+				if not Library.import_refusal(asset, here).is_empty():
+					continue
 			SHOW_THIS_GAME:
 				if here.is_empty() or asset["game"] != here["game"]:
 					continue
@@ -315,6 +389,8 @@ func refill() -> void:
 
 		if status == Library.FULL:
 			list.set_item_custom_fg_color(index, FULL_COLOUR)
+		elif Library.import_refusal(asset, here).is_empty():
+			list.set_item_custom_fg_color(index, IMPORT_COLOUR)
 
 		list.set_item_tooltip(index, tooltip(asset, status))
 		list.set_item_metadata(index, shown.size())
@@ -337,6 +413,8 @@ func tooltip(asset: Dictionary, status: String) -> String:
 	var does: String = ("This level has the class: it is placed as the game's own %s, with its logic." % asset["kind"].trim_suffix("s")
 		if status == Library.FULL else
 		"Placed as static scenery (Game/StaticAssets): its look, no logic; collision with rc1_static_collision."
+		+ ("\nOr \"Add with its own logic\": its class comes too, and runs as in its level."
+			if Library.import_refusal(asset, here).is_empty() else "")
 		+ ("\nOr \"Add on a class's logic\": animated, it behaves as a class of this level." if asset["kind"] == "mobys" else ""))
 	return "%s, class %d\nFrom %s\n%s\nDrag it into the 3D view, or double-click to add it in front of the camera." % [
 		asset["name"], int(asset["class"]), where, does]
@@ -352,15 +430,6 @@ func asset_at(index: int) -> Dictionary:
 func can_add_as(asset: Dictionary) -> bool:
 	return not asset.is_empty() and asset["kind"] == "mobys" and not here.is_empty() \
 		and Library.status(asset, here) != Library.FULL and not here["classes"].get("mobys", {}).is_empty()
-
-
-## Whether ASSET can come with its own logic: a moby of another level of the same rac1 NTSC disc
-## that this level does not have (editor/foreign_classes.py).
-func can_import(asset: Dictionary) -> bool:
-	return not asset.is_empty() and asset["kind"] == "mobys" and not here.is_empty() \
-		and asset["game"] == "rac1" and here["game"] == "rac1" and asset["disc"] == "ntsc" \
-		and here["disc"] == "ntsc" and int(asset["level"]) != int(here["level"]) \
-		and Library.status(asset, here) != Library.FULL
 
 
 ## The level's moby classes, by name, to pick the one the selected asset behaves as.

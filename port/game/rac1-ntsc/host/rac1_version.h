@@ -76,6 +76,8 @@ static inline unsigned rac1_moby_vtbl_address(int level) {
 #define RAC1_ADDR_0x001E8F00u 0x001E8B80u
 /* register_moby_class (foreign_class.c). */
 #define RAC1_ADDR_0x00203E78u 0x00203640u
+/* resident_class_id_by_slot (foreign_class.c). */
+#define RAC1_ADDR_0x001B3C80u 0x001B3900u
 
 /* Where this version's decompilation declares a function otherwise: the type in its prototypes. */
 /* ParseBin's result, the loaded level's entry. */

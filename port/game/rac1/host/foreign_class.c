@@ -40,11 +40,30 @@ typedef struct {
 static Foreign s_foreign[FOREIGN_MAX];
 static int s_foreign_count;
 static int s_registered;
+/* The imported class being registered (-1: none): only it binds to a stand-in, never a class of
+ * the level's own that has no update. */
+static int s_registering = -1;
 
 static void foreign_run(int k, gaddr moby) {
     Foreign* f = &s_foreign[k];
     const int loaded = openrac_game_loaded_overlay();
-    if (f->update == 0 || loaded < 0 || openrac_guest_foreign_enter(f->level, loaded) != 0) {
+    if (f->update == 0 || loaded < 0) {
+        return;
+    }
+    if (openrac_guest_foreign_enter(f->level, loaded) != 0) {
+        if (!f->ran) {
+            f->ran = 1;
+            char message[200];
+            snprintf(
+                message,
+                sizeof(message),
+                "imported moby class %d does not run: level %d's program is missing or bigger "
+                "than this level's",
+                f->oclass,
+                f->level
+            );
+            openrac_game_warn(message);
+        }
         return;
     }
     if (!f->ran) {
@@ -133,17 +152,41 @@ void rac1_foreign_classes_load(int level) {
         return;
     }
     char line[128];
-    while (fgets(line, sizeof(line), file) != NULL && s_foreign_count < FOREIGN_MAX) {
+    int skipped = 0;
+    while (fgets(line, sizeof(line), file) != NULL) {
         int oclass = -1, from = -1;
-        if (line[0] == '#' || sscanf(line, "%d\t%d", &oclass, &from) != 2) {
+        if (line[0] == '#' || line[0] == '\n' || line[0] == '\r') {
             continue;
         }
-        if (oclass < 0 || oclass >= 0x800 || from < 0 || from >= LEVELS || from == level) {
+        int known = 0;
+        if (sscanf(line, "%d\t%d", &oclass, &from) == 2 && oclass >= 0 && oclass < 0x800
+            && from >= 0 && from < LEVELS && from != level) {
+            for (int k = 0; k < s_foreign_count; ++k) {
+                known |= s_foreign[k].oclass == oclass;
+            }
+        } else {
+            known = 1;
+        }
+        if (known || s_foreign_count == FOREIGN_MAX) {
+            ++skipped; /* a bad or repeated line, or one too many */
             continue;
         }
         s_foreign[s_foreign_count++] = (Foreign){oclass, from, 0, 0};
     }
     fclose(file);
+    if (skipped > 0) {
+        char message[200];
+        snprintf(
+            message,
+            sizeof(message),
+            "level %d: %d line(s) of classes.tsv left out (a bad or repeated class, its own level, "
+            "or more than %d classes)",
+            level,
+            skipped,
+            FOREIGN_MAX
+        );
+        openrac_game_warn(message);
+    }
     if (s_foreign_count > 0 && !s_registered) {
         register_stand_ins();
     }
@@ -162,7 +205,7 @@ void rac1_foreign_classes_load(int level) {
 /* print_moby_class_sizes, which the level's loader calls once it has registered its own classes:
  * the imported ones register after them, each from its blob <mods>/level_NN/classes/<class>.bin
  * (its data as its own level's core has it, editor/foreign_classes.py). Drawn without the level's
- * textures (a skin draws it); its update binds through assign_moby_class_data as any class. */
+ * textures (the port draws its level's model); its update binds through assign_moby_class_data as any class. */
 void func_L00_00242120(unsigned int record, int count) {
     func_L00_00242120__game(record, count);
     const int level = openrac_game_loaded_overlay();
@@ -175,14 +218,31 @@ void func_L00_00242120(unsigned int record, int count) {
         memset(G(slots), 0, 16);
     }
     const gaddr slot_count = OPENRAC_DATA(RAC1_ADDR(0x00160000u));
+    const gaddr class_by_slot = OPENRAC_DATA(RAC1_ADDR(0x001B3C80u));
     const gaddr register_class = OPENRAC_CODE(RAC1_ADDR(0x00203E78u));
     gaddr at = FOREIGN_BLOBS;
     int registered = 0;
     for (int k = 0; k < s_foreign_count; ++k) {
         const Foreign* f = &s_foreign[k];
-        if (GREF(uint32_t, slot_count) >= MOBY_CLASS_SLOTS) {
+        const uint32_t used = GREF(uint32_t, slot_count);
+        if (used >= MOBY_CLASS_SLOTS) {
             openrac_game_warn("no moby class slot left for the imported classes");
             break;
+        }
+        int own = 0;
+        for (uint32_t slot = 0; slot < used; ++slot) {
+            own |= GREF(int16_t, class_by_slot + slot * 2u) == f->oclass;
+        }
+        if (own) {
+            char message[160];
+            snprintf(
+                message,
+                sizeof(message),
+                "moby class %d is this level's own: it runs as the level's, not imported",
+                f->oclass
+            );
+            openrac_game_warn(message);
+            continue;
         }
         char path[1024];
         snprintf(
@@ -205,15 +265,27 @@ void func_L00_00242120(unsigned int record, int count) {
         fseek(file, 0, SEEK_SET);
         if (size < 0x50 || (gaddr)size > FOREIGN_BLOBS + FOREIGN_BLOBS_SIZE - at) {
             fclose(file);
-            openrac_game_warn("an imported moby class does not fit");
+            char message[1100];
+            snprintf(
+                message,
+                sizeof(message),
+                "imported moby class %d: %s is %s",
+                f->oclass,
+                path,
+                size < 0x50 ? "too small to be a class" : "too big for the room left"
+            );
+            openrac_game_warn(message);
             continue;
         }
         const size_t read = fread(G(at), 1, (size_t)size, file);
         fclose(file);
         if (read != (size_t)size) {
+            openrac_game_warn("an imported moby class could not be read");
             continue;
         }
+        s_registering = k;
         GFN(void (*)(gaddr, gaddr, gaddr, int), register_class)(at, 0, slots, f->oclass);
+        s_registering = -1;
         at = (at + (gaddr)size + 15u) & ~15u;
         ++registered;
     }
@@ -234,7 +306,7 @@ void func_L00_00242120(unsigned int record, int count) {
 gaddr rac1_foreign_class_update(int oclass) {
     for (int k = 0; k < s_foreign_count; ++k) {
         Foreign* f = &s_foreign[k];
-        if (f->oclass != oclass) {
+        if (f->oclass != oclass || k != s_registering) {
             continue;
         }
         const gaddr vtbl = RAC1_MOBY_VTBL(f->level);

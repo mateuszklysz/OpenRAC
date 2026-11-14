@@ -936,6 +936,9 @@ bool load_level(
                 continue;
             }
             const fs::path other = dir.parent_path() / std::format("level_{:02}", from);
+            if (other.filename() == dir.filename()) {
+                continue;  // its own level's: the runtime leaves it out too (foreign_class.c)
+            }
             json::Value other_manifest;
             std::string other_error;
             if (!json::parse_file(
@@ -949,9 +952,11 @@ bool load_level(
                 log::warn("imported moby class {}: level {} has no model of it", id, from);
                 continue;
             }
-            auto model = load_model(other / cls["mesh"].string(), out, error);
+            std::string model_error;
+            auto model = load_model(other / cls["mesh"].string(), out, model_error);
             if (!model) {
-                return false;
+                log::warn("imported moby class {}: {}", id, model_error);
+                continue;
             }
             mobys[id] = {*model, static_cast<float>(cls["scale"].number(1.0)), false};
         }

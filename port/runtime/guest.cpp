@@ -2487,6 +2487,15 @@ int openrac_guest_foreign_enter(int from, int loaded) {
     if (p == nullptr || !openrac::runtime::Memory::get().mapped(p->low, p->high - p->low)) {
         return -1;
     }
+    // Its program goes where the loaded one is: one that reaches further would write over what
+    // the loaded level keeps after its program (its heap).
+    gaddr loaded_high = 0;
+    for (const Chunk& c : level_program(loaded)) {
+        loaded_high = std::max(loaded_high, static_cast<gaddr>(c.base + c.bytes.size()));
+    }
+    if (p->high > ((loaded_high + 3u) & ~3u)) {
+        return -1;
+    }
     // Built while the loaded program is in memory: they read its code there.
     const std::vector<ForeignBlock>& blocks = foreign_blocks(*p, from, loaded);
     first.unlock();

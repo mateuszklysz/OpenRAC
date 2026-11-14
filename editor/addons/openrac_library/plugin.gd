@@ -8,11 +8,13 @@ extends EditorPlugin
 ##   with the class scale its own scene gives it and collision on for mobys and ties.
 ## Godot's own drop (from the dock into the 3D view or the Scene dock) may put the node anywhere:
 ## it is moved to its group right after, keeping where it was dropped.
-## behaviour_inspector.gd adds the Behaviour section to a moby's Inspector.
+## behaviour_inspector.gd adds the Behaviour section to a moby's Inspector, foreign_inspector.gd the
+## Imported class section to a moby that came with its own logic from another level.
 
 const Dock = preload("dock.gd")
 const Library = preload("library.gd")
 const BehaviourInspector = preload("behaviour_inspector.gd")
+const ForeignInspector = preload("foreign_inspector.gd")
 
 ## The groups under Game, by kind, for an asset the level has.
 const GROUPS: Dictionary = {"mobys": "Mobys", "ties": "Ties", "shrubs": "Shrubs"}
@@ -25,9 +27,13 @@ const ADD_DISTANCE: float = 12.0
 
 var dock: Dock
 var behaviour_inspector: BehaviourInspector
+var foreign_inspector: ForeignInspector
 
 ## What placed files are, by res:// path: the asset placed, until its node arrives.
 var pending: Dictionary = {}
+
+## Set while an asset waits for the editor to import it (ready_to_place()).
+var waiting_for_import: bool = false
 
 ## Nodes added this frame, to put where they belong once the drop has finished.
 var arrived: Array[Node] = []
@@ -40,6 +46,9 @@ func _enter_tree() -> void:
 	behaviour_inspector = BehaviourInspector.new()
 	behaviour_inspector.undo_redo = get_undo_redo()
 	add_inspector_plugin(behaviour_inspector)
+	foreign_inspector = ForeignInspector.new()
+	foreign_inspector.level_name = level_name
+	add_inspector_plugin(foreign_inspector)
 	scene_changed.connect(handle_scene_changed)
 	get_tree().node_added.connect(handle_node_added)
 	handle_scene_changed(EditorInterface.get_edited_scene_root())
@@ -52,9 +61,57 @@ func _exit_tree() -> void:
 	scene_changed.disconnect(handle_scene_changed)
 	remove_inspector_plugin(behaviour_inspector)
 	behaviour_inspector = null
+	remove_inspector_plugin(foreign_inspector)
+	foreign_inspector = null
 	remove_dock(dock)
 	dock.queue_free()
 	dock = null
+
+
+## Whether PATH is imported and can be placed now. When the editor is still bringing it in (a new
+## folder takes a scan of its own), says so and calls AGAIN once it is imported (up to a minute).
+func ready_to_place(path: String, again: Callable) -> bool:
+	if waiting_for_import:
+		dock.show_report("Still bringing the last asset in; try again in a moment.")
+		return false
+
+	if ResourceLoader.exists(path) or not FileAccess.file_exists(path):
+		return true
+
+	waiting_for_import = true
+	dock.show_report("Bringing %s in: it is placed as soon as the editor has imported it..." % path.get_file())
+	wait_for_import(path, again)
+	return false
+
+
+## Waits for PATH's import, then calls AGAIN (ready_to_place()).
+func wait_for_import(path: String, again: Callable) -> void:
+	var filesystem: EditorFileSystem = EditorInterface.get_resource_filesystem()
+
+	if not filesystem.is_scanning():
+		filesystem.scan()
+
+	for _i in range(240):
+		await get_tree().create_timer(0.25).timeout
+
+		if ResourceLoader.exists(path) and not filesystem.is_scanning():
+			waiting_for_import = false
+			again.call()
+			return
+
+	waiting_for_import = false
+	dock.show_report("The editor could not import %s." % path, true)
+
+
+## The name of LEVEL of the edited level's disc, as the dock read it, or "".
+func level_name(level: int) -> String:
+	var at: Dictionary = here()
+
+	for entry in dock.levels if dock != null else []:
+		if entry["game"] == at.get("game") and entry["disc"] == at.get("disc") and int(entry["level"]) == level:
+			return String(entry["name"])
+
+	return ""
 
 
 func handle_scene_changed(root: Node) -> void:
@@ -108,7 +165,7 @@ func prepare(asset: Dictionary) -> String:
 	dock.importing = false
 
 	if path.is_empty():
-		dock.show_report(" ".join(error))
+		dock.show_report(" ".join(error), true)
 		return ""
 
 	pending[path] = asset
@@ -125,7 +182,7 @@ func add_in_view(asset: Dictionary) -> void:
 	var game: Node3D = root.get_node_or_null("Game") as Node3D if root != null else null
 
 	if game == null:
-		dock.show_report("Open a level scene first.")
+		dock.show_report("Open a level scene first.", true)
 		return
 
 	var path: String = prepare(asset)
@@ -133,10 +190,13 @@ func add_in_view(asset: Dictionary) -> void:
 	if path.is_empty():
 		return
 
+	if not ready_to_place(path, add_in_view.bind(asset)):
+		return
+
 	var scene := ResourceLoader.load(path) as PackedScene
 
 	if scene == null:
-		dock.show_report("Godot could not load %s." % path)
+		dock.show_report("Godot could not load %s." % path, true)
 		return
 
 	var node := scene.instantiate() as Node3D
@@ -179,7 +239,7 @@ func add_as(asset: Dictionary, host_class: int) -> void:
 	var level: Dictionary = here()
 
 	if game == null or level.is_empty():
-		dock.show_report("Open a level scene first.")
+		dock.show_report("Open a level scene first.", true)
 		return
 
 	var host_path: String = String(level["classes"]["mobys"].get(host_class, ""))
@@ -189,13 +249,13 @@ func add_as(asset: Dictionary, host_class: int) -> void:
 	dock.importing = false
 
 	if host_path.is_empty() or skin_path.is_empty():
-		dock.show_report(" ".join(error) if not error.is_empty() else "This level has no moby class %d." % host_class)
+		dock.show_report(" ".join(error) if not error.is_empty() else "This level has no moby class %d." % host_class, true)
 		return
 
 	var host_scene := ResourceLoader.load(host_path) as PackedScene
 
 	if host_scene == null:
-		dock.show_report("Godot could not load %s." % host_path)
+		dock.show_report("Godot could not load %s." % host_path, true)
 		return
 
 	var host: Dictionary = {"name": "Class %d" % host_class, "scale": 1.0}
@@ -256,17 +316,27 @@ func add_foreign(asset: Dictionary) -> void:
 	var game: Node3D = root.get_node_or_null("Game") as Node3D if root != null else null
 
 	if game == null:
-		dock.show_report("Open a level scene first.")
+		dock.show_report("Open a level scene first.", true)
+		return
+
+	var refusal: String = Library.import_refusal(asset, here())
+
+	if not refusal.is_empty():
+		dock.show_report(refusal, true)
 		return
 
 	var error: Array = []
 	dock.importing = true
 	var path: String = Library.prepare(asset, here(), error)
 	dock.importing = false
+
+	if not path.is_empty() and not ready_to_place(path, add_foreign.bind(asset)):
+		return
+
 	var scene := ResourceLoader.load(path) as PackedScene if not path.is_empty() else null
 
 	if scene == null:
-		dock.show_report(" ".join(error) if not error.is_empty() else "Godot could not load %s." % path)
+		dock.show_report(" ".join(error) if not error.is_empty() else "Godot could not load %s." % path, true)
 		return
 
 	var node := scene.instantiate() as Node3D
@@ -291,7 +361,11 @@ func add_foreign(asset: Dictionary) -> void:
 	undo_redo.add_do_method(group, "add_child", node)
 	undo_redo.add_do_property(node, "owner", root)
 	undo_redo.add_do_property(node, "global_position", at)
+	# Drawn at its class's size, as in the game: the packed moby's own scale is this over that.
+	var scale: float = float(asset["scale"])
+	undo_redo.add_do_property(node, "scale", Vector3(scale, scale, scale))
 	undo_redo.add_do_method(node, "set_meta", "rc1_foreign_level", int(asset["level"]))
+	undo_redo.add_do_method(node, "set_meta", "rc1_foreign_class_scale", scale)
 	undo_redo.add_do_reference(node)
 	undo_redo.add_undo_method(group, "remove_child", node)
 
@@ -301,9 +375,8 @@ func add_foreign(asset: Dictionary) -> void:
 	undo_redo.commit_action()
 	EditorInterface.get_selection().clear()
 	EditorInterface.get_selection().add_node(node)
-	dock.show_report(("Added %s with its own logic from %s: the game runs its class there. Pack, then play "
-		+ "(Ratchet & Clank NTSC). If its logic needs its level's paths or cameras it may not work.") % [node.name,
-		asset["level_name"] if not String(asset["level_name"]).is_empty() else "its level"])
+	dock.show_report("Added %s with its own logic from %s. Pack, then play; the Inspector says what to expect." % [
+		node.name, asset["level_name"] if not String(asset["level_name"]).is_empty() else "level %02d" % int(asset["level"])])
 
 
 ## The group ASSET goes in under GAME; a new, parentless Node3D for a static group not made yet.

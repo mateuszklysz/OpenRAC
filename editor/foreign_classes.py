@@ -1,7 +1,8 @@
 """Imported moby classes: a moby of a class from another level, which runs as it does there.
 
 A moby under Game/Mobys with rc1_foreign_level metadata (the level the class is from) and the class
-of a moby scene the level does not have. The port registers the class when the level loads, from its
+of a moby scene the level does not have; rc1_foreign_class_scale is its class's scale, which the
+editor draws it at (its own scale is the node's over that). The port registers the class when the level loads, from its
 data as its own level's core has it, and runs its update in its own level's program, swapped in for
 the call (port/game/rac1/host/foreign_class.c). Pack writes, beside the level's placements:
 
@@ -38,17 +39,28 @@ class Donor:
     pvar: bytes | None = None
     pointers: list[int] = field(default_factory=list)   # pointer fixups in the block (offsets)
     links: list[int] = field(default_factory=list)      # moby links in the block (offsets)
+    shared: list[tuple[int, bytes]] = field(default_factory=list)   # (offset in the block, its shared data)
 
 
-def wanted(text: str) -> dict[int, int]:
-    """The scene's imported classes: class -> its level."""
-    out = {}
+def wanted(text: str) -> tuple[dict[int, int], list[str]]:
+    """The scene's imported classes (class -> its level), and what is wrong with the others."""
+    out, problems = {}, []
     for node in scene_mobys(text):
         level = node["meta"].get("foreign_level")
-        if node["class_id"] is None or level is None:
+        if level is None:
             continue
-        out[node["class_id"]] = int(str(level).strip().strip('"'))
-    return out
+        if node["class_id"] is None:
+            problems.append(f"{node['name']}: rc1_foreign_level on a moby with no class scene; not imported")
+            continue
+        try:
+            level = int(str(level).strip().strip('"'))
+        except ValueError:
+            problems.append(f"{node['name']}: rc1_foreign_level must be a level number, not {level!r}")
+            continue
+        if out.setdefault(node["class_id"], level) != level:
+            problems.append(f"{node['name']}: class {node['class_id']} is already imported from level "
+                            f"{out[node['class_id']]:02}; a class comes from one level, so it is too")
+    return out, problems
 
 
 def donor(level: int, gameplay: bytes, class_id: int) -> Donor | None:
@@ -72,6 +84,14 @@ def donor(level: int, gameplay: bytes, class_id: int) -> Donor | None:
             if where + 4 <= len(block):
                 struct.pack_into("<i", block, where, -1)
         out.pvar = bytes(block)
+        # Its shared data (a part of the file's blob that its block points at): each piece runs to
+        # the next piece any block points at, or the blob's end.
+        blob, records = gp.shared(gameplay)
+        starts = sorted({into for _, _, into in records} | {len(blob)})
+        for pvar, where, into in records:
+            if pvar == source and 0 <= into < len(blob):
+                end = next(s for s in starts if s > into)
+                out.shared.append((where, bytes(blob[into:end])))
     return out
 
 

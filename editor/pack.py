@@ -229,7 +229,7 @@ def apply(node: dict, record: dict, original: dict | None, whole: bool, problems
         record["class_id"] = node["class_id"]
     # Godot may save inherited class metadata on every instance. These facts describe
     # the class; they are not editable gameplay fields and must not become false edits.
-    descriptive = ("index", "class", "class_name", "source", "update", "foreign_level")
+    descriptive = ("index", "class", "class_name", "source", "update", "foreign_level", "foreign_class_scale")
     meta = {k: v for k, v in node["meta"].items() if k not in descriptive and not gamedata.owns(k)}
     if original is None or not same_fields(meta, original["fields"]):
         for key in ALWAYS:
@@ -328,6 +328,11 @@ def pack_level(level_id: int, gameplay: bytes, scene: str, available_classes: se
                 donor = foreign[node["class_id"]]
                 record = dict(donor.record, group=-1)
                 apply(node, record, None, False, problems)
+                # The editor draws it at its class's size (rc1_foreign_class_scale): the game
+                # scales the class by the moby's own scale.
+                class_scale = node["meta"].get("foreign_class_scale", 1.0)
+                if isinstance(class_scale, (int, float)) and class_scale > 0:
+                    record["scale"] /= class_scale
                 added.append((record, donor))
                 added_names.append(node["name"])
                 changes.append(f"{node['name']}: added, class {node['class_id']} from level {donor.level:02}")
@@ -446,6 +451,10 @@ def pack_level(level_id: int, gameplay: bytes, scene: str, available_classes: se
                 data += model.pvar
                 links += [(new, where) for where in model.links]
                 pointers += [(new, where) for where in model.pointers]
+                for where, piece in model.shared:
+                    blob += bytes(-len(blob) % 16)
+                    shared_records.append((new, where, len(blob)))
+                    blob += piece
                 record["pvar_index"] = new
         elif 0 <= source < len(pvars):
             at, size = pvars[source]
@@ -476,6 +485,7 @@ def pack_level(level_id: int, gameplay: bytes, scene: str, available_classes: se
         if 0 <= moby < len(originals):
             struct.pack_into("<i", data, at, place.get(moby, -1))
 
+    imported = any(not isinstance(model, (int, type(None))) for _, model in added)
     sections = {gp.MOBYS: gp.write_records(gameplay, table)}
     for pointer, new in ((gp.GROUPS, gp.write_groups(group_lists) if group_lists else b""),
                          (gp.TABLE, b"".join(struct.pack("<2i", *entry) for entry in pvars)),
@@ -486,6 +496,8 @@ def pack_level(level_id: int, gameplay: bytes, scene: str, available_classes: se
         start = gp.offset(gameplay, pointer)
         if start > 0 and new and gameplay[start:start + len(new)] != new:
             sections[pointer] = new
+        elif start <= 0 and imported and new and new not in (gp.write_fixups([]), gp.write_shared(b"", [])):
+            sections[pointer] = new     # another level's moby brings a section this level lacks
     numbering = {owner[old]["name"]: new for old, new in place.items()}
     numbering.update({name: len(kept) + k for k, name in enumerate(added_names)})
     if node_names is not None:
@@ -796,24 +808,30 @@ def pack(disc, survey: dict, project: Path, out: Path,
         # Imported classes: another level's class, which runs in its own level's program
         # (foreign_classes.py).
         import foreign_classes
-        donors, blobs, foreign_problems = {}, {}, []
-        for class_id, there in foreign_classes.wanted(text).items():
+        wanted, foreign_problems = foreign_classes.wanted(text)
+        donors, blobs, sources = {}, {}, {}
+        for class_id, there in wanted.items():
             try:
                 if available_classes is not None and class_id in available_classes:
                     raise ValueError(f"class {class_id} is this level's own; it needs no rc1_foreign_level")
                 if disc.version.key != "ntsc":
                     raise ValueError(f"class {class_id}: imported classes run on the NTSC disc only, for now")
                 foreign_classes.check(info["id"], there, class_id)
-                source = next(i for i in survey["levels"] if i["id"] == there)
-                source_place = source["ranges"][disc.version.gameplay]
-                found = foreign_classes.donor(there, decoded(disc.sectors(source_place["lba"], source_place["sectors"])),
-                                              class_id)
+                if there not in sources:     # each level read once, for all its classes
+                    source = next((i for i in survey["levels"] if i["id"] == there), None)
+                    if source is None:
+                        raise ValueError(f"class {class_id}: this disc has no level {there:02}")
+                    source_place = source["ranges"][disc.version.gameplay]
+                    sources[there] = (decoded(disc.sectors(source_place["lba"], source_place["sectors"])),
+                                      load_level(disc, source))
+                source_gameplay, source_level = sources[there]
+                found = foreign_classes.donor(there, source_gameplay, class_id)
                 if found is None:
                     raise ValueError(f"class {class_id}: level {there:02} places no moby of it to copy")
-                blobs[class_id] = (there, foreign_classes.class_blob(load_level(disc, source), class_id))
+                blobs[class_id] = (there, foreign_classes.class_blob(source_level, class_id))
                 donors[class_id] = found
-            except (ValueError, StopIteration, FormatError) as error:
-                foreign_problems.append(f"imported class: {error or 'no such level'}")
+            except (ValueError, FormatError) as error:
+                foreign_problems.append(f"imported {error}; its mobys are not packed")
         names: list[str] = []
         moby_spawn_ids: dict[str, int] = {}
         edited, changes, problems = pack_level(info["id"], gameplay, text, available_classes, names, moby_spawn_ids,

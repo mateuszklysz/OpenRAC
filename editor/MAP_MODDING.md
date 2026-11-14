@@ -57,11 +57,16 @@ installed copy) and any folder named in the project setting
 `openrac/library/folders`. Pick a game, disc, level or kind in the tree, or
 search by name or class number. Each asset has a preview and a tooltip.
 
-Drag one into the 3D view or onto the Scene dock, or double-click it to add it in
-front of the camera. What it becomes depends on the level you edit:
+Pick one to see under the list what it is and which buttons work here (a
+greyed button's tooltip says why not). Drag one into the 3D view or onto the
+Scene dock, or double-click it to add it in front of the camera. What it
+becomes depends on the level you edit:
 
 - **Green**: this level has the class. It goes under **Game/Mobys**, **Ties** or
   **Shrubs** as the game's own, with its logic, as if you duplicated one.
+- **Blue**: a moby of another level of this disc that can come with its own
+  logic (**Add with its own logic** below); added as it is, it is white's.
+  The filter **From other levels, with their own logic** lists only those.
 - **White**: any other class, level or game. It goes under **Game/StaticAssets**
   as static scenery: its look only, no logic yet. A moby is copied as a still
   model (no skin or animation) into `res://library/<game>/<disc>/level_NN/`, with
@@ -84,7 +89,9 @@ not import.
 **Add with its own logic** (for a white moby of another level of the same
 Ratchet & Clank NTSC disc) brings its class too: the game runs its own logic,
 as it does in its level. In the scene it is a moby of that class under
-**Game/Mobys** with `rc1_foreign_level` metadata (its level). Pack copies its
+**Game/Mobys** with `rc1_foreign_level` metadata (its level), drawn at its
+class's size (`rc1_foreign_class_scale`); its Inspector's **Imported class**
+section says where its logic runs from. Pack copies its
 class's data from that level's core into `classes/<class>.bin`, lists it in
 `classes.tsv`, and places the moby with a copy of the first moby of that class
 in its level: its values and its pvars, with its links to other mobys cleared
