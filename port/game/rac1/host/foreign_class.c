@@ -26,10 +26,10 @@
 #define LEVELS 19
 /* Stand-in code addresses: past the game's 32 MiB, where no program has code. */
 #define FOREIGN_TAG_BASE 0x0FF00000u
-/* The imported classes' data: the upper half of the port's own guest memory, which nothing else
- * uses (stack, strings and statics are its first 3 MiB). */
-#define FOREIGN_BLOBS (GUEST_PORT + (8u << 20)) /* 8 MiB in */
-#define FOREIGN_BLOBS_SIZE (8u << 20)
+/* The imported classes' data: the game adds a class's address to its offsets as a signed word, and
+ * its last material run's flag only ends the list when that address is below 0x80000000. */
+#define FOREIGN_BLOBS GUEST_PORT_LOW
+#define FOREIGN_BLOBS_SIZE GUEST_PORT_LOW_SIZE
 #define MOBY_CLASS_SLOTS 224u
 
 typedef struct {
