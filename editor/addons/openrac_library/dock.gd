@@ -50,6 +50,7 @@ var list: AssetList
 var report: Label
 var add_button: Button
 var as_button: Button
+var own_button: Button
 var classes_menu: PopupMenu
 
 
@@ -110,7 +111,8 @@ func _init() -> void:
 	list.item_activated.connect(func(index: int) -> void: add(index))
 	list.item_selected.connect(func(index: int) -> void:
 		add_button.disabled = false
-		as_button.disabled = not can_add_as(asset_at(index)))
+		as_button.disabled = not can_add_as(asset_at(index))
+		own_button.disabled = not can_import(asset_at(index)))
 	split.add_child(list)
 
 	add_button = Button.new()
@@ -130,6 +132,17 @@ func _init() -> void:
 	as_button.disabled = true
 	as_button.pressed.connect(show_classes)
 	box.add_child(as_button)
+	own_button = Button.new()
+	own_button.text = "Add with its own logic"
+	own_button.tooltip_text = ("A moby of another level of this disc, with its own class and logic: the game runs it in "
+		+ "its own level's program (Ratchet & Clank, NTSC, for now). One whose logic needs its level's paths "
+		+ "or cameras may not work; each costs about a millisecond a frame.")
+	own_button.disabled = true
+	own_button.pressed.connect(func() -> void:
+		var selected: PackedInt32Array = list.get_selected_items()
+		if not selected.is_empty():
+			plugin.add_foreign(asset_at(selected[0])))
+	box.add_child(own_button)
 	classes_menu = PopupMenu.new()
 	classes_menu.id_pressed.connect(func(id: int) -> void:
 		var selected: PackedInt32Array = list.get_selected_items()
@@ -339,6 +352,15 @@ func asset_at(index: int) -> Dictionary:
 func can_add_as(asset: Dictionary) -> bool:
 	return not asset.is_empty() and asset["kind"] == "mobys" and not here.is_empty() \
 		and Library.status(asset, here) != Library.FULL and not here["classes"].get("mobys", {}).is_empty()
+
+
+## Whether ASSET can come with its own logic: a moby of another level of the same rac1 NTSC disc
+## that this level does not have (editor/foreign_classes.py).
+func can_import(asset: Dictionary) -> bool:
+	return not asset.is_empty() and asset["kind"] == "mobys" and not here.is_empty() \
+		and asset["game"] == "rac1" and here["game"] == "rac1" and asset["disc"] == "ntsc" \
+		and here["disc"] == "ntsc" and int(asset["level"]) != int(here["level"]) \
+		and Library.status(asset, here) != Library.FULL
 
 
 ## The level's moby classes, by name, to pick the one the selected asset behaves as.

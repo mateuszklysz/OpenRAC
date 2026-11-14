@@ -31,6 +31,11 @@
 #define RAC1_NAME_(f) #f
 #define RAC1_NAME(f) RAC1_NAME_(f)
 
+/* foreign_class.c: the moby classes this level imports from other levels' programs (its
+ * classes.tsv), read as its program loads; the stand-in update of one (0: not imported). */
+void rac1_foreign_classes_load(int level);
+gaddr rac1_foreign_class_update(int oclass);
+
 /* boot.c: a new game straight in `level` from the title, as --level N with OPENRAC_DIRECT. */
 void rac1_start_level(int level);
 

@@ -81,6 +81,21 @@ beside the level's placements (`editor/skins.py`); the port draws it
 class's own. The model is copied under `res://library/skins`, which Godot does
 not import.
 
+**Add with its own logic** (for a white moby of another level of the same
+Ratchet & Clank NTSC disc) brings its class too: the game runs its own logic,
+as it does in its level. In the scene it is a moby of that class under
+**Game/Mobys** with `rc1_foreign_level` metadata (its level). Pack copies its
+class's data from that level's core into `classes/<class>.bin`, lists it in
+`classes.tsv`, and places the moby with a copy of the first moby of that class
+in its level: its values and its pvars, with its links to other mobys cleared
+(`editor/foreign_classes.py`). The port registers the class when the level
+loads, draws it with its level's model, and runs its update in its own level's
+program, swapped in for the call (`port/game/rac1/host/foreign_class.c`). No mod
+is needed. Limits: the class's level must not have a bigger program than this
+one (Pack says so); logic that needs its level's paths, cameras or other mobys
+does not find them here (Kerwan's robot dog removes itself, Big Al and the
+statue work); each such moby costs about a millisecond a frame on a desktop.
+
 **Behaviour** (at the top of a moby's Inspector) gives a moby a simple movement
 instead of its own logic: spin, bob, patrol (out along the way it faces and
 back), orbit, face the hero, or follow the hero, each with its numbers (speed,
@@ -266,8 +281,10 @@ standalone map; creators should use format 4 and normal launcher preparation.
   positive 131,072-unit world, and each cell and the total 256 MiB arena must
   hold its data. **Check the limits** in the Godot Collision dock estimates
   affected cells and world bounds before packing.
-- Templates supply their own code, object classes and unedited resources. The
-  framework does not automatically import behavior from another level or game.
+- Templates supply their own code, object classes and unedited resources. A
+  moby class of another level of the same disc can come with its own logic
+  (Ratchet & Clank NTSC, **Add with its own logic** above); another game's
+  cannot.
 - Galaxy previews still use template artwork/location; the added world has its
   own selectable name and resource mount. This does not add a retail ISO overlay.
 - NTSC-U supports existing standalone maps, but ship destinations are PAL only.

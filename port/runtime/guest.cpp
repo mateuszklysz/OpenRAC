@@ -23,6 +23,8 @@
 #include <unordered_set>
 #include <vector>
 
+#include "openrac/foreign.h"
+
 #if defined(_WIN32)
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
@@ -2352,6 +2354,228 @@ gaddr openrac_hook_in_copy(
     return answers.remember({current_overlay(), exe_fn, size, home, home_fn, stub, k}, [&] {
         return hook_in_copy(exe_fn, size, home, home_fn, stub, k);
     });
+}
+
+}  // extern "C"
+
+// ---- Foreign classes ----
+//
+// A moby class of another level's program (level `from`) run in the level loaded: its code reads
+// its own level's addresses, so it runs in its own program, swapped in over the loaded one for the
+// call. The engine's globals (every address code common to both programs forms) are carried over
+// into the foreign program on the way in and back on the way out, their pointers into a program
+// moved to the other's places; the rest of the foreign program (its own data and bss) keeps its
+// state from call to call. Nothing of this runs for a level that imports no class.
+
+namespace {
+
+struct ForeignBlock {
+    gaddr from;    // in the foreign program
+    gaddr loaded;  // the same globals in the loaded one
+    std::uint32_t size;
+};
+
+struct ForeignProgram {
+    gaddr low = 0, high = 0;
+    std::vector<std::uint8_t> image;                  // its memory between calls
+    std::map<int, std::vector<ForeignBlock>> blocks;  // by the loaded level
+    // Reused from call to call (a call each frame for each moby of the class): the buffers of a
+    // frame, and each loaded level's globals as last carried in and what they became.
+    std::vector<std::uint8_t> spare_saved;
+    std::vector<std::uint32_t> spare_entered;
+    std::map<int, std::pair<std::vector<std::uint32_t>, std::vector<std::uint32_t>>> carried;
+};
+
+struct ForeignFrame {
+    int from = 0, loaded = 0;
+    std::vector<std::uint8_t> saved;     // the loaded program's bytes under the foreign one
+    std::vector<std::uint32_t> entered;  // each block's words as carried in, for what changed
+};
+
+std::map<int, ForeignProgram> g_foreign;
+std::vector<ForeignFrame> g_foreign_frames;
+
+ForeignProgram* foreign_program(int from) {
+    auto found = g_foreign.find(from);
+    if (found != g_foreign.end()) {
+        return found->second.image.empty() ? nullptr : &found->second;
+    }
+    ForeignProgram& p = g_foreign[from];
+    const auto& chunks = level_program(from);
+    if (chunks.empty()) {
+        return nullptr;
+    }
+    p.low = UINT32_MAX;
+    for (const Chunk& c : chunks) {
+        p.low = std::min(p.low, c.base);
+        p.high = std::max(p.high, static_cast<gaddr>(c.base + c.bytes.size()));
+    }
+    p.low &= ~3u;
+    p.high = (p.high + 3u) & ~3u;
+    p.image.assign(p.high - p.low, 0);
+    for (const Chunk& c : chunks) {
+        std::memcpy(p.image.data() + (c.base - p.low), c.bytes.data(), c.bytes.size());
+    }
+    return &p;
+}
+
+// The engine's globals as runs of addresses with one offset between the programs: each paired
+// address and up to 0x100 bytes after it (as relocate_by moves them), until the next pair.
+const std::vector<ForeignBlock>& foreign_blocks(ForeignProgram& p, int from, int loaded) {
+    auto found = p.blocks.find(loaded);
+    if (found != p.blocks.end()) {
+        return found->second;
+    }
+    std::vector<ForeignBlock>& out = p.blocks[loaded];
+    const auto& pairs = level_pair_map(from, loaded).data;
+    for (std::size_t i = 0; i < pairs.size(); ++i) {
+        const gaddr at = pairs[i].first & ~3u;
+        if (at < p.low || at >= p.high) {
+            continue;
+        }
+        gaddr end = std::min<gaddr>(at + 0x100u, p.high);
+        if (i + 1 < pairs.size()) {
+            end = std::min<gaddr>(end, pairs[i + 1].first & ~3u);
+        }
+        if (end <= at) {
+            continue;
+        }
+        const gaddr there = at + static_cast<gaddr>(pairs[i].second);
+        if (!out.empty() && out.back().from + out.back().size == at
+            && out.back().loaded + out.back().size == there) {
+            out.back().size += end - at;
+        } else {
+            out.push_back({at, there, end - at});
+        }
+    }
+    std::uint64_t bytes = 0;
+    for (const ForeignBlock& b : out) {
+        bytes += b.size;
+    }
+    info(
+        "foreign level {} in level {}: {} runs of the engine's globals, {} bytes",
+        from,
+        loaded,
+        out.size(),
+        bytes
+    );
+    return out;
+}
+
+// A word carried from one program to the other: an address in a program, the other's place for it.
+std::uint32_t foreign_moved(const LevelMap& map, std::uint32_t value) {
+    if (value < g_level_low || value >= g_level_high) {
+        return value;
+    }
+    auto code = map.code.find(value);
+    if (code != map.code.end()) {
+        return code->second;
+    }
+    return relocate_by(map, value);
+}
+
+}  // namespace
+
+extern "C" {
+
+int openrac_guest_foreign_enter(int from, int loaded) {
+    if (from == loaded || from < 0 || loaded < 0) {
+        return -1;
+    }
+    std::unique_lock first(g_relocate_lock);
+    ForeignProgram* p = foreign_program(from);
+    if (p == nullptr || !openrac::runtime::Memory::get().mapped(p->low, p->high - p->low)) {
+        return -1;
+    }
+    // Built while the loaded program is in memory: they read its code there.
+    const std::vector<ForeignBlock>& blocks = foreign_blocks(*p, from, loaded);
+    first.unlock();
+    ForeignFrame& f = g_foreign_frames.emplace_back();
+    f.from = from;
+    f.loaded = loaded;
+    f.saved.swap(p->spare_saved);
+    f.saved.resize(p->high - p->low);
+    std::memcpy(f.saved.data(), G(p->low), f.saved.size());
+    f.entered.swap(p->spare_entered);
+    f.entered.clear();
+    std::memcpy(G(p->low), p->image.data(), p->image.size());
+    // Built while the foreign program is in memory, for the same reason.
+    std::scoped_lock hold(g_relocate_lock);
+    const LevelMap& back = level_pair_map(loaded, from);
+    const auto loaded_word = [&](gaddr at) {
+        std::uint32_t w;
+        if (at >= p->low && at + 4 <= p->high) {
+            std::memcpy(&w, f.saved.data() + (at - p->low), 4);
+        } else {
+            std::memcpy(&w, G(at), 4);
+        }
+        return w;
+    };
+    // Most globals are what they were at the last call: their translation is kept.
+    auto& [seen, became] = p->carried[loaded];
+    std::size_t n = 0;
+    for (const ForeignBlock& b : blocks) {
+        for (std::uint32_t k = 0; k < b.size; k += 4, ++n) {
+            const std::uint32_t was = loaded_word(b.loaded + k);
+            if (n >= seen.size()) {
+                seen.push_back(was);
+                became.push_back(foreign_moved(back, was));
+            } else if (seen[n] != was) {
+                seen[n] = was;
+                became[n] = foreign_moved(back, was);
+            }
+            const std::uint32_t w = became[n];
+            std::memcpy(G(b.from + k), &w, 4);
+            f.entered.push_back(w);
+        }
+    }
+    g_overlay = from;
+    return 0;
+}
+
+void openrac_guest_foreign_leave(void) {
+    if (g_foreign_frames.empty()) {
+        return;
+    }
+    ForeignFrame f = std::move(g_foreign_frames.back());
+    g_foreign_frames.pop_back();
+    ForeignProgram& p = g_foreign[f.from];
+    std::scoped_lock hold(g_relocate_lock);
+    const LevelMap& there = level_pair_map(f.from, f.loaded);
+    std::size_t n = 0;
+    // Only what the foreign code changed goes back: the rest of the loaded program's globals stay
+    // exactly as they were.
+    for (const ForeignBlock& b : p.blocks[f.loaded]) {
+        for (std::uint32_t k = 0; k < b.size; k += 4, ++n) {
+            std::uint32_t w;
+            std::memcpy(&w, G(b.from + k), 4);
+            if (n < f.entered.size() && w == f.entered[n]) {
+                continue;
+            }
+            const std::uint32_t moved = foreign_moved(there, w);
+            const gaddr at = b.loaded + k;
+            if (at >= p.low && at + 4 <= p.high) {
+                std::memcpy(f.saved.data() + (at - p.low), &moved, 4);
+            } else {
+                std::memcpy(G(at), &moved, 4);
+            }
+        }
+    }
+    std::memcpy(p.image.data(), G(p.low), p.image.size());
+    std::memcpy(G(p.low), f.saved.data(), f.saved.size());
+    p.spare_saved.swap(f.saved);
+    p.spare_entered.swap(f.entered);
+    g_overlay = f.loaded;
+}
+
+uint32_t openrac_guest_level_word(int level, gaddr address) {
+    std::scoped_lock hold(g_relocate_lock);
+    return level_reader(level, address);
+}
+
+void openrac_guest_forget_foreign(void) {
+    g_foreign.clear();
+    g_foreign_frames.clear();
 }
 
 }  // extern "C"

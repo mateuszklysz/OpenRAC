@@ -123,6 +123,7 @@ RAC1_TYPE_func_0012DA38_result func_0012DA38(void) {
     }
     const RAC1_TYPE_func_0012DA38_result entry = func_0012DA38__game();
     loaded_level = GREF(int, CURRENT_LEVEL);
+    rac1_foreign_classes_load(openrac_game_loaded_overlay());
     ++program_loads;
     ++moby_generation;
     /* No level: Quit Game, whose level's loader read the boot program back from the disc

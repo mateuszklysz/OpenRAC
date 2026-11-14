@@ -248,6 +248,64 @@ func add_as(asset: Dictionary, host_class: int) -> void:
 		host["name"], asset["name"], asset["level_name"] if not String(asset["level_name"]).is_empty() else "its level"])
 
 
+## Adds ASSET, a moby of another level of this disc, with its own class and logic: a moby of its
+## class under Game/Mobys with rc1_foreign_level, which editor/foreign_classes.py packs and the
+## port runs in its own level's program. Undoable.
+func add_foreign(asset: Dictionary) -> void:
+	var root: Node = EditorInterface.get_edited_scene_root()
+	var game: Node3D = root.get_node_or_null("Game") as Node3D if root != null else null
+
+	if game == null:
+		dock.show_report("Open a level scene first.")
+		return
+
+	var error: Array = []
+	dock.importing = true
+	var path: String = Library.prepare(asset, here(), error)
+	dock.importing = false
+	var scene := ResourceLoader.load(path) as PackedScene if not path.is_empty() else null
+
+	if scene == null:
+		dock.show_report(" ".join(error) if not error.is_empty() else "Godot could not load %s." % path)
+		return
+
+	var node := scene.instantiate() as Node3D
+	var camera: Camera3D = EditorInterface.get_editor_viewport_3d(0).get_camera_3d()
+	var at: Vector3 = camera.global_position - camera.global_basis.z * ADD_DISTANCE if camera != null else game.global_position
+	var group: Node3D = game.get_node_or_null(GROUPS["mobys"]) as Node3D
+	var make_group: bool = group == null
+
+	if make_group:
+		group = Node3D.new()
+		group.name = GROUPS["mobys"]
+
+	node.name = free_name(group, base_name(asset))
+	var undo_redo := get_undo_redo()
+	undo_redo.create_action("Add %s with its own logic" % asset["name"], UndoRedo.MERGE_DISABLE, root)
+
+	if make_group:
+		undo_redo.add_do_method(game, "add_child", group)
+		undo_redo.add_do_property(group, "owner", root)
+		undo_redo.add_do_reference(group)
+
+	undo_redo.add_do_method(group, "add_child", node)
+	undo_redo.add_do_property(node, "owner", root)
+	undo_redo.add_do_property(node, "global_position", at)
+	undo_redo.add_do_method(node, "set_meta", "rc1_foreign_level", int(asset["level"]))
+	undo_redo.add_do_reference(node)
+	undo_redo.add_undo_method(group, "remove_child", node)
+
+	if make_group:
+		undo_redo.add_undo_method(game, "remove_child", group)
+
+	undo_redo.commit_action()
+	EditorInterface.get_selection().clear()
+	EditorInterface.get_selection().add_node(node)
+	dock.show_report(("Added %s with its own logic from %s: the game runs its class there. Pack, then play "
+		+ "(Ratchet & Clank NTSC). If its logic needs its level's paths or cameras it may not work.") % [node.name,
+		asset["level_name"] if not String(asset["level_name"]).is_empty() else "its level"])
+
+
 ## The group ASSET goes in under GAME; a new, parentless Node3D for a static group not made yet.
 func group_for(game: Node3D, asset: Dictionary) -> Node3D:
 	var full: bool = Library.status(asset, here()) == Library.FULL

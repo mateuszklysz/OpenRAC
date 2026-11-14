@@ -74,6 +74,8 @@ static inline unsigned rac1_moby_vtbl_address(int level) {
 #define RAC1_ADDR_0x001B3580u 0x001B3200u
 #define RAC1_ADDR_0x001B3900u 0x001B3580u
 #define RAC1_ADDR_0x001E8F00u 0x001E8B80u
+/* register_moby_class (foreign_class.c). */
+#define RAC1_ADDR_0x00203E78u 0x00203640u
 
 /* Where this version's decompilation declares a function otherwise: the type in its prototypes. */
 /* ParseBin's result, the loaded level's entry. */
@@ -388,6 +390,10 @@ static inline unsigned rac1_moby_vtbl_address(int level) {
 #define func_001FFFB8__game game_FUN_001ff780__game
 #define func_L00_0023B140 game_FUN_L00_0023a7a8
 #define func_L00_0023B140__game game_FUN_L00_0023a7a8__game
+/* print_moby_class_sizes, wrapped for the imported moby classes (foreign_class.c). */
+#define RAC1_FOREIGN_CLASSES 1
+#define func_L00_00242120 game_FUN_L00_00241788
+#define func_L00_00242120__game game_FUN_L00_00241788__game
 #define func_0021A610 game_FUN_002196b8
 #define func_0021A610__game game_FUN_002196b8__game
 #define func_L00_002781D8 game_FUN_L00_002772c0

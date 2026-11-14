@@ -8,6 +8,7 @@
 #include <bit>
 #include <cgltf.h>
 #include <cmath>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <format>
@@ -918,6 +919,41 @@ bool load_level(
                     fades_known = fades_known && cls["billboard_fade"].is_number();
                 }
             }
+        }
+    }
+
+    // Moby classes the level imports from other levels (the editor's classes.tsv beside the
+    // edited placements, "class<TAB>level" lines; rac1/host/foreign_class.c runs them): each
+    // class's model as its own level's manifest has it.
+    if (!out.overrides.empty()) {
+        std::ifstream imported(out.overrides / "classes.tsv");
+        std::string line;
+        while (std::getline(imported, line)) {
+            int id = -1, from = -1;
+            if (line.empty() || line[0] == '#'
+                || std::sscanf(line.c_str(), "%d\t%d", &id, &from) != 2 || id < 0 || from < 0
+                || mobys.contains(id)) {
+                continue;
+            }
+            const fs::path other = dir.parent_path() / std::format("level_{:02}", from);
+            json::Value other_manifest;
+            std::string other_error;
+            if (!json::parse_file(
+                    (other / "manifest.json").string(), other_manifest, other_error
+                )) {
+                log::warn("imported moby class {}: {}", id, other_error);
+                continue;
+            }
+            const json::Value& cls = other_manifest["classes"]["moby"][std::to_string(id)];
+            if (!cls["mesh"].is_string()) {
+                log::warn("imported moby class {}: level {} has no model of it", id, from);
+                continue;
+            }
+            auto model = load_model(other / cls["mesh"].string(), out, error);
+            if (!model) {
+                return false;
+            }
+            mobys[id] = {*model, static_cast<float>(cls["scale"].number(1.0)), false};
         }
     }
 
