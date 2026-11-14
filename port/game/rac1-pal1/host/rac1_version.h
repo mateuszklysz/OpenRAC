@@ -91,6 +91,12 @@ static inline unsigned rac1_moby_vtbl_address(int level) {
 #define RAC1_ADDR_L02_0x0015FA1Cu 0x0015F91Cu
 #define RAC1_ADDR_L02_0x0015FA20u 0x0015F920u
 
+/* Imported moby classes (rac1/host/foreign_class.c): register_moby_class and
+ * resident_class_id_by_slot in this release (release_names.json, the release's check). */
+#define RAC1_FOREIGN_CLASSES 1
+#define RAC1_ADDR_0x00203E78u 0x00203110u
+#define RAC1_ADDR_0x001B3C80u 0x001B3880u
+
 /* ---- generated below ---- */
 
 /* Addresses: games/rac1's, this version's (RAC1_LADDR: in level NN's program). */

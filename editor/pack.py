@@ -814,8 +814,8 @@ def pack(disc, survey: dict, project: Path, out: Path,
             try:
                 if available_classes is not None and class_id in available_classes:
                     raise ValueError(f"class {class_id} is this level's own; it needs no rc1_foreign_level")
-                if disc.version.key != "ntsc":
-                    raise ValueError(f"class {class_id}: imported classes run on the NTSC disc only, for now")
+                if disc.version.key not in foreign_classes.DISCS:
+                    raise ValueError(f"class {class_id}: imported classes run on Ratchet & Clank's discs only")
                 foreign_classes.check(info["id"], there, class_id)
                 if there not in sources:     # each level read once, for all its classes
                     source = next((i for i in survey["levels"] if i["id"] == there), None)

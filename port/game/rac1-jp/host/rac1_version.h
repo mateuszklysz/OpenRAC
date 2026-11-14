@@ -96,6 +96,12 @@ static inline unsigned rac1_moby_vtbl_address(int level) {
 /* Aridia's counters with "HUD: Edges" (hud.c): NTSC-J's anchors are not paired yet, so that part is left out. */
 #define RAC1_OMIT_func_L02_0023D6E0 1
 
+/* Imported moby classes (rac1/host/foreign_class.c): register_moby_class and
+ * resident_class_id_by_slot in this release (release_names.json, the release's check). */
+#define RAC1_FOREIGN_CLASSES 1
+#define RAC1_ADDR_0x00203E78u 0x00204D98u
+#define RAC1_ADDR_0x001B3C80u 0x001B3A80u
+
 /* ---- generated below ---- */
 
 /* Addresses: games/rac1's, this version's (RAC1_LADDR: in level NN's program). */

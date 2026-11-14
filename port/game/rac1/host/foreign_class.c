@@ -28,8 +28,8 @@
 #define FOREIGN_TAG_BASE 0x0FF00000u
 /* The imported classes' data: the upper half of the port's own guest memory, which nothing else
  * uses (stack, strings and statics are its first 3 MiB). */
-#define FOREIGN_BLOBS (GUEST_PORT + 0x00800000u)
-#define FOREIGN_BLOBS_SIZE 0x00800000u
+#define FOREIGN_BLOBS (GUEST_PORT + (8u << 20)) /* 8 MiB in */
+#define FOREIGN_BLOBS_SIZE (8u << 20)
 #define MOBY_CLASS_SLOTS 224u
 
 typedef struct {
@@ -142,7 +142,7 @@ void rac1_foreign_classes_load(int level) {
     openrac_guest_forget_foreign();
 #ifndef RAC1_FOREIGN_CLASSES
     (void)level;
-    return; /* registered by the NTSC loader's wrap only, for now */
+    return; /* a release with no wrap of the loader */
 #endif
     if (level < 0 || openrac_game_mods_dir == NULL || openrac_game_mods_dir[0] == '\0') {
         return;

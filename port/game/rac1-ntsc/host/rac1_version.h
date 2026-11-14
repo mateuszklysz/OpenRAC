@@ -342,6 +342,11 @@ static inline unsigned rac1_moby_vtbl_address(int level) {
 #define RAC1_ADDR_L02_0x0015FA1Cu 0x0015F944u
 #define RAC1_ADDR_L02_0x0015FA20u 0x0015F948u
 
+/* print_moby_class_sizes, wrapped for the imported moby classes (foreign_class.c). */
+#define RAC1_FOREIGN_CLASSES 1
+#define func_L00_00242120 game_FUN_L00_00241788
+#define func_L00_00242120__game game_FUN_L00_00241788__game
+
 /* ---- generated below ---- */
 
 /* Functions: games/rac1's name, this version's. */
@@ -392,10 +397,6 @@ static inline unsigned rac1_moby_vtbl_address(int level) {
 #define func_001FFFB8__game game_FUN_001ff780__game
 #define func_L00_0023B140 game_FUN_L00_0023a7a8
 #define func_L00_0023B140__game game_FUN_L00_0023a7a8__game
-/* print_moby_class_sizes, wrapped for the imported moby classes (foreign_class.c). */
-#define RAC1_FOREIGN_CLASSES 1
-#define func_L00_00242120 game_FUN_L00_00241788
-#define func_L00_00242120__game game_FUN_L00_00241788__game
 #define func_0021A610 game_FUN_002196b8
 #define func_0021A610__game game_FUN_002196b8__game
 #define func_L00_002781D8 game_FUN_L00_002772c0

@@ -10,7 +10,7 @@ the call (port/game/rac1/host/foreign_class.c). Pack writes, beside the level's 
     <out>/level_NN/classes/<class>.bin   the class's data from its level's core
 
 and places the moby with a copy of the first moby of that class in its own level: its fields and its
-pvar block (its moby links in it name no moby here: -1). Rac1 on the NTSC disc only, for now. Any
+pvar block (its moby links in it name no moby here: -1). Rac1 only, on any of its discs. Any
 level's class can come into any other: only its level's data is swapped in for the call, and every
 level's data ends below every level's program end.
 """
@@ -24,6 +24,7 @@ from mobys import FIELDS, RECORD, moby_instances
 from pack import scene_mobys
 
 LEVELS = 19
+DISCS = ("ntsc", "pal", "pal1", "jp")   # the port runs them on each (rac1_version.h, RAC1_FOREIGN_CLASSES)
 
 
 @dataclass

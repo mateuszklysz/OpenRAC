@@ -87,7 +87,7 @@ class's own. The model is copied under `res://library/skins`, which Godot does
 not import.
 
 **Add with its own logic** (for a white moby of another level of the same
-Ratchet & Clank NTSC disc) brings its class too: the game runs its own logic,
+Ratchet & Clank disc) brings its class too: the game runs its own logic,
 as it does in its level. In the scene it is a moby of that class under
 **Game/Mobys** with `rc1_foreign_level` metadata (its level), drawn at its
 class's size (`rc1_foreign_class_scale`); its Inspector's **Imported class**
@@ -291,7 +291,7 @@ standalone map; creators should use format 4 and normal launcher preparation.
   affected cells and world bounds before packing.
 - Templates supply their own code, object classes and unedited resources. A
   moby class of another level of the same disc can come with its own logic
-  (Ratchet & Clank NTSC, **Add with its own logic** above); another game's
+  (Ratchet & Clank, **Add with its own logic** above); another game's
   cannot.
 - Galaxy previews still use template artwork/location; the added world has its
   own selectable name and resource mount. This does not add a retail ISO overlay.

@@ -240,8 +240,11 @@ static func import_refusal(asset: Dictionary, here: Dictionary) -> String:
 	if status(asset, here) == FULL:
 		return "This level has the class already: add it as it is."
 
-	if asset["game"] != "rac1" or here["game"] != "rac1" or asset["disc"] != "ntsc" or here["disc"] != "ntsc":
-		return "Only between levels of the Ratchet & Clank NTSC disc, for now."
+	if asset["game"] != "rac1" or here["game"] != "rac1":
+		return "Only between levels of Ratchet & Clank, for now."
+
+	if asset["disc"] != here["disc"]:
+		return "Only between levels of the same disc: its logic is that disc's program."
 
 	if int(asset["level"]) < 0 or int(asset["level"]) >= 19 or int(here["level"]) < 0 or int(here["level"]) >= 19:
 		return "Only between the game's own levels."
