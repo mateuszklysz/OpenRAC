@@ -191,7 +191,7 @@ func rescan() -> void:
 
 		level_item.collapsed = true
 
-	show_report("%d levels found in %d games." % [levels.size(), folders.size()] if not levels.is_empty()
+	show_report("Levels found: %d, in games: %d." % [levels.size(), folders.size()] if not levels.is_empty()
 		else "No levels found. Read a disc's levels from the launcher's Level editor tab first.")
 	refill()
 
