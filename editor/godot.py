@@ -49,9 +49,13 @@ from terrain import terrain
 from ties import tie_classes, tie_instances, tie_slot_normals
 
 SCRIPTS = Path(__file__).parent / "rc1"
-# The Collision dock, an editor plugin (addons/openrac_collision/plugin.gd): editor tooling only.
+# The editor plugins every project enables: the Collision dock (addons/openrac_collision) and the
+# Assets dock (addons/openrac_library). Editor tooling only.
 ADDON = Path(__file__).parent / "addons" / "openrac_collision"
 ADDON_CFG = "res://addons/openrac_collision/plugin.cfg"
+LIBRARY_ADDON = Path(__file__).parent / "addons" / "openrac_library"
+LIBRARY_ADDON_CFG = "res://addons/openrac_library/plugin.cfg"
+ADDONS = ((ADDON, ADDON_CFG), (LIBRARY_ADDON, LIBRARY_ADDON_CFG))
 GAME_TO_GODOT = [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1]  # (x, y, z) -> (x, z, -y)
 # Placements store W = 0.01 (0.0 on some); only other values become metadata.
 STORED_W = struct.unpack("<f", struct.pack("<f", 0.01))[0]
@@ -97,7 +101,7 @@ limits/global_shader_variables/buffer_size=1048576
 
 [editor_plugins]
 
-enabled=PackedStringArray("{addon}")
+enabled=PackedStringArray({addons})
 """
 
 
@@ -710,25 +714,27 @@ def write_project(project: Path, levels: list[int], region: str = "PAL", game: s
         fmt = games.FORMATS[game]
         name = (f"{fmt.title}: {fmt.level_name(levels[0])} ({region}, early access)" if len(levels) == 1
                 else f"{fmt.title} levels ({region}, early access)")
-    (project / "project.godot").write_text(PROJECT.format(main=main, name=name, addon=ADDON_CFG))
+    (project / "project.godot").write_text(PROJECT.format(main=main, name=name, addons=", ".join(f'"{cfg}"' for _, cfg in ADDONS)))
     shutil.copytree(SCRIPTS, project / "rc1")
     install_addon(project)
 
 
 def install_addon(project: Path) -> None:
-    """The Collision dock's files in a project, enabled in its project.godot (an older export's
+    """The editor plugins' files in a project, enabled in its project.godot (an older export's
     too: extract.py's update calls this, and a project.godot that names other plugins keeps them)."""
-    shutil.copytree(ADDON, project / "addons" / ADDON.name, dirs_exist_ok=True,
-                    ignore=shutil.ignore_patterns("*.uid"))
-    settings = project / "project.godot"
-    text = settings.read_text()
-    if ADDON_CFG in text:
-        return
-    if "[editor_plugins]" not in text:
-        text = text.rstrip("\n") + f'\n\n[editor_plugins]\n\nenabled=PackedStringArray("{ADDON_CFG}")\n'
-    elif "enabled=PackedStringArray(" in text:
-        text = text.replace("enabled=PackedStringArray(", f'enabled=PackedStringArray("{ADDON_CFG}", ', 1)
-        text = text.replace(f'"{ADDON_CFG}", )', f'"{ADDON_CFG}")')
-    else:
-        text = text.replace("[editor_plugins]\n", f'[editor_plugins]\n\nenabled=PackedStringArray("{ADDON_CFG}")\n', 1)
-    settings.write_text(text)
+    # Each goes in front, so the list keeps ADDONS' order.
+    for folder, cfg in reversed(ADDONS):
+        shutil.copytree(folder, project / "addons" / folder.name, dirs_exist_ok=True,
+                        ignore=shutil.ignore_patterns("*.uid"))
+        settings = project / "project.godot"
+        text = settings.read_text()
+        if cfg in text:
+            continue
+        if "[editor_plugins]" not in text:
+            text = text.rstrip("\n") + f'\n\n[editor_plugins]\n\nenabled=PackedStringArray("{cfg}")\n'
+        elif "enabled=PackedStringArray(" in text:
+            text = text.replace("enabled=PackedStringArray(", f'enabled=PackedStringArray("{cfg}", ', 1)
+            text = text.replace(f'"{cfg}", )', f'"{cfg}")')
+        else:
+            text = text.replace("[editor_plugins]\n", f'[editor_plugins]\n\nenabled=PackedStringArray("{cfg}")\n', 1)
+        settings.write_text(text)

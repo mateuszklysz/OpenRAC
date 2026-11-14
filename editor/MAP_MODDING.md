@@ -48,6 +48,31 @@ mobys, and imported props; it is not packed. Delete a supported object to remove
 it from the game. Pack reports hidden supported objects instead of silently
 keeping them visible at runtime.
 
+### The Assets dock
+
+The **Assets** dock (bottom left) lists the mobys, ties and shrubs of every level
+you have read, from every disc and game: the levels beside this project
+(`assets/levels/<game>/<disc>/`, or `active/<game>/data/levels/<disc>` in an
+installed copy) and any folder named in the project setting
+`openrac/library/folders`. Pick a game, disc, level or kind in the tree, or
+search by name or class number. Each asset has a preview and a tooltip.
+
+Drag one into the 3D view or onto the Scene dock, or double-click it to add it in
+front of the camera. What it becomes depends on the level you edit:
+
+- **Green**: this level has the class. It goes under **Game/Mobys**, **Ties** or
+  **Shrubs** as the game's own, with its logic, as if you duplicated one.
+- **White**: any other class, level or game. It goes under **Game/StaticAssets**
+  as static scenery: its look only, no logic yet. A moby is copied as a still
+  model (no skin or animation) into `res://library/<game>/<disc>/level_NN/`, with
+  its textures and a `.source.json` saying where it came from. It gets the class
+  scale its own scene gives it, and collision on (`rc1_static_collision`) for
+  mobys and ties, off for shrubs. Pack bakes it into the level as below.
+
+Every placement is one undoable edit. The copies under `library/` are made from
+your own disc's files: do not share them; a shared project refers to an asset by
+its `rc1_asset` metadata (game/disc/level/kind/class).
+
 ### Import static scenery from another level or your own model
 
 Use a static `.glb` or `.gltf` from an extracted donor level or make your own in

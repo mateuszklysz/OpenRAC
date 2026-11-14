@@ -1,0 +1,271 @@
+@tool
+extends EditorPlugin
+## The OpenRAC assets plugin: the Assets dock (dock.gd) and placing what it gives. Editor tooling
+## only. library.gd finds the assets and brings them into the project; this file puts them where
+## the packer reads them:
+## - a class this level has goes under Game/Mobys, Game/Ties or Game/Shrubs, as the game's own;
+## - anything else goes under Game/StaticAssets as static scenery (editor/static_assets.py),
+##   with the class scale its own scene gives it and collision on for mobys and ties.
+## Godot's own drop (from the dock into the 3D view or the Scene dock) may put the node anywhere:
+## it is moved to its group right after, keeping where it was dropped.
+
+const Dock = preload("dock.gd")
+const Library = preload("library.gd")
+
+## The groups under Game, by kind, for an asset the level has.
+const GROUPS: Dictionary = {"mobys": "Mobys", "ties": "Ties", "shrubs": "Shrubs"}
+
+## Static scenery (editor/static_assets.py GROUP).
+const STATIC_GROUP: String = "StaticAssets"
+
+## How far in front of the 3D view's camera Add places an asset, in the game's units.
+const ADD_DISTANCE: float = 12.0
+
+var dock: Dock
+
+## What placed files are, by res:// path: the asset placed, until its node arrives.
+var pending: Dictionary = {}
+
+## Nodes added this frame, to put where they belong once the drop has finished.
+var arrived: Array[Node] = []
+
+
+func _enter_tree() -> void:
+	dock = Dock.new()
+	dock.plugin = self
+	add_dock(dock)
+	scene_changed.connect(handle_scene_changed)
+	get_tree().node_added.connect(handle_node_added)
+	handle_scene_changed(EditorInterface.get_edited_scene_root())
+
+
+func _exit_tree() -> void:
+	if get_tree().node_added.is_connected(handle_node_added):
+		get_tree().node_added.disconnect(handle_node_added)
+
+	scene_changed.disconnect(handle_scene_changed)
+	remove_dock(dock)
+	dock.queue_free()
+	dock = null
+
+
+func handle_scene_changed(root: Node) -> void:
+	if dock != null:
+		dock.set_here(Library.here_of(root.scene_file_path) if root != null else {})
+
+
+## The level the edited scene is (library.gd here_of()).
+func here() -> Dictionary:
+	var root: Node = EditorInterface.get_edited_scene_root()
+	return Library.here_of(root.scene_file_path) if root != null else {}
+
+
+## Brings ASSET in for a drag: the res:// file Godot's drop will place, or empty (the dock shows
+## why).
+func prepare(asset: Dictionary) -> String:
+	var error: Array = []
+	var path: String = Library.prepare(asset, here(), error)
+
+	if path.is_empty():
+		dock.show_report(" ".join(error))
+		return ""
+
+	pending[path] = asset
+	return path
+
+
+# =============================================================================
+# PLACING
+# =============================================================================
+
+## Adds ASSET in front of the 3D view's camera, as an undoable edit.
+func add_in_view(asset: Dictionary) -> void:
+	var root: Node = EditorInterface.get_edited_scene_root()
+	var game: Node3D = root.get_node_or_null("Game") as Node3D if root != null else null
+
+	if game == null:
+		dock.show_report("Open a level scene first.")
+		return
+
+	var path: String = prepare(asset)
+
+	if path.is_empty():
+		return
+
+	var scene := ResourceLoader.load(path) as PackedScene
+
+	if scene == null:
+		dock.show_report("Godot could not load %s." % path)
+		return
+
+	var node := scene.instantiate() as Node3D
+	var camera: Camera3D = EditorInterface.get_editor_viewport_3d(0).get_camera_3d()
+	var at: Vector3 = camera.global_position - camera.global_basis.z * ADD_DISTANCE if camera != null else game.global_position
+	var group: Node3D = group_for(game, asset)
+	var make_group: bool = group.get_parent() == null
+	node.name = free_name(group, base_name(asset))
+	var undo_redo := get_undo_redo()
+	undo_redo.create_action("Add %s from the Assets dock" % asset["name"], UndoRedo.MERGE_DISABLE, root)
+
+	if make_group:
+		undo_redo.add_do_method(game, "add_child", group)
+		undo_redo.add_do_property(group, "owner", root)
+		undo_redo.add_do_reference(group)
+
+	undo_redo.add_do_method(group, "add_child", node)
+	undo_redo.add_do_property(node, "owner", root)
+	undo_redo.add_do_property(node, "global_position", at)
+	add_metadata(undo_redo, node, asset, path)
+	undo_redo.add_do_reference(node)
+	undo_redo.add_undo_method(group, "remove_child", node)
+
+	if make_group:
+		undo_redo.add_undo_method(game, "remove_child", group)
+
+	undo_redo.commit_action()
+	pending.erase(path)
+	EditorInterface.get_selection().clear()
+	EditorInterface.get_selection().add_node(node)
+	dock.show_report(placed_report(asset, node))
+
+
+## The group ASSET goes in under GAME; a new, parentless Node3D for a static group not made yet.
+func group_for(game: Node3D, asset: Dictionary) -> Node3D:
+	var full: bool = Library.status(asset, here()) == Library.FULL
+	var name: String = GROUPS[asset["kind"]] if full else STATIC_GROUP
+	var group: Node3D = game.get_node_or_null(name) as Node3D
+
+	if group == null:
+		group = Node3D.new()
+		group.name = name
+
+	return group
+
+
+## A node name of the asset: Moby_0012-like for the game's own (pack.py reads the class from the
+## scene, not the name), else its name in the library ("Sentrybot_rac1_pal_L03").
+func base_name(asset: Dictionary) -> String:
+	var name: String = String(asset["name"]).capitalize().replace(" ", "").validate_node_name()
+
+	if Library.status(asset, here()) == Library.FULL:
+		return name
+
+	return "%s_%s_%s_L%02d" % [name, asset["game"], asset["disc"], int(asset["level"])]
+
+
+func free_name(group: Node, base: String) -> String:
+	var name: String = base
+	var suffix: int = 2
+
+	while group.has_node(NodePath(name)):
+		name = "%s_%d" % [base, suffix]
+		suffix += 1
+
+	return name
+
+
+## What a static asset carries: its source, the class scale and whether it is solid.
+func add_metadata(undo_redo: EditorUndoRedoManager, node: Node3D, asset: Dictionary, path: String) -> void:
+	if not path.begins_with(Library.LIBRARY_DIR + "/"):
+		return
+
+	var scale: float = float(asset["scale"])
+	undo_redo.add_do_property(node, "scale", Vector3(scale, scale, scale))
+	undo_redo.add_do_method(node, "set_meta", "rc1_static_collision", asset["kind"] != "shrubs")
+	undo_redo.add_do_method(node, "set_meta", "rc1_asset", "%s/%s/level_%02d/%s/%d" % [asset["game"], asset["disc"],
+		int(asset["level"]), asset["kind"], int(asset["class"])])
+
+
+func placed_report(asset: Dictionary, node: Node) -> String:
+	if Library.status(asset, here()) == Library.FULL:
+		return "Added %s, the game's own %s of this level. Move it, then Pack the level." % [node.name, asset["kind"].trim_suffix("s")]
+
+	return ("Added %s as static scenery (Game/StaticAssets): it looks as it does in %s, with no logic yet. "
+		+ "Collision is %s (rc1_static_collision in the Inspector). Pack bakes it into the level.") % [node.name,
+		asset["level_name"] if not String(asset["level_name"]).is_empty() else "its level",
+		"on" if asset["kind"] != "shrubs" else "off"]
+
+
+# =============================================================================
+# GODOT'S DROP
+# =============================================================================
+
+## A node of a file the dock prepared: put it where it belongs once the drop has finished.
+func handle_node_added(node: Node) -> void:
+	if pending.is_empty() or not node.scene_file_path in pending:
+		return
+
+	var root: Node = EditorInterface.get_edited_scene_root()
+
+	if root == null or not root.is_ancestor_of(node):
+		return
+
+	arrived.append(node)
+
+	if arrived.size() == 1:
+		settle.call_deferred()
+
+
+## Moves each dropped node to its group under Game, keeping where it was dropped, as one undoable
+## edit after Godot's own.
+func settle() -> void:
+	var nodes: Array[Node] = arrived.duplicate()
+	arrived.clear()
+	var root: Node = EditorInterface.get_edited_scene_root()
+	var game: Node3D = root.get_node_or_null("Game") as Node3D if root != null else null
+
+	if game == null:
+		return
+
+	var undo_redo := get_undo_redo()
+	undo_redo.create_action("Place assets from the Assets dock", UndoRedo.MERGE_DISABLE, root)
+	var made: Dictionary = {}
+	var moved: Array[Node] = []
+
+	for node in nodes:
+		if not is_instance_valid(node) or not node is Node3D or not node.is_inside_tree():
+			continue
+
+		var asset: Dictionary = pending.get(node.scene_file_path, {})
+
+		if asset.is_empty():
+			continue
+
+		var group: Node3D = made.get(GROUPS.get(asset["kind"], "") if Library.status(asset, here()) == Library.FULL
+			else STATIC_GROUP, null)
+
+		if group == null:
+			group = group_for(game, asset)
+
+			if group.get_parent() == null:
+				undo_redo.add_do_method(game, "add_child", group)
+				undo_redo.add_do_property(group, "owner", root)
+				undo_redo.add_do_reference(group)
+				undo_redo.add_undo_method(game, "remove_child", group)
+
+			made[String(group.name)] = group
+
+		var old_parent: Node = node.get_parent()
+		var at: Transform3D = (node as Node3D).global_transform
+
+		if old_parent != group:
+			var name: String = free_name(group, base_name(asset))
+			undo_redo.add_do_method(old_parent, "remove_child", node)
+			undo_redo.add_do_property(node, "name", name)
+			undo_redo.add_do_method(group, "add_child", node)
+			undo_redo.add_do_property(node, "owner", root)
+			undo_redo.add_do_property(node, "global_transform", at)
+			undo_redo.add_undo_method(group, "remove_child", node)
+			undo_redo.add_undo_property(node, "name", node.name)
+			undo_redo.add_undo_method(old_parent, "add_child", node)
+			undo_redo.add_undo_property(node, "owner", root)
+			undo_redo.add_undo_property(node, "global_transform", at)
+
+		add_metadata(undo_redo, node, asset, node.scene_file_path)
+		moved.append(node)
+
+	undo_redo.commit_action()
+
+	if not moved.is_empty():
+		var asset: Dictionary = pending.get(moved[0].scene_file_path, {})
+		dock.show_report(placed_report(asset, moved[0]))

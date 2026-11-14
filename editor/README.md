@@ -211,6 +211,11 @@ function, its hook point and its pvar fields. The table comes from the
 decompilation's `config/overlays/names.tsv` (its `UpdateMoby_<class>` roles),
 per level, so it is only written when `games/rac1/decomp` is in the checkout.
 
+To place more, drag one from the **Assets** dock: the mobys, ties and shrubs of
+every level you have read, of every disc and game. A class this level has comes
+in as the game's own, with its logic; anything else as static scenery
+([MAP_MODDING.md](MAP_MODDING.md#the-assets-dock)).
+
 ## Pack your edits
 
 The modder's guide to the whole round trip (extract, edit in Godot, pack,

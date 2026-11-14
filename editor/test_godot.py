@@ -8,7 +8,7 @@ import tempfile
 import unittest
 
 from gltf import Gltf
-from godot import ADDON_CFG, GAME_TO_GODOT, Raw, Scene, install_addon, number, transform, write_project
+from godot import ADDON_CFG, LIBRARY_ADDON_CFG, GAME_TO_GODOT, Raw, Scene, install_addon, number, transform, write_project
 from mesh import Mesh
 
 
@@ -126,7 +126,8 @@ metadata/rc1_draw_distance = 2.5
             self.assertTrue((project / "rc1" / "check.gd").is_file())
             # The Collision dock, enabled.
             self.assertTrue((project / "addons" / "openrac_collision" / "plugin.cfg").is_file())
-            self.assertIn(f'[editor_plugins]\n\nenabled=PackedStringArray("{ADDON_CFG}")', text)
+            self.assertTrue((project / "addons" / "openrac_library" / "plugin.cfg").is_file())
+            self.assertIn(f'[editor_plugins]\n\nenabled=PackedStringArray("{ADDON_CFG}", "{LIBRARY_ADDON_CFG}")', text)
 
     def test_addon_into_an_older_project(self):
         """An export made before the dock gets it on update; plugins of the modder's stay."""
@@ -142,9 +143,10 @@ metadata/rc1_draw_distance = 2.5
                 install_addon(project)          # twice: still once
                 text = (project / "project.godot").read_text()
                 self.assertEqual(text.count(ADDON_CFG), 1)
+                self.assertEqual(text.count(LIBRARY_ADDON_CFG), 1)
                 self.assertEqual(text.count("[editor_plugins]"), 1)
                 self.assertTrue((project / "addons" / "openrac_collision" / "plugin.gd").is_file())
-            self.assertIn(f'enabled=PackedStringArray("{ADDON_CFG}", "res://addons/mine/plugin.cfg")',
+            self.assertIn(f'enabled=PackedStringArray("{ADDON_CFG}", "{LIBRARY_ADDON_CFG}", "res://addons/mine/plugin.cfg")',
                           (other / "project.godot").read_text())
 
 
