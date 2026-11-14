@@ -646,6 +646,21 @@ gaddr openrac_guest_nearest(const uint32_t* places, int count, gaddr caller) {
     return best != 0 ? best : fallback;
 }
 
+// While another level's update runs (openrac_guest_foreign_enter), only that level's data is in
+// memory, not its code: what reads code (the folded calls, the pair maps) reads it from its image.
+gaddr g_foreign_code_low = 0, g_foreign_code_high = 0;
+const std::uint8_t* g_foreign_code = nullptr;
+
+std::uint32_t code_word(gaddr at) {
+    std::uint32_t w;
+    if (at >= g_foreign_code_low && at + 4 <= g_foreign_code_high) {
+        std::memcpy(&w, g_foreign_code + (at - g_foreign_code_low), 4);
+    } else {
+        std::memcpy(&w, G(at), 4);
+    }
+    return w;
+}
+
 static gaddr folded_call(const uint32_t* places, int count, gaddr caller, uint32_t size, int k) {
     const int overlay = g_overlay_source != nullptr ? g_overlay_source() : g_overlay;
     if (size == 0 || caller == 0 || caller + size > 0x02000000u) {
@@ -664,8 +679,7 @@ static gaddr folded_call(const uint32_t* places, int count, gaddr caller, uint32
     gaddr only = 0;  // the one place every call in the caller's code goes to, if they agree
     bool several = false;
     for (std::uint32_t i = 0; i * 4 < size && result == 0; ++i) {
-        std::uint32_t w;
-        std::memcpy(&w, G(caller + i * 4), 4);
+        const std::uint32_t w = code_word(caller + i * 4);
         if ((w >> 26) != 3) {
             continue;
         }
@@ -717,8 +731,7 @@ static gaddr folded_address(
     bool called = false;  // the code calls one of the places
     int seen = 0;
     for (std::uint32_t i = 0; i * 4 < size && result == 0; ++i) {
-        std::uint32_t w;
-        std::memcpy(&w, G(caller + i * 4), 4);
+        const std::uint32_t w = code_word(caller + i * 4);
         const std::uint32_t op = w >> 26;
         const std::uint32_t rs = (w >> 21) & 31;
         const std::uint32_t rt = (w >> 16) & 31;
@@ -1096,9 +1109,7 @@ std::uint32_t exe_word(gaddr at) {
 }
 
 std::uint32_t game_word(gaddr at) {
-    std::uint32_t w;
-    std::memcpy(&w, G(at), 4);
-    return w;
+    return code_word(at);
 }
 
 // Pairs the address operands of a function's executable code and its copy: known register values
@@ -2377,6 +2388,11 @@ struct ForeignBlock {
 
 struct ForeignProgram {
     gaddr low = 0, high = 0;
+    // Its data, before its code (every rac1 level's program is laid out so, data ending below
+    // 0x21C600 and every program after 0x2F0000): only this goes into memory for a call, so a
+    // level with a bigger program than the loaded one's runs too. Its code stays in `image`, read
+    // through code_word().
+    gaddr data_high = 0;
     std::vector<std::uint8_t> image;                  // its memory between calls
     std::map<int, std::vector<ForeignBlock>> blocks;  // by the loaded level
     // Reused from call to call (a call each frame for each moby of the class): the buffers of a
@@ -2388,6 +2404,8 @@ struct ForeignProgram {
 
 struct ForeignFrame {
     int from = 0, loaded = 0;
+    gaddr code_low = 0, code_high = 0;  // code_word()'s redirect before this frame
+    const std::uint8_t* code = nullptr;
     std::vector<std::uint8_t> saved;     // the loaded program's bytes under the foreign one
     std::vector<std::uint32_t> entered;  // each block's words as carried in, for what changed
 };
@@ -2413,8 +2431,17 @@ ForeignProgram* foreign_program(int from) {
     p.low &= ~3u;
     p.high = (p.high + 3u) & ~3u;
     p.image.assign(p.high - p.low, 0);
+    gaddr code = p.low;
     for (const Chunk& c : chunks) {
         std::memcpy(p.image.data() + (c.base - p.low), c.bytes.data(), c.bytes.size());
+        code = std::max(code, c.base);
+    }
+    // The last chunk is its code; the rest must end before it (else the whole program swaps).
+    p.data_high = code & ~3u;
+    for (const Chunk& c : chunks) {
+        if (c.base != code && c.base + c.bytes.size() > p.data_high) {
+            p.data_high = p.high;
+        }
     }
     return &p;
 }
@@ -2430,10 +2457,10 @@ const std::vector<ForeignBlock>& foreign_blocks(ForeignProgram& p, int from, int
     const auto& pairs = level_pair_map(from, loaded).data;
     for (std::size_t i = 0; i < pairs.size(); ++i) {
         const gaddr at = pairs[i].first & ~3u;
-        if (at < p.low || at >= p.high) {
+        if (at < p.low || at >= p.data_high) {
             continue;
         }
-        gaddr end = std::min<gaddr>(at + 0x100u, p.high);
+        gaddr end = std::min<gaddr>(at + 0x100u, p.data_high);
         if (i + 1 < pairs.size()) {
             end = std::min<gaddr>(end, pairs[i + 1].first & ~3u);
         }
@@ -2484,16 +2511,16 @@ int openrac_guest_foreign_enter(int from, int loaded) {
     }
     std::unique_lock first(g_relocate_lock);
     ForeignProgram* p = foreign_program(from);
-    if (p == nullptr || !openrac::runtime::Memory::get().mapped(p->low, p->high - p->low)) {
+    if (p == nullptr || !openrac::runtime::Memory::get().mapped(p->low, p->data_high - p->low)) {
         return -1;
     }
-    // Its program goes where the loaded one is: one that reaches further would write over what
+    // Its data goes where the loaded program is: data that reached past it would write over what
     // the loaded level keeps after its program (its heap).
     gaddr loaded_high = 0;
     for (const Chunk& c : level_program(loaded)) {
         loaded_high = std::max(loaded_high, static_cast<gaddr>(c.base + c.bytes.size()));
     }
-    if (p->high > ((loaded_high + 3u) & ~3u)) {
+    if (p->data_high > ((loaded_high + 3u) & ~3u)) {
         return -1;
     }
     // Built while the loaded program is in memory: they read its code there.
@@ -2503,17 +2530,23 @@ int openrac_guest_foreign_enter(int from, int loaded) {
     f.from = from;
     f.loaded = loaded;
     f.saved.swap(p->spare_saved);
-    f.saved.resize(p->high - p->low);
+    f.saved.resize(p->data_high - p->low);
     std::memcpy(f.saved.data(), G(p->low), f.saved.size());
     f.entered.swap(p->spare_entered);
     f.entered.clear();
-    std::memcpy(G(p->low), p->image.data(), p->image.size());
-    // Built while the foreign program is in memory, for the same reason.
+    std::memcpy(G(p->low), p->image.data(), f.saved.size());
+    f.code_low = g_foreign_code_low;
+    f.code_high = g_foreign_code_high;
+    f.code = g_foreign_code;
+    g_foreign_code_low = p->data_high;
+    g_foreign_code_high = p->high;
+    g_foreign_code = p->image.data() + (p->data_high - p->low);
+    // Built with the foreign data in memory and its code read from its image (code_word()).
     std::scoped_lock hold(g_relocate_lock);
     const LevelMap& back = level_pair_map(loaded, from);
     const auto loaded_word = [&](gaddr at) {
         std::uint32_t w;
-        if (at >= p->low && at + 4 <= p->high) {
+        if (at >= p->low && at + 4 <= p->data_high) {
             std::memcpy(&w, f.saved.data() + (at - p->low), 4);
         } else {
             std::memcpy(&w, G(at), 4);
@@ -2563,15 +2596,18 @@ void openrac_guest_foreign_leave(void) {
             }
             const std::uint32_t moved = foreign_moved(there, w);
             const gaddr at = b.loaded + k;
-            if (at >= p.low && at + 4 <= p.high) {
+            if (at >= p.low && at + 4 <= p.data_high) {
                 std::memcpy(f.saved.data() + (at - p.low), &moved, 4);
             } else {
                 std::memcpy(G(at), &moved, 4);
             }
         }
     }
-    std::memcpy(p.image.data(), G(p.low), p.image.size());
+    std::memcpy(p.image.data(), G(p.low), f.saved.size());
     std::memcpy(G(p.low), f.saved.data(), f.saved.size());
+    g_foreign_code_low = f.code_low;
+    g_foreign_code_high = f.code_high;
+    g_foreign_code = f.code;
     p.spare_saved.swap(f.saved);
     p.spare_entered.swap(f.entered);
     g_overlay = f.loaded;

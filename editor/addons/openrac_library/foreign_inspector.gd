@@ -41,7 +41,7 @@ func section(node: Node3D) -> Control:
 	var name: String = String(level_name.call(level))
 	text.text = ("[b]Imported class[/b]\nIts own logic runs from level %02d%s, as it does there. "
 		+ "[color=#9aa4b2]Pack, then play (Ratchet & Clank NTSC). Logic that needs its level's paths, cameras "
-		+ "or other mobys may not find them here; its sounds and texts may be this level's. Each costs about a "
-		+ "millisecond a frame.[/color]") % [level, "" if name.is_empty() else " (%s)" % name]
+		+ "or other mobys may not find them here; its sounds and texts may be this level's. Each costs about "
+		+ "half a millisecond a frame.[/color]") % [level, "" if name.is_empty() else " (%s)" % name]
 	panel.add_child(text)
 	return panel

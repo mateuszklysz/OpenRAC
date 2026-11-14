@@ -10,9 +10,9 @@ the call (port/game/rac1/host/foreign_class.c). Pack writes, beside the level's 
     <out>/level_NN/classes/<class>.bin   the class's data from its level's core
 
 and places the moby with a copy of the first moby of that class in its own level: its fields and its
-pvar block (its moby links in it name no moby here: -1). Rac1 on the NTSC disc only, for now. The
-class's own level must not have a bigger program than this level's (its program goes in the same
-place).
+pvar block (its moby links in it name no moby here: -1). Rac1 on the NTSC disc only, for now. Any
+level's class can come into any other: only its level's data is swapped in for the call, and every
+level's data ends below every level's program end.
 """
 
 from dataclasses import dataclass, field
@@ -24,10 +24,6 @@ from mobys import FIELDS, RECORD, moby_instances
 from pack import scene_mobys
 
 LEVELS = 19
-# Where each level's program ends (it starts at 0x15EF00, the same for every level); NTSC.
-PROGRAM_ENDS = (0x2F0CD0, 0x31D208, 0x2FF930, 0x2F0A40, 0x2F4A68, 0x32ED58, 0x319998, 0x32C980,
-                0x31A310, 0x318D90, 0x2F9F60, 0x32BF48, 0x319D10, 0x31B6A8, 0x31A1F8, 0x2FC3E8,
-                0x2F8E80, 0x303EC8, 0x30A0C0)
 
 
 @dataclass
@@ -112,9 +108,6 @@ def check(here: int, there: int, class_id: int) -> None:
         raise ValueError(f"class {class_id}: there is no level {there}")
     if there == here:
         raise ValueError(f"class {class_id}: rc1_foreign_level is this level")
-    if PROGRAM_ENDS[there] > PROGRAM_ENDS[here]:
-        raise ValueError(f"class {class_id}: level {there:02}'s program is bigger than this level's, "
-                         "so it cannot run here")
 
 
 def write(out: Path, blobs: dict[int, tuple[int, bytes]]) -> list[str]:

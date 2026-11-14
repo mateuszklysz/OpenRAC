@@ -11,7 +11,8 @@ extern "C" {
 #endif
 
 /* A moby class of level `from`'s program run in level `loaded` (an imported class): its code is
- * that level's, on that level's addresses. enter swaps `from`'s program in over the loaded one,
+ * that level's, on that level's addresses. enter swaps `from`'s data in over the loaded one's (its
+ * code is read from a copy, so a bigger program fits too),
  * carrying the engine's globals over (their pointers moved to its places), and makes it the program
  * calls go to; leave carries what the call changed back and puts the loaded program in again. The
  * foreign program keeps its own data between calls. enter returns 0, or -1 (no such program). */

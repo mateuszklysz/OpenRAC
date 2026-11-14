@@ -228,13 +228,6 @@ static func status(asset: Dictionary, here: Dictionary) -> String:
 	return FULL if classes.has(int(asset["class"])) else LOOK
 
 
-## Where each level's program ends, Ratchet & Clank NTSC (editor/foreign_classes.py PROGRAM_ENDS):
-## a class comes with its own logic only from a level whose program is no bigger than this one's.
-const PROGRAM_ENDS: Array[int] = [0x2F0CD0, 0x31D208, 0x2FF930, 0x2F0A40, 0x2F4A68, 0x32ED58, 0x319998,
-	0x32C980, 0x31A310, 0x318D90, 0x2F9F60, 0x32BF48, 0x319D10, 0x31B6A8, 0x31A1F8, 0x2FC3E8, 0x2F8E80,
-	0x303EC8, 0x30A0C0]
-
-
 ## Why ASSET cannot come into the level HERE with its own class and logic (editor/foreign_classes.py),
 ## or "" when it can.
 static func import_refusal(asset: Dictionary, here: Dictionary) -> String:
@@ -250,14 +243,8 @@ static func import_refusal(asset: Dictionary, here: Dictionary) -> String:
 	if asset["game"] != "rac1" or here["game"] != "rac1" or asset["disc"] != "ntsc" or here["disc"] != "ntsc":
 		return "Only between levels of the Ratchet & Clank NTSC disc, for now."
 
-	var there: int = int(asset["level"])
-	var level: int = int(here["level"])
-
-	if there < 0 or there >= PROGRAM_ENDS.size() or level < 0 or level >= PROGRAM_ENDS.size():
+	if int(asset["level"]) < 0 or int(asset["level"]) >= 19 or int(here["level"]) < 0 or int(here["level"]) >= 19:
 		return "Only between the game's own levels."
-
-	if PROGRAM_ENDS[there] > PROGRAM_ENDS[level]:
-		return "Level %02d's program is bigger than this level's, so its logic cannot run here." % there
 
 	return ""
 

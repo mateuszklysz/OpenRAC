@@ -97,11 +97,12 @@ class's data from that level's core into `classes/<class>.bin`, lists it in
 in its level: its values and its pvars, with its links to other mobys cleared
 (`editor/foreign_classes.py`). The port registers the class when the level
 loads, draws it with its level's model, and runs its update in its own level's
-program, swapped in for the call (`port/game/rac1/host/foreign_class.c`). No mod
-is needed. Limits: the class's level must not have a bigger program than this
-one (Pack says so); logic that needs its level's paths, cameras or other mobys
-does not find them here (Kerwan's robot dog removes itself, Big Al and the
-statue work); each such moby costs about a millisecond a frame on a desktop.
+program: its level's data is swapped in for the call, and its code is read from
+a copy (`port/game/rac1/host/foreign_class.c`). No mod is needed, and any
+level's class can come into any other. Limits: logic that needs its level's
+paths, cameras or other mobys does not find them here (Kerwan's robot dog
+removes itself, Big Al and the statue work); each such moby costs about half a
+millisecond a frame on a desktop.
 
 **Behaviour** (at the top of a moby's Inspector) gives a moby a simple movement
 instead of its own logic: spin, bob, patrol (out along the way it faces and

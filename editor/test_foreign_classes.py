@@ -31,10 +31,9 @@ class ForeignClasses(unittest.TestCase):
         self.assertEqual(found, {})
         self.assertIn("must be a level number", problems[0])
 
-    def test_a_class_from_a_bigger_program_or_the_same_level_is_refused(self):
-        foreign_classes.check(5, 3, 909)         # Kerwan's program fits in Rilgar's place
-        with self.assertRaises(ValueError):
-            foreign_classes.check(3, 5, 909)
+    def test_a_class_from_the_same_level_or_no_level_is_refused(self):
+        foreign_classes.check(5, 3, 909)
+        foreign_classes.check(3, 5, 909)         # a bigger program comes in too
         with self.assertRaises(ValueError):
             foreign_classes.check(3, 3, 909)
         with self.assertRaises(ValueError):

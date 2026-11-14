@@ -5,7 +5,9 @@
  * Imported moby classes: a class of another level's program placed in this level by OpenRAC
  * Editor (editor/foreign_classes.py packs it). Its data is in this level's core like the level's
  * own classes; its update is its own level's code, which reads that level's addresses, so it runs
- * in its own program, swapped in over this one for the call (openrac_guest_foreign_enter, openrac/foreign.h).
+ * in its own program for the call: that level's data is swapped in over this one's, and its code
+ * is read from a copy (openrac_guest_foreign_enter, openrac/foreign.h). Every level's data ends
+ * below every level's program end, so a class of any level runs in any other.
  *
  * The pack lists the classes in <mods>/level_NN/classes.tsv, one "class<TAB>level" a line.
  * assign_moby_class_data (moby_class.c) binds such a class to a stand-in address, which the moby
