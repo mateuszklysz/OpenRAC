@@ -257,6 +257,7 @@ void use_level(int number) {
     g->level = scene::LevelData();
     g->prop_models.clear();
     g->prop_rigs.clear();
+    g->moby_skins = {};
     g->picker.clear();
     std::string error;
     const LevelSources sources = level_sources(wanted);
@@ -327,6 +328,26 @@ void use_level(int number) {
             }
         } else {
             log::warn("mods: prop mesh {}: {}", mesh.string(), why);
+        }
+    }
+    // The edited level's skins (editor/skins.py), beside its placements: a broken file leaves
+    // every moby drawn as its class.
+    if (!sources.edited.empty()) {
+        const std::filesystem::path skins = sources.edited.parent_path() / "skins.json";
+        std::error_code missing;
+        if (std::filesystem::is_regular_file(skins, missing)) {
+            std::string why;
+            std::vector<std::string> warnings;
+            if (!scene::load_moby_skins(skins, g->level, g->moby_skins, why, warnings)) {
+                g->moby_skins = {};
+                log::warn("level {}: {}: {}", wanted, skins.string(), why);
+            }
+            for (const std::string& warning : warnings) {
+                log::warn("level {}: {}", wanted, warning);
+            }
+            if (!g->moby_skins.empty()) {
+                log::info("level {}: {} mobys drawn as skins", wanted, g->moby_skins.by_spawn_id.size());
+            }
         }
     }
     enhanced::install_texture_upscaler(g->renderer->textures());

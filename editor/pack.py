@@ -248,7 +248,8 @@ def apply(node: dict, record: dict, original: dict | None, whole: bool, problems
 
 
 def pack_level(level_id: int, gameplay: bytes, scene: str, available_classes: set[int] | None = None,
-               node_names: list[str] | None = None) -> tuple[bytes, list[str], list[str]]:
+               node_names: list[str] | None = None,
+               spawn_ids: dict[str, int] | None = None) -> tuple[bytes, list[str], list[str]]:
     """The gameplay file with the scene's edits, what changed, and what could not be packed.
 
     A moby the scene has once keeps its place in the table. A node with the index of another
@@ -258,7 +259,7 @@ def pack_level(level_id: int, gameplay: bytes, scene: str, available_classes: se
     fixups, links and shared records that name it), and joins its group. A moby with no node
     left is deleted: the table closes up, and the groups and the pvars' moby links, which name
     mobys by their place in the table, follow. NODE_NAMES, when given, gets each packed moby's node
-    name, in the table's order."""
+    name, in the table's order; SPAWN_IDS each packed moby's spawn id, by its node's name."""
     originals = moby_instances(gameplay)
     raw = gp.records(gameplay)
     nodes = scene_mobys(scene)
@@ -373,6 +374,8 @@ def pack_level(level_id: int, gameplay: bytes, scene: str, available_classes: se
         numbering = {owner[i]["name"]: i for i in kept}
         if node_names is not None:
             node_names[:] = sorted(numbering, key=numbering.get)
+        if spawn_ids is not None:
+            spawn_ids.update({owner[i]["name"]: dict(zip(FIELDS, RECORD.unpack(kept[i])))["spawn_id"] for i in kept})
         return gamedata.pack_level(gameplay, bytes(out), scene, numbering, changes, problems)
 
     # The table again: the mobys that stay, in their order, then the new ones.
@@ -466,6 +469,10 @@ def pack_level(level_id: int, gameplay: bytes, scene: str, available_classes: se
     numbering.update({name: len(kept) + k for k, name in enumerate(added_names)})
     if node_names is not None:
         node_names[:] = sorted(numbering, key=numbering.get)
+    if spawn_ids is not None:
+        spawn_ids.update({owner[old]["name"]: dict(zip(FIELDS, RECORD.unpack(kept[old])))["spawn_id"]
+                          for old in kept})
+        spawn_ids.update({name: record["spawn_id"] for name, (record, _) in zip(added_names, added)})
     return gamedata.pack_level(gameplay, gp.replace(gameplay, sections), scene, numbering, changes, problems)
 
 
@@ -766,7 +773,8 @@ def pack(disc, survey: dict, project: Path, out: Path,
             available_classes = {struct.unpack_from("<i", entry, 4)[0]
                                  for entry in target_level.table(0x18, 32)}
         names: list[str] = []
-        edited, changes, problems = pack_level(info["id"], gameplay, text, available_classes, names)
+        moby_spawn_ids: dict[str, int] = {}
+        edited, changes, problems = pack_level(info["id"], gameplay, text, available_classes, names, moby_spawn_ids)
         if edited != gameplay and len(edited) > EXPANDED_RAM_BYTES:
             raise FormatError(f"level {info['id']:02}: decoded gameplay data is {len(edited)} bytes; it cannot "
                               "fit in the 256 MiB expanded guest RAM arena", code="level-too-big")
@@ -802,6 +810,14 @@ def pack(disc, survey: dict, project: Path, out: Path,
             total += animated_count
             if not changes and placements is None and not wrote and static_bake is None:
                 packed += 1
+        # Skins: mobys drawn as another level's or game's model (skins.py), beside the placements.
+        import skins
+        skin_changes, skin_problems = skins.write_skins(scene.parents[2], text, out / name, moby_spawn_ids)
+        scenery_changes += skin_changes
+        scenery_problems += skin_problems
+        if skin_changes and not changes and placements is None and not wrote and static_bake is None \
+                and not animated_count:
+            packed += 1
         # Cutscenes: files the cutscene player mod reads from the pack, beside the level's.
         level_classes = []
 

@@ -53,6 +53,37 @@ func handle_scene_changed(root: Node) -> void:
 	if dock != null:
 		dock.set_here(Library.here_of(root.scene_file_path) if root != null else {})
 
+	if root != null:
+		show_skins(root)
+
+
+## Each moby with a skin shows the skin, not its class's own model (which the game does not draw):
+## a "SkinLook" child read from the skin's file, which the scene does not save.
+func show_skins(root: Node) -> void:
+	var mobys: Node = root.get_node_or_null("Game/Mobys")
+
+	if mobys == null:
+		return
+
+	for moby in mobys.get_children():
+		if not moby.has_meta("rc1_skin") or moby.has_node("SkinLook"):
+			continue
+
+		var look: Node3D = Library.scene_of(String(moby.get_meta("rc1_skin")))
+
+		if look == null:
+			continue
+
+		var model: Node3D = moby.get_node_or_null("Model") as Node3D
+
+		if model != null:
+			model.visible = false
+
+		var scale: float = float(moby.get_meta("rc1_skin_class_scale", 1.0))
+		look.name = "SkinLook"
+		look.transform = Transform3D(Basis.from_scale(Vector3(scale, scale, scale)), Vector3.ZERO)
+		moby.add_child(look)
+
 
 ## The level the edited scene is (library.gd here_of()).
 func here() -> Dictionary:
@@ -64,7 +95,9 @@ func here() -> Dictionary:
 ## why).
 func prepare(asset: Dictionary) -> String:
 	var error: Array = []
+	dock.importing = true
 	var path: String = Library.prepare(asset, here(), error)
+	dock.importing = false
 
 	if path.is_empty():
 		dock.show_report(" ".join(error))
@@ -127,6 +160,84 @@ func add_in_view(asset: Dictionary) -> void:
 	EditorInterface.get_selection().clear()
 	EditorInterface.get_selection().add_node(node)
 	dock.show_report(placed_report(asset, node))
+
+
+## Adds ASSET's model, as it is (animated), on the logic of HOST_CLASS, a moby class this level
+## has: a moby of that class under Game/Mobys, which the game draws as ASSET's model (a skin:
+## editor/skins.py packs it, the port draws it). Undoable.
+func add_as(asset: Dictionary, host_class: int) -> void:
+	var root: Node = EditorInterface.get_edited_scene_root()
+	var game: Node3D = root.get_node_or_null("Game") as Node3D if root != null else null
+	var level: Dictionary = here()
+
+	if game == null or level.is_empty():
+		dock.show_report("Open a level scene first.")
+		return
+
+	var host_path: String = String(level["classes"]["mobys"].get(host_class, ""))
+	var error: Array = []
+	dock.importing = true
+	var skin_path: String = Library.prepare_skin(asset, error)
+	dock.importing = false
+
+	if host_path.is_empty() or skin_path.is_empty():
+		dock.show_report(" ".join(error) if not error.is_empty() else "This level has no moby class %d." % host_class)
+		return
+
+	var host_scene := ResourceLoader.load(host_path) as PackedScene
+
+	if host_scene == null:
+		dock.show_report("Godot could not load %s." % host_path)
+		return
+
+	var host: Dictionary = {"name": "Class %d" % host_class, "scale": 1.0}
+	Library.read_class_scene(host, FileAccess.get_file_as_string(host_path))
+	var node := host_scene.instantiate() as Node3D
+	var scale: float = float(asset["scale"])
+	var camera: Camera3D = EditorInterface.get_editor_viewport_3d(0).get_camera_3d()
+	var at: Vector3 = camera.global_position - camera.global_basis.z * ADD_DISTANCE if camera != null else game.global_position
+	var group: Node3D = game.get_node_or_null(GROUPS["mobys"]) as Node3D
+	var make_group: bool = group == null
+
+	if make_group:
+		group = Node3D.new()
+		group.name = GROUPS["mobys"]
+
+	var label: String = "%s_as_%s" % [String(host["name"]).capitalize().replace(" ", ""),
+		String(asset["name"]).capitalize().replace(" ", "")]
+	node.name = free_name(group, label.validate_node_name())
+	var undo_redo := get_undo_redo()
+	undo_redo.create_action("Add %s on the logic of %s" % [asset["name"], host["name"]], UndoRedo.MERGE_DISABLE, root)
+
+	if make_group:
+		undo_redo.add_do_method(game, "add_child", group)
+		undo_redo.add_do_property(group, "owner", root)
+		undo_redo.add_do_reference(group)
+
+	undo_redo.add_do_method(group, "add_child", node)
+	undo_redo.add_do_property(node, "owner", root)
+	undo_redo.add_do_property(node, "global_position", at)
+	undo_redo.add_do_method(node, "set_meta", "rc1_skin", skin_path)
+	undo_redo.add_do_method(node, "set_meta", "rc1_skin_asset", "%s/%s/level_%02d/%s/%d" % [asset["game"],
+		asset["disc"], int(asset["level"]), asset["kind"], int(asset["class"])])
+	# The game scales the moby by its own class's scale: the skin's is that times this.
+	undo_redo.add_do_method(node, "set_meta", "rc1_skin_scale", scale / maxf(float(host["scale"]), 0.0001))
+	undo_redo.add_do_method(node, "set_meta", "rc1_skin_class_scale", scale)
+	undo_redo.add_do_method(node, "set_meta", "rc1_skin_animations", [])
+	undo_redo.add_do_method(self, "show_skins", root)
+	undo_redo.add_do_reference(node)
+	undo_redo.add_undo_method(group, "remove_child", node)
+
+	if make_group:
+		undo_redo.add_undo_method(game, "remove_child", group)
+
+	undo_redo.commit_action()
+	EditorInterface.get_selection().clear()
+	EditorInterface.get_selection().add_node(node)
+	dock.show_report(("Added %s: a %s of this level (its logic) that the game draws as %s from %s. "
+		+ "Its animations: rc1_skin_animations in the Inspector (entry N is the skin's animation for the "
+		+ "class's sequence N; -1 or none: the same number, else the first). Pack, then play.") % [node.name,
+		host["name"], asset["name"], asset["level_name"] if not String(asset["level_name"]).is_empty() else "its level"])
 
 
 ## The group ASSET goes in under GAME; a new, parentless Node3D for a static group not made yet.

@@ -143,6 +143,19 @@ class LibraryOnProjects(unittest.TestCase):
             # Its indices stay whole numbers (Godot reads every JSON number as a float).
             self.assertIsInstance(document.doc["accessors"][0]["count"], int)
 
+            # On a class's logic: the model as it is, skeleton and animations kept.
+            # Under a folder Godot does not import, as the skinned importer is kept out of it.
+            self.assertEqual(result["skin_path"], "res://library/skins/rac1/pal/level_03/mobys/moby_75.glb")
+            self.assertEqual(result["skin_animations"], ["seq_00"])
+            self.assertEqual(result["skin_look"], "Skeleton3D")
+            self.assertEqual(result["class_label"], "vendor")
+            skins_dir = here / "library" / "skins"
+            self.assertTrue((skins_dir / ".gdignore").is_file())
+            skin = gltf_read.read(skins_dir / "rac1" / "pal" / "level_03" / "mobys" / "moby_75.glb")
+            self.assertTrue(skin.list("skins") and skin.list("animations"))
+            self.assertTrue((skins_dir / "rac1" / "pal" / "level_03" / "textures" / "t.png").is_file())
+            self.assertFalse((skins_dir / "rac1" / "pal" / "level_03" / "textures" / "t.png.import").exists())
+
 
 if __name__ == "__main__":
     unittest.main()

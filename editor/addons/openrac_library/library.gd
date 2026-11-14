@@ -27,6 +27,10 @@ const SKIPPED_SUFFIXES: PackedStringArray = ["-backups", "-tutorial"]
 ## Where a used asset's files go in this project.
 const LIBRARY_DIR: String = "res://library"
 
+## Where skins are copied (prepare_skin()): a folder Godot does not import (.gdignore), so a
+## skinned model never goes through the importer; the plugin draws it from the file.
+const SKINS_DIR: String = "res://library/skins"
+
 ## The project setting that lists more folders of projects.
 const FOLDERS_SETTING: String = "openrac/library/folders"
 
@@ -262,9 +266,28 @@ static func prepare(asset: Dictionary, here: Dictionary, error: Array) -> String
 	if status(asset, here) == FULL:
 		return String(here["classes"][asset["kind"]][int(asset["class"])])
 
-	var level_dir: String = LIBRARY_DIR.path_join(String(asset["game"])).path_join(String(asset["disc"])) \
+	return copy_in(asset, String(asset["model"]).get_file(), true, error)
+
+
+## A moby's model as it is, skin and animations kept, to draw on another class's logic (a skin:
+## plugin.gd add_as()); made once under SKINS_DIR, not imported. Empty, with the reason in
+## `error`, when it cannot be brought in.
+static func prepare_skin(asset: Dictionary, error: Array) -> String:
+	if not FileAccess.file_exists(SKINS_DIR.path_join(".gdignore")):
+		DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(SKINS_DIR))
+		FileAccess.open(SKINS_DIR.path_join(".gdignore"), FileAccess.WRITE).close()
+
+	return copy_in(asset, String(asset["model"]).get_file(), false, error, SKINS_DIR)
+
+
+## Copies ASSET's model into <ROOT>/<game>/<disc>/level_NN/<kind>/NAME, still when STILL_MODEL,
+## with its textures by the same relative paths and a .source.json, and imports them (none under
+## SKINS_DIR).
+static func copy_in(asset: Dictionary, name: String, still_model: bool, error: Array,
+		root: String = LIBRARY_DIR) -> String:
+	var level_dir: String = root.path_join(String(asset["game"])).path_join(String(asset["disc"])) \
 		.path_join("level_%02d" % int(asset["level"]))
-	var target: String = level_dir.path_join(String(asset["kind"])).path_join(String(asset["model"]).get_file())
+	var target: String = level_dir.path_join(String(asset["kind"])).path_join(name)
 
 	if FileAccess.file_exists(target):
 		return target
@@ -277,7 +300,10 @@ static func prepare(asset: Dictionary, here: Dictionary, error: Array) -> String
 		return ""
 
 	var json: Dictionary = document["json"]
-	still(json)
+
+	if still_model:
+		still(json)
+
 	var copied: PackedStringArray = []
 
 	# Its textures, by the same relative paths ("../textures/x.png"), so the copy finds them.
@@ -318,14 +344,67 @@ static func prepare(asset: Dictionary, here: Dictionary, error: Array) -> String
 	out.close()
 
 	# Where it came from, for the pack and for whoever shares the level.
-	var note := FileAccess.open(target.get_basename() + ".source.json", FileAccess.WRITE)
+	var note := FileAccess.open(target.trim_suffix(".glb") + ".source.json", FileAccess.WRITE)
 	note.store_string(JSON.stringify({"format": 1, "game": asset["game"], "disc": asset["disc"],
 		"level": asset["level"], "kind": asset["kind"], "class": asset["class"], "name": asset["name"]}, "  ") + "\n")
 	note.close()
 
 	copied.append(target)
-	import_files(copied)
+
+	if root != SKINS_DIR:
+		import_files(copied)
+
 	return target
+
+
+## The model at PATH (a skin under SKINS_DIR) as a scene, read from its file, not imported; null
+## when it cannot be read.
+static func scene_of(path: String) -> Node3D:
+	var state := GLTFState.new()
+	state.handle_binary_image_mode = GLTFState.HANDLE_BINARY_IMAGE_MODE_EMBED_AS_UNCOMPRESSED
+	var document := GLTFDocument.new()
+	var data: PackedByteArray = self_contained(path)
+
+	if data.is_empty() or document.append_from_buffer(data, "", state) != OK:
+		return null
+
+	return document.generate_scene(state) as Node3D
+
+
+## The .glb at PATH with its textures inside it as data, so that reading it never asks the editor
+## to import a file (outside the project, or under SKINS_DIR); empty when it cannot be read.
+static func self_contained(path: String) -> PackedByteArray:
+	var glb: Dictionary = read_glb(FileAccess.get_file_as_bytes(path))
+
+	if glb.is_empty():
+		return PackedByteArray()
+
+	for image in glb["json"].get("images", []):
+		var uri: String = String(image.get("uri", ""))
+
+		if not uri.is_empty() and not uri.begins_with("data:"):
+			var bytes: PackedByteArray = FileAccess.get_file_as_bytes(path.get_base_dir().path_join(uri).simplify_path())
+			image["uri"] = "data:image/png;base64," + Marshalls.raw_to_base64(bytes)
+
+	return write_glb(glb["json"], glb["bin"])
+
+
+## The animations' names of the model at PATH, in order (a skin's: "seq_00"...).
+static func animation_names(path: String) -> PackedStringArray:
+	var names := PackedStringArray()
+	var document: Dictionary = read_glb(FileAccess.get_file_as_bytes(path))
+
+	for animation in document.get("json", {}).get("animations", []):
+		names.append(String(animation.get("name", "animation %d" % names.size())))
+
+	return names
+
+
+## The name a class scene gives its class (rc1_class_name), or "Class N".
+static func class_label(scene_path: String, number: int) -> String:
+	var asset: Dictionary = {"name": "Class %d" % number}
+	read_class_scene(asset, FileAccess.get_file_as_string(scene_path))
+	return String(asset["name"])
 
 
 ## Has the editor import new files now, the textures before the model that names them.

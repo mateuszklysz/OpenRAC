@@ -40,12 +40,17 @@ var previews: Dictionary = {}
 ## Models still to preview: [model file].
 var preview_queue: Array = []
 
+## Set by plugin.gd while it brings files in.
+var importing: bool = false
+
 var search: LineEdit
 var filter: OptionButton
 var tree: Tree
 var list: AssetList
 var report: Label
 var add_button: Button
+var as_button: Button
+var classes_menu: PopupMenu
 
 
 func _init() -> void:
@@ -103,7 +108,9 @@ func _init() -> void:
 	list.fixed_column_width = 96
 	list.fixed_icon_size = Vector2i(80, 80)
 	list.item_activated.connect(func(index: int) -> void: add(index))
-	list.item_selected.connect(func(_index: int) -> void: add_button.disabled = false)
+	list.item_selected.connect(func(index: int) -> void:
+		add_button.disabled = false
+		as_button.disabled = not can_add_as(asset_at(index)))
 	split.add_child(list)
 
 	add_button = Button.new()
@@ -116,6 +123,20 @@ func _init() -> void:
 			add(selected[0]))
 	box.add_child(add_button)
 
+	as_button = Button.new()
+	as_button.text = "Add on a class's logic..."
+	as_button.tooltip_text = ("A moby from another level or game, animated, that behaves as a class of this level: "
+		+ "pick the class. The game runs that class's logic and draws this model.")
+	as_button.disabled = true
+	as_button.pressed.connect(show_classes)
+	box.add_child(as_button)
+	classes_menu = PopupMenu.new()
+	classes_menu.id_pressed.connect(func(id: int) -> void:
+		var selected: PackedInt32Array = list.get_selected_items()
+		if not selected.is_empty():
+			plugin.add_as(asset_at(selected[0]), id))
+	add_child(classes_menu)
+
 	report = Label.new()
 	report.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	report.custom_minimum_size = Vector2(160, 0)
@@ -127,6 +148,11 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
+	# Not while files are brought in: importing runs frames of its own, and a preview made inside
+	# one of them can take the editor down.
+	if importing:
+		return
+
 	for _i in range(PREVIEWS_PER_FRAME):
 		if preview_queue.is_empty():
 			return
@@ -220,6 +246,7 @@ func refill() -> void:
 	shown.clear()
 	preview_queue.clear()
 	add_button.disabled = true
+	as_button.disabled = true
 	var selected: TreeItem = tree.get_selected()
 	var scope: Dictionary = selected.get_metadata(0) if selected != null else {}
 	var words: String = search.text.strip_edges().to_lower()
@@ -296,7 +323,8 @@ func tooltip(asset: Dictionary, status: String) -> String:
 		"" if String(asset["level_name"]).is_empty() else " (%s)" % asset["level_name"]]
 	var does: String = ("This level has the class: it is placed as the game's own %s, with its logic." % asset["kind"].trim_suffix("s")
 		if status == Library.FULL else
-		"Placed as static scenery (Game/StaticAssets): its look, no logic yet; collision with rc1_static_collision.")
+		"Placed as static scenery (Game/StaticAssets): its look, no logic; collision with rc1_static_collision."
+		+ ("\nOr \"Add on a class's logic\": animated, it behaves as a class of this level." if asset["kind"] == "mobys" else ""))
 	return "%s, class %d\nFrom %s\n%s\nDrag it into the 3D view, or double-click to add it in front of the camera." % [
 		asset["name"], int(asset["class"]), where, does]
 
@@ -305,6 +333,30 @@ func tooltip(asset: Dictionary, status: String) -> String:
 func asset_at(index: int) -> Dictionary:
 	var at: Variant = list.get_item_metadata(index)
 	return shown[int(at)] if at != null and int(at) < shown.size() else {}
+
+
+## Whether ASSET can go on a class's logic here: a moby this level does not have, with a skeleton.
+func can_add_as(asset: Dictionary) -> bool:
+	return not asset.is_empty() and asset["kind"] == "mobys" and not here.is_empty() \
+		and Library.status(asset, here) != Library.FULL and not here["classes"].get("mobys", {}).is_empty()
+
+
+## The level's moby classes, by name, to pick the one the selected asset behaves as.
+func show_classes() -> void:
+	classes_menu.clear()
+	var entries: Array = []
+
+	for number in here["classes"]["mobys"]:
+		entries.append([Library.class_label(here["classes"]["mobys"][number], number), int(number)])
+
+	entries.sort_custom(func(a: Array, b: Array) -> bool: return a[0].naturalnocasecmp_to(b[0]) < 0)
+
+	for entry in entries:
+		classes_menu.add_item("%s (class %d)" % entry, entry[1])
+
+	classes_menu.position = Vector2i(as_button.get_screen_position() + Vector2(0, as_button.size.y))
+	classes_menu.max_size = Vector2i(400, 500)
+	classes_menu.popup()
 
 
 func add(index: int) -> void:
@@ -325,22 +377,12 @@ func make_preview(model: String) -> void:
 		return
 
 	# Its textures go in as data, so the editor does not try to import files outside the project.
-	var glb: Dictionary = Library.read_glb(FileAccess.get_file_as_bytes(model))
-
-	if glb.is_empty():
-		return
-
-	for image in glb["json"].get("images", []):
-		var uri: String = String(image.get("uri", ""))
-
-		if not uri.is_empty() and not uri.begins_with("data:"):
-			var bytes: PackedByteArray = FileAccess.get_file_as_bytes(model.get_base_dir().path_join(uri).simplify_path())
-			image["uri"] = "data:image/png;base64," + Marshalls.raw_to_base64(bytes)
-
+	var data: PackedByteArray = Library.self_contained(model)
 	var state := GLTFState.new()
+	state.handle_binary_image_mode = GLTFState.HANDLE_BINARY_IMAGE_MODE_EMBED_AS_UNCOMPRESSED
 	var document := GLTFDocument.new()
 
-	if document.append_from_buffer(Library.write_glb(glb["json"], glb["bin"]), "", state) != OK:
+	if data.is_empty() or document.append_from_buffer(data, "", state) != OK:
 		return
 
 	var meshes: Array = state.get_meshes()

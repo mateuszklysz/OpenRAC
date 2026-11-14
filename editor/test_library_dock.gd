@@ -33,7 +33,11 @@ func _initialize() -> void:
 						look_asset = asset
 
 	var errors: Array = []
-	var result: Dictionary = {"place": {"game": place["game"], "disc": place["disc"]}, "levels": levels,
+	var skin: String = Library.prepare_skin(look_asset, errors)
+	var look: Node3D = Library.scene_of(skin)
+	var result: Dictionary = {"skin_path": skin, "skin_animations": Library.animation_names(skin),
+		"skin_look": look.get_child(0).get_class() if look != null and look.get_child_count() > 0 else "",
+		"class_label": Library.class_label("res://levels/level_05/mobys/moby_10.tscn", 10),"place": {"game": place["game"], "disc": place["disc"]}, "levels": levels,
 		"status": status, "names": names, "full_path": Library.prepare(full_asset, here, errors),
 		"look_path": Library.prepare(look_asset, here, errors), "errors": errors}
 	var file := FileAccess.open(out, FileAccess.WRITE)

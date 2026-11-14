@@ -1691,6 +1691,21 @@ TickMobys pose_mobys(
         if (!cls->second.second && g->level.overridden_models == 0) {
             instance.world_sphere = m.world_sphere;
         }
+        // A moby drawn as another model (scene/moby_skin.h): its class's logic, the skin's look, at
+        // the skin's scale. Its pose is the skin's own animation, below.
+        const scene::MobySkin* skin = nullptr;
+        if (!g->moby_skins.empty() && m.address + 0x100 <= ram.size()) {
+            const int id = g->profile->moby_spawn_id(ram.data() + m.address);
+            const auto found = g->moby_skins.by_spawn_id.find(id);
+            if (id >= 0 && found != g->moby_skins.by_spawn_id.end()) {
+                skin = &found->second;
+                instance.model = skin->model;
+                instance.world_sphere = {};
+                for (int i = 0; i < 12; ++i) {
+                    instance.matrix[static_cast<std::size_t>(i)] *= skin->scale;
+                }
+            }
+        }
         // How MobyProc blends it (ReRAC's MobyBlend, from the game's moby draw). Its vertex alpha is
         // its alpha byte (+0x23) times its distance fade (GameProfile::moby_distance_fade: the last 16
         // units of its draw distance) >> 7. Mode bit 0x200 (+0x34) adds it; the fade below 0x80 or
@@ -1800,8 +1815,25 @@ TickMobys pose_mobys(
 
         // Unweighted joints are needed only by bone attachments or explicit developer inspection.
         const auto& model = g->level.models[instance.model];
-        const int joints =
+        int joints =
             std::max(model.joints, (inspect_bones || attached_bones) ? int(model.bones.size()) : 0);
+        if (skin != nullptr) {
+            // The skin's animation for the class's sequence, from when the sequence began.
+            const int sequence = ram[m.address + g->profile->moby_anim_fields() + 2];
+            const auto pose = animate ? scene::prop_rig_palette(
+                                            skin->rig,
+                                            scene::moby_skin_animation(*skin, sequence),
+                                            scene::moby_skin_seconds(g->moby_skins, m.address, sequence),
+                                            true
+                                        )
+                                      : std::vector<std::array<float, 16>>{};
+            joints = 0;
+            if (!pose.empty()) {
+                instance.palette = static_cast<int>(palette.size());
+                palette.insert(palette.end(), pose.begin(), pose.end());
+                joints = static_cast<int>(pose.size());
+            }
+        }
         if (debug && g->index % 100 == 0 && m.class_id == 0) {
             // The hero, for bring-up: where he is and what his animation fields and pose say.
             const auto pose = scene::moby_palette(ram, m.address);
@@ -1836,7 +1868,7 @@ TickMobys pose_mobys(
             );
         }
         // Its pose, evaluated after the loop with the others' on several threads.
-        if (animate && joints > 0) {
+        if (animate && joints > 0 && skin == nullptr) {
             const bool target = into_texture.contains(m.address) || on_screen.contains(m.address);
             pose_jobs.push_back(
                 {m.address, joints, target, target ? target_mobys.size() : live.size()}

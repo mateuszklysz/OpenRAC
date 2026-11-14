@@ -69,6 +69,18 @@ front of the camera. What it becomes depends on the level you edit:
   scale its own scene gives it, and collision on (`rc1_static_collision`) for
   mobys and ties, off for shrubs. Pack bakes it into the level as below.
 
+**Add on a class's logic...** (for a white moby) puts it on a class this level
+has: pick the class, and the game runs that class's logic (a vendor's menu, an
+enemy's attack) while it draws the other model, animated. In the scene it is a
+moby of that class with `rc1_skin` metadata, showing the other model. Its
+`rc1_skin_animations` list says which of the model's animations plays for each
+of the class's sequences (entry N for sequence N; -1 or none: the same number
+if the model has it, else its first). Pack writes `skins.json` and the model
+beside the level's placements (`editor/skins.py`); the port draws it
+(`port/scene/moby_skin.h`). Only the look changes: collision and logic stay the
+class's own. The model is copied under `res://library/skins`, which Godot does
+not import.
+
 Every placement is one undoable edit. The copies under `library/` are made from
 your own disc's files: do not share them; a shared project refers to an asset by
 its `rc1_asset` metadata (game/disc/level/kind/class).

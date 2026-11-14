@@ -41,6 +41,7 @@
 #include "renderer/effects/shadows.h"
 #include "renderer/gl/framebuffer.h"
 #include "renderer/renderer.h"
+#include "scene/moby_skin.h"
 #include "scene/prop_rig.h"
 #include "scene/level.h"
 #include "scene/level_renderer.h"
@@ -251,6 +252,8 @@ struct State {
     std::vector<std::pair<std::filesystem::path, std::uint32_t>> prop_models;
     // The skinned ones' skeletons and animations (openrac_api.prop_animate).
     std::vector<std::pair<std::filesystem::path, scene::PropRig>> prop_rigs;
+    // The level's mobys drawn as another model (the editor's skins.json beside its placements).
+    scene::MobySkins moby_skins;
     scene::ObjectPicker picker;
     scene::LevelScene scene;
     DebugCamera debug_camera;  // Only the scene/render owner updates inspection poses.
