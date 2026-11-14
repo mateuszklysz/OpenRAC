@@ -818,6 +818,14 @@ def pack(disc, survey: dict, project: Path, out: Path,
         if skin_changes and not changes and placements is None and not wrote and static_bake is None \
                 and not animated_count:
             packed += 1
+        # Behaviours: mobys the behaviour presets mod moves (behaviours.py), beside the placements.
+        import behaviours
+        behaviour_changes, behaviour_problems = behaviours.write_behaviours(text, out / name, moby_spawn_ids)
+        scenery_changes += behaviour_changes
+        scenery_problems += behaviour_problems
+        if behaviour_changes and not changes and placements is None and not wrote and static_bake is None \
+                and not animated_count and not skin_changes:
+            packed += 1
         # Cutscenes: files the cutscene player mod reads from the pack, beside the level's.
         level_classes = []
 

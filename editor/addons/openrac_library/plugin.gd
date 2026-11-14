@@ -8,9 +8,11 @@ extends EditorPlugin
 ##   with the class scale its own scene gives it and collision on for mobys and ties.
 ## Godot's own drop (from the dock into the 3D view or the Scene dock) may put the node anywhere:
 ## it is moved to its group right after, keeping where it was dropped.
+## behaviour_inspector.gd adds the Behaviour section to a moby's Inspector.
 
 const Dock = preload("dock.gd")
 const Library = preload("library.gd")
+const BehaviourInspector = preload("behaviour_inspector.gd")
 
 ## The groups under Game, by kind, for an asset the level has.
 const GROUPS: Dictionary = {"mobys": "Mobys", "ties": "Ties", "shrubs": "Shrubs"}
@@ -22,6 +24,7 @@ const STATIC_GROUP: String = "StaticAssets"
 const ADD_DISTANCE: float = 12.0
 
 var dock: Dock
+var behaviour_inspector: BehaviourInspector
 
 ## What placed files are, by res:// path: the asset placed, until its node arrives.
 var pending: Dictionary = {}
@@ -34,6 +37,9 @@ func _enter_tree() -> void:
 	dock = Dock.new()
 	dock.plugin = self
 	add_dock(dock)
+	behaviour_inspector = BehaviourInspector.new()
+	behaviour_inspector.undo_redo = get_undo_redo()
+	add_inspector_plugin(behaviour_inspector)
 	scene_changed.connect(handle_scene_changed)
 	get_tree().node_added.connect(handle_node_added)
 	handle_scene_changed(EditorInterface.get_edited_scene_root())
@@ -44,6 +50,8 @@ func _exit_tree() -> void:
 		get_tree().node_added.disconnect(handle_node_added)
 
 	scene_changed.disconnect(handle_scene_changed)
+	remove_inspector_plugin(behaviour_inspector)
+	behaviour_inspector = null
 	remove_dock(dock)
 	dock.queue_free()
 	dock = null

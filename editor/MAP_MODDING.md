@@ -81,6 +81,17 @@ beside the level's placements (`editor/skins.py`); the port draws it
 class's own. The model is copied under `res://library/skins`, which Godot does
 not import.
 
+**Behaviour** (at the top of a moby's Inspector) gives a moby a simple movement
+instead of its own logic: spin, bob, patrol (out along the way it faces and
+back), orbit, face the hero, or follow the hero, each with its numbers (speed,
+height, distance...) and the class's animation it plays. It works on any moby,
+a skinned one too: an asset from another game added on a class's logic can then
+walk a round or follow Ratchet. It is kept as `rc1_behaviour` metadata; Pack
+writes `behaviours.json` beside the placements (`editor/behaviours.py`) and the
+editor's behaviour presets mod (`mods/behaviour-presets` in the editor's
+repository) plays it: turn that mod on to see it. The moby moves from where it
+is placed, through walls (no collision of its own), and its own update stops.
+
 Every placement is one undoable edit. The copies under `library/` are made from
 your own disc's files: do not share them; a shared project refers to an asset by
 its `rc1_asset` metadata (game/disc/level/kind/class).
