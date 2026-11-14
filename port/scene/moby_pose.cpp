@@ -37,9 +37,26 @@ std::uint32_t ram_address(std::uint32_t address, std::size_t size) {
     return address & 0x01FFFFFFu;
 }
 
+// The class region past RAM (set_moby_class_region).
+std::span<const std::uint8_t> g_region;
+std::uint32_t g_region_at = 0;
+
+// Where in the class region `bytes` at `address` are, or nullptr.
+const std::uint8_t* in_region(std::uint32_t address, std::size_t bytes) {
+    if (g_region.empty() || address < g_region_at || address - g_region_at > g_region.size()
+        || bytes > g_region.size() - (address - g_region_at)) {
+        return nullptr;
+    }
+    return g_region.data() + (address - g_region_at);
+}
+
 template <typename T>
 T at(std::span<const std::uint8_t> ram, std::uint32_t address) {
     T value{};
+    if (const std::uint8_t* there = in_region(address, sizeof(T))) {
+        std::memcpy(&value, there, sizeof(T));
+        return value;
+    }
     address = ram_address(address, ram.size());
     if (address + sizeof(T) <= ram.size()) {
         std::memcpy(&value, ram.data() + address, sizeof(T));
@@ -48,6 +65,9 @@ T at(std::span<const std::uint8_t> ram, std::uint32_t address) {
 }
 
 bool inside(std::span<const std::uint8_t> ram, std::uint32_t address, std::size_t bytes) {
+    if (in_region(address, bytes) != nullptr) {
+        return true;
+    }
     address = ram_address(address, ram.size());
     return address != 0 && address + bytes <= ram.size();
 }
@@ -62,7 +82,9 @@ std::optional<rac1::MobyFrame> key_at(
     }
     try {
         rac1::MobyFrame f =
-            rac1::parse_frame(assets::ByteView(ram), ram_address(address, ram.size()));
+            in_region(address, 0x10) != nullptr
+                ? rac1::parse_frame(assets::ByteView(g_region), address - g_region_at)
+                : rac1::parse_frame(assets::ByteView(ram), ram_address(address, ram.size()));
         if (f.header.quat_bytes == 0 || f.header.quat_bytes > 8 * kMaxJoints || joints == 0) {
             return std::nullopt;
         }
@@ -91,6 +113,11 @@ void set_moby_anim_fields(std::uint32_t first) {
 
 void set_moby_layer_records(bool records) {
     g_layer_records = records;
+}
+
+void set_moby_class_region(std::span<const std::uint8_t> bytes, std::uint32_t address) {
+    g_region = bytes;
+    g_region_at = address;
 }
 
 std::vector<rac1::JointMatrix> moby_palette(std::span<const std::uint8_t> ram, std::uint32_t moby) {

@@ -41,6 +41,7 @@
 #include "debug_overlay.h"
 #include "frontend.h"
 #include "platform/performance_hint.h"
+#include "scene/moby_pose.h"
 #endif
 
 namespace openrac::program {
@@ -287,6 +288,8 @@ int vsync() {
     if (g_window) {
         const auto* ram = runtime::Memory::get().base();
         const std::span<const std::uint8_t> memory(ram, runtime::Memory::get().ram_size());
+        // Imported moby classes live past RAM (rac1/host/foreign_class.c): poses read them there.
+        scene::set_moby_class_region({ram + GUEST_PORT_LOW, GUEST_PORT_LOW_SIZE}, GUEST_PORT_LOW);
 
         // Only a completed handoff may present or begin the next graphics measurement frame.
         if (!frontend::prepare_frame(memory) || !frontend::finish_render()) {

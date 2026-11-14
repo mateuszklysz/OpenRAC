@@ -45,6 +45,13 @@ void set_moby_anim_fields(std::uint32_t first);
 void set_moby_layer_records(bool records);
 
 /**
+ * Guest memory past RAM that a class may live in: the port's own region the imported moby classes
+ * are kept in (GUEST_PORT_LOW, rac1/host/foreign_class.c), its bytes and its game address. Poses
+ * read a class there as in RAM. None until it is set.
+ */
+void set_moby_class_region(std::span<const std::uint8_t> bytes, std::uint32_t address);
+
+/**
  * The joint palette of the moby at `moby` (a game address): one matrix per joint of the class's
  * high LOD, F_j = P_j S_j in packed model units (rows: the images of the axes, then the
  * translation). Empty when the moby has no class, no joints or no readable key: draw it as stored.
